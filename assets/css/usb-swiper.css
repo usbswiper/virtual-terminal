@@ -1,0 +1,41 @@
+body .vt-form-wrap {width: 100%;max-width: 1000px;}
+.vt-row {width: 100%;display: flex;}
+.vt-row .vt-col {width: calc(100% - 60px);display: block;background: #FFF;padding: 20px;box-shadow: 0 0 10px #CCC;margin: 0 10px;border-radius: 10px;}
+.vt-row .vt-col-10 {width: calc(10% - 60px);}
+.vt-row .vt-col-20 {width: calc(20% - 60px);}
+.vt-row .vt-col-30 {width: calc(30% - 60px);}
+.vt-row .vt-col-40 {width: calc(40% - 60px);}
+.vt-row .vt-col-50 {width: calc(50% - 60px);}
+.vt-row .vt-col-60 {width: calc(60% - 60px);}
+.vt-row .vt-col-70 {width: calc(70% - 60px);}
+.vt-row .vt-col-80 {width: calc(80% - 60px);}
+.vt-row .vt-col-90 {width: calc(90% - 60px);}
+.vt-row .vt-col-100 {width: calc(100% - 60px);}
+.vt-row fieldset {border: 1px solid #ddd;padding: 10px;margin-bottom: 20px;width: calc( 100% - 20px);display: block;}
+.vt-row fieldset legend {width: auto;background: #f5f5f5;border: 1px solid #ddd;padding: 5px 20px;}
+.vt-fields-wrap {width: 100%;}
+.vt-fields-wrap .input-field-wrap {width: 100%;margin: 20px 0;display: block;}
+.vt-fields-wrap .input-field-wrap label {display: block;width: 100%;font-size: 14px;line-height: 1.42857143;color: #333;font-weight: 700;margin-bottom: 10px;}
+.vt-fields-wrap .input-field-wrap input, .vt-fields-wrap .input-field-wrap select, .vt-fields-wrap .input-field-wrap textarea {display: block;width: calc( 100% - 10px);height: auto;padding: 6px 12px;font-size: 14px;line-height: 1.42857143;color: #555;background-color: #fff;background-image: none;border: 1px solid #ccc;border-radius: 4px;-webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;}
+.vt-fields-wrap .input-field-wrap select { cursor: pointer;}
+.vt-fields-wrap .input-field-wrap .description {font-size: 14px;margin: 5px 0;color: #737373;font-style: italic;}
+.vt-fields-wrap .input-field-wrap label.checkbox-label {width: 50%;display: inline-block;}
+.vt-fields-wrap .input-field-wrap .checkmark-container {width: calc(50% - 10px);display: inline-block;}
+.vt-fields-wrap .input-field-wrap input[type="checkbox"] {width: auto;margin: 0;display: inline-block;}
+.vt-fields-wrap .input-field-wrap .error {font-size: 12px;color: #a94442;margin-top: 10px;}
+.card-form {width: 100%;}
+.card-form .vt-card-field {width: 100%;display: block;margin-bottom: 10px;}
+.card-form .vt-card-field div.card_field {height: 3em;border: 1px solid #CCC;padding: 10px;}
+.card-form .vt-card-field label {width: 100%;display: block;margin-bottom: 5px;font-size: 16px;}
+.card-form .vt-card-details {width: 100%;display: block;}
+.card-form .vt-card-details .vt-card-field-50 {width: calc(50% - 3px);display: inline-block;}
+.vt-form-notification p.notification {width: calc(100% - 20px);margin: 0 10px;padding: 10px;background: #FFF;border: 1px solid #CCC;border-left: 5px solid #ccc;}
+.vt-form-notification {width: 100%;display: block;margin: 10px 0;}
+.vt-form-notification p.notification strong {margin-right: 5px;}
+.vt-form-notification p.notification.error {border-left-color: #d63638;}
+.vt-form-notification p.notification.success {border-left-color: #00a32a;}
+.vt-form-contents {width: 100%;}
+.vt-form-contents .vt-row {width: 100%;display: block;position: relative;}
+.vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
+.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 70px;bottom: auto;width: 25%;}
+.vt-button {color: #ffffff!important;border-width: 0px!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;}
