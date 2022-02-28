@@ -484,9 +484,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 	$get_countries = usb_swiper_get_countries();
 	$get_states = usb_swiper_get_states();
 
-	$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
-	$payment_action = !empty( $Usb_Swiper_PPCP->settings['payment_action'] ) ? $Usb_Swiper_PPCP->settings['payment_action'] : 'capture';
-
 	$form_fields = array(
 		'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
 			array(
@@ -537,11 +534,11 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 					'capture' => __( 'Capture', 'usb-swiper' ),
 					'authorize' => __( 'Authorize', 'usb-swiper' ),
 				),
-				'default' => $payment_action,
+				'default' => 'capture',
 				'attributes' => '',
 				'description' => '',
-				'readonly' => true,
-				'disabled' => true,
+				'readonly' => false,
+				'disabled' => false,
 				'class' => '',
 			),
 			array(
@@ -556,6 +553,9 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				),
 				'description' => '',
 				'class' => '',
+				'is_symbol' => true,
+				'symbol' => '$',
+				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
 				'type' => 'text',
@@ -568,7 +568,10 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 					'pattern' => '([0-9]|\$|,|.)+'
 				),
 				'description' => '',
-				'class' => '',
+				'class' => 'currency-sign',
+				'is_symbol' => true,
+				'symbol' => '$',
+				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
 				'type' => 'text',
@@ -581,7 +584,10 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 					'pattern' => '([0-9]|\$|,|.)+'
 				),
 				'description' => '',
-				'class' => '',
+				'class' => 'currency-sign',
+				'is_symbol' => true,
+				'symbol' => '$',
+				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
 				'type' => 'text',
@@ -594,7 +600,10 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 					'maxlength' => '4'
 				),
 				'description' => '',
-				'class' => '',
+				'class' => 'tax-rate-sign',
+				'is_symbol' => true,
+				'symbol' => '%',
+				'symbol_wrap_class' => 'currency-sign after'
 			),
 			array(
 				'type' => 'text',
@@ -605,7 +614,10 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'readonly' => true,
 				'attributes' => '',
 				'description' => '',
-				'class' => '',
+				'class' => 'currency-sign',
+				'is_symbol' => true,
+				'symbol' => '$',
+				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
 				'type' => 'text',
@@ -616,7 +628,10 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'readonly' => true,
 				'attributes' => '',
 				'description' => '',
-				'class' => '',
+				'class' => 'currency-sign',
+				'is_symbol' => true,
+				'symbol' => '$',
+				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
 				'type' => 'text',
@@ -970,12 +985,17 @@ function usb_swiper_get_html_field( $field ) {
 function usbswiper_get_onboarding_user() {
 
 	$merchant_user = array();
-	if( isset( $_COOKIE['merchant_onboarding_user'] ) && !empty( $_COOKIE['merchant_onboarding_user'] ) ) {
 
-		$merchant_user = json_decode(base64_decode( ($_COOKIE['merchant_onboarding_user'])));
+	if( is_user_logged_in() ) {
+		$merchant_user = get_user_meta( get_current_user_id(),'_merchant_onboarding_user',true);
+		$merchant_user = !empty( $merchant_user ) ? json_decode(base64_decode( ($merchant_user))) : '';
 	}
 
-	return (array)$merchant_user;
+	/*if( isset( $_COOKIE['merchant_onboarding_user'] ) && !empty( $_COOKIE['merchant_onboarding_user'] ) ) {
+		$merchant_user = json_decode(base64_decode( ($_COOKIE['merchant_onboarding_user'])));
+	}*/
+
+	return !empty( $merchant_user ) ? (array)$merchant_user : '';
 }
 
 /**
@@ -994,26 +1014,37 @@ function usbswiper_get_platform_fees( $cart_total ) {
 	}
 
 	$user_id = get_current_user_id();
+	$billing_country = get_user_meta( $user_id, 'billing_country', true);
 	$merchant_response = get_user_meta( $user_id, '_merchant_onboarding_response', true);
 	$merchant_country = !empty( $merchant_response['country'] ) ? $merchant_response['country'] :'';
-	$settings = get_option( 'usb_swiper_settings', true );
-	$partner_fees = !empty( $settings['partner_fees'] ) ? $settings['partner_fees'] : '';
-	$fees = !empty( $partner_fees['fees']) ? $partner_fees['fees'] : '';
+	$settings = usb_swiper_get_settings('partner_fees');
+	$fees = !empty( $settings['fees']) ? $settings['fees'] : '';
+	$default_partner_percentage = !empty( $settings['default_partner_percentage']) ? $settings['default_partner_percentage'] : '';
 
-	$platform_fees = 0;
+	$country = !empty( $billing_country ) ? $billing_country : $merchant_country;
+
+	$country_fees = array();
 	if( !empty( $fees ) && is_array( $fees )) {
 
 		foreach ( $fees as $key => $fee ) {
 
-			if( !empty( $fee['country_code'] ) && !empty( $merchant_country ) && $merchant_country == $fee['country_code'] ) {
+			$country_code = !empty( $fee['country_code'] ) ? $fee['country_code'] : '';
+			if( !empty( $country_code ) ) {
 
-				if( !empty( $fee['percentage'] ) && $fee['percentage'] > 0 ) {
-
-					$percentage = $fee['percentage'];
-					$platform_fees = ( $cart_total * $percentage) / 100;
-				}
+				$country_fees[$country_code] = !empty( $fee['percentage'] ) ? $fee['percentage'] : '';
 			}
 		}
+	}
+
+	$percentage = $default_partner_percentage;
+	if( isset( $country_fees[$country] ) && !empty( $country_fees[$country] ) ) {
+		$percentage = $country_fees[$country];
+	}
+
+	$platform_fees = 0;
+
+	if( !empty( $percentage ) && $percentage > 0 ) {
+		$platform_fees = ( $cart_total * $percentage ) / 100;
 	}
 
 	return !empty( $platform_fees ) ? number_format( $platform_fees, 2, '.', '' ) : 0;

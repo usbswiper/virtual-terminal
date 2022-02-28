@@ -165,6 +165,7 @@ class Usb_Swiper {
 		$this->loader->add_action('template_redirect', $plugin_public, 'template_redirect');
 		$this->loader->add_action('usb_swiper_before_transactions', $plugin_public, 'paypal_disconnect_button');
 		$this->loader->add_action('woocommerce_api_usb_swiper_transaction', $plugin_public, 'handle_usb_swiper_transaction');
+		$this->loader->add_action('wp_logout', $plugin_public, 'wp_logout');
 
 		if (!is_admin()) {
 			return;

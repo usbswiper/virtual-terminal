@@ -159,6 +159,8 @@ class Usb_Swiper_PPCP{
 
 			if ( ! empty( $response ) && ! empty( $response['merchant_id'] ) ) {
 
+			    $country = '';
+
 				$merchant_email = ! empty( $response['primary_email'] ) ? $response['primary_email'] : '';
 
 				if( !empty( $merchant_email ) && is_email( $merchant_email ) ) {
@@ -170,11 +172,13 @@ class Usb_Swiper_PPCP{
 						$user_email = !empty( $user_info->user_email ) ? $user_info->user_email : '';
 						if( !empty( $user_email ) && $user_email != $merchant_email ) {
 							$user_id = $this->create_new_user_by_email($merchant_email);
+							$country = !empty( $response['country'] ) ? $response['country'] : '';
 						}
 
 					} else {
 
 						$user_id = $this->create_new_user_by_email($merchant_email);
+						$country = !empty( $response['country'] ) ? $response['country'] : '';
 					}
 
 					if ( ! is_wp_error( $user_id ) ) {
@@ -190,10 +194,16 @@ class Usb_Swiper_PPCP{
 							)
 						));
 
-						setcookie( 'merchant_onboarding_user', $user_data, time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
+						//setcookie( 'merchant_onboarding_user', $user_data, time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
+
+                        if( !empty( $country ) ) {
+	                        update_user_meta( $user_id, "billing_country", $country );
+                        }
 
 						wc_set_customer_auth_cookie( $user_id );
 						update_user_meta( $user_id, '_merchant_onboarding_response', $response );
+						update_user_meta( $user_id, '_merchant_onboarding_user', $user_data );
+
 
 						$settings = usb_swiper_get_settings('general');
 						$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
