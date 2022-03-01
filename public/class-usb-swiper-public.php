@@ -88,7 +88,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			}
 
 			$smart_js_arg['commit'] = apply_filters( 'usb_swiper_skip_final_review', 'true' );
-			$smart_js_arg['intent'] = ( $this->payment_action === 'capture' ) ? 'capture' : 'authorize';
 			$smart_js_arg['locale'] = self::get_button_locale_code();
 
 			$components = array("buttons","hosted-fields","funding-eligibility","messages");
@@ -334,9 +333,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 		public function usb_swiper_paypal_connect( $args ) {
 
+			$settings = usb_swiper_get_settings('general');
+			$vt_page_id = !empty($settings['virtual_terminal_page']) ? (int)$settings['virtual_terminal_page'] : '';
+
 			$args = shortcode_atts( array(
                 'label' => '',
                 'label2' => __('Login with PayPal','usb-swiper'),
+                'after_login_label' => __('Launch to Terminal','usb-swiper'),
+                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url(),
             ), $args );
 
 			ob_start();
@@ -345,6 +349,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
 				if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
+				    ?>
+                    <div class="vt-form-login-wrap">
+                        <p><a class="vt-button button button-primary" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
+                    </div>
+                    <?php
 
 				} else {
 					$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
@@ -353,19 +362,19 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			} else {
 
-				$settings = usb_swiper_get_settings('general');
+				/*$settings = usb_swiper_get_settings('general');
 				$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
 				if( isset( $_COOKIE['merchant_onboarding_user']) && !empty( $_COOKIE['merchant_onboarding_user'] ) ) {
 					$paypal_login_url = !empty( $vt_page_id ) ? add_query_arg( array( '_nonce' => wp_create_nonce('login-with-paypal'), 'ppcp' => true, 'type'=>'login', ), get_the_permalink($vt_page_id) ): '#';
-					?>
+					*/?><!--
                     <div class="vt-form-login-wrap">
-                        <p><a class="vt-button button button-primary" href="<?php echo !empty( $paypal_login_url ) ? esc_url($paypal_login_url) : ''; ?>"><?php echo !empty( $args['label2'] ) ? $args['label2'] : __('Login with PayPal','usb-swiper'); ?></a></p>
+                        <p><a class="vt-button button button-primary" href="<?php /*echo !empty( $paypal_login_url ) ? esc_url($paypal_login_url) : ''; */?>"><?php /*echo !empty( $args['label2'] ) ? $args['label2'] : __('Login with PayPal','usb-swiper'); */?></a></p>
                     </div>
-					<?php
-				} else {
+					--><?php
+                /*} else {*/
 					$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
 					echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
-				}
+				//}
             }
 
 			$form = ob_get_contents();
@@ -448,7 +457,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if( isset( $_GET['_nonce'] ) && !empty( $_GET['_nonce'] ) && wp_verify_nonce( esc_attr( $_GET['_nonce'] ), 'disconnect-to-paypal' ) && isset($_GET['ppcp'] ) && !empty( $_GET['ppcp'] ) && '1' === $_GET['ppcp'] && !empty( $_GET['type'] ) && 'disconnect' === $_GET['type'] ) {
 
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_response');
-				setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
+				delete_user_meta( get_current_user_id(),'_merchant_onboarding_user');
+				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 				wp_safe_redirect(site_url());
 				exit();
 			}
@@ -723,7 +733,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 									        "value" => $platform_fees
 								        ),
 								        'payee' => array(
-									        //'email_address' => $primary_email,
 									        'merchant_id' => $admin_merchant_id,
 								        ),
 							        )
@@ -858,6 +867,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$user_content = $WC_Email->format_string($user_content);
 			$user_content = $WC_Email->style_inline($user_content);
 			wp_mail($BillingEmail, $user_subject, $user_content, $get_headers);
+		}
+
+		public function wp_logout( $logout_url ) {
+			wp_redirect( home_url() );
+			exit();
 		}
 	}
 }

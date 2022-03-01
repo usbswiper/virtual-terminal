@@ -747,23 +747,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'class' => 'regular-text',
 				    'value' => 'true',
 			    ),
-			    array(
-				    'type' => 'select',
-				    'id' => 'payment_action',
-				    'name' => 'payment_action',
-				    'label' => __('Payment Action', 'usb-swiper'),
-				    'wrapper' => false,
-				    'required' => true,
-				    'options' => array(
-				         'capture' => __( 'Capture', 'usb-swiper'),
-				         'authorize' => __( 'Authorize', 'usb-swiper'),
-                    ),
-				    'default' => 'capture',
-				    'attributes' => '',
-				    'description' => '',
-				    'class' => 'regular-text',
-				    'value' => '',
-			    ),
             );
 
 		    return apply_filters('usb_swiper_get_general_fields', $fields);
@@ -863,7 +846,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	                <?php if( $display_title ) { ?>
                         <label for="partner_fee_percentage_<?php echo $col_id; ?>"><?php _e('Percentage(%)','usb-swiper'); ?></label>
 	                <?php } ?>
-                    <input type="number" min="0" step="0.1" minlength="0" max="100" maxlength="100" class="regular-text" name="partner_fee_percentage_<?php echo $col_id; ?>" id="partner_fee_percentage_<?php echo $col_id; ?>" value="<?php echo esc_attr($percentage); ?>" />
+                    <input type="number" min="0" step="any" minlength="0" max="100" maxlength="100" class="regular-text" name="partner_fee_percentage_<?php echo $col_id; ?>" id="partner_fee_percentage_<?php echo $col_id; ?>" value="<?php echo esc_attr($percentage); ?>" />
                 </td>
                 <td class="partner-fee-actions">
 	                <?php if( $display_title ) { ?>
@@ -894,6 +877,35 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			}
 
 			?>
+            <div class="default-partner-fee-wrap">
+                <table class="form-table">
+                    <tbody>
+                        <tr>
+                            <th for="<?php echo 'default_partner_percentage'; ?>"><?php _e('Default Partner Fee','usb-swiper'); ?></th>
+                            <td>
+                                <?php echo usb_swiper_get_html_field(array(
+	                                'type' => 'number',
+	                                'id' => 'default_partner_percentage',
+	                                'name' => 'default_partner_percentage',
+	                                'label' => '',
+	                                'wrapper' => false,
+	                                'required' => false,
+	                                'attributes' => array(
+                                        'min' => 0,
+                                        'step' => 'any',
+                                        'minlength' => 0,
+                                        'max' => 100,
+                                        'maxlength' => 100,
+                                    ),
+	                                'description' => '',
+	                                'class' => 'regular-text',
+	                                'value' => !empty( $settings['default_partner_percentage'] ) ? $settings['default_partner_percentage'] : '',
+                                ),); ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="add-new-partner-fee-wrap">
                 <button type="button" data-nonce="<?php echo wp_create_nonce('add-partner-fee-nonce'); ?>" class="button button-primary add-new-partner-fee-btn"><?php _e('Add New Fee', 'usb-swiper'); ?></button>
                 <input type="hidden" name="partner_fee_total_row" id="partner_fee_total_row" value="<?php echo $total_fees; ?>">
@@ -978,6 +990,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$usb_swiper_settings = get_option( $setting_key, true );
 
 		    $total_row = !empty( $_POST['partner_fee_total_row'] ) ? (int) $_POST['partner_fee_total_row'] : 0;
+		    $default_partner_percentage = !empty( $_POST['default_partner_percentage'] ) ? $_POST['default_partner_percentage'] : '';
 
 		    if( !empty( $total_row) && $total_row > 0 ) {
 
@@ -1013,6 +1026,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                         )
                     );
 		        }
+
+			    $usb_swiper_settings[$current_section]['default_partner_percentage'] = $default_partner_percentage;
 
 			    update_option( $setting_key, $usb_swiper_settings );
 

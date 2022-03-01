@@ -5,7 +5,7 @@ if( empty($transaction_id)) {
 
 $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits', true);
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
-$credit_card_number = $card_last_digits.'('.$card_brand.')';
+$credit_card_number = $card_last_digits.' ('.$card_brand.')';
 if( empty( $card_last_digits )) {
 	$credit_card_number = __('Credit Card','usb-swiper');
 }
@@ -53,15 +53,9 @@ if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
     <div class="transaction-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Transaction details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
-            <thead>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Items','usb-swiper'); ?></th>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php _e('Total','usb-swiper'); ?></th>
-                </tr>
-            </thead>
             <tbody>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Transaction Amount','usb-swiper'); ?><?php echo !empty( $ItemName) ? '('.$ItemName.')': ''; ?></th>
+                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $ItemName) ? $ItemName : ''; ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($NetAmount); ?></td>
                 </tr>
                 <tr>
@@ -188,17 +182,17 @@ if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Source','usb-swiper'); ?></th>
                     <?php if( !empty( $payment_card_number ) ) {  ?>
-                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo sprintf( '%s( %s ) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
+                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo sprintf( '%s (%s) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
                     <?php } else { ?>
                         <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo $credit_card_number; ?></td>
                     <?php } ?>
                 </tr>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment CreatedAt','usb-swiper'); ?></th>
+                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Created At','usb-swiper'); ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_create_time ) ? date('Y/m/d g:i a', strtotime($payment_create_time)) : ''; ?></td>
                 </tr>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment UpdatedAt','usb-swiper'); ?></th>
+                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Updated At','usb-swiper'); ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_update_time ) ? date('Y/m/d g:i a', strtotime($payment_update_time)) : ''; ?></td>
                 </tr>
             </tbody>

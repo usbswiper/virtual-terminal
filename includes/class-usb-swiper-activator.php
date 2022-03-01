@@ -42,7 +42,6 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 					'general' => array(
 						'virtual_terminal_page' => $vt_page_id,
 						'is_paypal_sandbox' => false,
-						'payment_action' => 'capture',
 					),
 					'partner_fees' => array(
 						'fees' => array(

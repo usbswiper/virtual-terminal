@@ -29,6 +29,9 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 				'multiple' => false,
                 'autocomplete' => 'off',
                 'settings' => array(),
+                'is_symbol' => false,
+                'symbol' => '',
+                'symbol_wrap_class' => '',
 			);
 		}
 
@@ -102,15 +105,25 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 				}
 			}
 
+			$is_symbol = !empty( $args['is_symbol'] ) ? $args['is_symbol'] : '';
+			$symbol = !empty( $args['symbol'] ) ? $args['symbol'] : '';
+			$symbol_wrap_class = !empty( $args['symbol_wrap_class'] ) ? $args['symbol_wrap_class'] : '';
+
 			ob_start();
 
 			echo $this->wrapper_start($args);
 
 			    echo  $this->label($args);
-			    ?>
-                <input autocomplete="<?php echo $autocomplete; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $required.' '.$disable.' '.$readonly.' '.$attributes; ?> class="<?php echo !empty($args['class']) ? $args['class'] : ''; ?>" type="<?php echo !empty($args['type']) ? $args['type'] : ''; ?>" name="<?php echo !empty($args['name']) ? $args['name'] : ''; ?>" id="<?php echo !empty($args['id']) ? $args['id'] : ''; ?>" value="<?php echo $value; ?>">
-				<?php
 
+			    if( $is_symbol ) { ?>
+			        <div class="sign <?php echo $symbol_wrap_class; ?>">
+			            <div class="sign-symbol"><?php echo $symbol; ?></div>
+			            <input autocomplete="<?php echo $autocomplete; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $required.' '.$disable.' '.$readonly.' '.$attributes; ?> class="<?php echo !empty($args['class']) ? $args['class'] : ''; ?>" type="<?php echo !empty($args['type']) ? $args['type'] : ''; ?>" name="<?php echo !empty($args['name']) ? $args['name'] : ''; ?>" id="<?php echo !empty($args['id']) ? $args['id'] : ''; ?>" value="<?php echo $value; ?>">
+                    </div>
+			    <?php } else { ?>
+                    <input autocomplete="<?php echo $autocomplete; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $required.' '.$disable.' '.$readonly.' '.$attributes; ?> class="<?php echo !empty($args['class']) ? $args['class'] : ''; ?>" type="<?php echo !empty($args['type']) ? $args['type'] : ''; ?>" name="<?php echo !empty($args['name']) ? $args['name'] : ''; ?>" id="<?php echo !empty($args['id']) ? $args['id'] : ''; ?>" value="<?php echo $value; ?>">
+                    <?php
+                }
 			    echo  $this->description($args);
 
 			echo $this->wrapper_end($args);

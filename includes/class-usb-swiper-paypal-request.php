@@ -28,7 +28,6 @@ class Usb_Swiper_Paypal_request{
 		$this->landing_page = apply_filters( 'usb_swiper_landing_page', 'NO_PREFERENCE');
 		$this->advanced_card_payments = apply_filters( 'usb_swiper_advanced_card_payments', 'yes');
 		$this->enable_checkout_button = apply_filters( 'usb_swiper_enable_checkout_button', 'yes');
-		$this->paymentaction = !empty( $settings['payment_action'] ) ? $settings['payment_action']: 'capture';
 		$this->payee_preferred = 'yes' === apply_filters( 'usb_swiper_payee_preferred', 'no');
 		$this->soft_descriptor = 'yes' === apply_filters( 'usb_swiper_soft_descriptor', '');
 
@@ -235,10 +234,12 @@ class Usb_Swiper_Paypal_request{
 			$reference_id .= '_'.$InvoiceID;
 		}
 
-		$intent = ($this->paymentaction === 'capture') ? 'CAPTURE' : 'AUTHORIZE';
+		$payment_action = get_post_meta( $transaction_id,'TransactionType', true);
+
+		$intent = ($payment_action === 'capture') ? 'CAPTURE' : 'AUTHORIZE';
 		$order_total = get_post_meta($transaction_id,'GrandTotal',true);
 
-		update_post_meta( $transaction_id,'_payment_action', $this->paymentaction);
+		update_post_meta( $transaction_id,'_payment_action', $payment_action);
 
 		$body_request = array(
 			'intent' => $intent,
@@ -263,7 +264,7 @@ class Usb_Swiper_Paypal_request{
 		$body_request['purchase_units'][0]['soft_descriptor'] = $this->soft_descriptor;
 
 		$platform_fees = usbswiper_get_platform_fees( $order_total );
-		if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $this->paymentaction ) {
+		if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $payment_action ) {
 
 			if ($this->is_sandbox) {
 				$admin_merchant_id = USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID;
@@ -375,10 +376,12 @@ class Usb_Swiper_Paypal_request{
 	public function handle_cc_transaction_request( $paypal_transaction_id ) {
 
 		$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
+		$payment_action = get_post_meta( $transaction_id,'TransactionType', true);
+		$payment_action = !empty( $payment_action ) ? $payment_action : 'capture';
 
 		$this->api_log->log("Action: Capture Order", $transaction_id);
 
-		if ($this->paymentaction === 'capture') {
+		if ($payment_action === 'capture') {
 
 			$args = array(
 				'method' => 'POST',
@@ -416,7 +419,7 @@ class Usb_Swiper_Paypal_request{
 
 		}
 
-		update_post_meta( $transaction_id,'_payment_action', $this->paymentaction);
+		update_post_meta( $transaction_id,'_payment_action', $payment_action);
 		update_post_meta( $transaction_id,'_environment', ($this->is_sandbox) ? 'sandbox' : 'live');
 
 		return $this->api_response;
