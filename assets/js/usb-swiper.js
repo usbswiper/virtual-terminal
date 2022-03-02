@@ -55,13 +55,11 @@ jQuery( document ).ready(function( $ ) {
                             return res.json();
                         }).then(function (data) {
 
-                            if (typeof data.success !== 'undefined') {
-s
+                            if( data.orderID ) {
+                                return  data.orderID;
                             } else {
-                                return data.orderID;
+                                set_notification(data.message, 'error', data.message_type);
                             }
-
-                            return data.orderID;
                         });
                     }
                 },
@@ -84,7 +82,6 @@ s
                     }
                 }
             }).then(function (hf) {
-                console.log(hf);
                 hf.on('cardTypeChange', function (event) {
                     if (event.cards.length === 1) {
 
@@ -126,8 +123,12 @@ s
                                             $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                         }
                                     });
+                                } else{
+                                    set_notification(data.message, 'error', data.message_type);
+                                    $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 }
-                            }, function (error) {
+                            },
+                            function (error) {
                                 set_notification(error.message, 'error', error.name);
                                 $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                             }
@@ -197,4 +198,16 @@ s
     }
 
     render_cc_form();
+
+    $(document).on('change','#TransactionCurrency', function () {
+        $('form#ae-paypal-pos-form').addClass('processing').block({
+            message: null,
+            overlayCSS: {
+                background: '#fff',
+                opacity: 0.6
+            }
+        });
+        window.location.href = usb_swiper_settings.vt_page_url+'?'+$(this).attr('name')+'='+$(this).val();
+
+    });
 });

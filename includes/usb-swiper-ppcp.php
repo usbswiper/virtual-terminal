@@ -111,7 +111,8 @@ class Usb_Swiper_PPCP{
 				),
 			);
 
-			return $this->api_request->request($url, $args, 'seller_onboarding_status');
+			$file_name = 'onboarding-'.date('Y-m-d');
+			return $this->api_request->request($url, $args, 'seller_onboarding_status', $file_name);
 
 		} catch (Exception $ex) {
 
@@ -160,6 +161,7 @@ class Usb_Swiper_PPCP{
 			if ( ! empty( $response ) && ! empty( $response['merchant_id'] ) ) {
 
 			    $country = '';
+			    $primary_currency = '';
 
 				$merchant_email = ! empty( $response['primary_email'] ) ? $response['primary_email'] : '';
 
@@ -173,12 +175,14 @@ class Usb_Swiper_PPCP{
 						if( !empty( $user_email ) && $user_email != $merchant_email ) {
 							$user_id = $this->create_new_user_by_email($merchant_email);
 							$country = !empty( $response['country'] ) ? $response['country'] : '';
+							$primary_currency = !empty( $response['primary_currency'] ) ? $response['primary_currency'] : '';
 						}
 
 					} else {
 
 						$user_id = $this->create_new_user_by_email($merchant_email);
 						$country = !empty( $response['country'] ) ? $response['country'] : '';
+						$primary_currency = !empty( $response['primary_currency'] ) ? $response['primary_currency'] : '';
 					}
 
 					if ( ! is_wp_error( $user_id ) ) {
@@ -199,6 +203,10 @@ class Usb_Swiper_PPCP{
                         if( !empty( $country ) ) {
 	                        update_user_meta( $user_id, "billing_country", $country );
                         }
+
+						if( !empty( $primary_currency ) ) {
+							update_user_meta( $user_id, "_primary_currency", $primary_currency );
+						}
 
 						wc_set_customer_auth_cookie( $user_id );
 						update_user_meta( $user_id, '_merchant_onboarding_response', $response );

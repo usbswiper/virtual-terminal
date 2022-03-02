@@ -526,6 +526,20 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
 			array(
 				'type' => 'select',
+				'id' => 'TransactionCurrency',
+				'name' => 'TransactionCurrency',
+				'label' => __( 'Currency', 'usb-swiper'),
+				'required' => true,
+				'options' => usbswiper_get_currency_code_options(),
+				'default' => usbswiper_get_default_currency(),
+				'attributes' => '',
+				'description' => '',
+				'readonly' => false,
+				'disabled' => false,
+				'class' => 'usbswiper-change-currency',
+			),
+			array(
+				'type' => 'select',
 				'id' => 'TransactionType',
 				'name' => 'TransactionType',
 				'label' => __( 'Transaction Type', 'usb-swiper'),
@@ -554,7 +568,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'description' => '',
 				'class' => '',
 				'is_symbol' => true,
-				'symbol' => '$',
+				'symbol' => usbswiper_get_currency_symbol(),
 				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
@@ -570,7 +584,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'description' => '',
 				'class' => 'currency-sign',
 				'is_symbol' => true,
-				'symbol' => '$',
+				'symbol' => usbswiper_get_currency_symbol(),
 				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
@@ -586,7 +600,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'description' => '',
 				'class' => 'currency-sign',
 				'is_symbol' => true,
-				'symbol' => '$',
+				'symbol' => usbswiper_get_currency_symbol(),
 				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
@@ -616,7 +630,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'description' => '',
 				'class' => 'currency-sign',
 				'is_symbol' => true,
-				'symbol' => '$',
+				'symbol' => usbswiper_get_currency_symbol(),
 				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
@@ -630,7 +644,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'description' => '',
 				'class' => 'currency-sign',
 				'is_symbol' => true,
-				'symbol' => '$',
+				'symbol' => usbswiper_get_currency_symbol(),
 				'symbol_wrap_class' => 'currency-sign'
 			),
 			array(
@@ -1153,4 +1167,41 @@ if( !function_exists( 'usb_swiper_get_unique_id_data') ) {
 
 		return $unique_id_data;
 	}
+}
+
+function usbswiper_get_currency_code_options() {
+
+	$currency_code_options = get_woocommerce_currencies();
+
+	foreach ( $currency_code_options as $code => $name ) {
+		$currency_code_options[ $code ] = $name . ' (' . get_woocommerce_currency_symbol( $code ) . ')';
+	}
+
+	return $currency_code_options;
+}
+
+function usbswiper_get_default_currency( $user_id = 0 ) {
+
+	if( empty( $user_id ) ) {
+		$user_id = get_current_user_id();
+	}
+
+	$currency = 'USD';
+	if( is_user_logged_in() ) {
+		$currency = get_user_meta( $user_id, '_primary_currency', true);
+		$currency = !empty( $currency ) ? $currency : 'USD';
+	}
+
+	if( isset($_GET['TransactionCurrency']) && !empty( $_GET['TransactionCurrency'])) {
+		$currency = esc_html($_GET['TransactionCurrency']);
+	}
+
+	return $currency;
+}
+
+function usbswiper_get_currency_symbol() {
+
+	$currency = usbswiper_get_default_currency();
+
+	return get_woocommerce_currency_symbol( $currency );
 }

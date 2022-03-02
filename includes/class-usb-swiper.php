@@ -166,6 +166,8 @@ class Usb_Swiper {
 		$this->loader->add_action('usb_swiper_before_transactions', $plugin_public, 'paypal_disconnect_button');
 		$this->loader->add_action('woocommerce_api_usb_swiper_transaction', $plugin_public, 'handle_usb_swiper_transaction');
 		$this->loader->add_action('wp_logout', $plugin_public, 'wp_logout');
+		$this->loader->add_action('woocommerce_edit_account_form', $plugin_public, 'wc_edit_account_form');
+		$this->loader->add_action('woocommerce_save_account_details', $plugin_public, 'wc_save_account_details');
 
 		if (!is_admin()) {
 			return;
@@ -184,10 +186,15 @@ class Usb_Swiper {
 		$this->loader->add_filter('parse_query', $plugin_admin, 'parse_query_filter');
 		$this->loader->add_action('usb_swiper_section_content_general', $plugin_admin, 'general_settings');
 		$this->loader->add_action('usb_swiper_section_content_partner_fees', $plugin_admin, 'partner_fees_settings');
+		$this->loader->add_action('usb_swiper_section_content_logs', $plugin_admin, 'logs_settings');
 		$this->loader->add_action('usb_swiper_save_section_partner_fees', $plugin_admin, 'save_partner_fees');
 		$this->loader->add_action('usb_swiper_section_content_uninstall', $plugin_admin, 'uninstall_settings');
 		$this->loader->add_action('wp_ajax_insert_new_partner_fee', $plugin_admin, 'insert_new_partner_fee');
 		$this->loader->add_action('wp_ajax_remove_partner_fee', $plugin_admin, 'remove_partner_fee');
+		$this->loader->add_action( 'show_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
+		$this->loader->add_action( 'edit_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
+		$this->loader->add_action( 'personal_options_update', $plugin_admin, 'save_customer_meta_fields' );
+		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'save_customer_meta_fields' );
 	}
 
 	/**

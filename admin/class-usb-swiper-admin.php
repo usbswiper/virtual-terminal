@@ -351,9 +351,13 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     echo !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
                     break;
 				case 'grand_total':
-
+					if( !class_exists('Usb_Swiper_Paypal_request') ) {
+						include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+					}
+					$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+					$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $post_id);
 					$grand_total = get_post_meta( $post_id, 'GrandTotal', true );
-					echo !empty( $grand_total ) ? wc_price($grand_total) : '';
+					echo !empty( $grand_total ) ? wc_price($grand_total, array('currency' => $transaction_currency)) : '';
 					break;
 				case 'payment_status' :
 					$payment_status = !empty( $payment_authorizations['status'] ) ? $payment_authorizations['status'] : '';
@@ -465,6 +469,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			return $current_menu;
 		}
 
+		public function exclude_form_tab() {
+
+		    return apply_filters( 'usb_swiper_exclude_form_tab' , array('logs'));
+		}
+
 		/**
 		 * Get menu items.
 		 *
@@ -477,6 +486,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				array(
 					''              => __( 'General', 'usb-swiper' ),
 					'partner_fees'  => __( 'Partner Fees', 'usb-swiper' ),
+					'logs'  => __( 'Logs', 'usb-swiper' ),
 					'uninstall'     => __( 'Uninstall', 'usb-swiper' ),
 				)
 			);
@@ -603,6 +613,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 			$current_page    = $this->current_page();
 			$current_section = $this->current_section();
+			$exclude_form_tab = $this->exclude_form_tab();
 			?>
             <div class="usb-swiper-wrap wrap">
                 <div class="nav-wrap">
@@ -612,8 +623,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     <?php
                     $this->heading_title();
                     $this->notification();
-                    ?>
+
+                    if( !in_array($current_section,$exclude_form_tab)) { ?>
                     <form method="post" id="usb_swiper_form" action="" enctype="multipart/form-data">
+                    <?php } ?>
+
                         <div class="content-wrap">
 	                        <?php
 	                        do_action( 'usb_swiper_section_before_content', $current_section );
@@ -630,6 +644,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	                        do_action( 'usb_swiper_section_after_content', $current_section );
 	                        ?>
                         </div>
+                        <?php if( !in_array($current_section,$exclude_form_tab)) { ?>
                         <p class="submit <?php echo ! empty( $current_section ) ? esc_attr( $current_section ) : ''; ?> ">
                             <button name="save" class="button-primary" type="submit" value="submit"><?php esc_attr_e( 'Save changes', 'usb-swiper' ); ?></button>
                             <input type="hidden" name="action" value="usb_swiper_settings">
@@ -638,6 +653,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                             <input type="hidden" name="current_section" value="<?php echo esc_attr( $current_section ); ?>">
                         </p>
                     </form>
+                    <?php } ?>
                 </div>
             </div>
             <?php
@@ -1106,6 +1122,82 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			}
 
 			return $fee_html;
+		}
+
+		public function logs_settings() {
+
+		    $Usb_Swiper_Log = new Usb_Swiper_Log();
+            $logs = $Usb_Swiper_Log->get_log_files();
+			$log_filter = !empty( $_POST['log_filter']) ? $_POST['log_filter'] : $Usb_Swiper_Log->handle.'.log';
+		    ?>
+            <div class="usb-swiper-log-filter">
+                <h2><?php echo esc_html($log_filter); ?></h2>
+                <form method="post" name="log_filter_form" id="log_filter_form">
+                    <select class="regular-text" name="log_filter" id="log_filter">
+                        <?php
+                        if( !empty( $logs ) && is_array( $logs ) ) {
+                            foreach ( $logs as $log ) {
+	                            if( !empty( $log ) ) {
+		                            $log_to_array = explode( '.', $log );
+		                            $file_ext     = ! empty( $log_to_array ) ? end( $log_to_array ) : '';
+		                            if ( ! empty( $file_ext ) && 'log' === $file_ext ) {
+			                            ?>
+                                        <option <?php selected($log_filter, $log); ?> value="<?php echo $log; ?>"><?php echo $log; ?></option>
+			                            <?php
+		                            }
+	                            }
+                            }
+                        }
+                        ?>
+                    </select>
+                    <button class="button button-primary" type="submit" name="log_btn" id="log_btn"><?php _e('View Log', 'usb-swiper'); ?></button>
+                </form>
+            </div>
+            <div class="jc-log-viewer">
+                <pre><?php echo $Usb_Swiper_Log->get_log_content($log_filter); ?></pre>
+            </div>
+            <?php
+		}
+
+		public function add_customer_meta_fields( $user ) {
+
+		    $user_id = !empty( $user->ID ) ? $user->ID : 0;
+
+		    ?>
+            <h2><?php _e('Currency Setting','usb-swiper') ?></h2>
+            <table class="form-table">
+                <tbody>
+                    <tr>
+                        <th><?php _e('Currency','usb-swiper') ?></th>
+                        <td>
+	                        <?php
+	                        echo  usb_swiper_get_html_field( array(
+		                        'type' => 'select',
+		                        'id' => 'TransactionCurrency',
+		                        'name' => 'TransactionCurrency',
+		                        'label' => '',
+		                        'required' => true,
+		                        'options' => usbswiper_get_currency_code_options(),
+		                        'default' => usbswiper_get_default_currency( $user_id ),
+		                        'attributes' => '',
+		                        'description' => '',
+		                        'readonly' => false,
+		                        'disabled' => false,
+		                        'class' => '',
+		                        'wrapper' => false
+	                        ));
+	                        ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <?php
+		}
+
+		public function save_customer_meta_fields( $user_id ) {
+
+		    $currency = !empty( $_POST[ 'TransactionCurrency' ] ) ? $_POST[ 'TransactionCurrency' ] : 'USD';
+			update_user_meta( $user_id, '_primary_currency',  $currency);
 		}
 	}
 }

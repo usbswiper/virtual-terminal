@@ -36,6 +36,12 @@ if( $has_transactions ) : ?>
 	                    $payment_action = 'CAPTURE';
                         $payment_status = !empty( $payment_captures['status'] ) ? $payment_captures['status'] : '';
                     }
+
+                    if( !class_exists('Usb_Swiper_Paypal_request') ) {
+                        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+                    }
+                    $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+                    $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $id );
                     ?>
 				<tr class="woocommerce-transactions-table__row woocommerce-transactions-table__row--status-<?php echo esc_attr( $payment_status ); ?> transactions">
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo $id; ?></td>
@@ -43,7 +49,7 @@ if( $has_transactions ) : ?>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_response['id'] ) ? $payment_response['id'] : ''; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-status"><?php echo !empty( $payment_status ) ? esc_attr($payment_status) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-type"><?php echo !empty( $payment_action ) ? strtoupper(esc_attr( $payment_action )) : '-'; ?></td>
-					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-total"><?php echo !empty( $grand_total ) ? wc_price(esc_attr( $grand_total )) : '-'; ?></td>
+					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-total"><?php echo !empty( $grand_total ) ? wc_price(esc_attr( $grand_total ), array('currency' => $transaction_currency)) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-date"><?php echo esc_attr( get_the_time( __( 'Y/m/d g:i a' ), $transaction ) ); ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions">
 						<a href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
