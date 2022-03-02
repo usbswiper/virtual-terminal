@@ -99,7 +99,7 @@ class Usb_Swiper_Onboarding{
             ),
 		);
 
-		return $this->api_request->request($host_url, $args, 'signup-link');
+		return $this->api_request->request($host_url, $args, 'signup-link' );
 	}
 
 	public function paypal_signup_button( $url, $id, $label ) {

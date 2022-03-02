@@ -120,7 +120,7 @@ class Usb_Swiper_Paypal_request{
 		return !empty( $response['access_token'] ) ? $response['access_token'] : '';
 	}
 
-	public function request( $url, $args, $action_name = 'default' ) {
+	public function request( $url, $args, $action_name = 'default', $log_file = '' ) {
 
 		try {
 
@@ -131,14 +131,14 @@ class Usb_Swiper_Paypal_request{
 
 			$this->result = wp_remote_get($url, $args);
 
-			return $this->parse_response($this->result, $url, $args, $action_name);
+			return $this->parse_response($this->result, $url, $args, $action_name, $log_file);
 
 		} catch (Exception $ex) {
 
 		}
 	}
 
-	public function parse_response($paypal_api_response, $url, $request, $action_name) {
+	public function parse_response($paypal_api_response, $url, $request, $action_name, $log_file= '') {
 
 		try {
 			if ( is_wp_error($paypal_api_response) ) {
@@ -162,22 +162,22 @@ class Usb_Swiper_Paypal_request{
 					do_action('usb_swiper_request_respose_data', $request, $response, $action_name);
 				}
 
-				$this->api_log->log("Action: ".ucwords(str_replace('_', ' ', $action_name)));
-				$this->api_log->log('Request URL: '.$url);
+				$this->api_log->log("Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
+				$this->api_log->log('Request URL: '.$url, $log_file);
 				if ( !empty($request['body']) && is_array($request['body']) ) {
-					$this->api_log->log( 'Request Body: ' . print_r( $request, true ) );
+					$this->api_log->log( 'Request Body: ' . print_r( $request, true ), $log_file );
 				} elseif ( !empty($request['body']) && is_string($request['body']) ) {
-					$this->api_log->log( 'Request Body: ' . print_r(json_decode($request['body'], true), true));
+					$this->api_log->log( 'Request Body: ' . print_r(json_decode($request['body'], true), true), $log_file);
 				}
 
-				$this->api_log->log('Response Code: '.$status_code);
-				$this->api_log->log('Response Message: '.wp_remote_retrieve_response_message($paypal_api_response));
+				$this->api_log->log('Response Code: '.$status_code, $log_file);
+				$this->api_log->log('Response Message: '.wp_remote_retrieve_response_message($paypal_api_response), $log_file);
 				if ( !empty( $response['body']) && is_array($response['body'])) {
-					$this->api_log->log('Response Body: ' . print_r($response['body'], true));
+					$this->api_log->log('Response Body: ' . print_r($response['body'], true), $log_file);
 				} elseif ( !empty($response) && is_array($response)) {
-					$this->api_log->log('Response Body: ' . print_r($response, true));
+					$this->api_log->log('Response Body: ' . print_r($response, true), $log_file);
 				} else {
-					$this->api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($response), true), true));
+					$this->api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($response), true), true), $log_file);
 				}
 
 				return $response;
@@ -192,7 +192,7 @@ class Usb_Swiper_Paypal_request{
 		$currency_code = get_woocommerce_currency();
 		if( !empty( $transaction_id ) && $transaction_id > 0 ) {
 
-			$transaction_currency = get_post_meta($transaction_id,'wc_transaction_currency', true);
+			$transaction_currency = get_post_meta($transaction_id,'TransactionCurrency', true);
 			if( !empty( $transaction_currency ) ) {
 				$currency_code = $transaction_currency;
 			}
@@ -362,13 +362,7 @@ class Usb_Swiper_Paypal_request{
 			'body' => json_encode($body_request),
 		);
 
-		$this->api_log->log("Action: Create Order", $transaction_id);
-		$this->api_log->log("Request URL: ".$this->paypal_order_api, $transaction_id);
-		$this->api_log->log("Request Body: ".print_r($body_request, true), $transaction_id, true);
-
-		$this->api_response = $this->request($this->paypal_order_api, $args, 'create_order');
-
-		$this->api_log->log("Response Body: ".print_r($this->api_response, true), $transaction_id, true);
+		$this->api_response = $this->request($this->paypal_order_api, $args, 'create_order', $transaction_id );
 
 		return $this->api_response;
 	}
@@ -378,8 +372,6 @@ class Usb_Swiper_Paypal_request{
 		$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
 		$payment_action = get_post_meta( $transaction_id,'TransactionType', true);
 		$payment_action = !empty( $payment_action ) ? $payment_action : 'capture';
-
-		$this->api_log->log("Action: Capture Order", $transaction_id);
 
 		if ($payment_action === 'capture') {
 
@@ -395,9 +387,7 @@ class Usb_Swiper_Paypal_request{
 				),
 			);
 
-			$this->api_log->log("Request URL: ".$this->paypal_order_api . $paypal_transaction_id . '/capture', $transaction_id);
-			$this->api_response = $this->request($this->paypal_order_api . $paypal_transaction_id . '/capture', $args, 'capture_order');
-			$this->api_log->log("Response Body: ".print_r($this->api_response, true), $transaction_id, true);
+			$this->api_response = $this->request($this->paypal_order_api . $paypal_transaction_id . '/capture', $args, 'capture_order', $transaction_id);
 
 		} else {
 
@@ -413,10 +403,7 @@ class Usb_Swiper_Paypal_request{
 				),
 			);
 
-			$this->api_log->log("Request URL: ".$this->paypal_order_api . $paypal_transaction_id . '/authorize', $transaction_id);
-			$this->api_response = $this->request($this->paypal_order_api . $paypal_transaction_id . '/authorize', $args, 'authorize_order');
-			$this->api_log->log("Response Body: ".print_r($this->api_response, true), $transaction_id, true);
-
+			$this->api_response = $this->request($this->paypal_order_api . $paypal_transaction_id . '/authorize', $args, 'authorize_order', $transaction_id);
 		}
 
 		update_post_meta( $transaction_id,'_payment_action', $payment_action);

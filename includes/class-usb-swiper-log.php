@@ -20,7 +20,7 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 		 * @access public
 		 * @var string
 		 */
-		public $handle = 'usb-swiper';
+		public $handle = 'USBSwiper';
 
 		/**
 		 * Paypal environment.
@@ -162,6 +162,43 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			}
 
 			return $logs;
+		}
+
+		public function get_log_files() {
+
+			$upload_dir = wp_upload_dir();
+			$basedir = !empty( $upload_dir['basedir']) ? $upload_dir['basedir'] : '';
+			$log_files = scandir($basedir.'/'.$this->handle);
+
+			$files = array(
+				$this->handle.'.log',
+			);
+
+			if( !empty( $log_files ) && is_array( $log_files ) ) {
+
+				foreach ( $log_files as $key => $log_file ) {
+					if ( str_contains( $log_file, $this->handle . '-onboarding-' ) ) {
+						$files[] = $log_file;
+					}
+				}
+			}
+
+			return $files;
+		}
+
+		public function get_log_content( $log ) {
+			$upload_dir = wp_upload_dir();
+			$basedir = !empty( $upload_dir['basedir']) ? $upload_dir['basedir'] : '';
+
+			$file = $basedir.'/'.$this->handle.'/'.$log;
+
+			$log_content = '';
+			if( file_exists( $file ) ) {
+
+				$log_content = esc_html( file_get_contents( $file ) );
+			}
+
+			return $log_content;
 		}
 	}
 }

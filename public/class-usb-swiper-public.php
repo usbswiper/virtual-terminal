@@ -67,7 +67,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$smart_js_arg = array();
 
 			$this->currency_list = array('AUD', 'BRL', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'INR', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'GBP', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD');
-			$this->currency = in_array(get_woocommerce_currency(), $this->currency_list) ? get_woocommerce_currency() : 'USD';
+			$this->currency = in_array(usbswiper_get_default_currency(), $this->currency_list) ? usbswiper_get_default_currency() : 'USD';
 
 			$smart_js_arg['currency'] = $this->currency;
 
@@ -200,6 +200,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_layout' => apply_filters('usb_swiper_smart_button_style_layout','vertical'),
 					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
+                    'vt_page_url' => get_the_permalink($vt_page_id),
 				) );
 			}
 
@@ -578,7 +579,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				usb_swiper_set_session('usb_swiper_woo_transaction_id', $transaction_id);
 
-			    update_post_meta($transaction_id,'wc_transaction_currency', get_woocommerce_currency());
+			    //update_post_meta($transaction_id,'wc_transaction_currency', get_woocommerce_currency());
 
 			    if( !empty( $transaction ) && is_array( $transaction ) ) {
 			        foreach ( $transaction as $key => $value ) {
@@ -603,10 +604,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					wp_delete_post($transaction_id);
 				    $message_name = !empty( $response['name'] ) ? $response['name'] :'';
 				    $message = !empty( $response['message'] ) ? $response['message'] :'';
+				    $details = !empty( $response['details'][0] ) ? $response['details'][0] :'';
+
 					wp_send_json( array(
 					        'status' => 'error',
-                            'message' => $message,
-                            'message_type' => $message_name,
+                            'message' => !empty( $details['description'] ) ? $details['description'] : $message,
+                            'message_type' => !empty( $details['issue'] ) ? $details['issue'] : $message_name,
                     ), 200 );
 				}
 			}
@@ -756,9 +759,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				            $args['body'] = json_encode($body_request);
 				        }
 
-				        $this->api_log->log("Request URL: ".$capture_url, $post_id);
-				        $this->api_response = $Paypal_request->request($capture_url, $args, 'capture_authorized_order');
-				        $this->api_log->log("Capture Authorized Order Response Body: ".print_r($this->api_response, true), $post_id);
+				        $this->api_response = $Paypal_request->request($capture_url, $args, 'capture_authorized_order', $post_id);
+
 				        if( !empty( $this->api_response['id'] ) ) {
 
 					        $order_args = array(
@@ -773,8 +775,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						        ),
 					        );
 
-					        $response = $Paypal_request->request($Paypal_request->order_url.$paypal_transaction_id, $order_args, 'order_response');
-					        $this->api_log->log("Response Body: ".print_r($response, true), $post_id);
+					        $response = $Paypal_request->request($Paypal_request->order_url.$paypal_transaction_id, $order_args, 'order_response', $post_id);
 					        update_post_meta($post_id, '_payment_response', $response);
 					        $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
 					        update_post_meta($post_id, '_payment_status', $payment_status);
@@ -872,6 +873,39 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		public function wp_logout( $logout_url ) {
 			wp_redirect( home_url() );
 			exit();
+		}
+
+		public function wc_edit_account_form() {
+
+		    ?>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+	            <?php
+	            echo  usb_swiper_get_html_field( array(
+		            'type' => 'select',
+		            'id' => 'TransactionCurrency',
+		            'name' => 'TransactionCurrency',
+		            'label' => __( 'Currency', 'usb-swiper'),
+		            'required' => true,
+		            'options' => usbswiper_get_currency_code_options(),
+		            'default' => usbswiper_get_default_currency(),
+		            'attributes' => '',
+		            'description' => '',
+		            'readonly' => false,
+		            'disabled' => false,
+		            'class' => '',
+                    'wrapper' => false
+	            ));
+	            ?>
+            </p>
+            <?php
+		}
+
+		public function wc_save_account_details( $user_id ) {
+
+			if ( is_user_logged_in() ) {
+				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
+				update_user_meta( $user_id, "_primary_currency", $primary_currency );
+			}
 		}
 	}
 }

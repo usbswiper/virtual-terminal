@@ -39,7 +39,11 @@ if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
 	$payment_create_time = !empty( $payment_captures['create_time'] ) ? $payment_captures['create_time'] : '';
 	$payment_update_time = !empty( $payment_captures['update_time'] ) ? $payment_captures['update_time'] : '';
 }
-
+if( !class_exists('Usb_Swiper_Paypal_request') ) {
+	include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+}
+$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 ?>
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
     <div class="transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
@@ -56,23 +60,23 @@ if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
             <tbody>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $ItemName) ? $ItemName : ''; ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($NetAmount); ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($NetAmount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Shipping Amount','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($ShippingAmount); ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($ShippingAmount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Handling Amount','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($HandlingAmount); ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($HandlingAmount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Tax Amount','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($TaxAmount); ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($TaxAmount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Grand Total','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($GrandTotal); ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($GrandTotal, array('currency' => $transaction_currency)); ?></td>
                 </tr>
             </tbody>
         </table>
