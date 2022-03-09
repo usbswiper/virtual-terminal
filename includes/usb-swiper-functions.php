@@ -521,7 +521,19 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				),
 				'description' => '',
 				'class' => '',
-			)
+			),
+			array(
+				'type' => 'text',
+				'id' => 'BillingEmail',
+				'name' => 'BillingEmail',
+				'label' => __( 'Email Address', 'usb-swiper'),
+				'required' => true,
+				'options' => array(),
+				'attributes' => array(
+					//'maxlength' => 25
+				),
+				'class' => '',
+			),
 		)),
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
 			array(
@@ -779,18 +791,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'options' => array(),
 				'attributes' => array(
 					'maxlength' => 25
-				),
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingEmail',
-				'name' => 'BillingEmail',
-				'label' => __( 'Email Address', 'usb-swiper'),
-				'required' => false,
-				'options' => array(),
-				'attributes' => array(
-					//'maxlength' => 25
 				),
 				'class' => 'vt-billing-address-field',
 			),
@@ -1204,4 +1204,67 @@ function usbswiper_get_currency_symbol() {
 	$currency = usbswiper_get_default_currency();
 
 	return get_woocommerce_currency_symbol( $currency );
+}
+
+function usbswiper_round_amount( $price, $precision ) {
+	$round_price = round($price, $precision);
+	return number_format($round_price, $precision, '.', '');
+}
+
+function usbswiper_get_payment_status( $status ) {
+
+	if( empty( $status ) ) {
+		return '';
+	}
+
+	return str_replace( array('_','-'),' ', $status);
+}
+
+function usbswiper_get_refund_status() {
+
+	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED'));
+}
+
+function get_total_refund_amount( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return;
+	}
+
+	$GrandTotal = get_post_meta( $transaction_id, 'GrandTotal', true);
+
+	$payment_response = get_post_meta( $transaction_id,'_payment_response', true);
+
+	if( empty( $payment_response ) ) {
+		return;
+	}
+
+	$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
+	$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
+	$captures = !empty( $payment_details['captures'] ) ? $payment_details['captures'] : '';
+	$refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
+
+	$total_refund_amount = 0;
+	if( !empty( $refunds ) && is_array( $refunds ) ) {
+		foreach ( $refunds as $key => $refund ) {
+
+			if( !empty( $refund['amount']['value'] ) && $refund['amount']['value'] > 0 ) {
+				$total_refund_amount = $total_refund_amount + $refund['amount']['value'];
+			}
+
+		}
+	}
+
+	$remaining_amount = $GrandTotal - $total_refund_amount;
+
+	$args = array(
+		'ex_tax_label'       => false,
+		'currency'           => '',
+		'decimal_separator'  => wc_get_price_decimal_separator(),
+		'thousand_separator' => wc_get_price_thousand_separator(),
+		'decimals'           => wc_get_price_decimals(),
+		'price_format'       => get_woocommerce_price_format(),
+	);
+
+	return !empty( $remaining_amount ) ? number_format( $remaining_amount, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'] ) : '';
 }

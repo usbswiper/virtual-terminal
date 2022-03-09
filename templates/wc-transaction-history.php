@@ -2,7 +2,6 @@
 if( empty($transaction_id)) {
     return;
 }
-
 $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits', true);
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
 $credit_card_number = $card_last_digits.' ('.$card_brand.')';
@@ -27,6 +26,7 @@ $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_re
 $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 $payment_captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
 $payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
+$payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
 $payment_intent_id = !empty( $payment_authorizations['id'] ) ? $payment_authorizations['id'] : '';
 $payment_status = !empty( $payment_authorizations['status'] ) ? $payment_authorizations['status'] : '';
 $payment_create_time = !empty( $payment_authorizations['create_time'] ) ? $payment_authorizations['create_time'] : '';
@@ -46,11 +46,48 @@ $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 ?>
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
+    <?php
+    $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
+    if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
+        $get_refund_status = usbswiper_get_refund_status();
+	    if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
+
+	        $refund_amount = get_total_refund_amount($transaction_id);
+
+            ?>
+            <div class="transaction-refund-wrap transaction-history-field">
+                <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
+                <div class="refund-form-wrap">
+                    <form method="post" action="" name="vt_refund_form" id="vt_refund_form">
+                        <div class="refund-field">
+                            <label for="transaction_amount"><?php _e('Total Amount', 'usb-swiper'); ?></label>
+                            <input type="text" readonly name="transaction_amount" id="transaction_amount" value="<?php echo $GrandTotal; ?>" />
+                        </div>
+                        <div class="refund-field">
+                            <label for="remaining_amount"><?php _e('Remaining Amount', 'usb-swiper'); ?></label>
+                            <input type="text" readonly name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
+                        </div>
+                        <div class="refund-field">
+                            <label for="refund_amount"><?php _e('Refund Amount', 'usb-swiper'); ?></label>
+                            <input type="number" min="0" step="any" max="<?php echo $refund_amount; ?>" maxlength="<?php echo $refund_amount; ?>" name="refund_amount" id="refund_amount" value="<?php echo $refund_amount; ?>" />
+                        </div>
+                        <div class="refund-field refund-actions">
+                            <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('refund-request'); ?>">
+                            <input type="hidden" name="transaction_id" id="transaction_id" value="<?php echo $transaction_id; ?>">
+                            <button type="submit" class="vt-button confirm-transaction-refund" id="transaction_refund_btn" name="transaction_refund_btn"><?php _e('Refund','usb-swiper'); ?></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <?php
+        }
+    }
+     ?>
     <div class="transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id"><?php _e('Transaction ID','usb-swiper'); ?><strong style="display: block;"><?php echo $transaction_id; ?></strong></li>
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-date"><?php _e('Date','usb-swiper'); ?><strong style="display: block;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
-            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="payment-status"><?php _e('Status','usb-swiper'); ?><strong style="display: block;"><?php echo $payment_status; ?></strong></li>
+            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="payment-status"><?php _e('Status','usb-swiper'); ?><strong style="display: block;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="card-details"><?php _e('Card Detail','usb-swiper'); ?><strong style="display: block;"><?php echo $credit_card_number; ?></strong></li>
         </ul>
     </div>
@@ -81,6 +118,33 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
             </tbody>
         </table>
     </div>
+    <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) { ?>
+    <div class="refund-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+        <h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Refund Details','usb-swiper'); ?></h2>
+        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table refund_details">
+            <thead>
+                <tr>
+                    <th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-id"><?php _e('ID','usb-swiper'); ?></th>
+                    <th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-amount"><?php _e('Amount','usb-swiper'); ?></th>
+                    <th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-date"><?php _e('Date','usb-swiper'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                foreach ( $payment_refunds as $key => $payment_refund ) {
+                    ?>
+                    <tr>
+                        <td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['id'] ) ? $payment_refund['id'] : '' ?></td>
+                        <td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['amount']['value'] ) ? wc_price($payment_refund['amount']['value']) : '' ?></td>
+                        <td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['create_time'] ) ? date('Y/m/d g:i a', strtotime($payment_refund['create_time'])) : '' ?></td>
+                    </tr>
+                    <?php
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <?php } ?>
     <div class="customer-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <?php
         $billingInfo = get_post_meta( $transaction_id, 'billingInfo', true);
@@ -181,7 +245,7 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_status ) ? $payment_status : ''; ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status($payment_status) : ''; ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Source','usb-swiper'); ?></th>
@@ -207,4 +271,5 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Notes</strong>: %s','usb-swiper'), esc_html($Notes));?></p>
         </div>
     <?php } ?>
+
 </div>

@@ -362,7 +362,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				case 'payment_status' :
 					$payment_status = !empty( $payment_authorizations['status'] ) ? $payment_authorizations['status'] : '';
 					if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
-						$payment_status = !empty( $payment_captures['status'] ) ? $payment_captures['status'] : '';
+						$payment_status = !empty( $payment_captures['status'] ) ? usbswiper_get_payment_status($payment_captures['status']) : '';
 					}
 					echo $payment_status;
 					break;
