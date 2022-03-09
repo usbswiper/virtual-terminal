@@ -79,6 +79,17 @@ class Usb_Swiper_Paypal_request{
 		return $addr . $pid . $_SERVER['REQUEST_TIME'] . mt_rand(0, 0xffff);
 	}
 
+	public function get_paypal_auth_assertion() {
+		$temp = array( "alg" => "none" );
+		$returnData = base64_encode(json_encode($temp)) . '.';
+		$temp = array(
+			"iss" => $this->partner_client_id,
+			"payer_id" => $this->merchant_id
+		);
+		$returnData .= base64_encode(json_encode($temp)) . '.';
+		return $returnData;
+	}
+
 	public function get_generate_token() {
 		try {
 			$args = array(
@@ -230,9 +241,9 @@ class Usb_Swiper_Paypal_request{
 
 		$InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
 		$reference_id = 'wc_transaction_'.$transaction_id;
-		if( !empty( $InvoiceID ) ) {
+		/*if( !empty( $InvoiceID ) ) {
 			$reference_id .= '_'.$InvoiceID;
-		}
+		}*/
 
 		$payment_action = get_post_meta( $transaction_id,'TransactionType', true);
 
@@ -259,8 +270,12 @@ class Usb_Swiper_Paypal_request{
 			),
 		);
 
-		$body_request['purchase_units'][0]['invoice_id'] = $reference_id;
+		if( !empty( $InvoiceID ) ) {
+			$body_request['purchase_units'][0]['invoice_id'] = $InvoiceID;
+		}
+
 		$body_request['purchase_units'][0]['custom_id'] = $reference_id;
+
 		$body_request['purchase_units'][0]['soft_descriptor'] = $this->soft_descriptor;
 
 		$platform_fees = usbswiper_get_platform_fees( $order_total );
@@ -332,12 +347,17 @@ class Usb_Swiper_Paypal_request{
 		if( !empty( $Notes ) && strlen( $Notes ) > 127 ) {
 			$Notes = substr($Notes, 0, 127);
 		}
+
+		if( !empty( $Notes ) ) {
+			$body_request['purchase_units'][0]['description'] = html_entity_decode( $Notes, ENT_NOQUOTES, 'UTF-8' );
+		}
+
 		$NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
 
 		if( !empty( $ItemName ) ) {
 			$body_request['purchase_units'][0]['items'][0] = array(
 				'name'        => $ItemName,
-				'description' => html_entity_decode( $Notes, ENT_NOQUOTES, 'UTF-8' ),
+				'description' => '',
 				'sku'         => '',
 				'category'    => '',
 				'quantity'    => 1,
@@ -504,5 +524,75 @@ class Usb_Swiper_Paypal_request{
 			return is_array($e) ? self::remove_empty_key($e) : $e;
 		}, $data);
 		return $original === $data ? $data : self::remove_empty_key($data);
+	}
+
+	public function get_decimal_digits( $transaction_id ) {
+		$currency_code = $this->get_transaction_currency( $transaction_id );
+
+		$decimal_digits = 2;
+		if( in_array($currency_code, array('HUF', 'JPY', 'TWD')) ) {
+			$decimal_digits = 0;
+		}
+
+		return $decimal_digits;
+	}
+
+	public function refund_request( $request_url, $args ) {
+
+		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
+		$refund_amount = !empty( $args['refund_amount'] ) ? $args['refund_amount'] : '';
+		$paypal_transaction_id = !empty( $args['paypal_transaction_id'] ) ? $args['paypal_transaction_id'] : '';
+
+		$get_decimal_digits = $this->get_decimal_digits( $transaction_id );
+
+		$body_request = array(
+			'note_to_payer' => 'Refund',
+		);
+
+		if (!empty($refund_amount) && $refund_amount > 0) {
+			$body_request['amount'] = array(
+				'value' => usbswiper_round_amount($refund_amount, $get_decimal_digits),
+				'currency_code' => $this->get_transaction_currency( $transaction_id )
+			);
+		}
+
+		$refun_args = array(
+			'method' => 'POST',
+			'timeout' => 60,
+			'redirection' => 5,
+			'httpversion' => '1.1',
+			'blocking' => true,
+			'headers' => array(
+				'Content-Type' => 'application/json',
+				'Authorization' => 'Bearer '.$this->get_access_token(),
+				'Prefer' => 'return=representation',
+				'PayPal-Request-Id' => $this->generate_request_id(),
+				'PayPal-Auth-Assertion' => $this->get_paypal_auth_assertion(),
+			),
+			'body' => json_encode($body_request),
+		);
+
+		$this->api_response = $this->request($request_url, $refun_args, 'order_refund', $transaction_id);
+
+		if( !empty( $this->api_response['id'] ) ) {
+
+			$order_args = array(
+				'method' => 'GET',
+				'timeout' => 60,
+				'redirection' => 5,
+				'httpversion' => '1.1',
+				'blocking' => true,
+				'headers' => array(
+					'Content-Type' => 'application/json',
+					'Authorization' => 'Bearer '.$this->get_access_token(),
+				),
+			);
+
+			$response = $this->request($this->order_url.$paypal_transaction_id, $order_args, 'order_response', $transaction_id);
+			update_post_meta($transaction_id,'_payment_response', $response);
+			return $response;
+		}
+
+		return $this->api_response;
 	}
 }

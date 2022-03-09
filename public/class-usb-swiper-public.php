@@ -170,14 +170,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$settings = usb_swiper_get_settings('general');
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
-			if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID()) {
+			if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 
                 $sdk_obj = $this->get_paypal_sdk_obj();
                 wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
                 wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
 
 				wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
-
 				wp_enqueue_script( 'bootstrap-min', USBSWIPER_URL . 'assets/js/bootstrap.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'bootstrap-switch', USBSWIPER_URL . 'assets/js/bootstrap-switch.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'pos-functions', USBSWIPER_URL . 'assets/js/pos-functions.js', array( 'jquery' ), $this->version, true );
@@ -202,7 +201,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
                     'vt_page_url' => get_the_permalink($vt_page_id),
 				) );
-			}
+			} elseif ( $myaccount_page_id === get_the_ID() ) {
+
+				$sdk_obj = $this->get_paypal_sdk_obj();
+				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
+				wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
+
+				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
+
+				wp_localize_script( $this->plugin_name, 'usb_swiper_settings', array(
+					'ajax_url' => admin_url( 'admin-ajax.php' ),
+					'usb_swiper_transaction_nonce' => wp_create_nonce('usb_swiper_process_transaction'),
+					'three_d_secure_contingency' => apply_filters('usb_swiper_three_d_secure_contingency', 'SCA_WHEN_REQUIRED'),
+					'create_transaction_url' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_transaction', 'utm_nooverride' => '1', 'from' => 'vt_transaction' ), WC()->api_request_url( 'usb_swiper_transaction' ) ),
+					'cc_capture' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'cc_capture', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
+					'style_color' => apply_filters('usb_swiper_smart_button_style_color','gold'),
+					'style_shape' => apply_filters('usb_swiper_smart_button_style_shape','rect'),
+					'style_height' => apply_filters('usb_swiper_smart_button_style_height',''),
+					'style_label' => apply_filters('usb_swiper_smart_button_style_label','paypal'),
+					'style_layout' => apply_filters('usb_swiper_smart_button_style_layout','vertical'),
+					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
+					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
+					'vt_page_url' => get_the_permalink($vt_page_id),
+				) );
+            }
 
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
 		}
@@ -340,7 +362,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$args = shortcode_atts( array(
                 'label' => '',
                 'label2' => __('Login with PayPal','usb-swiper'),
-                'after_login_label' => __('Launch to Terminal','usb-swiper'),
+                'after_login_label' => __('Launch Virtual Terminal','usb-swiper'),
                 'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url(),
             ), $args );
 
@@ -906,6 +928,61 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				update_user_meta( $user_id, "_primary_currency", $primary_currency );
 			}
+		}
+
+		public function create_refund_request() {
+
+			$status = false;
+			$message = __('Something went wrong. Please try again.','usb-swiper');
+
+			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
+
+				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
+
+				if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+
+					$payment_response = get_post_meta( $transaction_id,'_payment_response', true);
+					$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
+					$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
+					$captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
+					$payment_links = !empty( $captures['links'] ) ? $captures['links'] : '';
+
+					if( !empty( $payment_links ) && is_array( $payment_links ) ) {
+					    foreach ( $payment_links as $key => $payment_link ) {
+					        if( !empty( $payment_link['rel']) && 'refund' === $payment_link['rel'] && !empty( $payment_link['href'] ) ) {
+
+						        if ( ! class_exists( 'Usb_Swiper_Paypal_request' ) ) {
+							        include_once USBSWIPER_PATH . '/includes/class-usb-swiper-paypal-request.php';
+						        }
+
+						        $args = array(
+							        'refund_amount' => ! empty( $_POST['refund_amount'] ) ? $_POST['refund_amount'] : '',
+							        'transaction_id' => $transaction_id,
+							        'paypal_transaction_id' => !empty( $payment_response['id'] ) ? $payment_response['id'] : '',
+						        );
+
+						        $Paypal_request = Usb_Swiper_Paypal_request::instance();
+						        $response = $Paypal_request->refund_request( $payment_link['href'], $args );
+
+						        if( !empty( $response['id'] ) ) {
+						            $status = true;
+						        }
+
+					        }
+					    }
+					}
+				}
+
+			} else {
+				$message = __('Nonce not verified.','usb-swiper');
+			}
+
+			$response = array(
+				'status' => $status,
+				'message' => $message,
+			);
+
+			wp_send_json( $response , 200 );
 		}
 	}
 }

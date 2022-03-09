@@ -199,6 +199,14 @@ jQuery( document ).ready(function( $ ) {
 
     render_cc_form();
 
+    const usb_swiper_add_loader = ( current_obj) => {
+        current_obj.append('<span class="vt-loader"></span>');
+    };
+
+    const usb_swiper_remove_loader = ( current_obj) => {
+        current_obj.children('.vt-loader').remove();
+    };
+
     $(document).on('change','#TransactionCurrency', function () {
         $('form#ae-paypal-pos-form').addClass('processing').block({
             message: null,
@@ -208,6 +216,37 @@ jQuery( document ).ready(function( $ ) {
             }
         });
         window.location.href = usb_swiper_settings.vt_page_url+'?'+$(this).attr('name')+'='+$(this).val();
+    });
 
+    $('.refund-form-wrap').hide();
+
+    $(document).on('click','.transaction-refund', function (event) {
+        event.preventDefault();
+        $(this).hide();
+        $('.refund-form-wrap').show();
+    });
+
+    $( "#vt_refund_form" ).submit(function( event ) {
+        var form = $(this);
+        var form_id = form.attr('id');
+        var submitButton = form.find('.confirm-transaction-refund');
+        usb_swiper_add_loader(submitButton);
+
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: $(this).serialize()+"&action=create_refund_request",
+        }).done(function ( response ) {
+
+            if( response.status) {
+                document.getElementById(form_id).reset();
+                window.location.reload();
+            }
+
+            usb_swiper_remove_loader(submitButton);
+        });
+
+        event.preventDefault();
     });
 });

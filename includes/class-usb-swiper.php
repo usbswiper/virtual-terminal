@@ -169,6 +169,8 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_edit_account_form', $plugin_public, 'wc_edit_account_form');
 		$this->loader->add_action('woocommerce_save_account_details', $plugin_public, 'wc_save_account_details');
 
+		$this->loader->add_action('wp_ajax_create_refund_request', $plugin_public,'create_refund_request');
+
 		if (!is_admin()) {
 			return;
 		}
