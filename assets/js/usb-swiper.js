@@ -226,6 +226,12 @@ jQuery( document ).ready(function( $ ) {
         $('.refund-form-wrap').show();
     });
 
+    $(document).on('click','.cancel-refund', function (event) {
+        event.preventDefault();
+        $('.transaction-refund').show();
+        $('.refund-form-wrap').hide();
+    });
+
     $( "#vt_refund_form" ).submit(function( event ) {
         var form = $(this);
         var form_id = form.attr('id');
