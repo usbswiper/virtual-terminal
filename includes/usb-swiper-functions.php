@@ -112,7 +112,7 @@ function usb_swiper_get_template( $template_name, $args = array(), $template_pat
 function usb_swiper_get_vt_tab_fields() {
 
 	$tab_fields = array(
-		'swiper' => __( 'Swipe Card' ,'usb-swiper' ),
+		//'swiper' => __( 'Swipe Card' ,'usb-swiper' ),
 		'personal_info' => __( 'Personal Information' ,'usb-swiper' ),
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
