@@ -16,35 +16,33 @@ $TaxAmount = get_post_meta( $transaction_id, 'TaxAmount', true);
 $GrandTotal = get_post_meta( $transaction_id, 'GrandTotal', true);
 $ItemName = get_post_meta( $transaction_id, 'ItemName', true);
 $Notes = get_post_meta( $transaction_id, 'Notes', true);
+$InvoiceID = get_post_meta( $transaction_id, 'InvoiceID', true);
+$transaction_debug_id = get_post_meta( $transaction_id, '_paypal_transaction_debug_id', true);
 
 $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
 $payment_source = !empty( $payment_response['payment_source'] ) ? $payment_response['payment_source'] : '';
 $payment_card_number = !empty( $payment_source['card']['last_digits'] ) ? $payment_source['card']['last_digits'] : '';
 $payment_card_brand = !empty( $payment_source['card']['brand'] ) ? $payment_source['card']['brand'] : '';
 $payment_card_type = !empty( $payment_source['card']['type'] ) ? $payment_source['card']['type'] : '';
+
 $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
-$payment_captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
-$payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
 $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
-$payment_intent_id = !empty( $payment_authorizations['id'] ) ? $payment_authorizations['id'] : '';
-$payment_status = !empty( $payment_authorizations['status'] ) ? $payment_authorizations['status'] : '';
-$payment_create_time = !empty( $payment_authorizations['create_time'] ) ? $payment_authorizations['create_time'] : '';
-$payment_update_time = !empty( $payment_authorizations['update_time'] ) ? $payment_authorizations['update_time'] : '';
-$payment_intent = 'AUTHORIZE';
-if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
-	$payment_intent = 'CAPTURE';
-	$payment_intent_id = $payment_captures['id'];
-	$payment_status = !empty( $payment_captures['status'] ) ? $payment_captures['status'] : '';
-	$payment_create_time = !empty( $payment_captures['create_time'] ) ? $payment_captures['create_time'] : '';
-	$payment_update_time = !empty( $payment_captures['update_time'] ) ? $payment_captures['update_time'] : '';
-}
+
+$payment_intent_id = usbswiper_get_transaction_id($transaction_id);
+$payment_status = usbswiper_get_transaction_status($transaction_id);
+$payment_action = usbswiper_get_transaction_type($transaction_id);
+$payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
+$payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
+
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
 	include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 }
+
 $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 ?>
+<div class="vt-form-notification"></div>
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
     <?php
     $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
@@ -86,7 +84,7 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
      ?>
     <div class="transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
-            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id"><?php _e('Transaction ID','usb-swiper'); ?><strong style="display: block;"><?php echo $transaction_id; ?></strong></li>
+            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id"><?php _e('Receipt ID','usb-swiper'); ?><strong style="display: block;"><?php echo $transaction_id; ?></strong></li>
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-date"><?php _e('Date','usb-swiper'); ?><strong style="display: block;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="payment-status"><?php _e('Status','usb-swiper'); ?><strong style="display: block;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="card-details"><?php _e('Card Detail','usb-swiper'); ?><strong style="display: block;"><?php echo $credit_card_number; ?></strong></li>
@@ -99,7 +97,6 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 		$shippingSameAsBilling = get_post_meta( $transaction_id, 'shippingSameAsBilling', true);
 
 		$billing_address = array();
-
 
 		$BillingFirstName = get_post_meta( $transaction_id, 'BillingFirstName', true);
 		if( !empty($BillingFirstName)) { $billing_address[] = $BillingFirstName; }
@@ -214,21 +211,23 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment ID','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_response['id'] ) ? $payment_response['id'] : ''; ?></td>
-                </tr>
-                <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Intent','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_intent ) ? $payment_intent : ''; ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_action ) ? $payment_action : ''; ?></td>
                 </tr>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Intent ID','usb-swiper'); ?></th>
+                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_intent_id ) ? $payment_intent_id : ''; ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status($payment_status) : ''; ?></td>
                 </tr>
+                <?php if( !empty( $InvoiceID ) ) { ?>
+                    <tr>
+                        <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Invoice ID','usb-swiper'); ?></th>
+                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo $InvoiceID; ?></td>
+                    </tr>
+                <?php } ?>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Source','usb-swiper'); ?></th>
                     <?php if( !empty( $payment_card_number ) ) {  ?>
@@ -245,6 +244,12 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Updated At','usb-swiper'); ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_update_time ) ? date('Y/m/d g:i a', strtotime($payment_update_time)) : ''; ?></td>
                 </tr>
+                <?php if( !empty( $transaction_debug_id ) ) { ?>
+                    <tr>
+                        <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('PayPal Debug ID','usb-swiper'); ?></th>
+                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo $transaction_debug_id; ?></td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
     </div>

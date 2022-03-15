@@ -1008,49 +1008,50 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		    $total_row = !empty( $_POST['partner_fee_total_row'] ) ? (int) $_POST['partner_fee_total_row'] : 0;
 		    $default_partner_percentage = !empty( $_POST['default_partner_percentage'] ) ? $_POST['default_partner_percentage'] : '';
 
-		    if( !empty( $total_row) && $total_row > 0 ) {
+			$fees = array();
 
-		        $fees = array();
-		        for ( $i = 1; $i <= $total_row; $i++ ) {
+            if( !empty( $total_row) && $total_row > 0 ) {
 
-		            $country_code =  !empty( $_POST['partner_fee_country_'.$i] ) ? $_POST['partner_fee_country_'.$i] : '';
+                for ( $i = 1; $i <= $total_row; $i ++ ) {
 
-		            if( !empty( $country_code ) ) {
+                    $country_code = ! empty( $_POST[ 'partner_fee_country_' . $i ] ) ? $_POST[ 'partner_fee_country_' . $i ] : '';
 
-		                if( !empty( $_POST['partner_fee_percentage_'.$i] ) ) {
-			                $fees[] = array(
-			                   'country_code' => $country_code,
-			                   'percentage' => $_POST[ 'partner_fee_percentage_' . $i ],
+                    if ( ! empty( $country_code ) ) {
+
+                        if ( ! empty( $_POST[ 'partner_fee_percentage_' . $i ] ) ) {
+                            $fees[] = array(
+                                'country_code' => $country_code,
+                                'percentage'   => $_POST[ 'partner_fee_percentage_' . $i ],
                             );
-		                }
-		            }
-		        }
+                        }
+                    }
+                }
+            }
 
-			    $current_section = ! empty( $_POST['current_section'] ) ? sanitize_text_field( $_POST['current_section'] ) : 'general';
+            $current_section = ! empty( $_POST['current_section'] ) ? sanitize_text_field( $_POST['current_section'] ) : 'general';
 
-		        if( !empty( $usb_swiper_settings ) && is_array( $usb_swiper_settings ) ) {
+            if( !empty( $usb_swiper_settings ) && is_array( $usb_swiper_settings ) ) {
 
-			        $usb_swiper_settings[$current_section] = array(
-				        'fees' => $fees,
-			        );
+                $usb_swiper_settings[$current_section] = array(
+                    'fees' => $fees,
+                );
 
-		        } else {
+            } else {
 
-			        $usb_swiper_settings = array(
-				        $current_section => array(
-				            'fees' => $fees,
-                        )
-                    );
-		        }
+                $usb_swiper_settings = array(
+                    $current_section => array(
+                        'fees' => $fees,
+                    )
+                );
+            }
 
-			    $usb_swiper_settings[$current_section]['default_partner_percentage'] = $default_partner_percentage;
+            $usb_swiper_settings[$current_section]['default_partner_percentage'] = $default_partner_percentage;
 
-			    update_option( $setting_key, $usb_swiper_settings );
+            update_option( $setting_key, $usb_swiper_settings );
 
-			    do_action( 'usb_swiper_after_save_section_' . $current_section );
+            do_action( 'usb_swiper_after_save_section_' . $current_section );
 
-			    self::add_message( __( 'Your settings has been saved.', 'usb-swiper' ) );
-		    }
+            self::add_message( __( 'Your settings has been saved.', 'usb-swiper' ) );
 		}
 
 		/**
@@ -1124,11 +1125,21 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			return $fee_html;
 		}
 
+		/**
+		 * Manage USBSwiper Onboarding logs.
+         *
+         * @since 1.0.0
+         *
+		 */
 		public function logs_settings() {
 
 		    $Usb_Swiper_Log = new Usb_Swiper_Log();
             $logs = $Usb_Swiper_Log->get_log_files();
-			$log_filter = !empty( $_POST['log_filter']) ? $_POST['log_filter'] : $Usb_Swiper_Log->handle.'.log';
+            $default_log = !empty( $logs[0] ) ? $logs[0] : '';
+			$log_filter = !empty( $_POST['log_filter']) ? $_POST['log_filter'] : $default_log;
+			if( empty( $log_filter ) ) {
+			    return;
+			}
 		    ?>
             <div class="usb-swiper-log-filter">
                 <h2><?php echo esc_html($log_filter); ?></h2>
@@ -1159,14 +1170,94 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             <?php
 		}
 
+		/**
+         * Add custom fields in user profile in admin area.
+         *
+         * @since 1.0.0
+         *
+		 * @param object $user Get user data.
+		 */
 		public function add_customer_meta_fields( $user ) {
 
 		    $user_id = !empty( $user->ID ) ? $user->ID : 0;
+		    if( empty( $user_id ) ) {
+		        return;
+		    }
+
+			$merchant_data = get_user_meta( $user_id,'_merchant_onboarding_response', true);
+			$get_countries = WC()->countries->get_countries();
 
 		    ?>
-            <h2><?php _e('Currency Setting','usb-swiper') ?></h2>
+            <h2><?php _e('PayPal Account Information','usb-swiper') ?></h2>
             <table class="form-table">
                 <tbody>
+                    <tr>
+                        <th><?php _e('Merchant ID','usb-swiper' ); ?>:</th>
+                        <td><?php echo !empty( $merchant_data['merchant_id'] ) ? $merchant_data['merchant_id'] : ''; ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Primary Email','usb-swiper' ); ?>:</th>
+                        <td><?php echo !empty( $merchant_data['primary_email'] ) ? $merchant_data['primary_email'] : ''; ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Primary Email Confirmed','usb-swiper' ); ?>:</th>
+                        <td>
+                            <?php
+                            $email_confirmed = !empty( $merchant_data['primary_email_confirmed'] ) ? $merchant_data['primary_email_confirmed'] : '';
+                            $is_email_confirm = '';
+                            $is_email_confirm_icon = 'dashicons-no';
+                            $is_email_confirm_label = __('Primary email is not confirmed','usb-swiper');
+                            if( !empty( $email_confirmed ) && $email_confirmed == 1 ) {
+	                            $is_email_confirm = 'is-confirmed';
+	                            $is_email_confirm_icon ='dashicons-yes';
+	                            $is_email_confirm_label = __('Primary email is confirmed','usb-swiper');
+                            }
+                            ?>
+                            <p class="vt-confirmation-icon paypal-email <?php echo $is_email_confirm; ?>" title="<?php echo $is_email_confirm_label; ?>"><span class="dashicons <?php echo $is_email_confirm_icon; ?>"></span></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Payments Receivable','usb-swiper' ); ?>:</th>
+                        <td>
+	                        <?php
+	                        $payments_receivable = !empty( $merchant_data['payments_receivable'] ) ? $merchant_data['payments_receivable'] : '';
+	                        $is_payments_receivable = '';
+	                        $is_payments_receivable_icon = 'dashicons-no';
+	                        $is_payments_receivable_label = __('Payments is not receivable','usb-swiper');
+	                        if( !empty( $payments_receivable ) && $payments_receivable == 1 ) {
+		                        $is_payments_receivable = 'is-confirmed';
+		                        $is_payments_receivable_icon ='dashicons-yes';
+		                        $is_payments_receivable_label = __('Payments is receivable','usb-swiper');
+	                        }
+	                        ?>
+                            <p class="vt-confirmation-icon paypal-payments-receivable <?php echo $is_payments_receivable; ?>" title="<?php echo $is_payments_receivable_label; ?>"><span class="dashicons <?php echo $is_payments_receivable_icon; ?>"></span></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('OAuth Third Party','usb-swiper' ); ?>:</th>
+                        <td>
+                            <?php
+                            $oauth_integrations = !empty( $merchant_data['oauth_integrations'][0] ) ? $merchant_data['oauth_integrations'][0] : '';
+                            $oauth_third_party = !empty( $oauth_integrations['oauth_third_party'][0] ) ? $oauth_integrations['oauth_third_party'][0] : '';
+                            $scopes = !empty( $oauth_third_party['scopes'] ) ? $oauth_third_party['scopes'] : '';
+                            if( !empty( $scopes ) && is_array( $scopes ) ) {
+                                echo '<ul class="oauth-third-party-scopes">';
+                                    foreach ( $scopes as $s_key => $scope ) {
+                                        echo "<li>".esc_url($scope)."</li>";
+                                    }
+                                echo '</ul>';
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Country','usb-swiper' ); ?>:</th>
+                        <td><?php
+                            $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
+                            echo !empty( $get_countries[$country_code] ) ? $get_countries[$country_code] : '';
+                            ?>
+                        </td>
+                    </tr>
                     <tr>
                         <th><?php _e('Currency','usb-swiper') ?></th>
                         <td>
@@ -1194,6 +1285,13 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             <?php
 		}
 
+		/**
+         * Save user custom field data.
+         *
+         * @since 1.0.0
+         *
+		 * @param $user_id
+		 */
 		public function save_customer_meta_fields( $user_id ) {
 
 		    $currency = !empty( $_POST[ 'TransactionCurrency' ] ) ? $_POST[ 'TransactionCurrency' ] : 'USD';

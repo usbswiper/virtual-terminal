@@ -247,7 +247,10 @@ jQuery( document ).ready(function( $ ) {
 
             if( response.status) {
                 document.getElementById(form_id).reset();
+                set_notification(response.message, 'success');
                 window.location.reload();
+            } else{
+                set_notification(response.message, 'error', response.message_type);
             }
 
             usb_swiper_remove_loader(submitButton);

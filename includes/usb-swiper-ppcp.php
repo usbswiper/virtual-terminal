@@ -198,8 +198,6 @@ class Usb_Swiper_PPCP{
 							)
 						));
 
-						//setcookie( 'merchant_onboarding_user', $user_data, time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
-
                         if( !empty( $country ) ) {
 	                        update_user_meta( $user_id, "billing_country", $country );
                         }
@@ -216,6 +214,12 @@ class Usb_Swiper_PPCP{
 						$settings = usb_swiper_get_settings('general');
 						$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
 						$vt_page_url = !empty( $vt_page_id ) ? get_the_permalink() : site_url();
+						$vt_response = array(array(
+						    'type' => 'success',
+						    'message' => __('You have successfully connected PayPal and you are ready to rock!','usb-swiper'),
+                        ));
+
+						set_transient('get_vt_connection_response' , maybe_serialize($vt_response), 30 );
 						wp_safe_redirect($vt_page_url);
 						exit();
 					}

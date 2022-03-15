@@ -170,9 +170,7 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			$basedir = !empty( $upload_dir['basedir']) ? $upload_dir['basedir'] : '';
 			$log_files = scandir($basedir.'/'.$this->handle);
 
-			$files = array(
-				$this->handle.'.log',
-			);
+			$files = array();
 
 			if( !empty( $log_files ) && is_array( $log_files ) ) {
 
@@ -183,10 +181,15 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 				}
 			}
 
-			return $files;
+			return !empty( $files ) ? array_reverse($files) : array();
 		}
 
 		public function get_log_content( $log ) {
+
+			if( empty( $log ) ) {
+				return '';
+			}
+
 			$upload_dir = wp_upload_dir();
 			$basedir = !empty( $upload_dir['basedir']) ? $upload_dir['basedir'] : '';
 
