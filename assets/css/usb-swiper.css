@@ -29,8 +29,9 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .card-form .vt-card-field label {width: 100%;display: block;margin-bottom: 5px;font-size: 16px;}
 .card-form .vt-card-details {width: 100%;display: block;}
 .card-form .vt-card-details .vt-card-field-50 {width: calc(50% - 3px);display: inline-block;}
-.vt-form-notification p.notification {width: calc(100% - 20px);margin: 5px 10px;padding: 10px;background: #FFF;border: 1px solid #CCC;border-left: 5px solid #ccc;}
+.vt-form-notification p.notification {width: calc(100% - 20px);margin: 15px auto;padding: 10px 20px;background: #FFF;border: 1px solid #CCC;border-left: 5px solid #ccc;}
 .vt-form-notification {width: 100%;display: block;margin: 10px 0;}
+.vt-form-notification p.notification strong {display: block;width: 100%;}
 .vt-form-notification p.notification strong {margin-right: 5px;}
 .vt-form-notification p.notification.error {border-left-color: #d63638;}
 .vt-form-notification p.notification.success {border-left-color: #00a32a;}
@@ -58,3 +59,12 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-loader {border: 3px solid #FFFFFF;border-radius: 100%;border-top: 3px solid #1d2327;width: 12px;height: 12px;-webkit-animation: spin 2s linear infinite;animation: spin 2s linear infinite;position: relative;display: inline-block;vertical-align: middle;left: 5px;}
 @-webkit-keyframes spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+table.paypal-account-information {border-width: 0;text-align: left;}
+table.paypal-account-information th, table.paypal-account-information td {border-width: 0;padding: 15px 0;vertical-align: top;border-bottom: 1px solid rgba(0,0,0,.1);}
+.vt-confirmation-icon {color: #d63638;margin: 0 !important;font-size: 25px;line-height: 25px;}
+.vt-confirmation-icon .dashicons {font-size: inherit;}
+.vt-confirmation-icon.is-confirmed {color: #00a32a;}
+ul.oauth-third-party-scopes {margin: 0 0 0 30px;padding: 0;list-style: decimal-leading-zero;}
+ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}
+.woocommerce select.woocommerce-Select {background-color: #eee;max-width: 100%;border-width: 0;border-radius: 0;color: #999;font-size: 14px;padding: 16px;line-height: 1.7em;border-style: solid;}
+.paypal-disconnect-button {margin-top: 20px;}

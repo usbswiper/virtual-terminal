@@ -11,3 +11,8 @@ tr.partner-fee-row td.country, tr.partner-fee-row td.partner-fee-percentage {wid
 .usb-swiper-log-filter {width: 100%;display: block;margin-bottom: 20px;text-align: right;}
 .usb-swiper-log-filter h2 {width: 50%;float: left;margin: 0;display: inline-block;text-align: left;}
 .jc-log-viewer {width: calc(100% - 40px);display: block;padding: 20px;background: #FFF;}
+.vt-confirmation-icon {color: #d63638;margin: 0 !important;font-size: 25px;line-height: 25px;}
+.vt-confirmation-icon .dashicons {font-size: inherit;}
+.vt-confirmation-icon.is-confirmed {color: #00a32a;}
+ul.oauth-third-party-scopes {margin: 0 0 0 30px;padding: 0;list-style: decimal-leading-zero;}
+ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}

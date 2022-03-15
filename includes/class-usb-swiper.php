@@ -163,7 +163,7 @@ class Usb_Swiper {
 		add_shortcode( 'usb_swiper_vt_form', array( $plugin_public, 'usb_swiper_vt_form') );
 
 		$this->loader->add_action('template_redirect', $plugin_public, 'template_redirect');
-		$this->loader->add_action('usb_swiper_before_transactions', $plugin_public, 'paypal_disconnect_button');
+		//$this->loader->add_action('usb_swiper_before_transactions', $plugin_public, 'paypal_disconnect_button');
 		$this->loader->add_action('woocommerce_api_usb_swiper_transaction', $plugin_public, 'handle_usb_swiper_transaction');
 		$this->loader->add_action('wp_logout', $plugin_public, 'wp_logout');
 		$this->loader->add_action('woocommerce_edit_account_form', $plugin_public, 'wc_edit_account_form');

@@ -107,5 +107,4 @@ class Usb_Swiper_Onboarding{
 		<a target="_blank" class="vt-button" id="<?php echo esc_attr($id); ?>" data-paypal-onboard-complete="onboardingCallback" href="<?php echo esc_url($url); ?>" data-paypal-button="true"><?php echo esc_html($label); ?></a>
 		<?php
 	}
-
 }

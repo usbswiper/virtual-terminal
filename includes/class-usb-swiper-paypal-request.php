@@ -198,6 +198,18 @@ class Usb_Swiper_Paypal_request{
 		}
 	}
 
+	public function handle_paypal_debug_id( $response, $transaction_id ) {
+
+		if(empty( $transaction_id ) ) {
+			return;
+		}
+
+		$debug_id = !empty( $response['debug_id'] ) ? $response['debug_id'] : '';
+		if( !empty( $debug_id ) && $transaction_id > 0 ) {
+			update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
+		}
+	}
+
 	public function get_transaction_currency( $transaction_id ){
 
 		$currency_code = get_woocommerce_currency();
@@ -214,7 +226,20 @@ class Usb_Swiper_Paypal_request{
 
 	public function shipping_preference() {
 
-		return WC()->cart->needs_shipping() ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING';
+		$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
+
+		$shipping_preference = 'NO_SHIPPING';
+
+		if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+
+			$shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true ) ;
+			if( empty( $shippingDisabled) ) {
+				$shipping_preference = 'SET_PROVIDED_ADDRESS';
+			}
+
+		}
+
+		return $shipping_preference;
 	}
 
 	public function application_context() {
@@ -241,13 +266,10 @@ class Usb_Swiper_Paypal_request{
 
 		$InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
 		$reference_id = 'wc_transaction_'.$transaction_id;
-		/*if( !empty( $InvoiceID ) ) {
-			$reference_id .= '_'.$InvoiceID;
-		}*/
 
 		$payment_action = get_post_meta( $transaction_id,'TransactionType', true);
 
-		$intent = ($payment_action === 'capture') ? 'CAPTURE' : 'AUTHORIZE';
+		$intent = ($payment_action === 'authorize') ? 'AUTHORIZE' : 'CAPTURE';
 		$order_total = get_post_meta($transaction_id,'GrandTotal',true);
 
 		update_post_meta( $transaction_id,'_payment_action', $payment_action);
@@ -384,6 +406,8 @@ class Usb_Swiper_Paypal_request{
 
 		$this->api_response = $this->request($this->paypal_order_api, $args, 'create_order', $transaction_id );
 
+		$this->handle_paypal_debug_id($this->api_response, $transaction_id);
+
 		return $this->api_response;
 	}
 
@@ -408,7 +432,7 @@ class Usb_Swiper_Paypal_request{
 			);
 
 			$this->api_response = $this->request($this->paypal_order_api . $paypal_transaction_id . '/capture', $args, 'capture_order', $transaction_id);
-
+			$this->handle_paypal_debug_id($this->api_response, $transaction_id);
 		} else {
 
 			$args = array(
@@ -424,6 +448,7 @@ class Usb_Swiper_Paypal_request{
 			);
 
 			$this->api_response = $this->request($this->paypal_order_api . $paypal_transaction_id . '/authorize', $args, 'authorize_order', $transaction_id);
+			$this->handle_paypal_debug_id($this->api_response, $transaction_id);
 		}
 
 		update_post_meta( $transaction_id,'_payment_action', $payment_action);
@@ -573,7 +598,7 @@ class Usb_Swiper_Paypal_request{
 		);
 
 		$this->api_response = $this->request($request_url, $refun_args, 'order_refund', $transaction_id);
-
+		$this->handle_paypal_debug_id($this->api_response, $transaction_id);
 		if( !empty( $this->api_response['id'] ) ) {
 
 			$order_args = array(
@@ -589,6 +614,7 @@ class Usb_Swiper_Paypal_request{
 			);
 
 			$response = $this->request($this->order_url.$paypal_transaction_id, $order_args, 'order_response', $transaction_id);
+			$this->handle_paypal_debug_id($response, $transaction_id);
 			update_post_meta($transaction_id,'_payment_response', $response);
 			return $response;
 		}

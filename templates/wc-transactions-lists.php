@@ -26,27 +26,21 @@ if( $has_transactions ) : ?>
                     $id = !empty($transaction->ID) ? esc_html( $transaction->ID ) : 0;
                     $grand_total = get_post_meta( $id, 'GrandTotal', true );
                     $payment_response = get_post_meta( $id, '_payment_response', true);
-                    $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
-                    $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
-                    $payment_captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
-                    $payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
-                    $payment_status = !empty( $payment_authorizations['status'] ) ? $payment_authorizations['status'] : '';
-				    $payment_action = 'AUTHORIZE';
-                    if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
-	                    $payment_action = 'CAPTURE';
-                        $payment_status = !empty( $payment_captures['status'] ) ? $payment_captures['status'] : '';
-                    }
+                    $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
+                    $payment_status = usbswiper_get_transaction_status($transaction->ID);
+				    $payment_action = usbswiper_get_transaction_type($transaction->ID);
 
                     if( !class_exists('Usb_Swiper_Paypal_request') ) {
                         include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
                     }
+
                     $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
                     $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $id );
                     ?>
 				<tr class="woocommerce-transactions-table__row woocommerce-transactions-table__row--status-<?php echo esc_attr( $payment_status ); ?> transactions">
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo $id; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-title"><?php echo !empty($transaction->post_title) ? esc_html( $transaction->post_title ) : '-'; ?></td>
-					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_response['id'] ) ? $payment_response['id'] : ''; ?></td>
+					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-status"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status(esc_attr($payment_status)) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-type"><?php echo !empty( $payment_action ) ? strtoupper(esc_attr( $payment_action )) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-total"><?php echo !empty( $grand_total ) ? wc_price(esc_attr( $grand_total ), array('currency' => $transaction_currency)) : '-'; ?></td>

@@ -167,6 +167,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function enqueue_scripts() {
 
+			wp_enqueue_style('dashicons');
+
 			$settings = usb_swiper_get_settings('general');
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
@@ -354,6 +356,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			}
 		}
 
+		/**
+         * Create connect to PayPal button.
+         *
+         * @since 1.0.0
+         *
+		 * @param array $args get connection arguments.
+		 *
+		 * @return false|string $form
+		 */
 		public function usb_swiper_paypal_connect( $args ) {
 
 			$settings = usb_swiper_get_settings('general');
@@ -418,7 +429,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function usb_swiper_vt_form( $args ) {
 
-			$args = shortcode_atts( array(), $args, 'usb_swiper_vt_form' );
+			$args = shortcode_atts( array(
+			        'notifications' => maybe_unserialize(get_transient('get_vt_connection_response')),
+            ), $args, 'usb_swiper_vt_form' );
 
 			ob_start();
 
@@ -509,7 +522,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
 		/**
-		 * Add new paypal disconnect button in transaction lists.
+		 * Add new PayPal disconnect button in transaction lists.
 		 *
          * @since 1.0.0
 		 */
@@ -618,12 +631,31 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				if( !empty( $response['id'] )) {
 
+				    if( !empty( $response['links'] ) && is_array( $response['links'] ) ) {
+				        foreach ( $response['links'] as $key => $links ) {
+				            if( !empty( $links['rel'] ) && 'self' === $links['rel'] && !empty( $links['href'] ) ) {
+				                $order_response = $Paypal_request->request($links['href'], array(
+					                'method' => 'GET',
+					                'timeout' => 60,
+					                'redirection' => 5,
+					                'httpversion' => '1.1',
+					                'blocking' => true,
+					                'headers' => array(
+						                'Content-Type' => 'application/json',
+						                'Authorization' => 'Bearer '.$Paypal_request->get_access_token(),
+					                ),
+				                ));
+					            $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
+					            update_post_meta($transaction_id, '_payment_response', $order_response);
+				            }
+				        }
+				    }
 				    update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
 					usb_swiper_set_session('usb_swiper_woo_create_transaction_id', $response['id']);
 					wp_send_json( array( 'orderID' => $response['id'] ), 200 );
 
 				} else{
-					wp_delete_post($transaction_id);
+					//wp_delete_post($transaction_id);
 				    $message_name = !empty( $response['name'] ) ? $response['name'] :'';
 				    $message = !empty( $response['message'] ) ? $response['message'] :'';
 				    $details = !empty( $response['details'][0] ) ? $response['details'][0] :'';
@@ -686,7 +718,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					    'redirect' => esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) ),
                     ), 200 );
 			    } else{
-			        wp_delete_post($transaction_id);
+			        //wp_delete_post($transaction_id);
 				    wp_send_json( array(
 					    'result' => 'error',
 					    'message' => __('Something went wrong. Please try again.','usb_swiper'),
@@ -782,7 +814,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				        }
 
 				        $this->api_response = $Paypal_request->request($capture_url, $args, 'capture_authorized_order', $post_id);
-
+				        $Paypal_request->handle_paypal_debug_id($this->api_response, $post_id);
 				        if( !empty( $this->api_response['id'] ) ) {
 
 					        $order_args = array(
@@ -798,6 +830,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					        );
 
 					        $response = $Paypal_request->request($Paypal_request->order_url.$paypal_transaction_id, $order_args, 'order_response', $post_id);
+					        $Paypal_request->handle_paypal_debug_id($response, $post_id);
 					        update_post_meta($post_id, '_payment_response', $response);
 					        $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
 					        update_post_meta($post_id, '_payment_status', $payment_status);
@@ -892,14 +925,99 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			wp_mail($BillingEmail, $user_subject, $user_content, $get_headers);
 		}
 
+		/**
+         * After logout page redirect to home page.
+         *
+         * @since 1.0.0
+         *
+		 * @param $logout_url
+		 */
 		public function wp_logout( $logout_url ) {
 			wp_redirect( home_url() );
 			exit();
 		}
 
+		/**
+		 * Add custom fields in additional information tab in my account page.
+         *
+         * @since 1.0.0
+		 */
 		public function wc_edit_account_form() {
-
+			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+			$get_countries = WC()->countries->get_countries();
 		    ?>
+            <h2><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
+            <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th><?php _e('Merchant ID','usb-swiper' ); ?>:</th>
+                        <td><?php echo !empty( $merchant_data['merchant_id'] ) ? $merchant_data['merchant_id'] : ''; ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Primary Email','usb-swiper' ); ?>:</th>
+                        <td><?php echo !empty( $merchant_data['primary_email'] ) ? $merchant_data['primary_email'] : ''; ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Primary Email Confirmed','usb-swiper' ); ?>:</th>
+                        <td>
+		                    <?php
+		                    $email_confirmed = !empty( $merchant_data['primary_email_confirmed'] ) ? $merchant_data['primary_email_confirmed'] : '';
+		                    $is_email_confirm = '';
+		                    $is_email_confirm_icon = 'dashicons-no';
+		                    $is_email_confirm_label = __('Primary email is not confirmed','usb-swiper');
+		                    if( !empty( $email_confirmed ) && $email_confirmed == 1 ) {
+			                    $is_email_confirm = 'is-confirmed';
+			                    $is_email_confirm_icon ='dashicons-yes';
+			                    $is_email_confirm_label = __('Primary email is confirmed','usb-swiper');
+		                    }
+		                    ?>
+                            <p class="vt-confirmation-icon paypal-email <?php echo $is_email_confirm; ?>" title="<?php echo $is_email_confirm_label; ?>"><span class="dashicons <?php echo $is_email_confirm_icon; ?>"></span></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Payments Receivable','usb-swiper' ); ?>:</th>
+                        <td>
+		                    <?php
+		                    $payments_receivable = !empty( $merchant_data['payments_receivable'] ) ? $merchant_data['payments_receivable'] : '';
+		                    $is_payments_receivable = '';
+		                    $is_payments_receivable_icon = 'dashicons-no';
+		                    $is_payments_receivable_label = __('Payments is not receivable','usb-swiper');
+		                    if( !empty( $payments_receivable ) && $payments_receivable == 1 ) {
+			                    $is_payments_receivable = 'is-confirmed';
+			                    $is_payments_receivable_icon ='dashicons-yes';
+			                    $is_payments_receivable_label = __('Payments is receivable','usb-swiper');
+		                    }
+		                    ?>
+                            <p class="vt-confirmation-icon paypal-payments-receivable <?php echo $is_payments_receivable; ?>" title="<?php echo $is_payments_receivable_label; ?>"><span class="dashicons <?php echo $is_payments_receivable_icon; ?>"></span></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('OAuth Third Party','usb-swiper' ); ?>:</th>
+                        <td>
+		                    <?php
+		                    $oauth_integrations = !empty( $merchant_data['oauth_integrations'][0] ) ? $merchant_data['oauth_integrations'][0] : '';
+		                    $oauth_third_party = !empty( $oauth_integrations['oauth_third_party'][0] ) ? $oauth_integrations['oauth_third_party'][0] : '';
+		                    $scopes = !empty( $oauth_third_party['scopes'] ) ? $oauth_third_party['scopes'] : '';
+		                    if( !empty( $scopes ) && is_array( $scopes ) ) {
+			                    echo '<ul class="oauth-third-party-scopes">';
+			                    foreach ( $scopes as $s_key => $scope ) {
+				                    echo "<li>".esc_url($scope)."</li>";
+			                    }
+			                    echo '</ul>';
+		                    }
+		                    ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php _e('Country','usb-swiper' ); ?>:</th>
+                        <td><?php
+		                    $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
+		                    echo !empty( $get_countries[$country_code] ) ? $get_countries[$country_code] : '';
+		                    ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 	            <?php
 	            echo  usb_swiper_get_html_field( array(
@@ -914,14 +1032,23 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		            'description' => '',
 		            'readonly' => false,
 		            'disabled' => false,
-		            'class' => '',
+		            'class' => 'woocommerce-Select',
                     'wrapper' => false
 	            ));
 	            ?>
             </p>
+            <div class="woocommerce-form-row paypal-disconnect-button"><?php $this->paypal_disconnect_button(); ?></div>
+            <div class="clear"></div>
             <?php
 		}
 
+		/**
+         * Save custom fields in user data.
+         *
+         * @since 1.0.0
+         *
+		 * @param $user_id
+		 */
 		public function wc_save_account_details( $user_id ) {
 
 			if ( is_user_logged_in() ) {
@@ -930,11 +1057,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			}
 		}
 
+		/**
+		 * Create new refund request.
+         *
+         * @since 1.0.0
+		 */
 		public function create_refund_request() {
 
 			$status = false;
 			$message = __('Something went wrong. Please try again.','usb-swiper');
-
+			$message_type = __('ERROR','usb-swiper');
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
@@ -966,8 +1098,20 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 						        if( !empty( $response['id'] ) ) {
 						            $status = true;
+							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
+						        } else{
+						            $message = __( 'Transaction amount not refund. Please try again.','usb-swiper');
+						            if( !empty( $response['error_description'] ) ) {
+							            $message = $response['error_description'];
+							            $message_type = !empty( $response['error'] ) ? $response['error'] : '';
+						            } elseif ( isset($response['details'][0]['description']) && !empty( $response['details'][0]['description'] ) ) {
+							            $message = $response['details'][0]['description'];
+							            $message_type = !empty( $response['details'][0]['issue'] ) ? $response['details'][0]['issue'] : '';
+						            } elseif ( !empty( $response['message'] ) ) {
+							            $message = $response['message'];
+							            $message_type = !empty( $response['name'] ) ? $response['name'] : '';
+						            }
 						        }
-
 					        }
 					    }
 					}
@@ -980,6 +1124,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$response = array(
 				'status' => $status,
 				'message' => $message,
+				'message_type' => $message_type,
 			);
 
 			wp_send_json( $response , 200 );

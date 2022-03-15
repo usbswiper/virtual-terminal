@@ -2,8 +2,8 @@
 /**
  * Plugin Name: USBSwiper
  * Plugin URI: http://www.angelleye.com/product/usb-swiper
- * Description: Create paypal transaction using swiper or manually and manage transactions.
- * Version: 1.1.0
+ * Description: Create PayPal transaction using swiper or manually and manage transactions.
+ * Version: 1.1.1
  * Author:  Angell EYE
  * Author URI:  http://www.angelleye.com/
  * License: GNU General Public License v3.0
@@ -25,7 +25,7 @@ if ( ! defined( 'USBSWIPER_PLUGIN_NAME' ) ) {
 
 //Define plugin version.
 if ( ! defined( 'USBSWIPER_VERSION' ) ) {
-	define( 'USBSWIPER_VERSION', '1.0.0' );
+	define( 'USBSWIPER_VERSION', '1.1.1' );
 }
 
 // Define plugin dir.
@@ -48,45 +48,47 @@ if( !defined('USBSWIPER_BASENAME')) {
 	define('USBSWIPER_BASENAME', plugin_basename( __FILE__ ));
 }
 
-// Define partner live merchant id.
+// Define PayPal partner live merchant id.
 if (!defined('USBSWIPER_PARTNER_MERCHANT_ID')) {
 	define('USBSWIPER_PARTNER_MERCHANT_ID', '4XQXFNHGHLK7J');
 }
 
-// Define partner sandbox merchant id.
+// Define PayPal partner sandbox merchant id.
 if (!defined('USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID')) {
 	define('USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID', 'QEV4T5D83THAJ');
 }
 
-// Define plugin live paypal partner client id.
+// Define plugin live PayPal partner client id.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID')) {
 	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID','');
 }
 
-// Define plugin live paypal partner client sandbox secret.
+// Define plugin live PayPal partner client sandbox secret.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET')) {
 	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET','');
 }
 
-// Define plugin sandbox paypal partner client sandbox id.
+// Define plugin sandbox PayPal partner client sandbox id.
 if( !defined('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID')) {
 	define('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID','AV1AYU6p6U4lJDNWthB68AJYInU2zD_9rIQS6Q-9gPNZBQk__Aak31mBqoL5RmoUQIUy4rS19OuH3dlp');
 }
 
-// Define plugin sandbox paypal partner client sandbox secret.
+// Define plugin sandbox PayPal partner client sandbox secret.
 if( !defined('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_SECRET')) {
 	define('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_SECRET','EKZN1w3VqHEezFpP6y6kQWuOFizP7297hVFI1wdM-pmoozz4uJyLKF5xl7PmpOP6aRlI_WYEqfZigGh2');
 }
 
-// Define plugin paypal partner logo url.
+// Define plugin PayPal partner logo url.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_LOGO')) {
 	define('USBSWIPER_PAYPAL_PARTNER_LOGO', 'https://www.usbswiper.com/img/usbswiper-logo-300x89.png');
 }
 
+// Define PayPal live attribution id.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID')) {
 	define('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID', '');
 }
 
+// Define PayPal sandbox attribution id.
 if( !defined('USBSWIPER_PAYPAL_SANDBOX_PARTNER_ATTRIBUTION_ID')) {
 	define('USBSWIPER_PAYPAL_SANDBOX_PARTNER_ATTRIBUTION_ID', 'FLAVORsb-wm93913837016_MP');
 }

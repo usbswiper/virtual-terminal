@@ -1,5 +1,15 @@
 <div class="vt-form-wrap woocommerce">
-    <div class="vt-form-notification"></div>
+    <div class="vt-form-notification">
+        <?php
+        if( !empty( $notifications ) && is_array( $notifications ) ) {
+            foreach ( $notifications as $key => $notification ) {
+                $type = !empty( $notification['type'] ) ? $notification['type'] : '';
+                $message = !empty( $notification['message'] ) ? $notification['message'] : '';
+                echo "<p class='notification {$type}'>{$message}</p>";
+            }
+        }
+        ?>
+    </div>
     <form method="post" action="" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
         <div class="vt-form-contents">
             <div class="vt-row">
