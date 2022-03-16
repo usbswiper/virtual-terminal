@@ -1,15 +1,17 @@
 body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-row {width: 100%;display: flex;}
 .vt-row .vt-col {width: calc(100% - 24px);display: block;background: #FFF;padding: 20px;box-shadow: 0 0 10px #CCC;margin: 0 10px;border-radius: 10px;}
-.vt-row .vt-col-10 {width: calc(10% - 24px);}
-.vt-row .vt-col-20 {width: calc(20% - 24px);}
-.vt-row .vt-col-30 {width: calc(30% - 24px);}
-.vt-row .vt-col-40 {width: calc(40% - 24px);}
-.vt-row .vt-col-50 {width: calc(50% - 24px);}
-.vt-row .vt-col-60 {width: calc(60% - 24px);}
-.vt-row .vt-col-70 {width: calc(70% - 24px);}
-.vt-row .vt-col-80 {width: calc(80% - 24px);}
-.vt-row .vt-col-90 {width: calc(90% - 24px);}
+.vt-row .vt-col:first-child {margin-left: 0;}
+.vt-row .vt-col:last-child {margin-right: 0;}
+.vt-row .vt-col-10 {width: calc(10% - 12px);}
+.vt-row .vt-col-20 {width: calc(20% - 12px);}
+.vt-row .vt-col-30 {width: calc(30% - 12px);}
+.vt-row .vt-col-40 {width: calc(40% - 12px);}
+.vt-row .vt-col-50 {width: calc(50% - 12px);}
+.vt-row .vt-col-60 {width: calc(60% - 12px);}
+.vt-row .vt-col-70 {width: calc(70% - 12px);}
+.vt-row .vt-col-80 {width: calc(80% - 12px);}
+.vt-row .vt-col-90 {width: calc(90% - 12px);}
 .vt-row .vt-col-100 {width: calc(100% - 24px);}
 .vt-row fieldset {border: 1px solid #ddd;padding: 10px;margin-bottom: 20px;width: calc( 100% - 20px);display: block;}
 .vt-row fieldset legend {width: auto;background: #f5f5f5;border: 1px solid #ddd;padding: 5px 20px;}
@@ -29,7 +31,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .card-form .vt-card-field label {width: 100%;display: block;margin-bottom: 5px;font-size: 16px;}
 .card-form .vt-card-details {width: 100%;display: block;}
 .card-form .vt-card-details .vt-card-field-50 {width: calc(50% - 3px);display: inline-block;}
-.vt-form-notification p.notification {width: calc(100% - 20px);margin: 15px auto;padding: 10px 20px !important;background: #FFF;border: 1px solid #CCC;border-left: 5px solid #ccc;}
+.vt-form-notification p.notification {width: 100%;margin: 15px auto;padding: 10px 20px !important;background: #FFF;border: 1px solid #CCC;border-left: 5px solid #ccc;}
 .vt-form-notification {width: 100%;display: block;margin: 10px 0;}
 .vt-form-notification p.notification strong {display: block;width: 100%;}
 .vt-form-notification p.notification strong {margin-right: 5px;}
@@ -38,7 +40,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-contents {width: 100%;}
 .vt-form-contents .vt-row {width: 100%;display: block;position: relative;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
-.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 70px;bottom: auto;width: 25%;}
+.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 70px;bottom: auto;width: 22%;}
 .vt-button {color: #ffffff!important;border-width: 0px!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
 .vt-button-normal {color: #3D72E7 !important;border-width: 1px !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background: #FFF;padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;border-color: #3D72E7 !important;}
 .vt-button-normal:hover{border-color: #3D72E7;}
@@ -68,4 +70,6 @@ ul.oauth-third-party-scopes {margin: 0 0 0 30px;padding: 0;list-style: decimal-l
 ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}
 .woocommerce select.woocommerce-Select {background-color: #eee;max-width: 100%;border-width: 0;border-radius: 0;color: #999;font-size: 14px;padding: 16px;line-height: 1.7em;border-style: solid;}
 .paypal-disconnect-button {margin-top: 20px;}
-h2.paypal-account-information-title {width: 100%;display: block;margin: 20px 0;}
+h2.wc-account-title {width: 100%;display: block;margin: 20px 0;}
+h2.wc-account-title.general-info {margin-top: 0;}
+.paypal-connect-button-wrap {text-align: center;}

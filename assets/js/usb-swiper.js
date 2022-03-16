@@ -246,9 +246,11 @@ jQuery( document ).ready(function( $ ) {
         }).done(function ( response ) {
 
             if( response.status) {
-                document.getElementById(form_id).reset();
                 set_notification(response.message, 'success');
-                window.location.reload();
+                document.getElementById(form_id).reset();
+                $('.transaction-refund').show();
+                $('.refund-form-wrap').hide();
+                $('.refund-details').html('').html(response.html);
             } else{
                 set_notification(response.message, 'error', response.message_type);
             }

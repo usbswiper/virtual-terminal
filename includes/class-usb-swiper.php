@@ -166,10 +166,13 @@ class Usb_Swiper {
 		//$this->loader->add_action('usb_swiper_before_transactions', $plugin_public, 'paypal_disconnect_button');
 		$this->loader->add_action('woocommerce_api_usb_swiper_transaction', $plugin_public, 'handle_usb_swiper_transaction');
 		$this->loader->add_action('wp_logout', $plugin_public, 'wp_logout');
+		$this->loader->add_action('woocommerce_edit_account_form_start', $plugin_public, 'wc_edit_account_form_start');
 		$this->loader->add_action('woocommerce_edit_account_form', $plugin_public, 'wc_edit_account_form');
 		$this->loader->add_action('woocommerce_save_account_details', $plugin_public, 'wc_save_account_details');
 
 		$this->loader->add_action('wp_ajax_create_refund_request', $plugin_public,'create_refund_request');
+		$this->loader->add_action('woocommerce_after_customer_login_form', $plugin_public,'display_paypal_connect_button');
+		$this->loader->add_action('woocommerce_after_my_account', $plugin_public,'display_paypal_connect_button');
 
 		if (!is_admin()) {
 			return;

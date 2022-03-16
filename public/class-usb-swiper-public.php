@@ -396,19 +396,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			} else {
 
-				/*$settings = usb_swiper_get_settings('general');
-				$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
-				if( isset( $_COOKIE['merchant_onboarding_user']) && !empty( $_COOKIE['merchant_onboarding_user'] ) ) {
-					$paypal_login_url = !empty( $vt_page_id ) ? add_query_arg( array( '_nonce' => wp_create_nonce('login-with-paypal'), 'ppcp' => true, 'type'=>'login', ), get_the_permalink($vt_page_id) ): '#';
-					*/?><!--
-                    <div class="vt-form-login-wrap">
-                        <p><a class="vt-button" href="<?php /*echo !empty( $paypal_login_url ) ? esc_url($paypal_login_url) : ''; */?>"><?php /*echo !empty( $args['label2'] ) ? $args['label2'] : __('Login with PayPal','usb-swiper'); */?></a></p>
-                    </div>
-					--><?php
-                /*} else {*/
-					$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
-					echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
-				//}
+				$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
+				echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
             }
 
 			$form = ob_get_contents();
@@ -937,6 +926,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			exit();
 		}
 
+		public function wc_edit_account_form_start() {
+		    ?>
+            <h2 class="wc-account-title general-info"><?php _e('General Information','usb-swiper'); ?></h2>
+            <?php
+		}
+
 		/**
 		 * Add custom fields in additional information tab in my account page.
          *
@@ -946,7 +941,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
 			$get_countries = WC()->countries->get_countries();
 		    ?>
-            <h2 class="paypal-account-information-title"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
+            <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
                     <tr>
@@ -1067,6 +1062,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$status = false;
 			$message = __('Something went wrong. Please try again.','usb-swiper');
 			$message_type = __('ERROR','usb-swiper');
+			$refund_html = '';
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
@@ -1099,6 +1095,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						        if( !empty( $response['id'] ) ) {
 						            $status = true;
 							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
+							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
 						        } else{
 						            $message = __( 'Transaction amount not refund. Please try again.','usb-swiper');
 						            if( !empty( $response['error_description'] ) ) {
@@ -1125,9 +1122,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'status' => $status,
 				'message' => $message,
 				'message_type' => $message_type,
+				'html' => $refund_html,
 			);
 
 			wp_send_json( $response , 200 );
+		}
+
+		public function display_paypal_connect_button() {
+
+		    echo '<div class="paypal-connect-button-wrap">';
+		        echo do_shortcode('[usb_swiper_paypal_connect label="CONNECT WITH PAYPAL" after_login_label="Launch Virtual Terminal"]');
+		    echo '</div>';
 		}
 	}
 }
