@@ -219,7 +219,7 @@ class Usb_Swiper_PPCP{
 						    'message' => __('You have successfully connected PayPal and you are ready to rock!','usb-swiper'),
                         ));
 
-						set_transient('get_vt_connection_response' , maybe_serialize($vt_response), 30 );
+						set_transient('get_vt_connection_response' , maybe_serialize($vt_response), 10 );
 						wp_safe_redirect($vt_page_url);
 						exit();
 					}

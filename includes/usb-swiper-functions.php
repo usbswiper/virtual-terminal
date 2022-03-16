@@ -1349,3 +1349,24 @@ function usbswiper_get_transaction_datetime( $transaction_id, $type = 'create_ti
 	return $date_time;
 
 }
+
+function usbswiper_get_locale() {
+
+	$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+	$country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : '';
+
+	if( empty( $country_code ) ) {
+		return'';
+	}
+
+	$locale_info = include WC()->plugin_path() . '/i18n/locale-info.php';
+	$country_locale = !empty( $locale_info[$country_code] ) ? $locale_info[$country_code] : '';
+
+	return !empty( $country_locale['default_locale'] ) ? str_replace('_','-', $country_locale['default_locale']) : '';
+}
+
+function usbswiper_get_brand_name() {
+
+	$billing_company = get_user_meta( get_current_user_id(),'billing_company', true);
+	return !empty( $billing_company ) ? $billing_company : '';
+}

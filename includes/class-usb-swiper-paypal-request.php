@@ -245,8 +245,8 @@ class Usb_Swiper_Paypal_request{
 	public function application_context() {
 
 		$application_context = array(
-			'brand_name' => $this->brand_name,
-			'locale' => 'en-US',
+			'brand_name' => usbswiper_get_brand_name(),
+			'locale' => usbswiper_get_locale(),
 			'landing_page' => $this->landing_page,
 			'shipping_preference' => $this->shipping_preference(),
 			'user_action' => 'PAY_NOW',
@@ -620,5 +620,51 @@ class Usb_Swiper_Paypal_request{
 		}
 
 		return $this->api_response;
+	}
+
+	public function get_refund_html( $transaction_id ) {
+
+		$refund_html = '';
+
+		if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+
+			$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+			$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
+			$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
+			$payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
+
+			if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
+
+				ob_start();
+				?>
+				<h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Refund Details','usb-swiper'); ?></h2>
+				<table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table refund_details">
+					<thead>
+					<tr>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-id"><?php _e('ID','usb-swiper'); ?></th>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-amount"><?php _e('Amount','usb-swiper'); ?></th>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-date"><?php _e('Date','usb-swiper'); ?></th>
+					</tr>
+					</thead>
+					<tbody>
+					<?php
+					foreach ( $payment_refunds as $key => $payment_refund ) {
+						?>
+						<tr>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['id'] ) ? $payment_refund['id'] : '' ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['amount']['value'] ) ? wc_price($payment_refund['amount']['value']) : '' ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['create_time'] ) ? date('Y/m/d g:i a', strtotime($payment_refund['create_time'])) : '' ?></td>
+						</tr>
+						<?php
+					}
+					?>
+					</tbody>
+				</table>
+				<?php
+				$refund_html = ob_get_contents();
+				ob_get_clean();
+			}
+		}
+		return $refund_html;
 	}
 }

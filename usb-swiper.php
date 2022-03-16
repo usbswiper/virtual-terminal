@@ -3,7 +3,7 @@
  * Plugin Name: USBSwiper
  * Plugin URI: http://www.angelleye.com/product/usb-swiper
  * Description: Create PayPal transaction using swiper or manually and manage transactions.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author:  Angell EYE
  * Author URI:  http://www.angelleye.com/
  * License: GNU General Public License v3.0
@@ -25,7 +25,7 @@ if ( ! defined( 'USBSWIPER_PLUGIN_NAME' ) ) {
 
 //Define plugin version.
 if ( ! defined( 'USBSWIPER_VERSION' ) ) {
-	define( 'USBSWIPER_VERSION', '1.1.1' );
+	define( 'USBSWIPER_VERSION', '1.1.2' );
 }
 
 // Define plugin dir.
