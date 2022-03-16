@@ -58,7 +58,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		/**
          * Get Paypal checkout sdk object.
          *
-         * @sin 1.0.0
+         * @since 1.0.0
          *
 		 * @return array $smart_js_arg
 		 */
@@ -234,7 +234,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		/**
          * Clean up paypal checkout sdk url.
          *
-         * @sin 1.0.0
+         * @since 1.0.0
          *
 		 * @param string $tag Get style tag.
 		 * @param $handle
@@ -287,7 +287,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		/**
 		 * Add new transaction endpoint.
          *
-         * @sin 1.0.0
+         * @since 1.0.0
 		 */
 		public function endpoint_init() {
 
@@ -385,7 +385,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
 				    ?>
                     <div class="vt-form-login-wrap">
-                        <p><a class="vt-button button button-primary" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
+                        <p><a class="vt-button" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
                     </div>
                     <?php
 
@@ -402,7 +402,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					$paypal_login_url = !empty( $vt_page_id ) ? add_query_arg( array( '_nonce' => wp_create_nonce('login-with-paypal'), 'ppcp' => true, 'type'=>'login', ), get_the_permalink($vt_page_id) ): '#';
 					*/?><!--
                     <div class="vt-form-login-wrap">
-                        <p><a class="vt-button button button-primary" href="<?php /*echo !empty( $paypal_login_url ) ? esc_url($paypal_login_url) : ''; */?>"><?php /*echo !empty( $args['label2'] ) ? $args['label2'] : __('Login with PayPal','usb-swiper'); */?></a></p>
+                        <p><a class="vt-button" href="<?php /*echo !empty( $paypal_login_url ) ? esc_url($paypal_login_url) : ''; */?>"><?php /*echo !empty( $args['label2'] ) ? $args['label2'] : __('Login with PayPal','usb-swiper'); */?></a></p>
                     </div>
 					--><?php
                 /*} else {*/
@@ -946,7 +946,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
 			$get_countries = WC()->countries->get_countries();
 		    ?>
-            <h2><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
+            <h2 class="paypal-account-information-title"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
                     <tr>
