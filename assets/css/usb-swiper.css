@@ -72,4 +72,4 @@ ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}
 .paypal-disconnect-button {margin-top: 20px;}
 h2.wc-account-title {width: 100%;display: block;margin: 20px 0;}
 h2.wc-account-title.general-info {margin-top: 0;}
-.paypal-connect-button-wrap {text-align: center;}
+.paypal-connect-button-wrap {text-align: center;margin-top: 20px;}
