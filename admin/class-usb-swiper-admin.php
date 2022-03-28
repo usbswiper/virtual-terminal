@@ -341,10 +341,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 			$payment_captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
 			$payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
-			$payment_intent = 'AUTHORIZE';
-			if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
-				$payment_intent = 'CAPTURE';
-			}
+			$payment_intent = usbswiper_get_transaction_type($post_id);
 
 			switch ( $column ) {
                 case 'transaction_id':
@@ -360,11 +357,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					echo !empty( $grand_total ) ? wc_price($grand_total, array('currency' => $transaction_currency)) : '';
 					break;
 				case 'payment_status' :
-					$payment_status = !empty( $payment_authorizations['status'] ) ? $payment_authorizations['status'] : '';
-					if( !empty( $payment_captures ) && !empty( $payment_captures['id'] ) ) {
-						$payment_status = !empty( $payment_captures['status'] ) ? usbswiper_get_payment_status($payment_captures['status']) : '';
-					}
-					echo $payment_status;
+				    $transaction_status = usbswiper_get_transaction_status($post_id);
+					echo usbswiper_get_payment_status($transaction_status);
 					break;
                 case 'payment_intent' :
 					echo !empty( $payment_intent ) ? strtoupper($payment_intent) : '';

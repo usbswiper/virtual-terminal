@@ -1294,13 +1294,25 @@ function usbswiper_get_transaction_status( $transaction_id ) {
 	$payments = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 	$captures = !empty( $payments['captures'][0] ) ? $payments['captures'][0] : '';
 	$authorizations = !empty( $payments['authorizations'][0] ) ? $payments['authorizations'][0] : '';
-	if( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
-		$status = !empty( $authorizations['status']) ? $authorizations['status'] : '';
-	} elseif ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
+
+	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
 		$status = !empty( $captures['status']) ? $captures['status'] : '';
+	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
+		$status = !empty( $authorizations['status']) ? $authorizations['status'] : '';
 	}
 
 	return $status;
+}
+
+function usbswiper_get_intent_id( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return '';
+	}
+
+	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+
+	return !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
 }
 
 function usbswiper_get_transaction_id( $transaction_id ) {
@@ -1317,10 +1329,10 @@ function usbswiper_get_transaction_id( $transaction_id ) {
 	$payments = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 	$captures = !empty( $payments['captures'][0] ) ? $payments['captures'][0] : '';
 	$authorizations = !empty( $payments['authorizations'][0] ) ? $payments['authorizations'][0] : '';
-	if( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
-		$payment_transaction_id = $authorizations['id'];
-	} elseif ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
+	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
 		$payment_transaction_id = $captures['id'];
+	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
+		$payment_transaction_id = $authorizations['id'];
 	}
 
 	return $payment_transaction_id;
@@ -1340,10 +1352,10 @@ function usbswiper_get_transaction_datetime( $transaction_id, $type = 'create_ti
 	$payments = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 	$captures = !empty( $payments['captures'][0] ) ? $payments['captures'][0] : '';
 	$authorizations = !empty( $payments['authorizations'][0] ) ? $payments['authorizations'][0] : '';
-	if( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
-		$date_time = !empty( $authorizations[$type] ) ? $authorizations[$type] : '';
-	} elseif ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
+	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
 		$date_time = !empty( $captures[$type] ) ? $captures[$type] : '';
+	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
+		$date_time = !empty( $authorizations[$type] ) ? $authorizations[$type] : '';
 	}
 
 	return $date_time;
@@ -1369,4 +1381,26 @@ function usbswiper_get_brand_name() {
 
 	$billing_company = get_user_meta( get_current_user_id(),'billing_company', true);
 	return !empty( $billing_company ) ? $billing_company : '';
+}
+
+function usbswiper_is_allow_capture( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return false;
+	}
+
+	$payment_action = usbswiper_get_transaction_type($transaction_id);
+
+	if( empty( $payment_action) || 'AUTHORIZE' !== $payment_action ) {
+		return false;
+	}
+
+	$is_allow_capture = false;
+	$payment_status = usbswiper_get_transaction_status($transaction_id);
+
+	if( !empty( $payment_status ) && 'CREATED' === $payment_status ) {
+		$is_allow_capture = true;
+	}
+
+	return $is_allow_capture;
 }

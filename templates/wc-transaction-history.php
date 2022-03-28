@@ -30,7 +30,8 @@ $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_re
 $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
 
-$payment_intent_id = usbswiper_get_transaction_id($transaction_id);
+$payment_intent_id = usbswiper_get_intent_id($transaction_id);
+$payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
 $payment_status = usbswiper_get_transaction_status($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
@@ -212,12 +213,16 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
                 <tr>
+                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Intent ID','usb-swiper'); ?></th>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_intent_id ) ? $payment_intent_id : ''; ?></td>
+                </tr>
+                <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Intent','usb-swiper'); ?></th>
                     <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_action ) ? $payment_action : ''; ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_intent_id ) ? $payment_intent_id : ''; ?></td>
+                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
                 </tr>
                 <tr>
                     <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
@@ -254,19 +259,20 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
             </tbody>
         </table>
     </div>
+
 	<?php if( !empty( $Notes ) ) { ?>
         <div class="custom-notes transaction-history-field" style="display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Notes</strong>: %s','usb-swiper'), esc_html($Notes));?></p>
         </div>
 	<?php } ?>
-	<?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) { ?>
-        <div class="refund-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
-            <?php
+
+    <div class="refund-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+	    <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
             if( !class_exists('Usb_Swiper_Paypal_request') ) {
 	            include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
             }
             $Paypal_request = new Usb_Swiper_Paypal_request();
-            echo $Paypal_request->get_refund_html($transaction_id); ?>
-        </div>
-	<?php } ?>
+            echo $Paypal_request->get_refund_html($transaction_id);
+	    } ?>
+    </div>
 </div>
