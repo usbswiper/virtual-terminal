@@ -37,7 +37,7 @@ if( $has_transactions ) : ?>
                     $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
                     $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $id );
                     ?>
-				<tr class="woocommerce-transactions-table__row woocommerce-transactions-table__row--status-<?php echo esc_attr( $payment_status ); ?> transactions">
+				<tr class="woocommerce-transactions-table__row woocommerce-transactions-table__row--status-<?php echo !empty( $payment_status ) ? esc_attr( strtolower($payment_status) ) : ''; ?> transactions">
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo $id; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-title"><?php echo !empty($transaction->post_title) ? esc_html( $transaction->post_title ) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
@@ -47,7 +47,7 @@ if( $has_transactions ) : ?>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-date"><?php echo esc_attr( get_the_time( __( 'Y/m/d g:i a' ), $transaction ) ); ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions">
 						<a href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
-                        <?php if( !empty( $payment_status ) && !empty( $payment_action ) && 'completed' !== strtolower( $payment_status ) && 'authorize' === strtolower( $payment_action ) ) {
+                        <?php if( usbswiper_is_allow_capture( $id ) ) {
                             $unique_id = usb_swiper_unique_id( array(
                                'type' => $payment_action,
                                'transaction_id' => $id,
