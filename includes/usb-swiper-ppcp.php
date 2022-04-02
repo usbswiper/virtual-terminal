@@ -48,16 +48,17 @@ class Usb_Swiper_PPCP{
 				$Usb_Swiper_Onboarding->paypal_signup_button($url, $id, $label);
 				$script_url = 'https://www.paypal.com/webapps/merchantboarding/js/lib/lightbox/partner.js';
 				?>
-				<script type="text/javascript">
+                <script type="text/javascript">
                     document.querySelectorAll('[data-paypal-onboard-complete=onboardingCallback]').forEach((element) => {
                         element.addEventListener('click', (e) => {
                             if ('undefined' === typeof PAYPAL) {
                                 e.preventDefault();
-                                alert('PayPal');
+                                console.log('PayPal');
                             }
                         });
-                    });</script>
-				<script id="paypal-js" src="<?php echo esc_url($script_url); ?>"></script> <?php
+                    });
+                </script>
+                <script id="paypal-js" src="<?php echo esc_url($script_url); ?>"></script> <?php
 			} else {
 				echo __('We could not properly connect to PayPal', 'usb-swiper');
 			}
@@ -226,5 +227,50 @@ class Usb_Swiper_PPCP{
 				}
 			}
 		}
+	}
+
+	public function handle_onboarding_user() {
+
+		$tracking_response = get_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response', true);
+        if( empty( $tracking_response ) ) {
+	        $merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+	        $tracking_id = ! empty( $merchant_data['tracking_id'] ) ? $merchant_data['tracking_id'] : '';
+
+	        if( !empty( $tracking_id ) ) {
+
+		        $this->host = ( $this->is_sandbox) ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+		        $partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
+
+		        try {
+
+			        if( !class_exists('Usb_Swiper_Paypal_request') ) {
+				        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+			        }
+
+			        $this->api_request = Usb_Swiper_Paypal_request::instance();
+
+			        $url = trailingslashit($this->host) .'v1/customer/partners/'.$partner_merchant_id.'/merchant-integrations?tracking_id='.$tracking_id;
+
+			        $args = array(
+				        'method' => 'GET',
+				        'headers' => array(
+					        'Authorization' => 'Bearer '.$this->api_request->get_access_token(),
+					        'Content-Type' => 'application/json',
+				        ),
+			        );
+
+			        $file_name = 'onboarding-'.date('Y-m-d' );
+			        $this->api_response = $this->api_request->request( $url, $args, 'seller_onboarding_status using tracking_id', $file_name );
+
+			        if( !empty( $this->api_response['merchant_id'] ) ) {
+
+			            update_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response', true );
+			        }
+
+		        } catch (Exception $ex) {
+
+		        }
+	        }
+        }
 	}
 }
