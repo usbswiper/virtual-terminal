@@ -454,6 +454,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			
 			$settings = usb_swiper_get_settings('general');
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
+			if( is_user_logged_in() ) {
+
+			    if( ( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) || ( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) ) {
+				    $Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
+				    $Usb_Swiper_PPCP->handle_onboarding_user();
+			    }
+			}
 
 			if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 
@@ -480,9 +488,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			}
 
 			if( isset( $_GET['_nonce'] ) && !empty( $_GET['_nonce'] ) && wp_verify_nonce( esc_attr( $_GET['_nonce'] ), 'disconnect-to-paypal' ) && isset($_GET['ppcp'] ) && !empty( $_GET['ppcp'] ) && '1' === $_GET['ppcp'] && !empty( $_GET['type'] ) && 'disconnect' === $_GET['type'] ) {
-
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_response');
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_user');
+				delete_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response');
 				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 				wp_safe_redirect(site_url());
 				exit();
@@ -500,6 +508,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					exit();
 				}
 			} elseif ( is_user_logged_in() ) {
+
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 					$merchant_user_info = usbswiper_get_onboarding_user();
 					if ( empty( $merchant_user_info ) ) {
@@ -1133,6 +1142,32 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		    echo '<div class="paypal-connect-button-wrap">';
 		        echo do_shortcode('[usb_swiper_paypal_connect label="CONNECT WITH PAYPAL" after_login_label="Launch Virtual Terminal"]');
 		    echo '</div>';
+		}
+
+		public function wc_before_edit_account_form() {
+
+			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+
+			$primary_email_confirmed = false;
+			if( !empty( $merchant_data['primary_email_confirmed'] ) && $merchant_data['primary_email_confirmed'] == 1 ) {
+				$primary_email_confirmed = true;
+			}
+
+			$payments_receivable = false;
+			if( !empty( $merchant_data['payments_receivable'] ) && $merchant_data['payments_receivable'] == 1 ) {
+				$payments_receivable = true;
+			}
+
+			?>
+            <div class="vt-form-notification">
+                <?php if( !$primary_email_confirmed ) { ?>
+                    <p class='notification error'><strong><?php _e('Primary email is not confirmed:','usb-swiper'); ?></strong><?php _e('Your PayPal account email address needs to be confirmed before you can use this Virtual Terminal.  Please complete that process and come back when you are done.','usb-swiper' ); ?></p>
+                <?php } ?>
+			    <?php if( !$payments_receivable ) { ?>
+                    <p class='notification error'><strong><?php _e('Account is not fully approved:','usb-swiper'); ?></strong>Your PayPal account is not fully approved for Complete Payments / Advanced Credit Cards.  Please contact PayPal to complete this process and then come back here to use the Virtual Terminal.</p>
+			    <?php } ?>
+            </div>
+            <?php
 		}
 	}
 }
