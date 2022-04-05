@@ -92,7 +92,7 @@ class Usb_Swiper_PPCP{
 	public function get_onboarding_status( $merchant_id ) {
 
 		$this->host = ( $this->is_sandbox) ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
-		$partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
+		$partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
 
 		try {
 
@@ -239,7 +239,7 @@ class Usb_Swiper_PPCP{
 	        if( !empty( $tracking_id ) ) {
 
 		        $this->host = ( $this->is_sandbox) ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
-		        $partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
+		        $partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
 
 		        try {
 

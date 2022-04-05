@@ -54,8 +54,8 @@ if (!defined('USBSWIPER_PARTNER_MERCHANT_ID')) {
 }
 
 // Define PayPal partner sandbox merchant id.
-if (!defined('USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID')) {
-	define('USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID', 'QEV4T5D83THAJ');
+if (!defined('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID')) {
+	define('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID', 'QEV4T5D83THAJ');
 }
 
 // Define plugin live PayPal partner client id.
