@@ -85,7 +85,7 @@ if( !defined('USBSWIPER_PAYPAL_PARTNER_LOGO')) {
 
 // Define PayPal live attribution id.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID')) {
-	define('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID', '');
+	define('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID', 'ANGELLFREEInc_SP');
 }
 
 // Define PayPal sandbox attribution id.
