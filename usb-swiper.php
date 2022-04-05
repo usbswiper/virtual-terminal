@@ -60,12 +60,12 @@ if (!defined('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID')) {
 
 // Define plugin live PayPal partner client id.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID')) {
-	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID','');
+	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID','AWnlvx7lFixpwSaWelS7LMS2j31Gaj8-PXyTEN-89fSY7Mu0gpR2kyQWKcWWLznTD8lfMjyZzFg_OYrr');
 }
 
 // Define plugin live PayPal partner client sandbox secret.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET')) {
-	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET','');
+	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET','EA03PqvpYVxpB-Rg3tUqePcv9DmBdC_1anQOYpFjXMr2K_5pEB9LMle_tXzBD8XnBIxSiGWRmzobZ1PD');
 }
 
 // Define plugin sandbox PayPal partner client sandbox id.
