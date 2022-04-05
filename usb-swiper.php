@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: USBSwiper
- * Plugin URI: http://www.angelleye.com/product/usb-swiper
+ * Plugin URI: http://store.usbswiper.com/
  * Description: Create PayPal transaction using swiper or manually and manage transactions.
  * Version: 1.1.4
- * Author:  Angell EYE
- * Author URI:  http://www.angelleye.com/
+ * Author:  USBSwiper
+ * Author URI:  http://store.usbswiper.com/
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: usb-swiper
