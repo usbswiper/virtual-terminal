@@ -774,7 +774,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				        if( !empty( $platform_fees ) && $platform_fees > 0 ) {
 
 					        if ($this->is_sandbox) {
-						        $admin_merchant_id = USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID;
+						        $admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
 					        } else{
 						        $admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
 					        }

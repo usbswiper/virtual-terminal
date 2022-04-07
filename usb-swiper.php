@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: USBSwiper
- * Plugin URI: http://www.angelleye.com/product/usb-swiper
+ * Plugin URI: http://store.usbswiper.com/
  * Description: Create PayPal transaction using swiper or manually and manage transactions.
- * Version: 1.1.4
- * Author:  Angell EYE
- * Author URI:  http://www.angelleye.com/
+ * Version: 1.1.5
+ * Author:  USBSwiper
+ * Author URI:  http://store.usbswiper.com/
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: usb-swiper
@@ -25,7 +25,7 @@ if ( ! defined( 'USBSWIPER_PLUGIN_NAME' ) ) {
 
 //Define plugin version.
 if ( ! defined( 'USBSWIPER_VERSION' ) ) {
-	define( 'USBSWIPER_VERSION', '1.1.4' );
+	define( 'USBSWIPER_VERSION', '1.1.5' );
 }
 
 // Define plugin dir.
@@ -54,18 +54,18 @@ if (!defined('USBSWIPER_PARTNER_MERCHANT_ID')) {
 }
 
 // Define PayPal partner sandbox merchant id.
-if (!defined('USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID')) {
-	define('USBSWIPER_SNADBOX_PARTNER_MERCHANT_ID', 'QEV4T5D83THAJ');
+if (!defined('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID')) {
+	define('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID', 'QEV4T5D83THAJ');
 }
 
 // Define plugin live PayPal partner client id.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID')) {
-	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID','');
+	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID','AWnlvx7lFixpwSaWelS7LMS2j31Gaj8-PXyTEN-89fSY7Mu0gpR2kyQWKcWWLznTD8lfMjyZzFg_OYrr');
 }
 
 // Define plugin live PayPal partner client sandbox secret.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET')) {
-	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET','');
+	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET','EA03PqvpYVxpB-Rg3tUqePcv9DmBdC_1anQOYpFjXMr2K_5pEB9LMle_tXzBD8XnBIxSiGWRmzobZ1PD');
 }
 
 // Define plugin sandbox PayPal partner client sandbox id.
@@ -85,7 +85,7 @@ if( !defined('USBSWIPER_PAYPAL_PARTNER_LOGO')) {
 
 // Define PayPal live attribution id.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID')) {
-	define('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID', '');
+	define('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID', 'ANGELLFREEInc_SP');
 }
 
 // Define PayPal sandbox attribution id.
