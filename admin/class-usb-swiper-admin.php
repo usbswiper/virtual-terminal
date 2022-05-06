@@ -745,6 +745,19 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'class' => 'regular-text',
 				    'value' => '',
 			    ),
+                array(
+                    'type' => 'select',
+                    'id' => 'vt_failure_page',
+                    'name' => 'vt_failure_page',
+                    'label' => __('Onboarding Failure Page', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'options' => $get_pages,
+                    'attributes' => '',
+                    'description' => '',
+                    'class' => 'regular-text',
+                    'value' => '',
+                ),
 			    array(
 				    'type' => 'checkbox',
 				    'id' => 'is_paypal_sandbox',
@@ -970,7 +983,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		public function insert_new_partner_fee() {
 
 			$status = false;
-			$message = __('Something went wrong. Please try again.', 'usb-swiper' );
+			$message = __('Nonce not verified. Please try again.', 'usb-swiper' );
 			$html = '';
 
 			if( !empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'add-partner-fee-nonce') ) {
@@ -1056,7 +1069,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		public function remove_partner_fee() {
 
 			$status = false;
-			$message = __('Something went wrong. Please try again.', 'usb-swiper' );
+			$message = __('Nonce not verified. Please try again.', 'usb-swiper' );
 			$html = '';
 
 			if( !empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'remove-partner-fee') ) {

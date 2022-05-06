@@ -484,7 +484,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						}
 					}
 				}
-
 			}
 
 			if( isset( $_GET['_nonce'] ) && !empty( $_GET['_nonce'] ) && wp_verify_nonce( esc_attr( $_GET['_nonce'] ), 'disconnect-to-paypal' ) && isset($_GET['ppcp'] ) && !empty( $_GET['ppcp'] ) && '1' === $_GET['ppcp'] && !empty( $_GET['type'] ) && 'disconnect' === $_GET['type'] ) {
@@ -719,11 +718,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			        //wp_delete_post($transaction_id);
 				    wp_send_json( array(
 					    'result' => 'error',
-					    'message' => __('Something went wrong. Please try again.','usb_swiper'),
+					    'message' => __('Transaction is not captured successfully.','usb_swiper'),
 				    ), 200 );
 			    }
 		    } else{
-			    $response = array( 'error' => true, 'message' => __('Something went wrong. Please try again.','usb_swiper') );
+			    $response = array( 'error' => true, 'message' => __('Transaction nonce not verified. Please try again.','usb_swiper') );
 			    wp_send_json( $response, 200 );
 		    }
 		}
@@ -744,11 +743,20 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        $paypal_transaction_id = !empty( $data['paypal_transaction_id'] ) ? $data['paypal_transaction_id'] : '';
 		        if( !empty( $post_id ) && $post_id > 0 ) {
 
+                    $transaction_status = usbswiper_get_transaction_status($post_id);
+                    $payment_intent = usbswiper_get_transaction_type($post_id);
+
 		            $payment_response = get_post_meta( $post_id,'_payment_response', true);
 			        $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 			        $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 			        $payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
 			        $payment_links = !empty( $payment_authorizations['links'] ) ? $payment_authorizations['links'] : '';
+
+                    $log_action_name = 'capture_authorized_order';
+                    if( !empty( $payment_intent ) && $payment_intent === 'CAPTURE' && !empty( $transaction_status ) && $transaction_status === 'CREATED' ) {
+                        $log_action_name = 'capture_created_order';
+                        $payment_links = !empty( $payment_response['links'] ) ? $payment_response['links'] : '';
+                    }
 
 			        if( !empty( $payment_links ) && is_array( $payment_links ) ) {
 
@@ -811,7 +819,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				            $args['body'] = json_encode($body_request);
 				        }
 
-				        $this->api_response = $Paypal_request->request($capture_url, $args, 'capture_authorized_order', $post_id);
+				        $this->api_response = $Paypal_request->request($capture_url, $args, $log_action_name, $post_id);
 				        $Paypal_request->handle_paypal_debug_id($this->api_response, $post_id);
 				        if( !empty( $this->api_response['id'] ) ) {
 
@@ -948,6 +956,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function wc_edit_account_form() {
 			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+
+           if( empty( $merchant_data)) {
+               return;
+           }
+
 			$get_countries = WC()->countries->get_countries();
 		    ?>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
@@ -1124,7 +1137,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				}
 
 			} else {
-				$message = __('Nonce not verified.','usb-swiper');
+				$message = __('Nonce not verified. Please try again.','usb-swiper');
 			}
 
 			$response = array(
@@ -1147,6 +1160,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		public function wc_before_edit_account_form() {
 
 			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+
+            if( empty( $merchant_data ) ) {
+                return;
+            }
 
 			$primary_email_confirmed = false;
 			if( !empty( $merchant_data['primary_email_confirmed'] ) && $merchant_data['primary_email_confirmed'] == 1 ) {

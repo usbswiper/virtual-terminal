@@ -165,6 +165,7 @@ class Usb_Swiper_Paypal_request{
 				$body = wp_remote_retrieve_body($paypal_api_response);
 
 				$status_code = (int) wp_remote_retrieve_response_code($paypal_api_response);
+				$headers = wp_remote_retrieve_headers($paypal_api_response);
 
 				$response = !empty($body) ? json_decode($body, true) : '';
 				$response = isset($response['body']) ? $response['body'] : $response;
@@ -181,6 +182,7 @@ class Usb_Swiper_Paypal_request{
 					$this->api_log->log( 'Request Body: ' . print_r(json_decode($request['body'], true), true), $log_file);
 				}
 
+				$this->api_log->log('Response headers: '.print_r($headers, true), $log_file);
 				$this->api_log->log('Response Code: '.$status_code, $log_file);
 				$this->api_log->log('Response Message: '.wp_remote_retrieve_response_message($paypal_api_response), $log_file);
 				if ( !empty( $response['body']) && is_array($response['body'])) {
@@ -273,6 +275,7 @@ class Usb_Swiper_Paypal_request{
 		$order_total = get_post_meta($transaction_id,'GrandTotal',true);
 
 		update_post_meta( $transaction_id,'_payment_action', $payment_action);
+        update_post_meta( $transaction_id,'_environment', ($this->is_sandbox) ? 'sandbox' : 'live');
 
 		$body_request = array(
 			'intent' => $intent,
