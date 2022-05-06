@@ -153,6 +153,29 @@ class Usb_Swiper_PPCP{
 		return $user_id;
 	}
 
+    public function is_merchant_applicable( $response ) {
+
+        $is_applicable = false;
+
+        $products = !empty( $response['products'] ) ? $response['products'] : '';
+
+        if( !empty( $products )) {
+            foreach ( $products as $key => $product ) {
+
+                $name = !empty( $product['name'] ) ? $product['name'] : '';
+                $vetting_status = !empty( $product['vetting_status'] ) ? $product['vetting_status'] : '';
+                $capabilities = !empty( $product['capabilities'] ) ? $product['capabilities'] : '';
+
+                if( !empty( $name ) && $name === 'PPCP_CUSTOM' && !empty( $capabilities ) && !empty( $vetting_status ) && ( $vetting_status === 'APPROVED' || $vetting_status === 'SUBSCRIBED') ) {
+
+                    $is_applicable = true;
+                }
+            }
+        }
+
+        return $is_applicable;
+    }
+
 	public function create_user() {
 
 		if( isset( $_REQUEST['merchantIdInPayPal'] ) &&  !empty( $_REQUEST['merchantIdInPayPal'] ) ) {
@@ -160,6 +183,16 @@ class Usb_Swiper_PPCP{
 			$response = $this->get_onboarding_status( esc_attr( $_REQUEST['merchantIdInPayPal'] ) );
 
 			if ( ! empty( $response ) && ! empty( $response['merchant_id'] ) ) {
+
+                $is_applicable = $this->is_merchant_applicable( $response );
+
+                if( empty( $is_applicable ) ) {
+                    $settings = usb_swiper_get_settings('general');
+                    $failure_page_id = !empty( $settings['vt_failure_page'] ) ? (int)$settings['vt_failure_page'] : '';
+                    $failure_page_url = !empty( $failure_page_id ) ? get_the_permalink($failure_page_id) : site_url();
+                    wp_safe_redirect($failure_page_url);
+                    exit();
+                }
 
 			    $country = '';
 			    $primary_currency = '';
@@ -214,7 +247,7 @@ class Usb_Swiper_PPCP{
 
 						$settings = usb_swiper_get_settings('general');
 						$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
-						$vt_page_url = !empty( $vt_page_id ) ? get_the_permalink() : site_url();
+						$vt_page_url = !empty( $vt_page_id ) ? get_the_permalink($vt_page_id) : site_url();
 						$vt_response = array(array(
 						    'type' => 'success',
 						    'message' => __('You have successfully connected PayPal and you are ready to rock!','usb-swiper'),

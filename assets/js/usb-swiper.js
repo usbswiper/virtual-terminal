@@ -124,7 +124,7 @@ jQuery( document ).ready(function( $ ) {
                                         }
                                     });
                                 } else{
-                                    set_notification(data.message, 'error', data.message_type);
+                                    set_notification(payload.message, 'error', payload.message_type);
                                     $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 }
                             },

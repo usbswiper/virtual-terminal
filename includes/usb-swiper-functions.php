@@ -1391,9 +1391,9 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 
 	$payment_action = usbswiper_get_transaction_type($transaction_id);
 
-	if( empty( $payment_action) || 'AUTHORIZE' !== $payment_action ) {
+	/*if( empty( $payment_action) || 'AUTHORIZE' !== $payment_action ) {
 		return false;
-	}
+	}*/
 
 	$is_allow_capture = false;
 	$payment_status = usbswiper_get_transaction_status($transaction_id);
