@@ -334,7 +334,7 @@ class Usb_Swiper_Paypal_request{
 		if (isset($NetAmount) && $NetAmount > 0) {
 			$body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
 				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => (number_format($NetAmount,2,'.','')),
+				'value' => number_format($NetAmount,2,'.',''),
 			);
 		}
 
