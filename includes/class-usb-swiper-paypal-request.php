@@ -389,7 +389,7 @@ class Usb_Swiper_Paypal_request{
 				'unit_amount' =>
 					array(
 						'currency_code' => $this->get_transaction_currency( $transaction_id ),
-						'value'         => number_format($NetAmount,2,'.',''),
+						'value'         => number_format((int)$NetAmount,2,'.',''),
 					),
 			);
 		}
