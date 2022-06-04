@@ -288,7 +288,7 @@ class Usb_Swiper_Paypal_request{
 						'amount' =>
 							array(
 								'currency_code' => $this->get_transaction_currency($transaction_id),
-								'value' => $order_total,
+								'value' => number_format($order_total,2,'.',''),
 								'breakdown' => array()
 							)
 					),
@@ -318,7 +318,7 @@ class Usb_Swiper_Paypal_request{
 					array(
 						'amount' => array(
 							"currency_code" => $this->get_transaction_currency($transaction_id),
-							"value" => $platform_fees
+							"value" => number_format($platform_fees,2,'.','')
 						),
 						'payee' => array(
 							//'email_address' => $primary_email,
@@ -334,7 +334,7 @@ class Usb_Swiper_Paypal_request{
 		if (isset($NetAmount) && $NetAmount > 0) {
 			$body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
 				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => $NetAmount,
+				'value' => (number_format($NetAmount,2,'.',''),
 			);
 		}
 
@@ -343,7 +343,7 @@ class Usb_Swiper_Paypal_request{
 		if (isset($ShippingAmount) && $ShippingAmount > 0) {
 			$body_request['purchase_units'][0]['amount']['breakdown']['shipping'] = array(
 				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => $ShippingAmount,
+				'value' => number_format($ShippingAmount,2,'.',''),
 			);
 		}
 
@@ -352,7 +352,7 @@ class Usb_Swiper_Paypal_request{
 		if (isset($HandlingAmount) && $HandlingAmount > 0) {
 			$body_request['purchase_units'][0]['amount']['breakdown']['handling'] = array(
 				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => $HandlingAmount,
+				'value' => number_format($HandlingAmount,2,'.'.''),
 			);
 		}
 
@@ -361,7 +361,7 @@ class Usb_Swiper_Paypal_request{
 		if (isset($TaxAmount) && $TaxAmount > 0) {
 			$body_request['purchase_units'][0]['amount']['breakdown']['tax_total'] = array(
 				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => $TaxAmount,
+				'value' => number_format($TaxAmount,2,'.',''),
 			);
 		}
 
@@ -389,7 +389,7 @@ class Usb_Swiper_Paypal_request{
 				'unit_amount' =>
 					array(
 						'currency_code' => $this->get_transaction_currency( $transaction_id ),
-						'value'         => $NetAmount,
+						'value'         => number_format($NetAmount,2,'.',''),
 					),
 			);
 		}
