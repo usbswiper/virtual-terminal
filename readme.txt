@@ -2,7 +2,7 @@
 Tags: woocommerce, paypal, express checkout, payments advanced, credit cards, credit card payments, payments, payment
 Requires at least: 5.3
 Tested up to: 5.6.0
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 1.1.7 =
+* Fix - Resolves an improperly formatted value, AF-38
 
 = 1.1.6 =
 * Fix - Onboarding failure handling.
