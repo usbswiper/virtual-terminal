@@ -11,15 +11,21 @@ if( empty( $card_last_digits )) {
 }
 
 $NetAmount = get_post_meta( $transaction_id, 'NetAmount', true);
+$NetAmount = usb_swiper_price_formatter($NetAmount);
 $ShippingAmount = get_post_meta( $transaction_id, 'ShippingAmount', true);
+$ShippingAmount = usb_swiper_price_formatter($ShippingAmount);
 $HandlingAmount = get_post_meta( $transaction_id, 'HandlingAmount', true);
+$HandlingAmount = usb_swiper_price_formatter($HandlingAmount);
 $TaxAmount = get_post_meta( $transaction_id, 'TaxAmount', true);
+$TaxAmount = usb_swiper_price_formatter($TaxAmount);
 $GrandTotal = get_post_meta( $transaction_id, 'GrandTotal', true);
+$GrandTotal = usb_swiper_price_formatter($GrandTotal);
 $ItemName = get_post_meta( $transaction_id, 'ItemName', true);
 $Notes = get_post_meta( $transaction_id, 'Notes', true);
 $InvoiceID = get_post_meta( $transaction_id, 'InvoiceID', true);
 $transaction_debug_id = get_post_meta( $transaction_id, '_paypal_transaction_debug_id', true);
-
+$global_payment_status = get_post_meta( $transaction_id, '_payment_status', true);
+$status_note = get_post_meta( $transaction_id, '_payment_status_notes', true);
 $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
 $payment_source = !empty( $payment_response['payment_source'] ) ? $payment_response['payment_source'] : '';
 $payment_card_number = !empty( $payment_source['card']['last_digits'] ) ? $payment_source['card']['last_digits'] : '';
@@ -36,6 +42,10 @@ $payment_status = usbswiper_get_transaction_status($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
+
+if( $global_payment_status === 'FAILED' ) {
+    $payment_status = $global_payment_status;
+}
 
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
 	include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
@@ -265,6 +275,13 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Notes</strong>: %s','usb-swiper'), esc_html($Notes));?></p>
         </div>
 	<?php } ?>
+
+    <?php if( !empty( $status_note ) ) { ?>
+        <div class="custom-payment-notes transaction-history-field" style="display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
+            <p style="margin: 0;"> <?php echo sprintf(__('<strong>Payment Notes</strong>: %s','usb-swiper'), $status_note);?></p>
+        </div>
+        <style type="text/css">.custom-payment-notes p span{ margin-left:5px; }</style>
+    <?php } ?>
 
     <div class="refund-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
 	    <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {

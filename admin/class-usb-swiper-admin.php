@@ -357,7 +357,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					echo !empty( $grand_total ) ? wc_price($grand_total, array('currency' => $transaction_currency)) : '';
 					break;
 				case 'payment_status' :
+                    $global_payment_status = get_post_meta( $post_id, '_payment_status', true);
 				    $transaction_status = usbswiper_get_transaction_status($post_id);
+                    if( $global_payment_status === 'FAILED' ) {
+                        $transaction_status = $global_payment_status;
+                    }
 					echo usbswiper_get_payment_status($transaction_status);
 					break;
                 case 'payment_intent' :
