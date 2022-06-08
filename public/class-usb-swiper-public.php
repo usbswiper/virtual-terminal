@@ -1186,5 +1186,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             </div>
             <?php
 		}
+
+        public function update_order_status() {
+
+            $status = false;
+
+            $order_id = ! empty( $_POST['order_id'] ) ? $_POST['order_id'] : '';
+            $message = ! empty( $_POST['message'] ) ? $_POST['message'] : '';
+
+            if( !empty( $order_id ) ) {
+                $transactions = get_posts( array(
+                    'post_type' => 'transactions',
+                    'posts_per_page' => 1,
+                    'meta_query' => array(
+                        'relation' => 'AND',
+                        array(
+                            'key' => '_paypal_transaction_id',
+                            'value' => $order_id,
+                            'compare' => 'LIKE',
+                        )
+                    ),
+                    'fields' => 'ids',
+                ));
+
+                $transaction_id = !empty( $transactions[0] ) ? $transactions[0] : '';
+                if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+                    update_post_meta($transaction_id, '_payment_status', 'FAILED');
+                    update_post_meta($transaction_id, '_payment_status_notes', $message);
+                }
+            }
+
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+            );
+
+            wp_send_json( $response);
+        }
 	}
 }

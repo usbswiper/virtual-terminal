@@ -56,7 +56,8 @@ jQuery( document ).ready(function( $ ) {
                         }).then(function (data) {
 
                             if( data.orderID ) {
-                                return  data.orderID;
+                                localStorage.setItem("vt_order_id", data.orderID);
+                                return data.orderID;
                             } else {
                                 set_notification(data.message, 'error', data.message_type);
                             }
@@ -114,6 +115,7 @@ jQuery( document ).ready(function( $ ) {
                             cardholderName: firstName + ' ' + lastName
                         }).then(
                             function (payload) {
+                                localStorage.removeItem('vt_order_id')
                                 if (payload.orderId) {
                                     $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + payload.orderId + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
                                         if( data.result === 'success' ) {
@@ -129,8 +131,23 @@ jQuery( document ).ready(function( $ ) {
                                 }
                             },
                             function (error) {
-                                set_notification(error.message, 'error', error.name);
+                                var message = error.message;
+                                jQuery.each( error.details, function( key, value ) {
+                                    message += '<span>'+value.description+'</span>';
+                                });
+                                var order_id = localStorage.getItem("vt_order_id");
+                                localStorage.removeItem('vt_order_id');
+                                set_notification(message, 'error', error.name);
                                 $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+
+                                jQuery.ajax({
+                                    url: usb_swiper_settings.ajax_url,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: "action=update_order_status&order_id=" + order_id+'&message='+message,
+                                }).done(function ( response ) {
+
+                                });
                             }
                         );
 

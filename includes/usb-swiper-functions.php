@@ -1404,3 +1404,12 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 
 	return $is_allow_capture;
 }
+
+function usb_swiper_price_formatter( $price ) {
+
+    if( !empty( $price ) ) {
+        $price = str_replace(',','', $price);
+    }
+
+    return $price;
+}

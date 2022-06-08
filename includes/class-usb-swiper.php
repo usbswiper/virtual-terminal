@@ -174,6 +174,8 @@ class Usb_Swiper {
 		$this->loader->add_action('wp_ajax_create_refund_request', $plugin_public,'create_refund_request');
 		$this->loader->add_action('woocommerce_after_customer_login_form', $plugin_public,'display_paypal_connect_button');
 		$this->loader->add_action('woocommerce_after_my_account', $plugin_public,'display_paypal_connect_button');
+		$this->loader->add_action('wp_ajax_update_order_status', $plugin_public,'update_order_status');
+		$this->loader->add_action('wp_ajax_nopriv_update_order_status', $plugin_public,'update_order_status');
 
 		if (!is_admin()) {
 			return;

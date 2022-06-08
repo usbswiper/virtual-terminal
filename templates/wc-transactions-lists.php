@@ -26,9 +26,14 @@ if( $has_transactions ) : ?>
                     $id = !empty($transaction->ID) ? esc_html( $transaction->ID ) : 0;
                     $grand_total = get_post_meta( $id, 'GrandTotal', true );
                     $payment_response = get_post_meta( $id, '_payment_response', true);
+                    $global_payment_status = get_post_meta( $id, '_payment_status', true);
                     $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
                     $payment_status = usbswiper_get_transaction_status($transaction->ID);
 				    $payment_action = usbswiper_get_transaction_type($transaction->ID);
+
+                    if( $global_payment_status === 'FAILED' ) {
+                        $payment_status = $global_payment_status;
+                    }
 
                     if( !class_exists('Usb_Swiper_Paypal_request') ) {
                         include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
@@ -47,7 +52,7 @@ if( $has_transactions ) : ?>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-date"><?php echo esc_attr( get_the_time( __( 'Y/m/d g:i a' ), $transaction ) ); ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions">
 						<a href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
-                        <?php if( usbswiper_is_allow_capture( $id ) ) {
+                        <?php if( usbswiper_is_allow_capture( $id ) && $global_payment_status !== 'FAILED' ) {
                             $unique_id = usb_swiper_unique_id( array(
                                'type' => $payment_action,
                                'transaction_id' => $id,
