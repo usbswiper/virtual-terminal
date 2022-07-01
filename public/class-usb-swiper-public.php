@@ -374,7 +374,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'label' => '',
                 'label2' => __('Login with PayPal','usb-swiper'),
                 'after_login_label' => __('Launch Virtual Terminal','usb-swiper'),
-                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url(),
+                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url().'/my-account/',
             ), $args );
 
 			ob_start();
@@ -490,8 +490,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_response');
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_user');
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response');
+                $this->disconnect_email(get_current_user_id());
 				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
-				wp_safe_redirect(site_url());
+				wp_safe_redirect(site_url().'/my-account/');
 				exit();
 			}
 
@@ -503,7 +504,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if( !is_user_logged_in()) {
 
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
-					wp_safe_redirect(site_url());
+					wp_safe_redirect(site_url().'/my-account/');
 					exit();
 				}
 			} elseif ( is_user_logged_in() ) {
@@ -517,6 +518,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				}
 			}
 		}
+
+		/**
+         * @since 1.0.0
+		 * @return void
+		 */
+        public function disconnect_email($user_id){
+	        $mailer = WC()->mailer()->get_emails();
+	        $mailer['UsbSwiperPaypalDisconnectedEmail']->template_html_path = USBSWIPER_PATH . 'templates/emails/paypaldisconnected.php';
+	        $mailer['UsbSwiperPaypalDisconnectedEmail']->trigger( $user_id );
+        }
 
 		/**
 		 * Add new PayPal disconnect button in transaction lists.
@@ -1152,9 +1163,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 		public function display_paypal_connect_button() {
 
-		    echo '<div class="paypal-connect-button-wrap">';
-		        echo do_shortcode('[usb_swiper_paypal_connect label="CONNECT WITH PAYPAL" after_login_label="Launch Virtual Terminal"]');
-		    echo '</div>';
+            if( is_user_logged_in() ) {
+                echo '<div class="paypal-connect-button-wrap">';
+                echo do_shortcode('[usb_swiper_paypal_connect label="CONNECT WITH PAYPAL" after_login_label="Launch Virtual Terminal"]');
+                echo '</div>';
+            }
 		}
 
 		public function wc_before_edit_account_form() {
@@ -1224,5 +1237,22 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             wp_send_json( $response);
         }
+
+
+		/**
+		 * Adds Email Template Path
+		 *
+		 * @since    1.1.8
+		 */
+		public function add_paypal_connected_email( $email_classes ) {
+
+			// add the email class to the list of email classes that WooCommerce loads
+			$email_classes['UsbSwiperPaypalConnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-connected-email.php';
+			$email_classes['UsbSwiperPaypalDisconnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-disconnected-email.php';
+
+			return $email_classes;
+
+		}
 	}
+
 }

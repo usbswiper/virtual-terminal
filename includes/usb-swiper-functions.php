@@ -1,4 +1,22 @@
 <?php
+
+
+///**
+// * Filter the cart template path to use our cart.php template instead of the theme's
+// */
+function usbswiper_locate_email_templates( $template, $template_name, $template_path ) {
+	$basename = basename( $template );
+	if( $basename == 'paypalconnected.php' ) {
+		$template = USBSWIPER_PATH . 'templates/emails/paypalconnected.php';
+		$template_path = USBSWIPER_PATH . 'templates/emails/' ;
+
+	}
+
+	return $template;
+}
+add_filter( 'wc_get_template', 'usbswiper_locate_email_templates', 10, 3 );
+
+
 /**
  * Check usb_swiper_get_settings function exists or not.
  *
@@ -113,7 +131,7 @@ function usb_swiper_get_vt_tab_fields() {
 
 	$tab_fields = array(
 		//'swiper' => __( 'Swipe Card' ,'usb-swiper' ),
-		'personal_info' => __( 'Personal Information' ,'usb-swiper' ),
+		'personal_info' => __( 'Buyer Information' ,'usb-swiper' ),
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
 		'shipping_address' => __( 'Shipping Address' ,'usb-swiper' ),
@@ -500,6 +518,18 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 		'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
 			array(
 				'type' => 'text',
+				'id' => 'company',
+				'name' => 'company',
+				'label' => __( 'Company Name', 'usb-swiper'),
+				'required' => false,
+				'options' => array(),
+				'attributes' => array(
+					//'maxlength' => 25
+				),
+				'class' => '',
+			),
+			array(
+				'type' => 'text',
 				'id' => 'BillingFirstName',
 				'name' => 'BillingFirstName',
 				'label' => __( 'First Name', 'usb-swiper'),
@@ -527,13 +557,14 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'id' => 'BillingEmail',
 				'name' => 'BillingEmail',
 				'label' => __( 'Email Address', 'usb-swiper'),
-				'required' => true,
+				'required' => false,
 				'options' => array(),
 				'attributes' => array(
 					//'maxlength' => 25
 				),
 				'class' => '',
 			),
+
 		)),
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
 			array(
@@ -1412,4 +1443,21 @@ function usb_swiper_price_formatter( $price ) {
     }
 
     return $price;
+}
+
+/**
+ * function to return user's name
+ */
+
+function usbswiper_get_user_name(){
+
+    $user_name = '';
+    if( is_user_logged_in() ) {
+        $current_user = wp_get_current_user();
+
+        $display_name = !empty( $current_user->display_name ) ? $current_user->display_name : '';
+        $user_name =  !empty( $current_user->user_firstname ) ? $current_user->user_firstname : $display_name;
+    }
+
+	return $user_name;
 }

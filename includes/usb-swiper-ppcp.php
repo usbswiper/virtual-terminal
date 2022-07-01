@@ -178,6 +178,7 @@ class Usb_Swiper_PPCP{
 
 	public function create_user() {
 
+
 		if( isset( $_REQUEST['merchantIdInPayPal'] ) &&  !empty( $_REQUEST['merchantIdInPayPal'] ) ) {
 
 			$response = $this->get_onboarding_status( esc_attr( $_REQUEST['merchantIdInPayPal'] ) );
@@ -206,17 +207,19 @@ class Usb_Swiper_PPCP{
 						$user_id = get_current_user_id();
 						$user_info = get_user_by( 'id', $user_id );
 						$user_email = !empty( $user_info->user_email ) ? $user_info->user_email : '';
-						if( !empty( $user_email ) && $user_email != $merchant_email ) {
-							$user_id = $this->create_new_user_by_email($merchant_email);
-							$country = !empty( $response['country'] ) ? $response['country'] : '';
-							$primary_currency = !empty( $response['primary_currency'] ) ? $response['primary_currency'] : '';
-						}
+						$mailer = WC()->mailer()->get_emails();
+                        $mailer['UsbSwiperPaypalConnectedEmail']->template_html_path = USBSWIPER_PATH . 'templates/emails/paypalconnected.php';
+						$mailer['UsbSwiperPaypalConnectedEmail']->trigger( $user_id );
 
-					} else {
 
-						$user_id = $this->create_new_user_by_email($merchant_email);
-						$country = !empty( $response['country'] ) ? $response['country'] : '';
-						$primary_currency = !empty( $response['primary_currency'] ) ? $response['primary_currency'] : '';
+					}
+
+                    else{
+	                    $settings = usb_swiper_get_settings('general');
+	                    $failure_page_id = !empty( $settings['vt_failure_page'] ) ? (int)$settings['vt_failure_page'] : '';
+	                    $failure_page_url = !empty( $failure_page_id ) ? get_the_permalink($failure_page_id) : site_url();
+	                    wp_safe_redirect($failure_page_url);
+	                    exit();
 					}
 
 					if ( ! is_wp_error( $user_id ) ) {

@@ -17,7 +17,9 @@ jQuery( document ).ready(function( $ ) {
 
     const set_notification = ( message, type ='success', message_type='' ) => {
         var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
-        $('.vt-form-notification').append(notification);
+        $('.vt-form-notification').empty().append(notification);
+
+
         $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
     }
 

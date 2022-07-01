@@ -322,6 +322,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$columns['payment_intent'] = __( 'Payment Intent', 'usb-swiper');
 			$columns['transaction_environment'] = __( 'Environment', 'usb-swiper');
 			$columns['date'] = $date;
+            $columns['company'] = __('Company','usb-swiper');
 
 			return $columns;
 		}
@@ -342,6 +343,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$payment_captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
 			$payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
 			$payment_intent = usbswiper_get_transaction_type($post_id);
+
 
 			switch ( $column ) {
                 case 'transaction_id':
@@ -371,6 +373,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	                $environment = get_post_meta( $post_id, '_environment', true);
 	                echo !empty( $environment ) ? strtoupper($environment) : '';
 	                break;
+                case 'company' :
+                    $company = get_post_meta($post_id,'company',true);
+                    echo $company;
+                    break;
+
 				default;
 					echo apply_filters( 'usb_swiper_transactions_column', '' , $column, $post_id );
 			}

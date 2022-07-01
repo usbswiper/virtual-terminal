@@ -1,7 +1,8 @@
 <?php
 if( empty($transaction_id)) {
-    return;
+	return;
 }
+
 
 $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits', true);
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
@@ -9,6 +10,7 @@ $credit_card_number = $card_last_digits.' ('.$card_brand.')';
 if( empty( $card_last_digits )) {
 	$credit_card_number = __('Credit Card','usb-swiper');
 }
+$company_name = get_post_meta($transaction_id,'company',true);
 
 $NetAmount = get_post_meta( $transaction_id, 'NetAmount', true);
 $NetAmount = usb_swiper_price_formatter($NetAmount);
@@ -42,9 +44,8 @@ $payment_status = usbswiper_get_transaction_status($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
-
 if( $global_payment_status === 'FAILED' ) {
-    $payment_status = $global_payment_status;
+	$payment_status = $global_payment_status;
 }
 
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
@@ -56,15 +57,15 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 ?>
 <div class="vt-form-notification"></div>
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
-    <?php
-    $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
-    if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
-        $get_refund_status = usbswiper_get_refund_status();
-	    if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
+	<?php
+	$myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
+	if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
+		$get_refund_status = usbswiper_get_refund_status();
+		if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
 
-	        $refund_amount = get_total_refund_amount($transaction_id);
+			$refund_amount = get_total_refund_amount($transaction_id);
 
-            ?>
+			?>
             <div class="transaction-refund-wrap transaction-history-field">
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
                 <div class="refund-form-wrap">
@@ -90,11 +91,12 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
                     </form>
                 </div>
             </div>
-            <?php
-        }
-    }
-     ?>
-    <div class="transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+			<?php
+		}
+	}
+	?>
+    <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+
         <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id"><?php _e('Receipt ID','usb-swiper'); ?><strong style="display: block;"><?php echo $transaction_id; ?></strong></li>
             <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-date"><?php _e('Date','usb-swiper'); ?><strong style="display: block;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
@@ -166,106 +168,227 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 		$ShippingEmail = get_post_meta( $transaction_id, 'ShippingEmail', true);
 
 		?>
-        <div style="width: calc(50% - 15px);display: inline-block;vertical-align: top;margin-right: 10px;<?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
-            <h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Billing Address','usb-swiper'); ?></h2>
-            <address style="padding: 10px;border: 1px solid #ebebeb;">
-				<?php echo !empty( $billing_address ) ? implode('<br/>', $billing_address) :'';?>
-                <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
-                <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+
+        <!--        Receipt Information-->
+        <div style="width: calc(33% - 15px);vertical-align: top;margin-left: 10px;" class=" form-detail show-me-only-in-print">
+
+            <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
+                <li class="transaction_history_receipt_info">
+                    <strong>
+						<?php _e('Receipt ID','usb-swiper'); ?>
+                    </strong>
+					<?php echo $transaction_id; ?>
+                </li>
+                <li class="transaction_history_receipt_info">
+                    <strong>
+						<?php _e('Date','usb-swiper'); ?>
+                    </strong>
+					<?php echo get_the_date('Y-m-d',$transaction_id); ?>
+                </li>
+                <li class="transaction_history_receipt_info">
+                    <strong>
+						<?php _e('Status','usb-swiper'); ?>
+
+                    </strong>
+
+					<?php echo usbswiper_get_payment_status($payment_status); ?>
+                </li>
+                <li class="transaction_history_receipt_info">
+                    <strong>
+						<?php _e('Card Detail','usb-swiper'); ?>
+                    </strong><?php echo $credit_card_number; ?>
+
+                </li>
+            </ul>
+        </div>
+        <!--        Billing Address-->
+        <div style=";display: inline-block;vertical-align: top;margin-right: 10px;<?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
+            <h2 class="transaction-details__title transaction-history-title"><?php _e('Billing Address','usb-swiper'); ?></h2>
+            <address class="address-wrap" >
+                <p style="margin-bottom: 0"> <strong>
+						<?php echo $company_name ;?>
+                    </strong>
+                </p>
+
+				<?php
+//				Splitting the Address Values
+
+                if (!empty($billing_address)){
+
+					$billing_address_first_name =  !empty( $billing_address[0] ) ? $billing_address[0] : '' ;
+					$billing_address_last_name = !empty( $billing_address[1] ) ? $billing_address[1] : '' ;
+					$billing_address_street1 = !empty( $billing_address[2] ) ? $billing_address[2] : '' ;
+					$billing_address_street2 = !empty( $billing_address[3] ) ? $billing_address[3] : '' ;
+					$billing_address_city  = !empty( $billing_address[4] ) ? $billing_address[4] : '' ;
+					$billing_address_state = !empty( $billing_address[5] ) ? $billing_address[5] : '' ;
+					$billing_address_pincode  = !empty( $billing_address[6] ) ? $billing_address[6] : '' ;
+					$billing_address_country  = !empty( $billing_address[7]) ? $billing_address[7] : '' ;
+				}
+				?>
+                <p>
+					<?php  echo esc_attr($billing_address_first_name)  . ' ' .   esc_attr($billing_address_last_name)  . ',<br/>';
+					echo esc_attr($billing_address_street1) . ', ' . esc_attr($billing_address_street2) . '</br>';
+					echo esc_attr($billing_address_city)  . ', ' .  esc_attr($billing_address_state)  . '- ' . esc_attr($billing_address_pincode)  . '<br/>';
+					echo esc_attr($billing_address_country)  . ' <br/>';
+					?>
+                </p>
+
+	            <?php
+	            if(!empty($BillingPhoneNumber)){
+		            ?>
+                    <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
+
+		            <?php
+	            }
+	            ?>
+
+	            <?php
+	            if(!empty($BillingEmail)){
+		            ?>
+                    <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+		            <?php
+	            }
+	            ?>
             </address>
         </div>
-        <div style="width: calc(50% - 15px);display: inline-block;vertical-align: top;margin-left: 10px;<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail">
-            <h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Shipping Address','usb-swiper'); ?></h2>
-            <address style="padding: 10px;border: 1px solid #ebebeb;">
+        <!--Shipping Address-->
+        <div  style="display: inline-block;vertical-align: top;margin-left: 10px;<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
+            <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
+            <address class="address-wrap" >
 				<?php if( 'true' !== $shippingDisabled ) { ?>
 					<?php if( 'true' !== $shippingSameAsBilling ) { ?>
-						<?php echo !empty( $shipping_address ) ? implode('<br/>', $shipping_address) :'';?>
-                        <p class="woocommerce-customer-details--phone"><?php echo $ShippingPhoneNumber; ?></p>
-                        <p class="woocommerce-customer-details--email"><?php echo $ShippingEmail; ?></p>
+                        <!--                Splitting the Address Values-->
+						<?php  if (!empty($shipping_address)){
+
+							$shipping_address_first_name = !empty( $shipping_address[0] ) ? $shipping_address[0] : '' ;
+							$shipping_address_last_name = !empty( $shipping_address[1] ) ? $shipping_address[1] : '' ;
+							$shipping_address_street1 = !empty( $shipping_address[2] ) ? $shipping_address[2] : '' ;
+							$shipping_address_street2 = !empty( $shipping_address[3] ) ? $shipping_address[3] : '' ;
+							$shipping_address_city  = !empty( $shipping_address[4] ) ? $shipping_address[4] : '' ;
+							$shipping_address_state = !empty( $shipping_address[5] ) ? $shipping_address[5] : '' ;
+							$shipping_address_pincode  = !empty( $shipping_address[6] ) ? $shipping_address[6] : '' ;
+							$shipping_address_country  = !empty( $shipping_address[7] ) ? $shipping_address[7] : '' ;
+						}
+						?>
+                        <p>
+							<?php  echo esc_attr($shipping_address_first_name) . ' ' .   esc_attr($shipping_address_last_name) . '</br>';
+							echo esc_attr($shipping_address_street1) . ', ' . esc_attr($shipping_address_street2) . '</br>';
+							echo esc_attr($shipping_address_city) . ', ' . esc_attr($shipping_address_state) . '-' . esc_attr($shipping_address_pincode) . '</br>';
+							echo esc_attr($shipping_address_country) . '</br>';
+							?>
+                        </p>
+
+                        <p class="woocommerce-customer-details--phone"><?php echo esc_attr($ShippingPhoneNumber); ?></p>
+                        <p class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
 					<?php } else { ?>
-						<?php echo !empty( $billing_address ) ? implode('<br/>', $billing_address) :'';?>
-                        <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
-                        <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+                        <p>
+							<?php  echo esc_attr($billing_address_first_name) . ' ' .   esc_attr($billing_address_last_name) . '</br>';
+							echo esc_attr($billing_address_street1) . ', ' . esc_attr($billing_address_street2) . '</br>';
+							echo esc_attr($billing_address_city) . ', ' . esc_attr($billing_address_state) . '-' . esc_attr($billing_address_pincode) . '</br>';
+							echo esc_attr($billing_address_country) . '</br>';
+							?>
+                        </p>
+						<?php
+						if(!empty($BillingPhoneNumber)){
+							?>
+                            <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
+
+							<?php
+						}
+						?>
+
+						<?php
+						if(!empty($BillingEmail)){
+							?>
+                            <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+
+							<?php
+						}
+						?>
+
 					<?php } ?>
 				<?php } ?>
             </address>
+
+
+
         </div>
     </div>
     <div class="transaction-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
-        <h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Item Details','usb-swiper'); ?></h2>
+        <h2 class="transaction-details__title transaction-history-title"><?php _e('Item Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $ItemName) ? $ItemName : ''; ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($NetAmount, array('currency' => $transaction_currency)); ?></td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Shipping Amount','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($ShippingAmount, array('currency' => $transaction_currency)); ?></td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Handling Amount','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($HandlingAmount, array('currency' => $transaction_currency)); ?></td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Tax Amount','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($TaxAmount, array('currency' => $transaction_currency)); ?></td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Grand Total','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo wc_price($GrandTotal, array('currency' => $transaction_currency)); ?></td>
-                </tr>
+            <tr>
+                <th class="transaction-table-header"><?php echo !empty( $ItemName) ? $ItemName : ''; ?></th>
+                <td class="transaction-table-header"><?php echo wc_price($NetAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Shipping Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header""><?php echo wc_price($ShippingAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Handling Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo wc_price($HandlingAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Tax Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo wc_price($TaxAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Grand Total','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo wc_price($GrandTotal, array('currency' => $transaction_currency)); ?></td>
+            </tr>
             </tbody>
         </table>
     </div>
     <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
-        <h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Transaction Details','usb-swiper'); ?></h2>
+        <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Payment Intent ID','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo !empty( $payment_intent_id ) ? $payment_intent_id : ''; ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Payment Intent','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo !empty( $payment_action ) ? $payment_action : ''; ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Payment Status','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status($payment_status) : ''; ?></td>
+            </tr>
+			<?php if( !empty( $InvoiceID ) ) { ?>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Intent ID','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_intent_id ) ? $payment_intent_id : ''; ?></td>
+                    <th class="transaction-table-header"><?php _e('Invoice ID','usb-swiper'); ?></th>
+                    <td class="transaction-table-header"><?php echo $InvoiceID; ?></td>
                 </tr>
+			<?php } ?>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Payment Source','usb-swiper'); ?></th>
+				<?php if( !empty( $payment_card_number ) ) {  ?>
+                    <td class="transaction-table-header"><?php echo sprintf( '%s (%s) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
+				<?php } else { ?>
+                    <td class="transaction-table-header"><?php echo $credit_card_number; ?></td>
+				<?php } ?>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Payment Created At','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo !empty( $payment_create_time ) ? date('Y/m/d g:i a', strtotime($payment_create_time)) : ''; ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header"><?php _e('Payment Updated At','usb-swiper'); ?></th>
+                <td class="transaction-table-header"><?php echo !empty( $payment_update_time ) ? date('Y/m/d g:i a', strtotime($payment_update_time)) : ''; ?></td>
+            </tr>
+			<?php if( !empty( $transaction_debug_id ) ) { ?>
                 <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Intent','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_action ) ? $payment_action : ''; ?></td>
+                    <th class="transaction-table-header"><?php _e('PayPal Debug ID','usb-swiper'); ?></th>
+                    <td class="transaction-table-header"><?php echo $transaction_debug_id; ?></td>
                 </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status($payment_status) : ''; ?></td>
-                </tr>
-                <?php if( !empty( $InvoiceID ) ) { ?>
-                    <tr>
-                        <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Invoice ID','usb-swiper'); ?></th>
-                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo $InvoiceID; ?></td>
-                    </tr>
-                <?php } ?>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Source','usb-swiper'); ?></th>
-                    <?php if( !empty( $payment_card_number ) ) {  ?>
-                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo sprintf( '%s (%s) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
-                    <?php } else { ?>
-                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo $credit_card_number; ?></td>
-                    <?php } ?>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Created At','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_create_time ) ? date('Y/m/d g:i a', strtotime($payment_create_time)) : ''; ?></td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('Payment Updated At','usb-swiper'); ?></th>
-                    <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo !empty( $payment_update_time ) ? date('Y/m/d g:i a', strtotime($payment_update_time)) : ''; ?></td>
-                </tr>
-                <?php if( !empty( $transaction_debug_id ) ) { ?>
-                    <tr>
-                        <th style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php _e('PayPal Debug ID','usb-swiper'); ?></th>
-                        <td style="text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;"><?php echo $transaction_debug_id; ?></td>
-                    </tr>
-                <?php } ?>
+			<?php } ?>
             </tbody>
         </table>
     </div>
@@ -276,20 +399,26 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
         </div>
 	<?php } ?>
 
-    <?php if( !empty( $status_note ) ) { ?>
+	<?php if( !empty( $status_note ) ) { ?>
         <div class="custom-payment-notes transaction-history-field" style="display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Payment Notes</strong>: %s','usb-swiper'), $status_note);?></p>
         </div>
         <style type="text/css">.custom-payment-notes p span{ margin-left:5px; }</style>
-    <?php } ?>
+	<?php } ?>
 
     <div class="refund-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
-	    <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
-            if( !class_exists('Usb_Swiper_Paypal_request') ) {
-	            include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
-            }
-            $Paypal_request = new Usb_Swiper_Paypal_request();
-            echo $Paypal_request->get_refund_html($transaction_id);
-	    } ?>
+		<?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
+			if( !class_exists('Usb_Swiper_Paypal_request') ) {
+				include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+			}
+			$Paypal_request = new Usb_Swiper_Paypal_request();
+			echo $Paypal_request->get_refund_html($transaction_id);
+		} ?>
+    </div>
+    <div class="custom-payment-notes signature">
+        <br/>
+        <br/>
+        <p class="signature-text"><?php _e('Signature........................................','ubs-swiper') ; ?>
+        </p>
     </div>
 </div>

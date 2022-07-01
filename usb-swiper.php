@@ -10,6 +10,7 @@
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: usb-swiper
  * Domain Path: /languages
+ *
  * Tested up to: 5.9
  */
 

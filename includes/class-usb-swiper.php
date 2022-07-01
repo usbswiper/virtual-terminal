@@ -71,6 +71,7 @@ class Usb_Swiper {
 		$this->define_hooks();
 	}
 
+
 	/**
 	 * Load the required dependencies for this plugin.
 	 *
@@ -177,6 +178,7 @@ class Usb_Swiper {
 		$this->loader->add_action('wp_ajax_update_order_status', $plugin_public,'update_order_status');
 		$this->loader->add_action('wp_ajax_nopriv_update_order_status', $plugin_public,'update_order_status');
 
+		$this->loader->add_filter( 'woocommerce_email_classes',$plugin_public, 'add_paypal_connected_email' );
 		if (!is_admin()) {
 			return;
 		}
@@ -204,6 +206,9 @@ class Usb_Swiper {
 		$this->loader->add_action( 'personal_options_update', $plugin_admin, 'save_customer_meta_fields' );
 		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'save_customer_meta_fields' );
 	}
+
+
+
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
