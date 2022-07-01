@@ -2,7 +2,7 @@
 Tags: woocommerce, paypal, express checkout, payments advanced, credit cards, credit card payments, payments, payment
 Requires at least: 5.3
 Tested up to: 5.6.0
-Stable tag: 1.1.8
+Stable tag: 1.1.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -37,6 +37,12 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
+= 1.1.9 =
+* Added - Connect to PayPal User Flow Change
+* Added - Sent email for connect to PayPal
+* Added - Sent email for disconnect to PayPal
+* Added - Add Company name field and label changes
+
 = 1.1.8 =
 * Fix - Resolves order create and capture issue.
 * Added - Handle fail order status
@@ -49,4 +55,3 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 = 1.1.6 =
 * Fix - Onboarding failure handling.
 * Feature - create and capture flow handling for the Capture method.
-
