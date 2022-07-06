@@ -326,7 +326,55 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 			return $columns;
 		}
+		/**
+		 * Set Query for Transaction Order By
+		 *
+		 * @since 1.1.9
+		 *
+		 * @param array $columns Get list table columns.
+		 *
+		 * @return array $columns
+		 */
+        public function transaction_custom_order_by($query){
+	        if ( ! is_admin() )
+		        return;
+	        $orderby = $query->get( 'orderby');
+	        if ( 'company' == $orderby ) {
+		        $query->set( 'meta_key', 'company' );
+		        $query->set( 'orderby', 'meta_value' );
+	        }
+	        if ( 'author' == $orderby ) {
+		        $query->set( 'orderby', 'author' );
+	        }
+	        if ( 'transaction_id' == $orderby ) {
+		        $query->set( 'meta_key', '_payment_response' );
+		        $query->set( 'orderby', 'meta_value' );
+	        }
 
+	        if ( 'payment_status' == $orderby ) {
+		        $query->set( 'meta_key', '_payment_status' );
+		        $query->set( 'orderby', 'meta_value' );
+	        }
+
+
+
+	        if ( 'grand_total' == $orderby ) {
+		        $query->set( 'meta_key', 'GrandTotal' );
+		        $query->set( 'orderby', 'meta_value_num' );
+	        }
+            return $query;
+        }
+		/**
+		 * Sortable Columns in Transaction
+		 */
+        public function transactions_sortable_columns($columns){
+	        $columns['transaction_id'] ='transaction_id';
+	        $columns['grand_total'] = 'grand_total';
+	        $columns['payment_status'] = 'payment_status';
+	        $columns['company'] = 'company';
+	        $columns['author'] = 'author';
+            return $columns;
+        }
 		/**
          * Display transactions post type custom column html.
          *
@@ -347,7 +395,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 			switch ( $column ) {
                 case 'transaction_id':
-                    echo !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
+                    $real_trans_id = usbswiper_get_transaction_id($post_id);
+                    echo   !empty( $real_trans_id ) ? $real_trans_id : '';
                     break;
 				case 'grand_total':
 					if( !class_exists('Usb_Swiper_Paypal_request') ) {
@@ -438,6 +487,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		        if( !empty( $_REQUEST['user_id'] ) && $_REQUEST['user_id'] > 0 ) {
 			        $query->query_vars['author'] = esc_attr( $_REQUEST['user_id'] );
 		        }
+
 		    }
 
 		    return $query;
@@ -1315,5 +1365,57 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		    $currency = !empty( $_POST[ 'TransactionCurrency' ] ) ? $_POST[ 'TransactionCurrency' ] : 'USD';
 			update_user_meta( $user_id, '_primary_currency',  $currency);
 		}
+
+        /**
+         * fixes Where clause for Trasaction Search in BackEnd
+         *
+         * @param $where
+         * @param $query
+         * @return array|mixed|string|string[]
+         * @since 1.1.9
+         *
+         */
+        public function transaction_search_query_replace(  $where, $query ){
+
+	        $transaction_search = !empty( $query->query_vars['transaction_search'] ) ? $query->query_vars['transaction_search'] : '';
+
+            if ( '1' == $transaction_search){
+
+	            $where = preg_replace('/\s+/', '', $where);
+	            $where = str_replace("AND((wp_postmeta.meta_key='_payment_response'", "OR((wp_postmeta.meta_key='_payment_response'", $where);
+	            $where = str_replace( 'AND', ' AND ', $where);
+	            $where = str_replace( 'OR', ' OR ', $where);
+	            $where = str_replace( 'LIKE', ' LIKE ', $where);
+	            $where = str_replace( '=', ' = ', $where);
+            }
+
+            return $where;
+        }
+
+        /**
+         * Trasaction Search in BackEnd
+         *
+         * @param $query
+         * @return mixed|void
+         * @since 1.1.9
+         *
+         */
+        public function transaction_search_query( $query ){
+	        if ( ! is_admin() ) {
+		        return $query;
+	        }
+
+            if ( 'transactions' == $query->get('post_type' ) && $query->is_search()){
+                $query->set('transaction_search', true);
+	            $query->set('meta_query', array(
+		            'relation' => 'AND',
+		            array(
+			            'key'     => '_payment_response',
+			            'value'   => $query->get('s'),
+			            'compare' => 'LIKE',
+		            ),
+	            ));
+            }
+        }
 	}
 }

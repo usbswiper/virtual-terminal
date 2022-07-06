@@ -179,6 +179,7 @@ class Usb_Swiper {
 		$this->loader->add_action('wp_ajax_nopriv_update_order_status', $plugin_public,'update_order_status');
 
 		$this->loader->add_filter( 'woocommerce_email_classes',$plugin_public, 'add_paypal_connected_email' );
+		$this->loader->add_filter( 'wp_login',$plugin_public, 'redirect_on_login',10,2 );
 		if (!is_admin()) {
 			return;
 		}
@@ -205,10 +206,15 @@ class Usb_Swiper {
 		$this->loader->add_action( 'edit_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
 		$this->loader->add_action( 'personal_options_update', $plugin_admin, 'save_customer_meta_fields' );
 		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'save_customer_meta_fields' );
+
+		//Transaction Search in Backend
+		$this->loader->add_action( 'pre_get_posts', $plugin_admin, 'transaction_search_query' );
+		$this->loader->add_action( 'posts_where', $plugin_admin, 'transaction_search_query_replace', 10, 2 );
+
+		//Filter for Transactions Sorting
+		$this->loader->add_filter('manage_edit-'.$this->post_type.'_sortable_columns', $plugin_admin,'transactions_sortable_columns');
+		$this->loader->add_action('pre_get_posts',$plugin_admin,'transaction_custom_order_by');
 	}
-
-
-
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.

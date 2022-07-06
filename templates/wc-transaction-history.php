@@ -175,19 +175,19 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
             <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
                 <li class="transaction_history_receipt_info">
                     <strong>
-						<?php _e('Receipt ID','usb-swiper'); ?>
+						<?php _e('Receipt ID : ','usb-swiper'); ?>
                     </strong>
 					<?php echo $transaction_id; ?>
                 </li>
                 <li class="transaction_history_receipt_info">
                     <strong>
-						<?php _e('Date','usb-swiper'); ?>
+						<?php _e('Date : ','usb-swiper'); ?>
                     </strong>
 					<?php echo get_the_date('Y-m-d',$transaction_id); ?>
                 </li>
                 <li class="transaction_history_receipt_info">
                     <strong>
-						<?php _e('Status','usb-swiper'); ?>
+						<?php _e('Status : ','usb-swiper'); ?>
 
                     </strong>
 
@@ -195,7 +195,7 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
                 </li>
                 <li class="transaction_history_receipt_info">
                     <strong>
-						<?php _e('Card Detail','usb-swiper'); ?>
+						<?php _e('Card Detail : ','usb-swiper'); ?>
                     </strong><?php echo $credit_card_number; ?>
 
                 </li>
