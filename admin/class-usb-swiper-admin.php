@@ -1372,7 +1372,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          * @param $where
          * @param $query
          * @return array|mixed|string|string[]
-         * @since 1.1.9
+         * @since 1.1.10
          *
          */
         public function transaction_search_query_replace(  $where, $query ){
@@ -1397,7 +1397,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          *
          * @param $query
          * @return mixed|void
-         * @since 1.1.9
+         * @since 1.1.10
          *
          */
         public function transaction_search_query( $query ){
