@@ -1262,7 +1262,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		function redirect_on_login($user_login, WP_User $user){
 			$merchant_user_info = get_user_meta( $user->ID,'_merchant_onboarding_user',true);
 			if ( empty( $merchant_user_info ) ) {
-				wp_safe_redirect( site_url().'/my-account' );
+				wp_safe_redirect( site_url().'/wp-login.php' );
 				exit();
 			}
             else{
