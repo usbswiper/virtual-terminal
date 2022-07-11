@@ -374,7 +374,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'label' => '',
                 'label2' => __('Login with PayPal','usb-swiper'),
                 'after_login_label' => __('Launch Virtual Terminal','usb-swiper'),
-                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url().'/wp-login.php',
+                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url().'/my-account/',
             ), $args );
 
 			ob_start();
@@ -492,7 +492,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response');
                 $this->disconnect_email(get_current_user_id());
 				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
-				wp_safe_redirect(site_url().'/wp-login.php');
+				wp_safe_redirect(site_url().'/my-account/');
 				exit();
 			}
 
