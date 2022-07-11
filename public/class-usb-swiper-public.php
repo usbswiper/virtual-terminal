@@ -1165,7 +1165,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             if( is_user_logged_in() ) {
                 echo '<div class="paypal-connect-button-wrap">';
-                echo do_shortcode('[usb_swiper_paypal_connect label="CONNECT WITH PAYPAL" after_login_label="Launch Virtual Terminal"]');
+                echo do_shortcode('[usb_swiper_paypal_connect label="Connect to PayPal" after_login_label="Launch Virtual Terminal"]');
                 echo '</div>';
             }
 		}
