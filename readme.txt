@@ -39,6 +39,7 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 = 1.1.13=
 * Adjusts redirects based on user account login / PayPal connection (VT-17)
+* Adjusts Connect to PayPal button label (VT-18)
 
 = 1.1.12 =
 * Follow up to VT-14
