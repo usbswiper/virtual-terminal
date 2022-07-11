@@ -512,7 +512,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 					$merchant_user_info = usbswiper_get_onboarding_user();
 					if ( empty( $merchant_user_info ) ) {
-						wp_safe_redirect( site_url() );
+						wp_safe_redirect( site_url() . '/my-account/' );
 						exit();
 					}
 				}
