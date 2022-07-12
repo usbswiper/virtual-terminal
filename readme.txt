@@ -1,8 +1,8 @@
-=== PayPal for WooCommerce ===
-Tags: woocommerce, paypal, express checkout, payments advanced, credit cards, credit card payments, payments, payment
+=== USBSwiper Hosted Virtual Terminal ===
+Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
-Tested up to: 5.6.0
-Stable tag: 1.1.13
+Tested up to: 6.0.1
+Stable tag: 1.1.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -37,7 +37,10 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
-= 1.1.13=
+= 1.1.14 =
+* More adjustments to login/account redirects (VT-26)
+
+= 1.1.13 =
 * Adjusts redirects based on user account login / PayPal connection (VT-17)
 * Adjusts Connect to PayPal button label (VT-18)
 
