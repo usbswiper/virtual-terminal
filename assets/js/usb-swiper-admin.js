@@ -1,5 +1,8 @@
 jQuery( document ).ready(function( $ ) {
-
+    $('.select2-original').select2({
+        placeholder: "Choose Users",
+        width: "50%"
+    });
     $(document).on('click','.add-new-partner-fee-btn', function (){
 
         var current_obj = $(this);

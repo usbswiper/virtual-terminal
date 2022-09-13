@@ -111,6 +111,10 @@ class Usb_Swiper {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once USBSWIPER_PATH.'/admin/class-usb-swiper-admin.php';
+		/**
+		 * The class responsible to manage User List Table.
+		 */
+		require_once USBSWIPER_PATH.'includes/class-usb-swiper-userlist-table.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -214,6 +218,8 @@ class Usb_Swiper {
 		//Filter for Transactions Sorting
 		$this->loader->add_filter('manage_edit-'.$this->post_type.'_sortable_columns', $plugin_admin,'transactions_sortable_columns');
 		$this->loader->add_action('pre_get_posts',$plugin_admin,'transaction_custom_order_by');
+		$this->loader->add_action('usb_swiper_after_form_content', $plugin_admin, 'display_partner_fees_exclude_user_list', 10, 2);
+
 	}
 
 	/**

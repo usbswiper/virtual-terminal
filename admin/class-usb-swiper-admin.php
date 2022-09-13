@@ -87,7 +87,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		 * @since    1.0.0
 		 */
 		public function enqueue_scripts() {
-
+			wp_enqueue_style('select2-css', USBSWIPER_URL . 'assets/css/select2.css', array(), '4.1.0-rc.0');
+			wp_enqueue_script('select2-js', USBSWIPER_URL . 'assets/js/select2.js', array('jquery'), '4.1.0-rc.0', true);
 			wp_enqueue_style($this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper-admin.css');
 			wp_enqueue_script($this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper-admin.js', array('jquery'), $this->version, true);
 			wp_localize_script( $this->plugin_name, 'usb_swiper_settings', array(
@@ -959,7 +960,15 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			if( isset( $settings['fees'] ) && is_array( $settings['fees'] ) ){
 			    $total_fees = count( $settings['fees'] );
 			}
-
+			$get_exclude_partner_users = get_option('get_exclude_partner_users', array());
+			$get_users = get_users();
+			$user_lists = array();
+			if (!empty($get_users)) {
+				foreach ($get_users as $key => $user) {
+					$user_id = !empty($user->ID) ? $user->ID : '';
+					$user_lists[$user_id] = !empty($user->display_name) ? $user->display_name : '';
+				}
+			}
 			?>
             <div class="default-partner-fee-wrap">
                 <table class="form-table">
@@ -985,6 +994,32 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	                                'class' => 'regular-text',
 	                                'value' => !empty( $settings['default_partner_percentage'] ) ? $settings['default_partner_percentage'] : '',
                                 ),); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th for="<?php echo 'partner_checkbox_input'; ?>"><?php _e('Exclude Partner Fees', 'usb-swiper'); ?></th>
+                            <td>
+		                        <?php
+		                        echo usb_swiper_get_html_field(array(
+			                        'type' => 'multiselect',
+			                        'id' => 'partner_checkbox_input',
+			                        'name' => 'partner_checkbox_input',
+			                        'label' => '',
+			                        'wrapper' => false,
+			                        'required' => false,
+			                        'attributes' => array(
+				                        'min' => 0,
+				                        'step' => 'any',
+				                        'minlength' => 0,
+				                        'max' => 100,
+				                        'maxlength' => 100,
+			                        ),
+			                        'description' => '',
+			                        'class' => 'select2-original',
+			                        'multiple' => 'multiple',
+			                        'value' => $get_exclude_partner_users,
+			                        'options' => $user_lists,
+		                        ),); ?>
                             </td>
                         </tr>
                     </tbody>
@@ -1116,8 +1151,16 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             $usb_swiper_settings[$current_section]['default_partner_percentage'] = $default_partner_percentage;
 
             update_option( $setting_key, $usb_swiper_settings );
-
-            do_action( 'usb_swiper_after_save_section_' . $current_section );
+			$is_partner_fee_exclude = !empty($_POST['partner_checkbox_input']) ? $_POST['partner_checkbox_input'] : '';
+			if (!empty($_POST['is_partner_fee_exclude'])) {
+				if (!empty($is_partner_fee_exclude) && is_array($is_partner_fee_exclude)) {
+					$is_partner_fee_exclude[] = $user_id;
+				} else {
+					$is_partner_fee_exclude = array($user_id);
+				}
+			}
+			update_option('get_exclude_partner_users', $is_partner_fee_exclude);
+			do_action( 'usb_swiper_after_save_section_' . $current_section );
 
             self::add_message( __( 'Your settings has been saved.', 'usb-swiper' ) );
 		}
@@ -1348,6 +1391,34 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	                        ?>
                         </td>
                     </tr>
+                    <tr>
+                        <th><?php _e('Exclude Partner Fees', 'usb-swiper') ?></th>
+                        <td>
+		                    <?php
+		                    $get_exclude_partner_users = get_option('get_exclude_partner_users');
+
+		                    $is_checked = false;
+		                    if (!empty($get_exclude_partner_users) && is_array($get_exclude_partner_users) && in_array($user_id, $get_exclude_partner_users)) {
+			                    $is_checked = true;
+		                    }
+		                    echo usb_swiper_get_html_field(array(
+			                    'type' => 'checkbox',
+			                    'id' => 'partner_checkbox_input',
+			                    'name' => 'partner_checkbox_input',
+			                    'label' => '',
+			                    'required' => false,
+			                    'default' => '',
+			                    'checked' => $is_checked,
+			                    'attributes' => '',
+			                    'description' => '',
+			                    'readonly' => false,
+			                    'disabled' => false,
+			                    'class' => '',
+			                    'wrapper' => false
+		                    ));
+		                    ?>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <?php
@@ -1364,6 +1435,23 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 		    $currency = !empty( $_POST[ 'TransactionCurrency' ] ) ? $_POST[ 'TransactionCurrency' ] : 'USD';
 			update_user_meta( $user_id, '_primary_currency',  $currency);
+			$is_partner_fee_exclude = !empty($_POST['partner_checkbox_input']) ? true : false;
+
+			$get_exclude_partner_users = get_option('get_exclude_partner_users', array());
+
+
+			if (!empty($_POST['partner_checkbox_input'])) {
+				if (!empty($get_exclude_partner_users) && is_array($get_exclude_partner_users)) {
+					$get_exclude_partner_users[] = $user_id;
+				} else {
+					$get_exclude_partner_users = array($user_id);
+				}
+			} else {
+				$user_key = array_search($user_id, $get_exclude_partner_users);
+				unset($get_exclude_partner_users[$user_key]);
+			}
+
+			update_option('get_exclude_partner_users', $get_exclude_partner_users);
 		}
 
         /**
@@ -1417,5 +1505,28 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	            ));
             }
         }
+		/**
+		 * Display Excluded Users List.
+		 *
+		 * @param $page
+		 * @param $section
+		 * @since 1.1.17
+		 *
+		 */
+		public function display_partner_fees_exclude_user_list($page, $section)
+		{
+			$tab_field = !empty($_GET['tab']) ? $_GET['tab'] : '';
+			$tab_page = !empty($page) ? $page : '';
+			if ($tab_field == 'partner_fees' && $tab_page == 'usb-swiper') {
+				$userTable = new Users_List_Table();
+				echo '<div class="wrap"><h2>Users List Table</h2>';
+				// Prepare table
+				$userTable->prepare_items();
+				// Display table
+				$userTable->display();
+				echo '</div>';
+				//end wp list table
+			}//main end if
+		}
 	}
 }

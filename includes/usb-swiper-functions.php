@@ -132,6 +132,7 @@ function usb_swiper_get_vt_tab_fields() {
 
 	$tab_fields = array(
 		//'swiper' => __( 'Swipe Card' ,'usb-swiper' ),
+		'currency_info' => __( 'Currency Information' ,'usb-swiper' ),
 		'personal_info' => __( 'Buyer Information' ,'usb-swiper' ),
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
@@ -516,6 +517,21 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'description' => sprintf( __( 'Note: A %1$sUSB credit card reader%2$s is required for swipe functionality.','usb-swiper'), '<a target="_blank" href="https://www.usbswiper.com/usbswiper-usb-magnetic-stripe-credit-card-reader.html?utm_source=angelleye&utm_medium=paypal-pos&utm_campaign=usbswiper">' ,'</a>')
 			)
 		)),
+		'currency_info' => apply_filters( 'usb_swiper_payment_info_fields1', array(
+			array(
+				'type' => 'select',
+				'id' => 'TransactionCurrency',
+				'name' => 'TransactionCurrency',
+				'label' => __( 'Currency', 'usb-swiper'),
+				'required' => true,
+				'options' => usbswiper_get_currency_code_options(),
+				'default' => usbswiper_get_default_currency(),
+				'attributes' => '',
+				'description' => '',
+				'readonly' => false,
+				'disabled' => false,
+				'class' => 'usbswiper-change-currency',
+			))),
 		'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
 			array(
 				'type' => 'text',
@@ -1060,6 +1076,10 @@ function usbswiper_get_platform_fees( $cart_total ) {
 	}
 
 	$user_id = get_current_user_id();
+	$exclude_partner_users = get_option('get_exclude_partner_users');
+	if( !empty( $exclude_partner_users ) && is_array( $exclude_partner_users ) && in_array( $user_id, $exclude_partner_users) ) {
+		return 0;
+	}
 	$billing_country = get_user_meta( $user_id, 'billing_country', true);
 	$merchant_response = get_user_meta( $user_id, '_merchant_onboarding_response', true);
 	$merchant_country = !empty( $merchant_response['country'] ) ? $merchant_response['country'] :'';
@@ -1086,9 +1106,6 @@ function usbswiper_get_platform_fees( $cart_total ) {
 	if( isset( $country_fees[$country] ) && !empty( $country_fees[$country] ) ) {
 		$percentage = $country_fees[$country];
 	}
-
-	$platform_fees = 0;
-
 	if( !empty( $percentage ) && $percentage > 0 ) {
 		$platform_fees = ( $cart_total * $percentage ) / 100;
 	}
