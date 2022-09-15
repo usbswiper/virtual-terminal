@@ -1306,6 +1306,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                         <th><?php _e('Merchant ID','usb-swiper' ); ?>:</th>
                         <td><?php echo !empty( $merchant_data['merchant_id'] ) ? $merchant_data['merchant_id'] : ''; ?></td>
                     </tr>
+                    
                     <tr>
                         <th><?php _e('Primary Email','usb-swiper' ); ?>:</th>
                         <td><?php echo !empty( $merchant_data['primary_email'] ) ? $merchant_data['primary_email'] : ''; ?></td>
@@ -1391,6 +1392,23 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	                        ?>
                         </td>
                     </tr>
+                    <!--  -->
+                    <!--
+                    <tr>
+		                <th><label for="customer_name"><?php //_e('Customer Name','usb-swiper' ); ?>:</label></th>
+		                <td><input type="text" name="customer_name" value="<?php //echo esc_attr(get_the_author_meta( 'customer_name', $user->ID )); ?>" class="regular-text" /></td>
+		            </tr> -->
+		            <tr>
+		                <th><label for="brand_name"><?php _e('Company Name','usb-swiper' ); ?>:</label></th>
+		                <td><input type="text" name="brand_name" value="<?php echo esc_attr(get_the_author_meta( 'brand_name', $user->ID )); ?>" class="regular-text" /></td>
+		            </tr>
+		            <!--
+		            <tr>
+		                <th><label for="company_address_name"><?php //_e('Company Address','usb-swiper' ); ?>:</label></th>
+		                <td><input type="text" name="company_address_name" value="<?php //echo esc_attr(get_the_author_meta( 'company_address_name', $user->ID )); ?>" class="regular-text" /></td>
+		            </tr>-->
+
+                    <!--  -->
                     <tr>
                         <th><?php _e('Exclude Partner Fees', 'usb-swiper') ?></th>
                         <td>
@@ -1438,6 +1456,21 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$is_partner_fee_exclude = !empty($_POST['partner_checkbox_input']) ? true : false;
 
 			$get_exclude_partner_users = get_option('get_exclude_partner_users', array());
+//todo
+//update_user_meta( $user_id,'customer_name', sanitize_text_field( $_POST['customer_name'] ) );
+// return the data
+//$customer_name = get_the_author_meta( 'customer_name', $userID );
+// echo the data
+//the_author_meta( 'company_name', $userID );
+
+update_user_meta( $user_id,'brand_name', sanitize_text_field( $_POST['brand_name'] ) );
+
+$brand_name = get_the_author_meta( 'brand_name', $userID );
+
+//update_user_meta( $user_id,'company_address_name', sanitize_text_field( $_POST['company_address_name'] ) );
+
+//$company_address_name = get_the_author_meta( 'company_address_name', $userID );
+ 
 
 
 			if (!empty($_POST['partner_checkbox_input'])) {

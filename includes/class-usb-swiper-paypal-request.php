@@ -22,14 +22,22 @@ class Usb_Swiper_Paypal_request{
 
 		$settings = usb_swiper_get_settings('general');
 		$this->settings = $settings;
-		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
 
-		$this->brand_name = apply_filters( 'usb_swiper_brand_name', get_bloginfo('name') );
+		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
+        //TODO
+        $brand_name = get_bloginfo('name');
+        $user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
+        if( !empty( $user_brand ) ) {
+            $brand_name = $user_brand;
+        }
+		$this->brand_name = apply_filters( 'usb_swiper_brand_name',  $brand_name);
+	
 		$this->landing_page = apply_filters( 'usb_swiper_landing_page', 'NO_PREFERENCE');
 		$this->advanced_card_payments = apply_filters( 'usb_swiper_advanced_card_payments', 'yes');
 		$this->enable_checkout_button = apply_filters( 'usb_swiper_enable_checkout_button', 'yes');
 		$this->payee_preferred = 'yes' === apply_filters( 'usb_swiper_payee_preferred', 'no');
-		$this->soft_descriptor = 'yes' === apply_filters( 'usb_swiper_soft_descriptor', '');
+		//todo
+		$this->soft_descriptor = apply_filters( 'usb_swiper_soft_descriptor', $brand_name);
 
 		if( $this->is_sandbox ) {
 			$this->token_url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
