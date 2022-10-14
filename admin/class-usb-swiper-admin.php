@@ -356,8 +356,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		        $query->set( 'orderby', 'meta_value' );
 	        }
 
-
-
 	        if ( 'grand_total' == $orderby ) {
 		        $query->set( 'meta_key', 'GrandTotal' );
 		        $query->set( 'orderby', 'meta_value_num' );
