@@ -652,12 +652,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						                'Content-Type' => 'application/json',
 						                'Authorization' => 'Bearer '.$Paypal_request->get_access_token(),
 					                ),
-				                ));
+				                ), 'order_response', $transaction_id);
 					            $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
 					            update_post_meta($transaction_id, '_payment_response', $order_response);
 				            }
 				        }
 				    }
+
 				    update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
 					usb_swiper_set_session('usb_swiper_woo_create_transaction_id', $response['id']);
 					wp_send_json( array( 'orderID' => $response['id'] ), 200 );
@@ -1204,6 +1205,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $status = false;
 
+            if( !class_exists('Usb_Swiper_Log') ) {
+                include_once USBSWIPER_PATH.'/includes/class-usb-swiper-log.php';
+            }
+
+            $api_log = new Usb_Swiper_Log();
+
             $order_id = ! empty( $_POST['order_id'] ) ? $_POST['order_id'] : '';
             $message = ! empty( $_POST['message'] ) ? $_POST['message'] : '';
 
@@ -1224,11 +1231,21 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $transaction_id = !empty( $transactions[0] ) ? $transactions[0] : '';
                 if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+
+                    $response = get_post_meta( $transaction_id, '_payment_response', true);
+                    $order_status = !empty( $response['status'] ) ? $response['status'] : '';
+                    $order_intent = !empty( $response['intent'] ) ? $response['intent'] : '';
+
                     update_post_meta($transaction_id, '_payment_status', 'FAILED');
                     update_post_meta($transaction_id, '_payment_status_notes', $message);
+
+                    $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
+                    $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
+                    $api_log->log('Response Order Status: '.$order_status, $transaction_id);
+                    $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
+                    $api_log->log('Response Message: '.$message, $transaction_id);
                 }
             }
-
 
             $response = array(
                 'status' => $status,
