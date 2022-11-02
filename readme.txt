@@ -40,6 +40,7 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 = 1.1.15 =
 * Adds failed transactions to logs (VT-12)
 * Adds ability to exclude merchants from being charged a platform_fee (VT-27)
+* Adjusts brand_name and soft_descriptor to use merchant company name (VT-29)
 
 = 1.1.14 =
 * More adjustments to login/account redirects (VT-26)
