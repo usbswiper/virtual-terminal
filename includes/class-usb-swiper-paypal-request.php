@@ -24,7 +24,6 @@ class Usb_Swiper_Paypal_request{
 		$this->settings = $settings;
 
 		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
-        //TODO
         $brand_name = get_bloginfo('name');
         $user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
         if( !empty( $user_brand ) ) {
@@ -36,7 +35,6 @@ class Usb_Swiper_Paypal_request{
 		$this->advanced_card_payments = apply_filters( 'usb_swiper_advanced_card_payments', 'yes');
 		$this->enable_checkout_button = apply_filters( 'usb_swiper_enable_checkout_button', 'yes');
 		$this->payee_preferred = 'yes' === apply_filters( 'usb_swiper_payee_preferred', 'no');
-		//todo
 		$this->soft_descriptor = apply_filters( 'usb_swiper_soft_descriptor', $brand_name);
 
 		if( $this->is_sandbox ) {
