@@ -37,6 +37,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
+= 1.1.15 =
+* Adds failed transactions to logs (VT-12)
+
 = 1.1.14 =
 * More adjustments to login/account redirects (VT-26)
 
