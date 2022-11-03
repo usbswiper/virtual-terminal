@@ -1066,6 +1066,24 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	            ));
 	            ?>
             </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                    echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_brand_name(),
+                    'id' => 'BrandName',
+                    'name' => 'BrandName',
+                    'label' => __( 'Brand Name', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                    ));
+                ?>
+            </p>
             <div class="woocommerce-form-row paypal-disconnect-button"><?php $this->paypal_disconnect_button(); ?></div>
             <div class="clear"></div>
             <?php
@@ -1082,7 +1100,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if ( is_user_logged_in() ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
+				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
 				update_user_meta( $user_id, "_primary_currency", $primary_currency );
+				update_user_meta( $user_id, "brand_name", $brand_name );
+
 			}
 		}
 

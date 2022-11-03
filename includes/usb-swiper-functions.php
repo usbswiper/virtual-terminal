@@ -586,20 +586,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
 			array(
 				'type' => 'select',
-				'id' => 'TransactionCurrency',
-				'name' => 'TransactionCurrency',
-				'label' => __( 'Currency', 'usb-swiper'),
-				'required' => true,
-				'options' => usbswiper_get_currency_code_options(),
-				'default' => usbswiper_get_default_currency(),
-				'attributes' => '',
-				'description' => '',
-				'readonly' => false,
-				'disabled' => false,
-				'class' => 'usbswiper-change-currency',
-			),
-			array(
-				'type' => 'select',
 				'id' => 'TransactionType',
 				'name' => 'TransactionType',
 				'label' => __( 'Transaction Type', 'usb-swiper'),
