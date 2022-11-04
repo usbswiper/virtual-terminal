@@ -1413,8 +1413,7 @@ function usbswiper_get_locale() {
 }
 
 function usbswiper_get_brand_name() {
-    //todo
-    $company_name = get_user_meta( get_current_user_id(),'brand_name', true);
+	$company_name = get_user_meta( get_current_user_id(),'brand_name', true);
 	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
 
