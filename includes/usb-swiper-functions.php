@@ -1427,9 +1427,8 @@ function usbswiper_get_locale() {
 }
 
 function usbswiper_get_brand_name() {
-
-	$billing_company = get_user_meta( get_current_user_id(),'billing_company', true);
-	return !empty( $billing_company ) ? $billing_company : '';
+	$company_name = get_user_meta( get_current_user_id(),'brand_name', true);
+	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
 
 function usbswiper_is_allow_capture( $transaction_id ) {
