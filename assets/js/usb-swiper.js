@@ -1,4 +1,29 @@
 jQuery( document ).ready(function( $ ) {
+    var company = localStorage.getItem('Company');
+    var BillingFirstName = localStorage.getItem('BillingFirstName');
+    var BillingLastName = localStorage.getItem('BillingLastName');
+    var BillingEmail = localStorage.getItem('BillingEmail');
+    var NetAmount = localStorage.getItem('NetAmount');
+    var ShippingAmount = localStorage.getItem('ShippingAmount');
+    var HandlingAmount = localStorage.getItem('HandlingAmount');
+    var TaxRate = localStorage.getItem('TaxRate');
+    var InvoiceNumber = localStorage.getItem('InvoiceNumber');
+    var ItemName = localStorage.getItem('ItemName');
+    var Notes = localStorage.getItem('Notes');
+    if (company !== null) $('#company').val(company);
+    if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
+    if (BillingLastName !== null) $('#BillingLastName').val(BillingLastName);
+    if (BillingEmail !== null) $('#BillingEmail').val(BillingEmail);
+    if (NetAmount !== null) $('#NetAmount').val(NetAmount);
+    if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
+    if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
+    if (TaxRate !== null){
+        TaxRate = parseInt(TaxRate);
+        $('#TaxRate').val(TaxRate);
+    }
+    if (InvoiceNumber !== null) $('#InvoiceID').val(InvoiceNumber);
+    if (ItemName !== null) $('#ItemName').val(ItemName);
+    if (Notes !== null) $('#Notes').val(Notes);
 
     if( $('#ae-paypal-pos-form').length > 0 ) {
         $(document).scroll(function () {
@@ -121,6 +146,17 @@ jQuery( document ).ready(function( $ ) {
                                 if (payload.orderId) {
                                     $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + payload.orderId + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
                                         if( data.result === 'success' ) {
+                                            localStorage.removeItem('Company');
+                                            localStorage.removeItem('BillingFirstName');
+                                            localStorage.removeItem('BillingLastName');
+                                            localStorage.removeItem('BillingEmail');
+                                            localStorage.removeItem('NetAmount');
+                                            localStorage.removeItem('ShippingAmount');
+                                            localStorage.removeItem('HandlingAmount');
+                                            localStorage.removeItem('TaxRate');
+                                            localStorage.removeItem('InvoiceNumber');
+                                            localStorage.removeItem('ItemName');
+                                            localStorage.removeItem('Notes');
                                             window.location.href = data.redirect;
                                         } else{
                                             set_notification(data.message, 'error', data.message_type);
@@ -201,6 +237,17 @@ jQuery( document ).ready(function( $ ) {
                         if (data.orderID) {
                             $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + data.orderID + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
                                 if( data.result === 'success' ) {
+                                    localStorage.removeItem('Company');
+                                    localStorage.removeItem('BillingFirstName');
+                                    localStorage.removeItem('BillingLastName');
+                                    localStorage.removeItem('BillingEmail');
+                                    localStorage.removeItem('NetAmount');
+                                    localStorage.removeItem('ShippingAmount');
+                                    localStorage.removeItem('HandlingAmount');
+                                    localStorage.removeItem('TaxRate');
+                                    localStorage.removeItem('InvoiceNumber');
+                                    localStorage.removeItem('ItemName');
+                                    localStorage.removeItem('Notes');
                                     window.location.href = data.redirect;
                                 } else{
                                     set_notification(data.message, 'error', data.message_type);
@@ -227,6 +274,29 @@ jQuery( document ).ready(function( $ ) {
     };
 
     $(document).on('change','#TransactionCurrency', function () {
+        var BillingLastName = $('#BillingLastName').val();
+        var BillingFirstName = $('#BillingFirstName').val();
+        var BillingEmail = $('#BillingEmail').val();
+        var NetAmount = $('#NetAmount').val();
+        var ShippingAmount = $('#ShippingAmount').val();
+        var HandlingAmount = $('#HandlingAmount').val();
+        var TaxRate = $('#TaxRate').val();
+        var InvoiceNumber = $('#InvoiceID').val();
+        var Company = $('#company').val();
+        var ItemName = $('#ItemName').val();
+        var Notes = $('#Notes').val();
+        localStorage.setItem('Company', Company);
+        localStorage.setItem('BillingFirstName', BillingFirstName);
+        localStorage.setItem('BillingLastName', BillingLastName);
+        localStorage.setItem('BillingEmail', BillingEmail);
+        localStorage.setItem('NetAmount', NetAmount);
+        localStorage.setItem('ShippingAmount', ShippingAmount);
+        localStorage.setItem('HandlingAmount', HandlingAmount);
+        localStorage.setItem('TaxRate', TaxRate);
+        localStorage.setItem('InvoiceNumber', InvoiceNumber);
+        localStorage.setItem('ItemName', ItemName);
+        localStorage.setItem('Notes', Notes);
+
         $('form#ae-paypal-pos-form').addClass('processing').block({
             message: null,
             overlayCSS: {
@@ -234,6 +304,7 @@ jQuery( document ).ready(function( $ ) {
                 opacity: 0.6
             }
         });
+
         window.location.href = usb_swiper_settings.vt_page_url+'?'+$(this).attr('name')+'='+$(this).val();
     });
 

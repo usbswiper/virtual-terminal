@@ -25,3 +25,20 @@ div#transaction-log {overflow-x: scroll;}
 @media print {
     p.signature-text{display: inline;}
 }
+/*select2 code here*/
+.select2-result-label .wrap:before{
+    position:absolute;
+    left:4px;
+    font-family:fontAwesome;
+    color:#999;
+    content:"\f096";
+    width:25px;
+    height:25px;
+
+}
+.select2-result-label .wrap.checked:before{
+    content:"\f14a";
+}
+.select2-result-label .wrap{
+    margin-left:15px;
+}
