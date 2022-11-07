@@ -584,6 +584,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 
 		)),
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
+
 			array(
 				'type' => 'select',
 				'id' => 'TransactionType',
