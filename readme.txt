@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.0.1
-Stable tag: 1.1.15
+Stable tag: 1.1.16
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 1.1.16 =
+* Adds an InvoiceID prefix to avoid PayPal duplicate invoice errors (VT-43)
 
 = 1.1.15 =
 * Adds failed transactions to logs (VT-12)
