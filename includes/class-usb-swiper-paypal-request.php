@@ -302,7 +302,7 @@ class Usb_Swiper_Paypal_request{
 		);
 
 		if( !empty( $InvoiceID ) ) {
-			$body_request['purchase_units'][0]['invoice_id'] = $InvoiceID;
+			$body_request['purchase_units'][0]['invoice_id'] = 'VT-' . $InvoiceID;
 		}
 
 		$body_request['purchase_units'][0]['custom_id'] = $reference_id;
