@@ -37,6 +37,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
+= 1.1.17 =
+* Removes public access from Transactions log (VT-45)
+
 = 1.1.16 =
 * Adds an InvoiceID prefix to avoid PayPal duplicate invoice errors (VT-43)
 
