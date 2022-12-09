@@ -165,6 +165,7 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_account_view-transaction_endpoint', $plugin_public, 'view_transactions_endpoint_cb');
 
 		add_shortcode( 'usb_swiper_paypal_connect', array( $plugin_public, 'usb_swiper_paypal_connect') );
+		add_shortcode( 'usb_swiper_vt_verification_form', array( $plugin_public, 'usb_swiper_vt_verification_form') );
 		add_shortcode( 'usb_swiper_vt_form', array( $plugin_public, 'usb_swiper_vt_form') );
 
 		$this->loader->add_action('template_redirect', $plugin_public, 'template_redirect');
@@ -184,6 +185,9 @@ class Usb_Swiper {
 
 		$this->loader->add_filter( 'woocommerce_email_classes',$plugin_public, 'add_paypal_connected_email' );
 		$this->loader->add_filter( 'wp_login',$plugin_public, 'redirect_on_login',10,2 );
+		$this->loader->add_action('wp_ajax_vt_verification_form', $plugin_admin, 'vt_verification_form_cb');
+		$this->loader->add_action('wp_ajax_vt_verification_form', $plugin_admin, 'vt_verification_form_cb');
+
 		if (!is_admin()) {
 			return;
 		}
@@ -220,6 +224,10 @@ class Usb_Swiper {
 		$this->loader->add_action('pre_get_posts',$plugin_admin,'transaction_custom_order_by');
 		$this->loader->add_action('usb_swiper_after_form_content', $plugin_admin, 'display_partner_fees_exclude_user_list', 10, 2);
 
+		$this->loader->add_action('show_user_profile', $plugin_admin, 'register_settings_for_vt_verification');
+		$this->loader->add_action('edit_user_profile', $plugin_admin, 'register_settings_for_vt_verification');
+		$this->loader->add_action('edit_user_profile_update', $plugin_admin, 'save_settings_for_vt_verification');
+		$this->loader->add_action('personal_options_update', $plugin_admin, 'save_settings_for_vt_verification');
 	}
 
 	/**

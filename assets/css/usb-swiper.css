@@ -80,6 +80,7 @@ p.signature-text{display: none;}
 .show-me-only-in-print{display: none ;}
 .transaction-table-header{text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
 .transaction-column{width: calc(50% - 15px);}
+.vt-verification-message {text-align: left;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}

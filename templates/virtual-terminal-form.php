@@ -1,3 +1,8 @@
+<?php
+$profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+$profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+if( true === $profile_status) {
+?>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
         <?php
@@ -64,3 +69,6 @@
         </div>
     </form>
 </div>
+<?php
+}
+?>

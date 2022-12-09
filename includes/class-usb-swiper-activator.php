@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /**
  * Check Usb_Swiper_Activator class exists or not.
@@ -33,6 +33,14 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 				$vt_page_id = wp_insert_post( array(
 					'post_title'    => __('Virtual Terminal', 'usb-swiper'),
 					'post_content'  => '[usb_swiper_vt_form]',
+					'post_status'   => 'publish',
+					'post_author'   => 1,
+					'post_type' => 'page'
+				) );
+
+				$vt_page_id = wp_insert_post( array(
+					'post_title'    => __('Virtual Terminal Verification', 'usb-swiper'),
+					'post_content'  => '[usb_swiper_vt_verification_form]',
 					'post_status'   => 'publish',
 					'post_author'   => 1,
 					'post_type' => 'page'
