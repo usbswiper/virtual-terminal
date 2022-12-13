@@ -66,6 +66,9 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 			$refund_amount = get_total_refund_amount($transaction_id);
 
 			?>
+            <div>
+                <button id="send_email_btn" class="vt-button"><?php _e('Send Email','usb-swiper'); ?></button>
+            </div>
             <div class="transaction-refund-wrap transaction-history-field">
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
                 <div class="refund-form-wrap">
@@ -420,5 +423,54 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
         <br/>
         <p class="signature-text"><?php _e('Signature........................................','ubs-swiper') ; ?>
         </p>
+    </div>
+</div>
+<?php
+
+$send_email_form_fields = array(
+	array(
+		'type' => 'text',
+		'id' => 'billing_email',
+		'name' => 'billing_email',
+		'label' => __( 'Billing Email:', 'usb-swiper'),
+		'attributes' => '',
+		'description' => '',
+		'readonly' => true,
+        'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : ''
+	),
+    array(
+		'type' => 'text',
+		'id' => 'new_billing_email',
+		'name' => 'new_billing_email',
+		'label' => __( 'New Billing Email:', 'usb-swiper'),
+		'attributes' => '',
+		'description' => '',
+		'readonly' => false,
+	),
+    array(
+		'type' => 'hidden',
+		'id' => 'transaction_id',
+		'name' => 'transaction_id',
+		'attributes' => '',
+		'description' => '',
+		'readonly' => false,
+		'value' => ! empty( $transaction_id ) ? esc_attr( $transaction_id ) : ''
+	),
+);
+?>
+<div class="vt-resend-email-form">
+    <div class="vt-resend-email-form-wrapper">
+        <div class="close">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="512px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve"><path d="M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4  L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1  c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1  c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z"/></svg>
+        </div>
+        <form id="vt_resend_email_form" method="post" action="" name="vt-resend-email-form">
+            <?php
+                foreach ($send_email_form_fields as $form_field){
+                    echo usb_swiper_get_html_field($form_field);
+                }
+            ?>
+            <button id="vt_send_email_cancel" type="reset" class="vt-button"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
+            <button id="vt_send_email_submit" type="submit" class="vt-button"><?php _e( 'Send Email', 'usb-swiper'); ?></button>
+        </form>
     </div>
 </div>

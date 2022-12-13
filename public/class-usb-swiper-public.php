@@ -227,7 +227,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'vt_page_url' => get_the_permalink($vt_page_id),
 				) );
             }
-
+			wp_enqueue_script( 'usb-swiper-general', USBSWIPER_URL . 'assets/js/usb-swiper-general.js', array( 'jquery' ), $this->version, true );
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
 		}
 
@@ -1308,6 +1308,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             }
 		}
+
+        function send_transaction_email(){
+
+            if(  )
+        }
 
 	}
 
