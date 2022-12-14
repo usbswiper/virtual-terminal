@@ -926,18 +926,21 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
 			$BillingEmail = !empty( $BillingEmail ) ? $BillingEmail : $author_email;
 
-            //send email to admin,
-			$admin_email = array( get_option('admin_email'), );
-			$site_title = get_option('blogname');
-			$admin_subject = sprintf(__("[%s]: New Transaction #%s",'usb-swiper'),$site_title,$transaction_id);
-			$admin_content = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
-			$admin_content = $WC_Email->format_string($admin_content);
-			$admin_content = $WC_Email->style_inline($admin_content);
-			$ignore_email = get_option('ignore_transaction_email');
+			//send email to admin,
+			$admin_email        = array( get_option('admin_email'), );
+			$site_title         = get_option('blogname');
+			$admin_subject      = sprintf(__("[%s]: New Transaction #%s",'usb-swiper'),$site_title,$transaction_id);
+			$admin_content      = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
+			$admin_content      = $WC_Email->format_string($admin_content);
+			$admin_content      = $WC_Email->style_inline($admin_content);
+			$ignore_email       = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
+			$current_user       = wp_get_current_user();
+			$current_user_email = $current_user->user_email;
+			wp_mail( $admin_email, $admin_subject, $admin_content, $get_headers );
 
-            if( true !== (bool)$ignore_email ){
-	            wp_mail( $admin_email, $admin_subject, $admin_content, $get_headers );
-            }
+			if( true !== (bool)$ignore_email ){
+				wp_mail( $current_user_email, $admin_subject, $admin_content, $get_headers );
+			}
 
 			//send email to user,
 			$user_subject = sprintf( __("Your %s transaction has been received!",'usb-swiper'), $site_title);
@@ -978,7 +981,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
            }
 
 			$get_countries = WC()->countries->get_countries();
-            $ignore_email_checkbox = get_option('ignore_transaction_email');
+			$ignore_email_checkbox = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
 		    ?>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
@@ -1128,7 +1131,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				update_user_meta( $user_id, "_primary_currency", $primary_currency );
 				update_user_meta( $user_id, "brand_name", $brand_name );
 				update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
-                update_option('ignore_transaction_email',$ignore_transaction_email);
 			}
 		}
 
