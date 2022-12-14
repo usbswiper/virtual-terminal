@@ -348,7 +348,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    $transaction = get_post($transaction_id);
 
 			    if( !empty( $transaction->post_author ) && (int)$transaction->post_author === get_current_user_id() ) {
-				    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $transaction_id ) );
+				    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $transaction_id, 'is_email_html' => true ) );
 			    } else {
 			        $message = __( "You can't access this transaction.",'usb-swiper');
 			        echo apply_filters( 'usb_swiper_transaction_access_denied', $message);
@@ -1311,7 +1311,40 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         function send_transaction_email(){
 
-            if(  )
+	        $status  = false;
+	        $message = '';
+
+	        if( ! empty( $_POST['vt-send-email-nonce'] ) && wp_verify_nonce( $_POST['vt-send-email-nonce'],'vt-send-email-form') ) {
+
+                $status            = true;
+                $message           = __( 'Transaction receipts copy has been sent via email','usb-swiper' );
+                $billing_email     = ! empty( $_POST['billing_email'] ) ? sanitize_text_field( $_POST['billing_email'] ) : '';
+                $transaction_id    = ! empty( $_POST['transaction_id'] ) ? sanitize_text_field( $_POST['transaction_id'] ) : '';
+            }
+
+            if( ! empty( $billing_email ) ) {
+
+	            if ( ! class_exists( 'WC_Email', false ) ) {
+		            include_once dirname( WC_PLUGIN_FILE ) . '/includes/emails/class-wc-email.php';
+	            }
+
+                $WC_Email     = new WC_Email();
+                $get_headers  = $WC_Email->get_headers();
+                $site_title   = get_option( 'blogname' );
+                $user_subject = sprintf( __( "Your %s transaction has been received!", 'usb-swiper' ), $site_title );
+                $user_content = $this->get_email_content( $transaction_id, array( 'email_heading' => __( 'Thank you for your Transaction', 'usb-swiper' ) ) );
+                $user_content = $WC_Email->format_string( $user_content );
+                $user_content = $WC_Email->style_inline( $user_content );
+
+                wp_mail( $billing_email, $user_subject, $user_content, $get_headers );
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+            );
+
+            wp_send_json( $response , 200 );
         }
 
 	}

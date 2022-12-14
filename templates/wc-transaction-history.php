@@ -312,9 +312,6 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 					<?php } ?>
 				<?php } ?>
             </address>
-
-
-
         </div>
     </div>
     <div class="transaction-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
@@ -435,17 +432,8 @@ $send_email_form_fields = array(
 		'label' => __( 'Billing Email:', 'usb-swiper'),
 		'attributes' => '',
 		'description' => '',
-		'readonly' => true,
-        'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : ''
-	),
-    array(
-		'type' => 'text',
-		'id' => 'new_billing_email',
-		'name' => 'new_billing_email',
-		'label' => __( 'New Billing Email:', 'usb-swiper'),
-		'attributes' => '',
-		'description' => '',
 		'readonly' => false,
+        'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : ''
 	),
     array(
 		'type' => 'hidden',
@@ -456,7 +444,17 @@ $send_email_form_fields = array(
 		'readonly' => false,
 		'value' => ! empty( $transaction_id ) ? esc_attr( $transaction_id ) : ''
 	),
+	array(
+		'type' => 'hidden',
+		'id' => 'vt_send_email_nonce',
+		'name' => 'vt-send-email-nonce',
+		'label' => '',
+		'value' => wp_create_nonce('vt-send-email-form'),
+		'required' => false,
+	)
 );
+
+if( !empty( $args['is_email_html'] ) ) {
 ?>
 <div class="vt-resend-email-form">
     <div class="vt-resend-email-form-wrapper">
@@ -469,8 +467,12 @@ $send_email_form_fields = array(
                     echo usb_swiper_get_html_field($form_field);
                 }
             ?>
-            <button id="vt_send_email_cancel" type="reset" class="vt-button"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
-            <button id="vt_send_email_submit" type="submit" class="vt-button"><?php _e( 'Send Email', 'usb-swiper'); ?></button>
+            <span><?php _e( 'Add multiple emails with "," separated', 'usb-swiper'); ?></span>
+            <div class="button-wrap">
+                <button id="vt_send_email_cancel" type="reset" class="vt-button"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
+                <button id="vt_send_email_submit" type="submit" class="vt-button"><?php _e( 'Send Email', 'usb-swiper'); ?></button>
+            </div>
         </form>
     </div>
 </div>
+<?php } ?>
