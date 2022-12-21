@@ -174,6 +174,11 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $this->text($args);
 		}
 
+        public function file( $args = array() ) {
+
+            return $this->text($args);
+        }
+
 		public function textarea( $args ) {
 
 			$args = $this->parse_args($args);

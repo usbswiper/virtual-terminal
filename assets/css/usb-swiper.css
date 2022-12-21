@@ -80,6 +80,16 @@ p.signature-text{display: none;}
 .show-me-only-in-print{display: none ;}
 .transaction-table-header{text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
 .transaction-column{width: calc(50% - 15px);}
+.vt-product-wrapper {background: #0006;bottom: 0;display:none;position: fixed;top: 0;right: 0;left: 0;}
+.vt-product-inner {background: white;border-radius: 16px;max-width: 600px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 20%;left: 0;right: 0;}
+.vt-product-wrapper .input-field-wrap {text-align: left;display: flex;}
+.vt-product-wrapper .input-field-wrap input {height: 20px;padding: 10px;}
+.vt-product-wrapper .input-field-wrap label {width: 25%;}
+.vt-product-wrapper .input-field-wrap {padding: 10px 0;}
+.vt-product-wrapper .button-wrap {display: block}
+.vt-product-wrapper span {color: #777777;font-size: 14px;}
+.vt-product-wrapper .close {position: relative;width: 600px;}
+.vt-product-wrapper .close svg {cursor: pointer;position: absolute;height: 26px;right: -4px;top: -26px;margin: 0 auto;width: 26px;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}
@@ -152,3 +162,104 @@ p.signature-text{display: none;}
     .transaction_history_receipt_info{list-style: none;}
 }
 
+table.my-account-products-listings-table {
+    padding: 20px 0;
+}
+
+.my-account-products-listings-table > thead > tr > th {
+    color: #4361ee;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 0.75rem;
+    text-transform: uppercase;
+}
+
+.my-account-products-listings-table td, .my-account-products-listings-table th {
+    border: 1px solid #ebedf2;
+    margin: 0;
+}
+
+.my-account-products-listings-table > tbody > tr > td {
+    vertical-align: middle;
+    color: #515365;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 0.75rem;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.my-account-products-listings-table tr td a {
+    text-decoration: none;
+}
+
+.vt-button-primary {
+    color: #fff !important;
+    background-color: #4361ee !important;
+    box-shadow: 0 10px 20px -10px #4361ee;
+    padding: 0.4375rem 1.25rem !important;
+    text-shadow: none;
+    white-space: normal;
+    word-wrap: break-word;
+    touch-action: manipulation;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    margin-top: 0 !important;
+    transition: all .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.vt-button-primary:hover {
+    box-shadow: none;
+    transform: translateY(-3px);
+}
+.input-field-wrap .vt-input-field, .vt-fields-wrap .input-field-wrap .vt-input-field, .vt-fields-wrap .input-field-wrap .vt-select-field {
+    border: 1px solid #bfc9d4;
+    color: #3b3f5c;
+    font-size: 15px;
+    padding: 8px 10px;
+    letter-spacing: 1px;
+    height: calc(1.4em + 1.4rem + 2px);
+    border-radius: 6px;
+    width: 100%;
+}
+
+.vt-fields-wrap .input-field-wrap .vt-input-field {
+    height: auto;
+    width: calc(100% - 20px);
+}
+
+.vt-fields-wrap .input-field-wrap .sign {
+    width: auto;
+}
+
+.vt-fields-wrap .input-field-wrap .sign .vt-input-field {
+    border-radius: 0 6px 6px 0;
+}
+
+.vt-fields-wrap .input-field-wrap .sign .vt-input-field {
+    border-radius: 0 6px 6px 0;
+}
+
+.vt-fields-wrap .input-field-wrap .sign.after .vt-input-field {
+    border-radius: 6px 0 0 6px;
+}
+
+.vt-product-wrapper .input-field-wrap label {
+    color: #3b3f5c;
+    font-size: 15px;
+    width: auto;
+}
+
+.vt-product-wrapper .input-field-wrap .p-2, .p-2 {
+    padding: 2px;
+}
