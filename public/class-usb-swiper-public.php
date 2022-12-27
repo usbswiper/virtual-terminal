@@ -1101,7 +1101,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		            'label' => __( 'Ignore Transaction Emails', 'usb-swiper'),
 		            'required' => false,
 		            'attributes' => '',
-		            'description' => __( 'Disable email notifications for transaction', 'usb-swiper'),
+		            'description' => __( 'Disable admin email notifications for transactions.', 'usb-swiper'),
 		            'readonly' => false,
 		            'disabled' => false,
 		            'class' => 'woocommerce-checkbox',
