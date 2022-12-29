@@ -447,11 +447,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function template_redirect() {
-			
+
 			if( is_admin() || ( !empty($_GET['et_fb']) && '1' == $_GET['et_fb'] )) {
 		        return;
 		    }
-			
+
 			$settings = usb_swiper_get_settings('general');
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
@@ -936,11 +936,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$ignore_email       = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
 			$current_user       = wp_get_current_user();
 			$current_user_email = $current_user->user_email;
-			wp_mail( $admin_email, $admin_subject, $admin_content, $get_headers );
 
-			if( true !== (bool)$ignore_email ){
-				wp_mail( $current_user_email, $admin_subject, $admin_content, $get_headers );
-			}
+            if( true !== (bool)$ignore_email ){
+                $admin_email[] = $current_user_email;
+            }
+
+            wp_mail( $admin_email, $admin_subject, $admin_content, $get_headers );
 
 			//send email to user,
 			$user_subject = sprintf( __("Your %s transaction has been received!",'usb-swiper'), $site_title);
