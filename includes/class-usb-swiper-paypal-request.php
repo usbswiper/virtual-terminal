@@ -373,7 +373,6 @@ class Usb_Swiper_Paypal_request{
 
 		$body_request['purchase_units'][0]['payee']['merchant_id'] = $this->merchant_id;
 
-		$ItemName = get_post_meta( $transaction_id,'ItemName', true);
 		$Notes = get_post_meta( $transaction_id,'Notes', true);
 		if( !empty( $Notes ) && strlen( $Notes ) > 127 ) {
 			$Notes = substr($Notes, 0, 127);
@@ -383,21 +382,45 @@ class Usb_Swiper_Paypal_request{
 			$body_request['purchase_units'][0]['description'] = html_entity_decode( $Notes, ENT_NOQUOTES, 'UTF-8' );
 		}
 
-		$NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
+        $vt_product = get_post_meta( $transaction_id,'VTProduct', true);
+        $vt_product_quantity = get_post_meta( $transaction_id,'VTProductQuantity', true);
+        $vt_product_price = get_post_meta( $transaction_id,'VTProductPrice', true);
+        $vt_products = array();
 
-		if( !empty( $ItemName ) ) {
-			$body_request['purchase_units'][0]['items'][0] = array(
-				'name'        => $ItemName,
-				'description' => '',
-				'sku'         => '',
-				'category'    => '',
-				'quantity'    => 1,
-				'unit_amount' =>
-					array(
-						'currency_code' => $this->get_transaction_currency( $transaction_id ),
-						'value'         => usb_swiper_price_formatter($NetAmount),
-					),
-			);
+        for( $i = 0; $i < count($vt_product); $i++ ){
+
+            $product = $vt_product[$i];
+            $quantity = $vt_product_quantity[$i];
+            $price = $vt_product_price[$i];
+
+            $vt_products[] = array(
+                'product_name' => $product,
+                'product_quantity' => $quantity,
+                'product_price' => $price
+            );
+        }
+
+        update_post_meta( $transaction_id, 'vt_products', $vt_products );
+
+		if( ! empty( $vt_products ) && is_array( $vt_products ) ) {
+
+            $purchase_units_items = array();
+
+            foreach ( $vt_products as $products ) {
+                $purchase_units_items[] =  array(
+                    'name'        => $products['product_name'],
+                    'description' => '',
+                    'sku'         => '',
+                    'category'    => '',
+                    'quantity'    => $products['product_quantity'],
+                    'unit_amount' => array(
+                            'currency_code' => $this->get_transaction_currency( $transaction_id ),
+                            'value'         => usb_swiper_price_formatter ( $products['product_price'] ),
+                        ),
+                );
+            }
+
+			$body_request['purchase_units'][0]['items'] = $purchase_units_items;
 		}
 
 		$body_request = $this->set_payer_shipping_details($body_request, $transaction_id);

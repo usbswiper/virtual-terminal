@@ -184,6 +184,10 @@ class Usb_Swiper {
 
 		$this->loader->add_filter( 'woocommerce_email_classes',$plugin_public, 'add_paypal_connected_email' );
 		$this->loader->add_filter( 'wp_login',$plugin_public, 'redirect_on_login',10,2 );
+		$this->loader->add_filter( 'wp_ajax_add_vt_product_wrapper', $plugin_public, 'add_vt_product_wrapper');
+		$this->loader->add_filter( 'wp_ajax_vt_search_product', $plugin_public, 'vt_search_product');
+		$this->loader->add_filter( 'wp_ajax_vt_add_product_value_in_inputs', $plugin_public, 'vt_add_product_value_in_inputs');
+
 		if (!is_admin()) {
 			return;
 		}

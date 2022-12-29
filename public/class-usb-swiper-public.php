@@ -179,6 +179,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
 
 				wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
+				wp_enqueue_style( 'select2', USBSWIPER_URL . 'assets/css/select2.min.css' );
 				wp_enqueue_script( 'bootstrap-min', USBSWIPER_URL . 'assets/js/bootstrap.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'bootstrap-switch', USBSWIPER_URL . 'assets/js/bootstrap-switch.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'pos-functions', USBSWIPER_URL . 'assets/js/pos-functions.js', array( 'jquery' ), $this->version, true );
@@ -187,6 +188,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				wp_enqueue_script( 'autoNumeric', USBSWIPER_URL . 'assets/js/autoNumeric.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'jquery-validate', USBSWIPER_URL . 'assets/js/jquery.validate.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
+				wp_enqueue_script( 'select2', USBSWIPER_URL . 'assets/js/select2.min.js', array( 'jquery' ), $this->version, true );
 
 				wp_localize_script( $this->plugin_name, 'usb_swiper_settings', array(
 					'ajax_url' => admin_url( 'admin-ajax.php' ),
@@ -585,7 +587,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function create_new_transaction() {
 
-			$tab_fields = usb_swiper_get_vt_tab_fields();
+			$tab_fields = usb_swiper_get_fields_for_transaction();
 
             $transaction = array();
 			if( !empty( $tab_fields ) && is_array( $tab_fields ) ) {
@@ -1308,6 +1310,155 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             }
 		}
+
+        /**
+         * Append HTML on click of add item in vt-product-wrapper
+         * @since   1.1.9
+         *
+         */
+        function add_vt_product_wrapper() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            $html = '';
+            $data_id = '';
+
+            if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS','usb-swiper');
+                $data_id = ! empty( $_POST['data-id'] ) ? $_POST['data-id'] : '';
+
+
+                $html .= usb_swiper_get_html_field(array(
+                    'type' => 'text',
+                    'id' => 'VTProduct',
+                    'name' => 'VTProduct[]',
+                    'required' => false,
+                    'placeholder' => __( 'Search Product', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'vt-input-field vt-product-input',
+                    'wrapper_class' => 'product'
+                ));
+
+                $html .= usb_swiper_get_html_field(array(
+                    'type' => 'number',
+                    'id' => 'VTProductQuantity',
+                    'name' => 'VTProductQuantity[]',
+                    'placeholder' => __( 'Quantity', 'usb-swiper'),
+                    'required' => false,
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'vt-input-field vt-product-quantity',
+                    'wrapper_class' => 'product_quantity'
+                ));
+
+                $html .= usb_swiper_get_html_field(array(
+                    'type' => 'number',
+                    'id' => 'VTProductPrice',
+                    'name' => 'VTProductPrice[]',
+                    'placeholder' => __( 'Price', 'usb-swiper'),
+                    'required' => false,
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'vt-input-field vt-product-price',
+                    'wrapper_class' => 'price'
+                ));
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'data_id' => $data_id + 1,
+                'html' => $html,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Append product list in search fields
+         * @since   1.1.9
+         *
+         */
+        function vt_search_product() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            $product_option = array();
+
+            if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS', 'usb-swiper');
+                $product_key = ! empty( $_POST['product-key'] ) ? $_POST['product-key'] : '';
+                $data = '';
+
+                $products = new WP_Query(array(
+                    'post_type' => 'product',
+                    'posts_per_page' => -1,
+                    'author' => get_current_user_id(),
+                    'order' => 'DESC',
+                    's' => $product_key
+                ));
+
+                if (!empty($products->posts)) {
+                    foreach ( $products->posts as $product ) {
+                        $data .= "<span class='product-item' data-id='$product->ID'>$product->post_title</span>";
+                    }
+                }
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'product_select' => $data,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Append product price in input fields.
+         * @since   1.1.9
+         *
+         */
+        function vt_add_product_value_in_inputs() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            $product_name = '';
+            $product_price = '';
+
+            if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS', 'usb-swiper');
+                $product_id = !empty($_POST['product-id']) ? $_POST['product-id'] : '';
+
+                $product = wc_get_product( $product_id );
+
+                $product_name = $product->get_name();
+                $product_price = $product->get_regular_price();
+
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'product_name' => $product_name,
+                'product_price' => $product_price,
+            );
+
+            wp_send_json( $response , 200 );
+        }
 
 	}
 

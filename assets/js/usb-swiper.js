@@ -8,7 +8,6 @@ jQuery( document ).ready(function( $ ) {
     var HandlingAmount = localStorage.getItem('HandlingAmount');
     var TaxRate = localStorage.getItem('TaxRate');
     var InvoiceNumber = localStorage.getItem('InvoiceNumber');
-    var ItemName = localStorage.getItem('ItemName');
     var Notes = localStorage.getItem('Notes');
     if (company !== null) $('#company').val(company);
     if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
@@ -22,7 +21,6 @@ jQuery( document ).ready(function( $ ) {
         $('#TaxRate').val(TaxRate);
     }
     if (InvoiceNumber !== null) $('#InvoiceID').val(InvoiceNumber);
-    if (ItemName !== null) $('#ItemName').val(ItemName);
     if (Notes !== null) $('#Notes').val(Notes);
 
     if( $('#ae-paypal-pos-form').length > 0 ) {
@@ -155,7 +153,6 @@ jQuery( document ).ready(function( $ ) {
                                             localStorage.removeItem('HandlingAmount');
                                             localStorage.removeItem('TaxRate');
                                             localStorage.removeItem('InvoiceNumber');
-                                            localStorage.removeItem('ItemName');
                                             localStorage.removeItem('Notes');
                                             window.location.href = data.redirect;
                                         } else{
@@ -246,7 +243,6 @@ jQuery( document ).ready(function( $ ) {
                                     localStorage.removeItem('HandlingAmount');
                                     localStorage.removeItem('TaxRate');
                                     localStorage.removeItem('InvoiceNumber');
-                                    localStorage.removeItem('ItemName');
                                     localStorage.removeItem('Notes');
                                     window.location.href = data.redirect;
                                 } else{
@@ -269,7 +265,7 @@ jQuery( document ).ready(function( $ ) {
         current_obj.append('<span class="vt-loader"></span>');
     };
 
-    const usb_swiper_remove_loader = ( current_obj) => {
+    const usb_swiper_remove_loader = ( current_obj ) => {
         current_obj.children('.vt-loader').remove();
     };
 
@@ -283,7 +279,6 @@ jQuery( document ).ready(function( $ ) {
         var TaxRate = $('#TaxRate').val();
         var InvoiceNumber = $('#InvoiceID').val();
         var Company = $('#company').val();
-        var ItemName = $('#ItemName').val();
         var Notes = $('#Notes').val();
         localStorage.setItem('Company', Company);
         localStorage.setItem('BillingFirstName', BillingFirstName);
@@ -294,7 +289,6 @@ jQuery( document ).ready(function( $ ) {
         localStorage.setItem('HandlingAmount', HandlingAmount);
         localStorage.setItem('TaxRate', TaxRate);
         localStorage.setItem('InvoiceNumber', InvoiceNumber);
-        localStorage.setItem('ItemName', ItemName);
         localStorage.setItem('Notes', Notes);
 
         $('form#ae-paypal-pos-form').addClass('processing').block({
@@ -350,4 +344,133 @@ jQuery( document ).ready(function( $ ) {
 
         event.preventDefault();
     });
+
+    $(document).on('click','.vt-remove-fields-wrap', function (){
+        $(this).parent().remove();
+    });
+
+    $(document).on('click','#vt_add_item', function () {
+
+        let repeater = $('#vt_repeater_field');
+        let nonce = $('#vt_add_product_nonce').val();
+        let loader = $(this);
+        let data_id = $(this).attr('data-id');
+        let data = {
+            'action': 'add_vt_product_wrapper',
+            'vt-add-product-nonce': nonce,
+            'data-id': data_id
+        };
+
+        usb_swiper_add_loader(loader);
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                loader.attr('data-id',response.data_id);
+                repeater.append('<div id="vt_fields_wrap_' + response.data_id + '" class="vt-fields-wrap">' + response.html + '<span class="vt-remove-fields-wrap"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span></div>');
+                usb_swiper_remove_loader(loader);
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
+    $(document).on('keyup','.vt-product-input', function () {
+
+        let search_val = $(this).val();
+        let vt_product_input = $(this);
+        let nonce = $('#vt_add_product_nonce').val();
+        let repeater = $('.vt-repeater-field');
+        let data = {
+            'action': 'vt_search_product',
+            'product-key': search_val,
+            'vt-add-product-nonce': nonce
+        };
+
+        repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+
+        if(search_val.length >= 3) {
+            $.post(usb_swiper_settings.ajax_url, data, function (response) {
+                if (response.status) {
+                    if(response.product_select) {
+                        if (vt_product_input.parents('.vt-fields-wrap').children('.product').children().hasClass('vt-search-result')) {
+                            vt_product_input.parents('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+                            vt_product_input.parents('.vt-fields-wrap').children('.product').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        } else {
+                            vt_product_input.parents('.vt-fields-wrap').children('.product').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        }
+                    } else {
+                        vt_product_input.parents('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+                    }
+                } else {
+                    set_notification(response.message, 'error', response.message_type);
+                }
+            });
+        }
+    });
+
+    $(document).on('click','.product-item', function () {
+
+        let product_id = $(this).attr('data-id');
+        let nonce = $('#vt_add_product_nonce').val();
+        let repeater = $('.vt-repeater-field');
+        let product_item = $(this);
+        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id')
+        let data = {
+            'action': 'vt_add_product_value_in_inputs',
+            'product-id': product_id,
+            'vt-add-product-nonce': nonce
+        };
+
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
+                $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
+                $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
+                repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+
+                let net_price_array = [];
+                let net_price = '';
+
+                $( ".vt-product-quantity" ).each(function(index) {
+                    console.log(index);
+                    let quantity = $(this).val();
+                    let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
+                    let price = $('#'+wrapper_id).children('.price').children('input').val();
+                    net_price_array[index] = Number(quantity) * Number(price);
+                });
+
+
+                for (let i = 0; i < net_price_array.length; i++) {
+                    net_price = Number(net_price_array[i]) + Number(net_price);
+                }
+
+                $('#NetAmount').val(net_price);
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
+    $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
+
+        let net_price_array = [];
+        let net_price = '';
+
+        $( ".vt-product-quantity" ).each(function(index) {
+            console.log(index);
+            let quantity_class = $(this);
+            let quantity = $(this).val();
+            let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
+            let price = $('#'+wrapper_id).children('.price').children('input').val();
+            net_price_array[index] = Number(quantity) * Number(price);
+        });
+
+
+        for (let i = 0; i < net_price_array.length; i++) {
+            net_price = Number(net_price_array[i]) + Number(net_price);
+        }
+
+        $('#NetAmount').val(net_price);
+    });
+
+
 });

@@ -2,9 +2,9 @@
 
 
 
-///**
-// * Filter the cart template path to use our cart.php template instead of the theme's
-// */
+/**
+ * Filter the cart template path to use our cart.php template instead of the theme's
+ */
 function usbswiper_locate_email_templates( $template, $template_name, $template_path ) {
 	$basename = basename( $template );
 	if( $basename == 'paypalconnected.php' ) {
@@ -132,7 +132,6 @@ function usb_swiper_get_vt_tab_fields() {
 
 	$tab_fields = array(
 		//'swiper' => __( 'Swipe Card' ,'usb-swiper' ),
-		'currency_info' => __( 'Currency Information' ,'usb-swiper' ),
 		'personal_info' => __( 'Buyer Information' ,'usb-swiper' ),
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
@@ -140,6 +139,18 @@ function usb_swiper_get_vt_tab_fields() {
 	);
 
 	return apply_filters( 'usb_swiper_get_vt_tab_fields', $tab_fields );
+}
+
+function usb_swiper_get_fields_for_transaction() {
+
+    return array(
+        'currency_info' => __( 'Currency Information' ,'usb-swiper' ),
+        'personal_info' => __( 'Buyer Information' ,'usb-swiper' ),
+        'product_info' => __( 'Product Information' ,'usb-swiper' ),
+        'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
+        'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
+        'shipping_address' => __( 'Shipping Address' ,'usb-swiper' ),
+    );
 }
 
 /**
@@ -504,477 +515,516 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 	$get_countries = usb_swiper_get_countries();
 	$get_states = usb_swiper_get_states();
 
-	$form_fields = array(
-		'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
-			array(
-				'type' => 'password',
-				'id' => 'swiper',
-				'name' => 'swiper',
-				'label' => __( 'Click to Swipe', 'usb-swiper'),
-				'required' => false,
-				'attributes' =>'',
-				'class' => '',
-				'description' => sprintf( __( 'Note: A %1$sUSB credit card reader%2$s is required for swipe functionality.','usb-swiper'), '<a target="_blank" href="https://www.usbswiper.com/usbswiper-usb-magnetic-stripe-credit-card-reader.html?utm_source=angelleye&utm_medium=paypal-pos&utm_campaign=usbswiper">' ,'</a>')
-			)
-		)),
-		'currency_info' => apply_filters( 'usb_swiper_payment_info_fields1', array(
-			array(
-				'type' => 'select',
-				'id' => 'TransactionCurrency',
-				'name' => 'TransactionCurrency',
-				'label' => __( 'Currency', 'usb-swiper'),
-				'required' => true,
-				'options' => usbswiper_get_currency_code_options(),
-				'default' => usbswiper_get_default_currency(),
-				'attributes' => '',
-				'description' => '',
-				'readonly' => false,
-				'disabled' => false,
-				'class' => 'usbswiper-change-currency',
-			))),
-		'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
-			array(
-				'type' => 'text',
-				'id' => 'company',
-				'name' => 'company',
-				'label' => __( 'Company Name', 'usb-swiper'),
-				'required' => false,
-				'options' => array(),
-				'attributes' => array(
-					//'maxlength' => 25
-				),
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingFirstName',
-				'name' => 'BillingFirstName',
-				'label' => __( 'First Name', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 35
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingLastName',
-				'name' => 'BillingLastName',
-				'label' => __( 'Last Name', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 35
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingEmail',
-				'name' => 'BillingEmail',
-				'label' => __( 'Email Address', 'usb-swiper'),
-				'required' => false,
-				'options' => array(),
-				'attributes' => array(
-					//'maxlength' => 25
-				),
-				'class' => '',
-			),
+    $form_fields = array(
+        'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
+            array(
+                'type' => 'password',
+                'id' => 'swiper',
+                'name' => 'swiper',
+                'label' => __( 'Click to Swipe', 'usb-swiper'),
+                'required' => false,
+                'attributes' =>'',
+                'class' => 'vt-input-field',
+                'description' => sprintf( __( 'Note: A %1$sUSB credit card reader%2$s is required for swipe functionality.','usb-swiper'), '<a target="_blank" href="https://www.usbswiper.com/usbswiper-usb-magnetic-stripe-credit-card-reader.html?utm_source=angelleye&utm_medium=paypal-pos&utm_campaign=usbswiper">' ,'</a>')
+            )
+        )),
+        'currency_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
+            array(
+                'type' => 'select',
+                'id' => 'TransactionCurrency',
+                'name' => 'TransactionCurrency',
+                'label' => __( 'Currency', 'usb-swiper'),
+                'required' => true,
+                'options' => usbswiper_get_currency_code_options(),
+                'default' => usbswiper_get_default_currency(),
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'usbswiper-change-currency',
+            ))),
 
-		)),
-		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
+        'product_info' => apply_filters( 'usb_swiper_product_info_fields', array(
+            array(
+                'type' => 'text',
+                'id' => 'VTProduct',
+                'name' => 'VTProduct[]',
+                'required' => false,
+                'placeholder' => __( 'Search Product', 'usb-swiper'),
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-input-field vt-product-input',
+                'wrapper_class' => 'product'
+            ),
+            array(
+                'type' => 'number',
+                'id' => 'VTProductQuantity',
+                'name' => 'VTProductQuantity[]',
+                'placeholder' => __( 'Quantity', 'usb-swiper'),
+                'required' => false,
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-input-field vt-product-quantity',
+                'wrapper_class' => 'product_quantity'
+            ),
+            array(
+                'type' => 'number',
+                'id' => 'VTProductPrice',
+                'name' => 'VTProductPrice[]',
+                'placeholder' => __( 'Price', 'usb-swiper'),
+                'required' => false,
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-input-field vt-product-price',
+                'wrapper_class' => 'price'
+            )
+            )),
+        'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
+            array(
+                'type' => 'text',
+                'id' => 'company',
+                'name' => 'company',
+                'placeholder' => __( 'Company Name', 'usb-swiper'),
+                'required' => false,
+                'options' => array(),
+                'attributes' => array(
+                    //'maxlength' => 25
+                ),
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingFirstName',
+                'name' => 'BillingFirstName',
+                'placeholder' => __( 'First Name', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 35
+                ),
+                'description' => '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingLastName',
+                'name' => 'BillingLastName',
+                'placeholder' => __( 'Last Name', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 35
+                ),
+                'description' => '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingEmail',
+                'name' => 'BillingEmail',
+                'placeholder' => __( 'Email Address', 'usb-swiper'),
+                'required' => false,
+                'options' => array(),
+                'attributes' => array(
+                    //'maxlength' => 25
+                ),
+                'class' => 'vt-input-field',
+            ),
 
-			array(
-				'type' => 'select',
-				'id' => 'TransactionType',
-				'name' => 'TransactionType',
-				'label' => __( 'Transaction Type', 'usb-swiper'),
-				'required' => true,
-				'options' => array(
-					'capture' => __( 'Capture', 'usb-swiper' ),
-					'authorize' => __( 'Authorize', 'usb-swiper' ),
-				),
-				'default' => 'capture',
-				'attributes' => '',
-				'description' => '',
-				'readonly' => false,
-				'disabled' => false,
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'NetAmount',
-				'name' => 'NetAmount',
-				'label' => __( 'Net Order Amount', 'usb-swiper'),
-				'required' => true,
-				'is_currency' => true,
-				'attributes' => array(
-					'pattern' => '([0-9]|\$|,|.)+'
-				),
-				'description' => '',
-				'class' => '',
-				'is_symbol' => true,
-				'symbol' => usbswiper_get_currency_symbol(),
-				'symbol_wrap_class' => 'currency-sign'
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingAmount',
-				'name' => 'ShippingAmount',
-				'label' => __( 'Shipping Amount', 'usb-swiper'),
-				'required' => false,
-				'is_currency' => true,
-				'attributes' => array(
-					'pattern' => '([0-9]|\$|,|.)+'
-				),
-				'description' => '',
-				'class' => 'currency-sign',
-				'is_symbol' => true,
-				'symbol' => usbswiper_get_currency_symbol(),
-				'symbol_wrap_class' => 'currency-sign'
-			),
-			array(
-				'type' => 'text',
-				'id' => 'HandlingAmount',
-				'name' => 'HandlingAmount',
-				'label' => __( 'Handling Amount', 'usb-swiper'),
-				'required' => false,
-				'is_currency' => true,
-				'attributes' => array(
-					'pattern' => '([0-9]|\$|,|.)+'
-				),
-				'description' => '',
-				'class' => 'currency-sign',
-				'is_symbol' => true,
-				'symbol' => usbswiper_get_currency_symbol(),
-				'symbol_wrap_class' => 'currency-sign'
-			),
-			array(
-				'type' => 'text',
-				'id' => 'TaxRate',
-				'name' => 'TaxRate',
-				'label' => __( 'Tax Rate', 'usb-swiper'),
-				'required' => false,
-				'is_percentage' => true,
-				'attributes' => array(
-					'maxlength' => '4'
-				),
-				'description' => '',
-				'class' => 'tax-rate-sign',
-				'is_symbol' => true,
-				'symbol' => '%',
-				'symbol_wrap_class' => 'currency-sign after'
-			),
-			array(
-				'type' => 'text',
-				'id' => 'TaxAmount',
-				'name' => 'TaxAmount',
-				'label' => __( 'Tax Amount', 'usb-swiper'),
-				'required' => false,
-				'readonly' => true,
-				'attributes' => '',
-				'description' => '',
-				'class' => 'currency-sign',
-				'is_symbol' => true,
-				'symbol' => usbswiper_get_currency_symbol(),
-				'symbol_wrap_class' => 'currency-sign'
-			),
-			array(
-				'type' => 'text',
-				'id' => 'GrandTotal',
-				'name' => 'GrandTotal',
-				'label' => __( 'Grand Total', 'usb-swiper'),
-				'required' => false,
-				'readonly' => true,
-				'attributes' => '',
-				'description' => '',
-				'class' => 'currency-sign',
-				'is_symbol' => true,
-				'symbol' => usbswiper_get_currency_symbol(),
-				'symbol_wrap_class' => 'currency-sign'
-			),
-			array(
-				'type' => 'text',
-				'id' => 'InvoiceID',
-				'name' => 'InvoiceID',
-				'label' => __( 'Invoice Number', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => '35'
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ItemName',
-				'name' => 'ItemName',
-				'label' => __( 'ItemName', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => '70'
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'textarea',
-				'id' => 'Notes',
-				'name' => 'Notes',
-				'label' => __( 'Notes', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => '127'
-				),
-				'description' => '',
-				'class' => '',
+        )),
+        'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
 
-			),
-		)),
-		'billing_address' => apply_filters( 'usb_swiper_billing_address_fields', array(
-			array(
-				'type' => 'checkbox',
-				'id' => 'billingInfo',
-				'name' => 'billingInfo',
-				'label' => __( 'Enter Billing Address', 'usb-swiper'),
-				'required' => false,
-				'value' => "true",
-				'checked' => true,
-				'attributes' => array(
-					'data-default-checked' => 'FALSE'
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingStreet',
-				'name' => 'BillingStreet',
-				'label' => __( 'Street', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingStreet2',
-				'name' => 'BillingStreet2',
-				'label' => __( 'Street 2', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingCity',
-				'name' => 'BillingCity',
-				'label' => __( 'City', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'select',
-				'id' => 'BillingState',
-				'name' => 'BillingState',
-				'label' => __( 'State', 'usb-swiper'),
-				'required' => true,
-				'attributes' => '',
-				'options' => $get_states,
-				'description' => '',
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingPostalCode',
-				'name' => 'BillingPostalCode',
-				'label' => __( 'Postal Code', 'usb-swiper'),
-				'required' => true,
-				'options' => array(),
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'select',
-				'id' => 'BillingCountryCode',
-				'name' => 'BillingCountryCode',
-				'label' => __( 'Country', 'usb-swiper'),
-				'required' => true,
-				'attributes' => '',
-				'options' => $get_countries,
-				'description' => '',
-				'class' => 'vt-billing-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingPhoneNumber',
-				'name' => 'BillingPhoneNumber',
-				'label' => __( 'Phone Number', 'usb-swiper'),
-				'required' => false,
-				'options' => array(),
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'class' => 'vt-billing-address-field',
-			),
-		)),
-		'shipping_address' => apply_filters( 'usb_swiper_shipping_address_fields', array(
-			array(
-				'type' => 'checkbox',
-				'id' => 'shippingDisabled',
-				'name' => 'shippingDisabled',
-				'label' => __( 'Shipping Not Req.', 'usb-swiper'),
-				'required' => false,
-				'value' => "true",
-				'attributes' => array(
-					'data-default-checked' => "TRUE"
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'checkbox',
-				'id' => 'shippingSameAsBilling',
-				'name' => 'shippingSameAsBilling',
-				'label' => __( 'Same as Billing', 'usb-swiper'),
-				'required' => false,
-				'value' => "true",
-				'attributes' => array(
-					'data-default-checked' => "TRUE"
-				),
-				'description' => '',
-				'class' => 'vt-enable-shipping-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingFirstName',
-				'name' => 'ShippingFirstName',
-				'label' => __( 'First Name', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingLastName',
-				'name' => 'ShippingLastName',
-				'label' => __( 'Last Name', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingStreet',
-				'name' => 'ShippingStreet',
-				'label' => __( 'Street', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingStreet2',
-				'name' => 'ShippingStreet2',
-				'label' => __( 'Street 2', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingCity',
-				'name' => 'ShippingCity',
-				'label' => __( 'City', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'select',
-				'id' => 'ShippingState',
-				'name' => 'ShippingState',
-				'label' => __( 'State', 'usb-swiper'),
-				'required' => true,
-				'options' => $get_states,
-				'attributes' => '',
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingPostalCode',
-				'name' => 'ShippingPostalCode',
-				'label' => __( 'Postal Code', 'usb-swiper'),
-				'required' => true,
-				'attributes' => '',
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'select',
-				'id' => 'ShippingCountryCode',
-				'name' => 'ShippingCountryCode',
-				'label' => __( 'Country', 'usb-swiper'),
-				'required' => true,
-				'options' => $get_countries,
-				'attributes' => '',
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingPhoneNumber',
-				'name' => 'ShippingPhoneNumber',
-				'label' => __( 'Phone Number', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'ShippingEmail',
-				'name' => 'ShippingEmail',
-				'label' => __( 'Email Address', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					//'maxlength' => 25
-				),
-				'description' => '',
-				'class' => 'vt-shipping-address-field',
-			),
-		)),
-	);
+            array(
+                'type' => 'select',
+                'id' => 'TransactionType',
+                'name' => 'TransactionType',
+                'label' => __( 'Transaction Type', 'usb-swiper'),
+                'placeholder' => __( 'Transaction Type', 'usb-swiper'),
+                'required' => true,
+                'options' => array(
+                    'capture' => __( 'Capture', 'usb-swiper' ),
+                    'authorize' => __( 'Authorize', 'usb-swiper' ),
+                ),
+                'default' => 'capture',
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-select-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'NetAmount',
+                'name' => 'NetAmount',
+                'label' => __( 'Net Order Amount', 'usb-swiper'),
+                'placeholder' => __( 'Net Order Amount', 'usb-swiper'),
+                'required' => true,
+                'is_currency' => true,
+                'attributes' => array(
+                    'pattern' => '([0-9]|\$|,|.)+'
+                ),
+                'description' => '',
+                'class' => 'vt-input-field',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign',
+                'readonly' => true,
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingAmount',
+                'name' => 'ShippingAmount',
+                'label' => __( 'Shipping Amount', 'usb-swiper'),
+                'placeholder' => __( 'Shipping Amount', 'usb-swiper'),
+                'required' => false,
+                'is_currency' => true,
+                'attributes' => array(
+                    'pattern' => '([0-9]|\$|,|.)+'
+                ),
+                'description' => '',
+                'class' => 'currency-sign vt-input-field',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign'
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'HandlingAmount',
+                'name' => 'HandlingAmount',
+                'label' => __( 'Handling Amount', 'usb-swiper'),
+                'placeholder' => __( 'Handling Amount', 'usb-swiper'),
+                'required' => false,
+                'is_currency' => true,
+                'attributes' => array(
+                    'pattern' => '([0-9]|\$|,|.)+'
+                ),
+                'description' => '',
+                'class' => 'currency-sign vt-input-field',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign'
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'TaxRate',
+                'name' => 'TaxRate',
+                'label' => __( 'Tax Rate', 'usb-swiper'),
+                'placeholder' => __( 'Tax Rate', 'usb-swiper'),
+                'required' => false,
+                'is_percentage' => true,
+                'attributes' => array(
+                    'maxlength' => '4'
+                ),
+                'description' => '',
+                'class' => 'tax-rate-sign vt-input-field',
+                'is_symbol' => true,
+                'symbol' => '%',
+                'symbol_wrap_class' => 'currency-sign after',
+                'value' => ''
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'TaxAmount',
+                'name' => 'TaxAmount',
+                'label' => __( 'Tax Amount', 'usb-swiper'),
+                'placeholder' => __( 'Tax Amount', 'usb-swiper'),
+                'required' => false,
+                'readonly' => true,
+                'attributes' => '',
+                'description' => '',
+                'class' => 'currency-sign vt-input-field',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign'
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'GrandTotal',
+                'name' => 'GrandTotal',
+                'label' => __( 'Grand Total', 'usb-swiper'),
+                'placeholder' => __( 'Grand Total', 'usb-swiper'),
+                'required' => false,
+                'readonly' => true,
+                'attributes' => '',
+                'description' => '',
+                'class' => 'currency-sign vt-input-field',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign'
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'InvoiceID',
+                'name' => 'InvoiceID',
+                'placeholder' => __( 'Invoice Number', 'usb-swiper'),
+                'required' => false,
+                'attributes' => array(
+                    'maxlength' => '35'
+                ),
+                'description' => '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'textarea',
+                'id' => 'Notes',
+                'name' => 'Notes',
+                'placeholder' => __( 'Notes', 'usb-swiper'),
+                'required' => false,
+                'attributes' => array(
+                    'maxlength' => '127'
+                ),
+                'description' => '',
+                'class' => 'vt-input-field vt-textarea-field',
+
+            ),
+        )),
+        'billing_address' => apply_filters( 'usb_swiper_billing_address_fields', array(
+            array(
+                'type' => 'checkbox',
+                'id' => 'billingInfo',
+                'name' => 'billingInfo',
+                'label' => __( 'Enter Billing Address', 'usb-swiper'),
+                'required' => false,
+                'value' => "true",
+                'checked' => true,
+                'attributes' => array(
+                    'data-default-checked' => 'FALSE'
+                ),
+                'description' => '',
+                'class' => '',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingStreet',
+                'name' => 'BillingStreet',
+                'placeholder' => __( 'Street', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-billing-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingStreet2',
+                'name' => 'BillingStreet2',
+                'placeholder' => __( 'Street 2', 'usb-swiper'),
+                'required' => false,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-billing-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingCity',
+                'placeholder' => 'BillingCity',
+                'label' => __( 'City', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-billing-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'select',
+                'id' => 'BillingState',
+                'name' => 'BillingState',
+                'label' => __( 'State', 'usb-swiper'),
+                'required' => true,
+                'attributes' => '',
+                'options' => $get_states,
+                'description' => '',
+                'class' => 'vt-billing-address-field vt-select-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingPostalCode',
+                'name' => 'BillingPostalCode',
+                'placeholder' => __( 'Postal Code', 'usb-swiper'),
+                'required' => true,
+                'options' => array(),
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'class' => 'vt-billing-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'select',
+                'id' => 'BillingCountryCode',
+                'name' => 'BillingCountryCode',
+                'placeholder' => __( 'Country', 'usb-swiper'),
+                'required' => true,
+                'attributes' => '',
+                'options' => $get_countries,
+                'description' => '',
+                'class' => 'vt-billing-address-field vt-select-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingPhoneNumber',
+                'name' => 'BillingPhoneNumber',
+                'placeholder' => __( 'Phone Number', 'usb-swiper'),
+                'required' => false,
+                'options' => array(),
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'class' => 'vt-billing-address-field vt-input-field',
+            ),
+        )),
+        'shipping_address' => apply_filters( 'usb_swiper_shipping_address_fields', array(
+            array(
+                'type' => 'checkbox',
+                'id' => 'shippingDisabled',
+                'name' => 'shippingDisabled',
+                'placeholder' => __( 'Shipping Not Req.', 'usb-swiper'),
+                'required' => false,
+                'value' => "true",
+                'attributes' => array(
+                    'data-default-checked' => "TRUE"
+                ),
+                'description' => '',
+                'class' => '',
+            ),
+            array(
+                'type' => 'checkbox',
+                'id' => 'shippingSameAsBilling',
+                'name' => 'shippingSameAsBilling',
+                'placeholder' => __( 'Same as Billing', 'usb-swiper'),
+                'required' => false,
+                'value' => "true",
+                'attributes' => array(
+                    'data-default-checked' => "TRUE"
+                ),
+                'description' => '',
+                'class' => 'vt-enable-shipping-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingFirstName',
+                'name' => 'ShippingFirstName',
+                'placeholder' => __( 'First Name', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingLastName',
+                'name' => 'ShippingLastName',
+                'placeholder' => __( 'Last Name', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingStreet',
+                'name' => 'ShippingStreet',
+                'placeholder' => __( 'Street', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingStreet2',
+                'name' => 'ShippingStreet2',
+                'placeholder' => __( 'Street 2', 'usb-swiper'),
+                'required' => false,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingCity',
+                'name' => 'ShippingCity',
+                'label' => __( 'City', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'select',
+                'id' => 'ShippingState',
+                'name' => 'ShippingState',
+                'placeholder' => __( 'State', 'usb-swiper'),
+                'required' => true,
+                'options' => $get_states,
+                'attributes' => '',
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-select-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingPostalCode',
+                'name' => 'ShippingPostalCode',
+                'placeholder' => __( 'Postal Code', 'usb-swiper'),
+                'required' => true,
+                'attributes' => '',
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'select',
+                'id' => 'ShippingCountryCode',
+                'name' => 'ShippingCountryCode',
+                'placeholder' => __( 'Country', 'usb-swiper'),
+                'required' => true,
+                'options' => $get_countries,
+                'attributes' => '',
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-select-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingPhoneNumber',
+                'name' => 'ShippingPhoneNumber',
+                'placeholder' => __( 'Phone Number', 'usb-swiper'),
+                'required' => false,
+                'attributes' => array(
+                    'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'ShippingEmail',
+                'name' => 'ShippingEmail',
+                'placeholder' => __( 'Email Address', 'usb-swiper'),
+                'required' => false,
+                'attributes' => array(
+                    //'maxlength' => 25
+                ),
+                'description' => '',
+                'class' => 'vt-shipping-address-field vt-input-field',
+            ),
+        )),
+    );
 
 	$form_fields = apply_filters( 'usb_swiper_get_vt_form_fields', $form_fields );
 
@@ -1233,6 +1283,26 @@ function usbswiper_get_default_currency( $user_id = 0 ) {
 	}
 
 	return $currency;
+}
+
+function vt_get_curent_user_products() {
+
+    $product_option = array('' => __( 'Select Product', 'usb-swiper'));
+
+    $products = new WP_Query( array(
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+        'author' => get_current_user_id(),
+        'order' => 'DESC',
+    ));
+
+    if( ! empty( $products->posts ) ) {
+        foreach ( $products->posts as $product ) {
+            $product_option[$product->ID] = $product->post_title;
+        }
+    }
+
+    return $product_option;
 }
 
 function usbswiper_get_currency_symbol() {
