@@ -35,44 +35,14 @@ jQuery( document ).ready(function( $ ) {
             'product_id' : product_id
         };
 
-        /*post it*/
         $.post(usb_swiper_settings.ajax_url, data, function(response) {
             if(response.type === "success") {
                 set_notification(response.message, 'success');
-                window.location.reload();
+                window.location.reload(true);
             }
             else {
                 set_notification(response.message, 'error', response.message_type);
             }
         });
-    });
-
-    $( "#vt_add_product_form_sss" ).submit(function( event ) {
-        var form = $(this);
-        var form_id = form.attr('id');
-        var submitButton = form.find('#vt_add_product_submit');
-        usb_swiper_add_loader(submitButton);
-
-        jQuery.ajax({
-            url: usb_swiper_settings.ajax_url,
-            type: 'POST',
-            dataType: 'json',
-            data: form.serialize()+"&action=vt_add_product",
-        }).done(function ( response ) {
-
-            if( response.status) {
-                set_notification(response.message, 'success');
-                document.getElementById(form_id).reset();
-                $(".vt-resend-email-form ").hide();
-            } else{
-                set_notification(response.message, 'error', response.message_type);
-            }
-            usb_swiper_remove_loader(submitButton);
-            $(".vt-product-wrapper").hide();
-            $('#vt_product_image').val('');
-
-        });
-
-        event.preventDefault();
     });
 });

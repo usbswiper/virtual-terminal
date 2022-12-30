@@ -1423,6 +1423,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         }
 
+        /**
+         * This function upload file from path
+         *
+         * @param $file
+         * @return int|string|WP_Error
+         */
         public function vt_upload_from_path( $file ) {
 
             $attach_id = '';
@@ -1457,6 +1463,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             return $attach_id;
         }
 
+        /**
+         * Delete product of current users from database
+         *
+         * @return void
+         */
         public function vt_delete_product_cb() {
 
             $status = false;
@@ -1478,6 +1489,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response);
         }
 
+        /**
+         * Extend product query and show only admins products
+         *
+         * @param $query
+         * @return void
+         */
         public function extend_product_query( $query ) {
 
             $args = array(
@@ -1495,10 +1512,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             $query->set( 'author__in', $admin_ids );
-        }
-
-        public function vt_update_product() {
-
         }
 
 	}
