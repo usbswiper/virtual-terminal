@@ -350,23 +350,21 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $(document).on('click','#vt_add_item', function () {
-
-        let repeater = $('#vt_repeater_field');
-        let nonce = $('#vt_add_product_nonce').val();
         let loader = $(this);
-        let data_id = $(this).attr('data-id');
+        loader.attr('disabled','disabled')
+        usb_swiper_add_loader(loader);
+
         let data = {
             'action': 'add_vt_product_wrapper',
-            'vt-add-product-nonce': nonce,
-            'data-id': data_id
+            'vt-add-product-nonce': $('#vt_add_product_nonce').val(),
+            'data-id': $('.vt-repeater-field .vt-fields-wrap').length
         };
 
-        usb_swiper_add_loader(loader);
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             if (response.status) {
-                loader.attr('data-id',response.data_id);
-                repeater.append('<div id="vt_fields_wrap_' + response.data_id + '" class="vt-fields-wrap">' + response.html + '<span class="vt-remove-fields-wrap"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span></div>');
+                $('#vt_repeater_field').append( response.html );
                 usb_swiper_remove_loader(loader);
+                loader.removeAttr('disabled')
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -431,7 +429,6 @@ jQuery( document ).ready(function( $ ) {
                 let net_price = '';
 
                 $( ".vt-product-quantity" ).each(function(index) {
-                    console.log(index);
                     let quantity = $(this).val();
                     let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
                     let price = $('#'+wrapper_id).children('.price').children('input').val();
@@ -456,7 +453,6 @@ jQuery( document ).ready(function( $ ) {
         let net_price = '';
 
         $( ".vt-product-quantity" ).each(function(index) {
-            console.log(index);
             let quantity_class = $(this);
             let quantity = $(this).val();
             let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');

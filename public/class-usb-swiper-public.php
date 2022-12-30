@@ -1326,57 +1326,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
                 $status = true;
                 $message_type = __('SUCCESS','usb-swiper');
-                $data_id = ! empty( $_POST['data-id'] ) ? $_POST['data-id'] : '';
-
-
-                $html .= usb_swiper_get_html_field(array(
-                    'type' => 'text',
-                    'id' => 'VTProduct',
-                    'name' => 'VTProduct[]',
-                    'required' => false,
-                    'placeholder' => __( 'Search Product', 'usb-swiper'),
-                    'attributes' => '',
-                    'description' => '',
-                    'readonly' => false,
-                    'disabled' => false,
-                    'class' => 'vt-input-field vt-product-input',
-                    'wrapper_class' => 'product'
-                ));
-
-                $html .= usb_swiper_get_html_field(array(
-                    'type' => 'number',
-                    'id' => 'VTProductQuantity',
-                    'name' => 'VTProductQuantity[]',
-                    'placeholder' => __( 'Quantity', 'usb-swiper'),
-                    'required' => false,
-                    'attributes' => '',
-                    'description' => '',
-                    'readonly' => false,
-                    'disabled' => false,
-                    'class' => 'vt-input-field vt-product-quantity',
-                    'wrapper_class' => 'product_quantity'
-                ));
-
-                $html .= usb_swiper_get_html_field(array(
-                    'type' => 'number',
-                    'id' => 'VTProductPrice',
-                    'name' => 'VTProductPrice[]',
-                    'placeholder' => __( 'Price', 'usb-swiper'),
-                    'required' => false,
-                    'attributes' => '',
-                    'description' => '',
-                    'readonly' => false,
-                    'disabled' => false,
-                    'class' => 'vt-input-field vt-product-price',
-                    'wrapper_class' => 'price'
-                ));
+                $data_id = ! empty( $_POST['data-id'] ) ? (int)$_POST['data-id'] : 0;
+                $html = get_product_html($data_id);
             }
 
             $response = array(
                 'status' => $status,
                 'message' => $message,
                 'message_type' => $message_type,
-                'data_id' => $data_id + 1,
                 'html' => $html,
             );
 

@@ -1535,3 +1535,58 @@ function usbswiper_get_user_name(){
 
 	return $user_name;
 }
+
+function get_product_html( $id = 0 ) {
+
+    $html = '<div id="vt_fields_wrap_'.$id.'" class="vt-fields-wrap">';
+
+    $html .= usb_swiper_get_html_field(array(
+        'type' => 'text',
+        'id' => 'VTProduct',
+        'name' => 'VTProduct[]',
+        'required' => false,
+        'placeholder' => __( 'Search Product', 'usb-swiper'),
+        'attributes' => '',
+        'description' => '',
+        'readonly' => false,
+        'disabled' => false,
+        'class' => 'vt-input-field vt-product-input',
+        'wrapper_class' => 'product'
+    ));
+
+    $html .= usb_swiper_get_html_field(array(
+        'type' => 'number',
+        'id' => 'VTProductQuantity',
+        'name' => 'VTProductQuantity[]',
+        'placeholder' => __( 'Quantity', 'usb-swiper'),
+        'required' => false,
+        'attributes' => '',
+        'description' => '',
+        'readonly' => false,
+        'disabled' => false,
+        'class' => 'vt-input-field vt-product-quantity',
+        'wrapper_class' => 'product_quantity'
+    ));
+
+    $html .= usb_swiper_get_html_field(array(
+        'type' => 'number',
+        'id' => 'VTProductPrice',
+        'name' => 'VTProductPrice[]',
+        'placeholder' => __( 'Price', 'usb-swiper'),
+        'required' => false,
+        'attributes' => '',
+        'description' => '',
+        'readonly' => false,
+        'disabled' => false,
+        'class' => 'vt-input-field vt-product-price',
+        'wrapper_class' => 'price'
+    ));
+
+    if( $id > 0 ) {
+        $html .= '<span class="vt-remove-fields-wrap"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span>';
+    }
+
+    $html .='</div>';
+
+    return $html;
+}

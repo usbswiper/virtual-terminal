@@ -54,6 +54,7 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 
 $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
+$vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 ?>
 <div class="vt-form-notification"></div>
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
@@ -64,7 +65,6 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 		if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
 
 			$refund_amount = get_total_refund_amount($transaction_id);
-
 			?>
             <div class="transaction-refund-wrap transaction-history-field">
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
@@ -226,7 +226,7 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 				}
 				?>
                 <p>
-					<?php  echo esc_attr($billing_address_first_name)  . ' ' .   esc_attr($billing_address_last_name)  . ',<br/>';
+					<?php echo esc_attr($billing_address_first_name)  . ' ' .   esc_attr($billing_address_last_name)  . ',<br/>';
 					echo esc_attr($billing_address_street1) . ', ' . esc_attr($billing_address_street2) . '</br>';
 					echo esc_attr($billing_address_city)  . ', ' .  esc_attr($billing_address_state)  . '- ' . esc_attr($billing_address_pincode)  . '<br/>';
 					echo esc_attr($billing_address_country)  . ' <br/>';
@@ -237,7 +237,6 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 	            if(!empty($BillingPhoneNumber)){
 		            ?>
                     <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
-
 		            <?php
 	            }
 	            ?>
@@ -257,7 +256,7 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
             <address class="address-wrap" >
 				<?php if( 'true' !== $shippingDisabled ) { ?>
 					<?php if( 'true' !== $shippingSameAsBilling ) { ?>
-                        <!--                Splitting the Address Values-->
+                        <!-- Splitting the Address Values-->
 						<?php  if (!empty($shipping_address)){
 
 							$shipping_address_first_name = !empty( $shipping_address[0] ) ? $shipping_address[0] : '' ;
@@ -305,21 +304,40 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 							<?php
 						}
 						?>
-
 					<?php } ?>
 				<?php } ?>
             </address>
-
-
-
         </div>
     </div>
     <div class="transaction-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+        <h2 class="transaction-details__title transaction-history-title"><?php _e('Product Details','usb-swiper'); ?></h2>
+        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+            <tbody>
+            <tr>
+                <td class="transaction-table-product-td"><?php _e('Product Name','usb-swiper'); ?></td>
+                <td class="transaction-table-product-td"><?php _e('Quantity','usb-swiper'); ?></td>
+                <td class="transaction-table-product-td"><?php _e('Price','usb-swiper'); ?></td>
+            </tr>
+            <?php
+                if( ! empty( $vt_products ) && is_array( $vt_products ) ) {
+                    foreach ( $vt_products as $vt_product ) {
+                        ?>
+                        <tr>
+                            <td class="transaction-table-product-td"><?php echo !empty( $vt_product['product_name'] ) ? $vt_product['product_name'] : '-'; ?></td>
+                            <td class="transaction-table-product-td"><?php echo !empty( $vt_product['product_quantity'] ) ? $vt_product['product_quantity'] : '-'; ?></td>
+                            <td class="transaction-table-product-td"><?php echo !empty( $vt_product['product_price'] ) ? wc_price($vt_product['product_price'], array('currency' => $transaction_currency)) : 0; ?></td>
+                        </tr>
+                        <?php
+                    }
+                }
+            ?>
+            </tbody>
+        </table>
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Item Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
-                <th class="transaction-table-header"><?php echo !empty( $ItemName) ? $ItemName : ''; ?></th>
+                <th class="transaction-table-header"><?php _e('Net Amount','usb-swiper'); ?></th>
                 <td class="transaction-table-header"><?php echo wc_price($NetAmount, array('currency' => $transaction_currency)); ?></td>
             </tr>
             <tr>

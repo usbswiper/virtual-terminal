@@ -387,17 +387,20 @@ class Usb_Swiper_Paypal_request{
         $vt_product_price = get_post_meta( $transaction_id,'VTProductPrice', true);
         $vt_products = array();
 
-        for( $i = 0; $i < count($vt_product); $i++ ){
+        if( !empty( $vt_product ) && is_array( $vt_product ) ) {
 
-            $product = $vt_product[$i];
-            $quantity = $vt_product_quantity[$i];
-            $price = $vt_product_price[$i];
+            for ($i = 0; $i < count($vt_product); $i++) {
 
-            $vt_products[] = array(
-                'product_name' => $product,
-                'product_quantity' => $quantity,
-                'product_price' => $price
-            );
+                $product = !empty($vt_product[$i]) ? $vt_product[$i] : '';
+                $quantity = !empty($vt_product_quantity[$i]) ? $vt_product_quantity[$i] : 1;
+                $price = !empty($vt_product_price[$i]) ? $vt_product_price[$i] : '';
+
+                $vt_products[] = array(
+                    'product_name' => $product,
+                    'product_quantity' => $quantity,
+                    'product_price' => $price
+                );
+            }
         }
 
         update_post_meta( $transaction_id, 'vt_products', $vt_products );
@@ -414,9 +417,9 @@ class Usb_Swiper_Paypal_request{
                     'category'    => '',
                     'quantity'    => $products['product_quantity'],
                     'unit_amount' => array(
-                            'currency_code' => $this->get_transaction_currency( $transaction_id ),
-                            'value'         => usb_swiper_price_formatter ( $products['product_price'] ),
-                        ),
+                        'currency_code' => $this->get_transaction_currency( $transaction_id ),
+                        'value'         => usb_swiper_price_formatter ( $products['product_price'] ),
+                    ),
                 );
             }
 

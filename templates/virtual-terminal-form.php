@@ -48,50 +48,10 @@
                                 'disabled' => false,
                                 'value' => wp_create_nonce('vt_add_product_nonce')
                             ));
+                            echo get_product_html();
                             ?>
-                            <div id="vt_fields_wrap_0" class="vt-fields-wrap">
-                                <?php echo usb_swiper_get_html_field(array(
-                                    'type' => 'text',
-                                    'id' => 'VTProduct',
-                                    'name' => 'VTProduct[]',
-                                    'required' => false,
-                                    'placeholder' => __( 'Search Product', 'usb-swiper'),
-                                    'attributes' => '',
-                                    'description' => '',
-                                    'readonly' => false,
-                                    'disabled' => false,
-                                    'class' => 'vt-input-field vt-product-input',
-                                    'wrapper_class' => 'product'
-                                ));
-                                echo usb_swiper_get_html_field(array(
-                                    'type' => 'number',
-                                    'id' => 'VTProductQuantity',
-                                    'name' => 'VTProductQuantity[]',
-                                    'placeholder' => __( 'Quantity', 'usb-swiper'),
-                                    'required' => false,
-                                    'attributes' => '',
-                                    'description' => '',
-                                    'readonly' => false,
-                                    'disabled' => false,
-                                    'class' => 'vt-input-field vt-product-quantity',
-                                    'wrapper_class' => 'product_quantity'
-                                ));
-                                echo usb_swiper_get_html_field(array(
-                                    'type' => 'number',
-                                    'id' => 'VTProductPrice',
-                                    'name' => 'VTProductPrice[]',
-                                    'placeholder' => __( 'Price', 'usb-swiper'),
-                                    'required' => false,
-                                    'attributes' => '',
-                                    'description' => '',
-                                    'readonly' => false,
-                                    'disabled' => false,
-                                    'class' => 'vt-input-field vt-product-price',
-                                    'wrapper_class' => 'price'
-                                )); ?>
-                            </div>
                         </div>
-                        <a data-id="0" id="vt_add_item" class="vt-add-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><?php _e( 'Add Item', 'usb-swiper'); ?></a>
+                        <button type="button" id="vt_add_item" class="vt-add-item vt-button-primary"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><?php _e( 'Add Item', 'usb-swiper'); ?></button>
                     </fieldset>
 					<?php
 					$tab_fields = usb_swiper_get_vt_tab_fields();
