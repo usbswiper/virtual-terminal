@@ -38,7 +38,7 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 					'post_type' => 'page'
 				) );
 
-				$vt_page_id = wp_insert_post( array(
+				$vt_verification_page_id = wp_insert_post( array(
 					'post_title'    => __('Virtual Terminal Verification', 'usb-swiper'),
 					'post_content'  => '[usb_swiper_vt_verification_form]',
 					'post_status'   => 'publish',
@@ -49,6 +49,7 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 				$settings = array(
 					'general' => array(
 						'virtual_terminal_page' => $vt_page_id,
+						'vt_verification_page' => $vt_verification_page_id,
 						'is_paypal_sandbox' => false,
 					),
 					'partner_fees' => array(

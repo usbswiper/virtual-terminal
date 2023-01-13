@@ -375,7 +375,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'label' => '',
                 'label2' => __('Login with PayPal','usb-swiper'),
                 'after_login_label' => __('Launch Virtual Terminal','usb-swiper'),
-                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url().'/my-account/',
+                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): get_the_permalink( get_option('woocommerce_myaccount_page_id') ),
             ), $args );
 
 			ob_start();
@@ -388,6 +388,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					$profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
 					$profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
 					$profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+                    $settings = usb_swiper_get_settings('general');
+                    $verification_page_id = $settings['vt_verification_page'];
 
 					if( true === $profile_status) {
 						?>
@@ -403,7 +405,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						?>
                         <p class="vt-verification-message"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.");?></p>
                         <div class="paypal-connect-button-wrap">
-                            <p><a class="vt-button" href="<?php echo home_url('/virtual-terminal-verification-form/'); ?>"><?php _e('Verify Profile','usb-swiper'); ?></a></p>
+                            <p><a class="vt-button" href="<?php echo get_permalink($verification_page_id); ?>"><?php _e('Verify Profile','usb-swiper'); ?></a></p>
                         </div>
 						<?php
 					}
@@ -507,7 +509,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				delete_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response');
 				$this->disconnect_email(get_current_user_id());
 				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
-				wp_safe_redirect(site_url().'/my-account/');
+				wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 				exit();
 			}
 
@@ -517,7 +519,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					exit();
 				} else {
 					if ( true === $profile_status ) {
-						wp_safe_redirect( get_the_permalink( $vt_page_id ) );
+                        if( ! current_user_can( 'manage_options' ) ) {
+                            wp_safe_redirect(get_the_permalink($vt_page_id));
+                        }
 					}
 				}
 			}
@@ -531,7 +535,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				}
 
 				if ( ! empty( $merchant_user_info ) && false === $profile_status ) {
-					wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+					wp_safe_redirect( get_the_permalink( $vt_verification_page ) );
 					exit();
 				}
 
@@ -543,7 +547,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						if ( !empty( $user_info ) &&  isset( $user_info->ID ) && $user_info->ID > 0) {
 
 							wc_set_customer_auth_cookie( $user_info->ID );
-							wp_safe_redirect(get_the_permalink($myaccount_page_id));
+							wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 							exit();
 						}
 					}
@@ -558,7 +562,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if( !is_user_logged_in()) {
 
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
-					wp_safe_redirect(site_url().'/wp-login.php');
+					wp_safe_redirect( site_url().'/wp-login.php' );
 					exit();
 				}
 			} elseif ( is_user_logged_in() ) {
@@ -566,7 +570,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 					$merchant_user_info = usbswiper_get_onboarding_user();
 					if ( empty( $merchant_user_info ) ) {
-						wp_safe_redirect( site_url() . '/my-account/' );
+						wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 						exit();
 					}
 				}
@@ -1350,21 +1354,72 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since   1.1.9
          *
          */
-		function redirect_on_login($user_login, WP_User $user){
+		function redirect_on_login($user_login, WP_User $user) {
+
 			$merchant_user_info = get_user_meta( $user->ID,'_merchant_onboarding_user',true);
+            $settings = usb_swiper_get_settings('general');
+            $vt_page_id = ! empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+            $vt_verification_page = ! empty( $settings['vt_verification_page'] ) ? (int) $settings['vt_verification_page'] : '';
+            $myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
+
 			if ( empty( $merchant_user_info ) ) {
-				wp_safe_redirect( site_url().'/my-account/' );
+				wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 				exit();
 			} else {
 	            $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
 	            $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
 	            if( true === $profile_status) {
-		            wp_safe_redirect( site_url() . '/virtual-terminal' );
+		            wp_safe_redirect( get_the_permalink( $vt_page_id ) );
 	            } else {
-		            wp_safe_redirect( site_url() . '/virtual-terminal-verification-form' );
+		            wp_safe_redirect( get_the_permalink( $vt_verification_page ) );
 	            }
 	            exit();
             }
 		}
+
+        /**
+         * Save function for VT verification form data in user meta
+         *
+         * @return void
+         */
+        public function vt_verification_form_cb()
+        {
+            $status       = false;
+            $message      = '';
+            $redirect_url = '';
+
+            if( ! empty( $_POST['vt-verification-nonce'] ) && wp_verify_nonce( $_POST['vt-verification-nonce'],'vt-verification-form') ) {
+
+                $status           = true;
+                $message          = __( 'Thank you for submitting data, Please wait for profile verification.','usb-swiper' );
+                $name             = ! empty( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
+                $phone            = ! empty( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+                $url              = ! empty( $_POST['website-url'] ) ? sanitize_url( $_POST['website-url'] ) : '';
+                $company_name     = ! empty( $_POST['company-name'] ) ? sanitize_text_field( $_POST['company-name'] ) : '';
+                $email            = ! empty( $_POST['email-address'] ) ? sanitize_email( $_POST['email-address'] ) : '';
+                $business_address = ! empty( $_POST['email-address'] ) ? sanitize_text_field( $_POST['business-address'] ) : '';
+                $redirect_url     = get_the_permalink( get_option('woocommerce_myaccount_page_id') );
+
+                $user_data = array(
+                    'name'             => $name,
+                    'phone'            => $phone,
+                    'url'              => $url,
+                    'company_name'     => $company_name,
+                    'email'            => $email,
+                    'business_address' => $business_address
+                );
+
+                update_user_meta( get_current_user_id(), 'verification_form_data', $user_data );
+                send_profile_verification_email('richard@usbswiper.com,andrew@usbswiper.com', get_current_user_id(), $name,'verification_started','Profile Verification','Profile Verification');
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'location_redirect' => $redirect_url
+            );
+
+            wp_send_json( $response , 200 );
+        }
 	}
 }

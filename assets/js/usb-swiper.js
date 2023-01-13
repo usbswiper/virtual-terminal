@@ -367,6 +367,7 @@ jQuery( document ).ready(function( $ ) {
             if( response.status) {
                 set_notification(response.message, 'success');
                 document.getElementById(form_id).reset();
+                window.location.href = response.location_redirect
             } else{
                 set_notification(response.message, 'error', response.message_type);
             }

@@ -1465,3 +1465,64 @@ function usbswiper_get_user_name(){
 
 	return $user_name;
 }
+
+/**
+ * Send email on verification process
+ *
+ * @param $to
+ * @param $user_id
+ * @param $user_name
+ * @param $verification_type
+ * @param $subject
+ * @param $email_heading
+ * @return void
+ */
+function send_profile_verification_email( $to, $user_id, $user_name, $verification_type, $subject, $email_heading ) {
+
+    if( empty( $user_id ) ) {
+        return;
+    }
+
+    if ( ! class_exists( 'WC_Email', false ) ) {
+        include_once dirname( WC_PLUGIN_FILE ) . '/includes/emails/class-wc-email.php';
+    }
+
+    $WC_Email    = new WC_Email();
+    $get_headers = $WC_Email->get_headers();
+    $email_body  = get_profile_verification_content( $user_id, $user_name, $verification_type, $email_heading );
+    $email_body  = $WC_Email->format_string($email_body);
+    $email_body  = $WC_Email->style_inline($email_body);
+    wp_mail( $to, $subject, $email_body, $get_headers );
+
+}
+
+/**
+ * Get email content for vt verification
+ *
+ * @param $user_id
+ * @param $user_name
+ * @param $verification_type
+ * @param $email_heading
+ * @return mixed|null
+ */
+function get_profile_verification_content( $user_id, $user_name, $verification_type, $email_heading ) {
+
+    ob_start();
+
+    wc_get_template( 'emails/email-header.php', array( 'email_heading' => $email_heading ) );
+
+    $args = array(
+        'user_id' => $user_id,
+        'user_name' => $user_name,
+        'verification_type' => $verification_type
+    );
+
+    usb_swiper_get_template( 'verification-email.php', $args );
+
+    wc_get_template( 'emails/email-footer.php' );
+
+    $email_content = ob_get_contents();
+    ob_get_clean();
+
+    return apply_filters('usb_swiper_get_email_content', $email_content);
+}

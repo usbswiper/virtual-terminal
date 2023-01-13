@@ -1476,6 +1476,19 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			}
 
 			update_option('get_exclude_partner_users', $get_exclude_partner_users);
+
+            if( ! empty( $_POST['user-verify-vt-nonce'] ) && wp_verify_nonce( $_POST['user-verify-vt-nonce'],'user-verify-vt-nonce') ) {
+
+                $user_verify_for_vt = ! empty( $_POST['user-verify-for-vt'] );
+
+                update_user_meta( $user_id, 'vt_user_verification_status', $user_verify_for_vt );
+                if( ! empty( $user_verify_for_vt ) ) {
+                    $user_data    = get_user_by( 'id', $user_id );
+                    $user_name    = $user_data->user_firstname;
+                    $user_email   = $user_data->user_email;
+                    send_profile_verification_email($user_email, $user_id, $user_name,'verification_completed','Profile Verification Completed', 'Profile Verification Completed');
+                }
+            }
 		}
 
         /**
@@ -1553,53 +1566,12 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			}//main end if
 		}
 
-		/**
-         * Save function for VT verification form data in user meta
+        /**
+         * Adding verification tab fields in user edit page
          *
-		 * @return void
-		 */
-        public function vt_verification_form_cb()
-        {
-	        $status  = false;
-            $message = '';
-
-            if( ! empty( $_POST['vt-verification-nonce'] ) && wp_verify_nonce( $_POST['vt-verification-nonce'],'vt-verification-form') ) {
-
-                $status           = true;
-	            $message          = __( 'Thank you for submitting data, Please wait for profile verification.','usb-swiper' );
-	            $name             = ! empty( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
-	            $phone            = ! empty( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
-	            $url              = ! empty( $_POST['website-url'] ) ? sanitize_url( $_POST['website-url'] ) : '';
-	            $company_name     = ! empty( $_POST['company-name'] ) ? sanitize_text_field( $_POST['company-name'] ) : '';
-	            $email            = ! empty( $_POST['email-address'] ) ? sanitize_email( $_POST['email-address'] ) : '';
-	            $business_address = ! empty( $_POST['email-address'] ) ? sanitize_text_field( $_POST['business-address'] ) : '';
-
-	            $user_data = array(
-		            'name'             => $name,
-		            'phone'            => $phone,
-		            'url'              => $url,
-		            'company_name'     => $company_name,
-		            'email'            => $email,
-		            'business_address' => $business_address
-	            );
-
-	            update_user_meta( get_current_user_id(), 'verification_form_data', $user_data );
-	            $profile_link = get_edit_user_link( get_current_user_id() );
-	            $email_message = sprintf( esc_html__( 'Hello admin %s, %s %s', 'usb-swiper' ), esc_html( $name ), ' has submitted profile for verification', '<br>' );
-	            $email_message .= esc_attr__( 'Please visit this page for response ', 'usb-swiper' ) . $profile_link . '<br>';
-	            $email_message .= esc_attr__( 'Thanks!', 'usb-swiper' );
-	            $email_message .= esc_attr__( '-USBSwiper Team', 'usb-swiper' );
-                wp_mail('richard@usbswiper.com,andrew@usbswiper.com','Profile verification',$email_message,'');
-            }
-
-	        $response = array(
-		        'status' => $status,
-		        'message' => $message,
-	        );
-
-	        wp_send_json( $response , 200 );
-        }
-
+         * @param $user
+         * @return void|null
+         */
         public function register_settings_for_vt_verification($user)
         {
 	        if ( ! current_user_can( 'edit_users' ) ) {
@@ -1631,34 +1603,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 </tr>
             </table>
             <?php
-        }
-        public function save_settings_for_vt_verification($user_id)
-        {
-	        if ( ! current_user_can( 'edit_users' ) ) {
-		        return null;
-	        }
-
-	        if( ! empty( $_POST['user-verify-vt-nonce'] ) && wp_verify_nonce( $_POST['user-verify-vt-nonce'],'user-verify-vt-nonce') ) {
-
-		        $user_verify_for_vt = ! empty( $_POST['user-verify-for-vt'] );
-
-		        update_user_meta( $user_id, 'vt_user_verification_status', $user_verify_for_vt );
-		        if( ! empty( $user_verify_for_vt ) ) {
-			        $user_data    = get_user_by( 'id', $user_id );
-			        $settings     = usb_swiper_get_settings( 'general' );
-			        $vt_page_id   = ! empty( $settings['virtual_terminal_page'] ) ? (int) $settings['virtual_terminal_page'] : '';
-			        $user_name    = $user_data->user_firstname;
-			        $user_email   = $user_data->user_email;
-			        $vt_page_link = get_permalink( $vt_page_id );
-
-			        $email_message = sprintf( esc_html__( 'Hello %s, %s %s', 'usb-swiper' ), esc_html( $user_name ), 'your profile verification is completed', '<br>' );
-			        $email_message .= esc_attr__( 'Please visit this page ', 'usb-swiper' ) . $vt_page_link . '<br>';
-			        $email_message .= esc_attr__( "If you have any questions or concerns feel free to submit a ticket to https://usbswiper.com/support and we'll get you taken care of.", 'usb-swiper' ) . '<br>';
-			        $email_message .= esc_attr__( 'Thanks!', 'usb-swiper' );
-			        $email_message .= esc_attr__( '-USBSwiper Team', 'usb-swiper' );
-			        wp_mail( $user_email, 'Profile verification', $email_message, '', '' );
-		        }
-	        }
         }
 	}
 }

@@ -4,7 +4,7 @@ $form_fields = array(
         'type' => 'text',
         'id' => 'name',
         'name' => 'name',
-        'placeholder' => __('your Name', 'usb-swiper'),
+        'placeholder' => __('Your Name', 'usb-swiper'),
         'label' => 'Name',
         'required' => true,
         'options' => '',
@@ -26,7 +26,7 @@ $form_fields = array(
 		'type' => 'url',
 		'id' => 'url',
 		'name' => 'website-url',
-		'placeholder' => __('your Website URL', 'usb-swiper'),
+		'placeholder' => __('https://company.com', 'usb-swiper'),
 		'label' => 'Website URL',
 		'required' => true,
 		'options' => '',
@@ -37,7 +37,7 @@ $form_fields = array(
 		'type' => 'text',
 		'id' => 'company-name',
 		'name' => 'company-name',
-		'placeholder' => __('Eg Company', 'usb-swiper'),
+		'placeholder' => __('Company', 'usb-swiper'),
 		'label' => 'Company Name',
 		'required' => true,
 		'options' => '',
@@ -48,7 +48,7 @@ $form_fields = array(
 		'type' => 'email',
 		'id' => 'email-address',
 		'name' => 'email-address',
-		'placeholder' => __('email.address.@company.com', 'usb-swiper'),
+		'placeholder' => __('email.address@company.com', 'usb-swiper'),
 		'label' => 'Email Address',
 		'required' => true,
 		'options' => '',
@@ -80,7 +80,8 @@ $form_fields = array(
 $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
 $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
 $profile_status = filter_var( $profile_status, FILTER_VALIDATE_BOOLEAN );
-if( false === $profile_status && empty( $profile_data ) ) {
+
+if( false === $profile_status && empty( $profile_data ) || ( current_user_can( 'manage_options' ) === true ) ) {
 ?>
     <div class="vt-verification-form-wrapper woocommerce">
         <div class="vt-form-notification">
