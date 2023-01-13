@@ -77,6 +77,18 @@ jQuery(function( $ ) {
         });
 
         /* Toggle Shipping Fields */
+        jQuery('input[name="PayByInvoiceDisabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
+            if(state) {
+                $('#PayByInvoice').show();
+                $('.vt-col-payments').hide();
+            } else {
+                $('#PayByInvoice').hide();
+                $('.vt-col-payments').show();
+            }
+            return false;
+        });
+
+        /* Toggle Shipping Fields */
         jQuery('input[name="shippingSameAsBilling"]').on('switchChange.bootstrapSwitch', function(event, state) {
             //console.log(this); // DOM element
             //console.log(event); // jQuery event
@@ -158,6 +170,9 @@ jQuery(function( $ ) {
                 }
             }
         }, 700);
+        if(jQuery('#PayByInvoiceDisabled').attr('data-default-checked') != 'TRUE'){
+            jQuery('#PayByInvoiceDisabled').bootstrapSwitch('toggleState');
+        }
 
         if(jQuery('#shippingDisabled').is(':checked'))
         {
@@ -294,6 +309,9 @@ function updateSalesTax()
     if(!taxAmount) taxAmount = 0;
     jQuery('#TaxAmountDisplay').html('<i>(' + currencySign + ' ' + roundNumber(taxAmount, 2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ')</i>');
     var taxAmountRounded = roundNumber(taxAmount,2);
+    if( NaN === taxAmountRounded || undefined === taxAmountRounded || null === taxAmountRounded){
+        taxAmountRounded = roundNumber(0,2);
+    }
     jQuery('#TaxAmount').val(taxAmountRounded);
     return false;
 }

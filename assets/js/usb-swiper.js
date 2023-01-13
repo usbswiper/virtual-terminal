@@ -25,6 +25,45 @@ jQuery( document ).ready(function( $ ) {
     if (ItemName !== null) $('#ItemName').val(ItemName);
     if (Notes !== null) $('#Notes').val(Notes);
 
+    $(document).on('click','#PayByInvoice', function (){
+
+        var VtForm = $('form#ae-paypal-pos-form');
+
+        if(VtForm.valid()){
+            VtForm.block({
+                message: null,
+                overlayCSS: {
+                    background: '#fff',
+                    opacity: 0.6
+                }
+            });
+            $(this).prop('disabled', true);
+            if (VtForm.is('.createOrder') === false) {
+                VtForm.addClass('createOrder');
+                return fetch(usb_swiper_settings.create_transaction_url, {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: VtForm.serialize(),
+                }).then(function (res) {
+                    return res.json();
+                }).then(function (data) {
+                    if( undefined !== data.invoiceUrl ){
+                        window.location.href = data.invoiceUrl;
+                    } else {
+                        set_notification(data.message, 'error', data.message_type);
+                    }
+                    $(this).prop('disabled', false);
+                    VtForm.unblock();
+                });
+            } else {
+                VtForm.unblock();
+            }
+        }
+
+    })
+
     if( $('#ae-paypal-pos-form').length > 0 ) {
         $(document).scroll(function () {
             var fh = $('#ae-paypal-pos-form').offset().top;
@@ -65,19 +104,26 @@ jQuery( document ).ready(function( $ ) {
             usb_swiper_ppcp_style['tagline'] = (usb_swiper_settings.style_tagline === 'yes') ? true : false;
         }
 
-        if (paypal.HostedFields.isEligible()) {
+        var VtForm = $('form#ae-paypal-pos-form');
 
+        if (paypal.HostedFields.isEligible()) {
             paypal.HostedFields.render({
                 createOrder: function () {
-                    if ($('form#ae-paypal-pos-form').is('.createOrder') === false) {
-                        $('form#ae-paypal-pos-form').addClass('createOrder');
+                    if (VtForm.is('.createOrder') === false) {
+                        VtForm.addClass('createOrder').block({
+                            message: null,
+                            overlayCSS: {
+                                background: '#fff',
+                                opacity: 0.6
+                            }
+                        });
 
                         return fetch(usb_swiper_settings.create_transaction_url, {
                             method: 'post',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             },
-                            body: $('form#ae-paypal-pos-form').serialize(),
+                            body: VtForm.serialize(),
                         }).then(function (res) {
                             return res.json();
                         }).then(function (data) {
@@ -116,7 +162,7 @@ jQuery( document ).ready(function( $ ) {
                     }
                 });
 
-                $("form#ae-paypal-pos-form").validate({
+                VtForm.validate({
                     rules: {},
                     messages: {},
                     submitHandler: function(form, event) {
@@ -125,7 +171,7 @@ jQuery( document ).ready(function( $ ) {
                         var state = hf.getState();
                         var contingencies = [];
                         contingencies = [usb_swiper_settings.three_d_secure_contingency];
-                        $('form#ae-paypal-pos-form').addClass('processing').block({
+                        VtForm.addClass('processing').block({
                             message: null,
                             overlayCSS: {
                                 background: '#fff',
@@ -135,7 +181,7 @@ jQuery( document ).ready(function( $ ) {
                         const firstName = document.getElementById('BillingFirstName') ? document.getElementById('BillingFirstName').value : '';
                         const lastName = document.getElementById('BillingLastName') ? document.getElementById('BillingLastName').value : '';
                         if (!firstName || !lastName) {
-                            $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                         }
                         hf.submit({
                             contingencies: contingencies,
@@ -144,7 +190,8 @@ jQuery( document ).ready(function( $ ) {
                             function (payload) {
                                 localStorage.removeItem('vt_order_id')
                                 if (payload.orderId) {
-                                    $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + payload.orderId + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
+                                    let transaction_id = $('#transaction_id').val();
+                                    $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + payload.orderId + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce + "&pbi_transaction_id="+transaction_id, function (data) {
                                         if( data.result === 'success' ) {
                                             localStorage.removeItem('Company');
                                             localStorage.removeItem('BillingFirstName');
@@ -160,12 +207,12 @@ jQuery( document ).ready(function( $ ) {
                                             window.location.href = data.redirect;
                                         } else{
                                             set_notification(data.message, 'error', data.message_type);
-                                            $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                         }
                                     });
                                 } else{
                                     set_notification(payload.message, 'error', payload.message_type);
-                                    $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                    VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 }
                             },
                             function (error) {
@@ -176,8 +223,7 @@ jQuery( document ).ready(function( $ ) {
                                 var order_id = localStorage.getItem("vt_order_id");
                                 localStorage.removeItem('vt_order_id');
                                 set_notification(message, 'error', error.name);
-                                $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
-
+                                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 jQuery.ajax({
                                     url: usb_swiper_settings.ajax_url,
                                     type: 'POST',
@@ -202,22 +248,22 @@ jQuery( document ).ready(function( $ ) {
                 paypal.Buttons({
                     onClick: function()  {
 
-                        if( $('form#ae-paypal-pos-form').valid() ) {
+                        if( VtForm.valid() ) {
                             return true;
                         } else{
                             return false;
                         }
                     },
                     createOrder: function(data, actions) {
-                        if ($('form#ae-paypal-pos-form').is('.createOrder') === false) {
-                            $('form#ae-paypal-pos-form').addClass('createOrder');
+                        if (VtForm.is('.createOrder') === false) {
+                            VtForm.addClass('createOrder');
 
                             return fetch(usb_swiper_settings.create_transaction_url, {
                                 method: 'post',
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded'
                                 },
-                                body: $('form#ae-paypal-pos-form').serialize(),
+                                body: VtForm.serialize(),
                             }).then(function (res) {
                                 return res.json();
                             }).then(function (data) {
@@ -251,15 +297,13 @@ jQuery( document ).ready(function( $ ) {
                                     window.location.href = data.redirect;
                                 } else{
                                     set_notification(data.message, 'error', data.message_type);
-                                    $('form#ae-paypal-pos-form').removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                    VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 }
                             });
                         }
                     }
                 }).render('#angelleye_ppcp_checkout');
-
             }
-
         }
     }
 
@@ -350,4 +394,132 @@ jQuery( document ).ready(function( $ ) {
 
         event.preventDefault();
     });
+
+    $(document).on('click','.vt-remove-fields-wrap', function (){
+        $(this).parent().remove();
+    });
+
+    $(document).on('click','#vt_add_item', function () {
+        let loader = $(this);
+        loader.attr('disabled','disabled')
+        usb_swiper_add_loader(loader);
+
+        let data = {
+            'action': 'add_vt_product_wrapper',
+            'vt-add-product-nonce': $('#vt_add_product_nonce').val(),
+            'data-id': $('.vt-repeater-field .vt-fields-wrap').length
+        };
+
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                $('#vt_repeater_field').append( response.html );
+                usb_swiper_remove_loader(loader);
+                loader.removeAttr('disabled')
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
+    $(document).on('keyup','.vt-product-input', function () {
+
+        let search_val = $(this).val();
+        let vt_product_input = $(this);
+        let nonce = $('#vt_add_product_nonce').val();
+        let repeater = $('.vt-repeater-field');
+        let data = {
+            'action': 'vt_search_product',
+            'product-key': search_val,
+            'vt-add-product-nonce': nonce
+        };
+
+        repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+
+        if(search_val.length >= 3) {
+            $.post(usb_swiper_settings.ajax_url, data, function (response) {
+                if (response.status) {
+                    if(response.product_select) {
+                        if (vt_product_input.parents('.vt-fields-wrap').children('.product').children().hasClass('vt-search-result')) {
+                            vt_product_input.parents('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+                            vt_product_input.parents('.vt-fields-wrap').children('.product').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        } else {
+                            vt_product_input.parents('.vt-fields-wrap').children('.product').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        }
+                    } else {
+                        vt_product_input.parents('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+                    }
+                } else {
+                    set_notification(response.message, 'error', response.message_type);
+                }
+            });
+        }
+    });
+
+    $(document).on('click','.product-item', function () {
+
+        let product_id = $(this).attr('data-id');
+        let nonce = $('#vt_add_product_nonce').val();
+        let repeater = $('.vt-repeater-field');
+        let product_item = $(this);
+        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id')
+        let data = {
+            'action': 'vt_add_product_value_in_inputs',
+            'product-id': product_id,
+            'vt-add-product-nonce': nonce
+        };
+
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
+                $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
+                $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
+                repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+
+                let net_price_array = [];
+                let net_price = '';
+
+                $( ".vt-product-quantity" ).each(function(index) {
+                    let quantity = $(this).val();
+                    let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
+                    let price = $('#'+wrapper_id).children('.price').children('input').val();
+                    net_price_array[index] = Number(quantity) * Number(price);
+                });
+
+
+                for (let i = 0; i < net_price_array.length; i++) {
+                    net_price = Number(net_price_array[i]) + Number(net_price);
+                }
+
+                $('#NetAmount').val(net_price);
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
+    $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
+
+        let net_price_array = [];
+        let net_price = '';
+
+        $( ".vt-product-quantity" ).each(function(index) {
+            let quantity_class = $(this);
+            let quantity = $(this).val();
+            let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
+            let price = $('#'+wrapper_id).children('.price').children('input').val();
+            net_price_array[index] = Number(quantity) * Number(price);
+        });
+
+
+        for (let i = 0; i < net_price_array.length; i++) {
+            net_price = Number(net_price_array[i]) + Number(net_price);
+        }
+
+        $('#NetAmount').val(net_price);
+    });
+
 });
+
+function removeInterval(){
+    clearInterval(LoaderInterval);
+}

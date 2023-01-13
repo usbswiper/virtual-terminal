@@ -1,0 +1,17 @@
+.vt-form-contents {
+    width: 100%;
+}
+
+.vt-form-contents .d-flex {
+    width: 100%;
+    display: flex;
+}
+
+.vt-form-contents .invoice-wrap {
+    width: 70%;
+}
+
+.vt-form-contents .paypal-payment {
+    width: 30%;
+    padding-left: 1rem;
+}

@@ -14,6 +14,7 @@ class Users_List_Table extends WP_List_Table {
 
         parent::__construct();
     }
+
     public function prepare_items() {
 
     
@@ -30,6 +31,7 @@ class Users_List_Table extends WP_List_Table {
         
         $this->items = $this->get_post_data();
     }
+
     public function get_columns() {
         $columns = array(
             'id'            => __( 'ID', 'bulk-featured-image'),
@@ -39,9 +41,11 @@ class Users_List_Table extends WP_List_Table {
         );
         return $columns;
     }
+
     public function get_hidden_columns() {
         return array();
     }
+
     public function get_sortable_columns() {
         return array(
             'user_login' => array('user_login', false),

@@ -99,6 +99,21 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			return $smart_js_arg;
         }
 
+
+        /**
+         * Register end point in wc_endpoints.
+         *
+         * @param  $query_vars
+         *
+         * @return
+         */
+        public function update_wc_endpoints( $query_vars ){
+
+            $query_vars['view-transaction'] = 'view-transaction';
+
+            return $query_vars;
+        }
+
 		/**
          * Get current locale.
          *
@@ -171,8 +186,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			$settings = usb_swiper_get_settings('general');
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
-			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
-			if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
+            $vt_pay_by_invoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+            $myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
+            if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() || ! empty( $vt_pay_by_invoice_id ) && $vt_pay_by_invoice_id === get_the_ID()) {
 
                 $sdk_obj = $this->get_paypal_sdk_obj();
                 wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
@@ -227,7 +243,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'vt_page_url' => get_the_permalink($vt_page_id),
 				) );
             }
-
+            wp_enqueue_style( 'pay-by-invoice', USBSWIPER_URL . 'assets/css/pay-by-invoice.css', array(), $this->version, 'all' );
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
 		}
 
@@ -292,7 +308,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		public function endpoint_init() {
 
 			add_rewrite_endpoint( 'transactions', EP_PAGES );
-			add_rewrite_endpoint( 'view-transaction', EP_PAGES );
+			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
 		}
 
 		/**
@@ -305,17 +321,27 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
 
 				$current_page   = !empty( $_GET['vt-page'] ) ? $_GET['vt-page'] : 1;
+                $transaction_type   = !empty( $_GET['vt-type'] ) ? sanitize_text_field($_GET['vt-type']) : "";
 
-				$transactions = new WP_Query( array(
-					'post_type' => 'transactions',
-					'post_status' => 'publish',
-					'posts_per_page' => !empty( get_option( 'posts_per_page' ) ) ? get_option( 'posts_per_page' ) : 10,
-					'paged' => $current_page,
-					'author' => get_current_user_id(),
-					'order' => 'DESC',
-					'orderby' => 'date',
-				) );
+                $transaction_args = array(
+                    'post_type' => 'transactions',
+                    'post_status' => 'publish',
+                    'posts_per_page' => !empty( get_option( 'posts_per_page' ) ) ? get_option( 'posts_per_page' ) : 10,
+                    'paged' => $current_page,
+                    'author' => get_current_user_id(),
+                    'order' => 'DESC',
+                    'orderby' => 'date',
+                );
 
+                if( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'invoice' || strtolower($transaction_type) === 'transaction' ) ){
+                    $transaction_args['meta_query'] = array(
+                        array(
+                            'key' => '_transaction_type',
+                            'value' => $transaction_type,
+                        )
+                    );
+                }
+                $transactions = new WP_Query( $transaction_args );
 				$args = array(
 					'transactions' => !empty( $transactions->posts ) ? $transactions->posts : '',
 					'current_page'    => absint( $current_page ),
@@ -325,12 +351,27 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				);
 
 				extract( $args );
-
+                ?>
+                <form class="transaction-filter-form" id="transaction_filter_form">
+                    <div class="transaction-filter-wrap">
+                        <div class="transaction-field-wrap form-row form-row-first">
+                            <select name="vt-type" id="vt_type" class="transaction-select">
+                                <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
+                                <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
+                                <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Transaction','usb-swiper'); ?></option>
+                            </select>
+                        </div>
+                        <div class="transaction-field-wrap form-row form-row-last">
+                            <button type="submit" class="button alt primary-button vt-button submit"><?php _e('SEARCH','usb-swiper'); ?></button>
+                        </div>
+                    </div>
+                </form>
+                <?php
 				usb_swiper_get_template('wc-transactions-lists.php', $args);
 			}
 		}
 
-		/**
+        /**
          * Transaction Detail page endpoint callback method.
          *
          * @since 1.0.0
@@ -355,6 +396,33 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
 			}
 		}
+
+        /**
+         * Invoice Detail page endpoint callback method.
+         *
+         * @since 1.0.0
+         *
+         * @param int $transaction_id Get transaction id.
+         */
+        public function view_invoice_endpoint_cb( $transaction_id ){
+
+            if( empty( $transaction_id ) ) {
+                return;
+            }
+
+            if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
+
+                $transaction = get_post($transaction_id);
+
+                if( !empty( $transaction->post_author ) && (int)$transaction->post_author === get_current_user_id() ) {
+                    usb_swiper_get_template( 'vt-pay-by-invoice.php', array( 'invoice_id' => $transaction_id ) );
+                    usb_swiper_get_template( 'wc-transaction-history.php',  );
+                } else {
+                    $message = __( "You can't access this transaction.",'usb-swiper');
+                    echo apply_filters( 'usb_swiper_transaction_access_denied', $message);
+                }
+            }
+        }
 
 		/**
          * Create connect to PayPal button.
@@ -430,8 +498,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
 				    usb_swiper_get_template( 'virtual-terminal-form.php', $args );
 			    }
-			} else {
-
 			}
 
 			$form = ob_get_contents();
@@ -447,12 +513,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function template_redirect() {
-			
+
+            $settings = usb_swiper_get_settings('general');
+
 			if( is_admin() || ( !empty($_GET['et_fb']) && '1' == $_GET['et_fb'] )) {
 		        return;
 		    }
-			
-			$settings = usb_swiper_get_settings('general');
+
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
 			if( is_user_logged_in() ) {
@@ -568,8 +635,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 switch ( $_GET['usb_swiper_ppcp_action'] ) {
 
                     case "create_transaction":
-                        $this->create_new_transaction();
-	                    break;
+                        $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
+
+                        if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+                            $this->pay_by_invoice_transaction($transaction_id);
+                        } else {
+                            $this->create_new_transaction();
+                        }
+                        break;
                     case "cc_capture":
                         $this->capture_transaction();
                         break;
@@ -584,9 +657,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function create_new_transaction() {
-
-			$tab_fields = usb_swiper_get_vt_tab_fields();
-
+			$tab_fields = usb_swiper_get_fields_for_transaction();
+            $invoice_payment = isset( $_POST['PayByInvoiceDisabled'] ) && (bool)$_POST['PayByInvoiceDisabled'] === true;
             $transaction = array();
 			if( !empty( $tab_fields ) && is_array( $tab_fields ) ) {
 			    foreach ( $tab_fields as $tab_id => $tab_field ) {
@@ -604,6 +676,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$BillingLastName = !empty( $transaction['BillingLastName'] ) ? $transaction['BillingLastName'] : '';
 
 			$display_name = $BillingFirstName.' '.$BillingLastName;
+            $transaction_type = 'TRANSACTION';
+
+            if( $invoice_payment ) {
+                $transaction_type = 'INVOICE';
+                $invoice_status = 'PENDING';
+            }
 
 			$transaction_id = wp_insert_post(array(
 				'post_title'   => wp_strip_all_tags($display_name),
@@ -615,7 +693,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if( !is_wp_error( $transaction_id ) ) {
 
-				wp_update_post( array(
+                update_post_meta($transaction_id, '_transaction_type', $transaction_type);
+                update_post_meta($transaction_id, '_transaction_user_id', get_current_user_id());
+                if( !empty( $invoice_status ) ){
+                    update_post_meta($transaction_id, '_payment_status', $invoice_status);
+                }
+
+                wp_update_post( array(
 					'ID'         => $transaction_id,
 					'post_title' => wp_strip_all_tags(sprintf( __( '#%s %s' ,'usb-swiper' ), $transaction_id ,$display_name)),
 				) );
@@ -630,51 +714,91 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			        }
 			    }
 
+                $vt_product = get_post_meta( $transaction_id,'VTProduct', true);
+                $vt_product_quantity = get_post_meta( $transaction_id,'VTProductQuantity', true);
+                $vt_product_price = get_post_meta( $transaction_id,'VTProductPrice', true);
+                $vt_products = array();
+
+                if( !empty( $vt_product ) && is_array( $vt_product ) ) {
+
+                    for ($i = 0; $i < count($vt_product); $i++) {
+
+                        $product = !empty($vt_product[$i]) ? $vt_product[$i] : '';
+                        $quantity = !empty($vt_product_quantity[$i]) ? $vt_product_quantity[$i] : 1;
+                        $price = !empty($vt_product_price[$i]) ? $vt_product_price[$i] : '';
+
+                        $vt_products[] = array(
+                            'product_name' => $product,
+                            'product_quantity' => $quantity,
+                            'product_price' => $price
+                        );
+                    }
+                }
+
+                update_post_meta( $transaction_id, 'vt_products', $vt_products );
+
 			    if( !class_exists('Usb_Swiper_Paypal_request') ) {
 				    include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 			    }
 
-			    $Paypal_request = Usb_Swiper_Paypal_request::instance();
-				$response = $Paypal_request->create_transaction_request($transaction_id);
+                if( ! $invoice_payment ) {
+                    $Paypal_request = Usb_Swiper_Paypal_request::instance();
+                    $response = $Paypal_request->create_transaction_request($transaction_id);
 
-				if( !empty( $response['id'] )) {
+                    if( !empty( $response['id'] )) {
 
-				    if( !empty( $response['links'] ) && is_array( $response['links'] ) ) {
-				        foreach ( $response['links'] as $key => $links ) {
-				            if( !empty( $links['rel'] ) && 'self' === $links['rel'] && !empty( $links['href'] ) ) {
-				                $order_response = $Paypal_request->request($links['href'], array(
-					                'method' => 'GET',
-					                'timeout' => 60,
-					                'redirection' => 5,
-					                'httpversion' => '1.1',
-					                'blocking' => true,
-					                'headers' => array(
-						                'Content-Type' => 'application/json',
-						                'Authorization' => 'Bearer '.$Paypal_request->get_access_token(),
-					                ),
-				                ), 'order_response', $transaction_id);
-					            $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
-					            update_post_meta($transaction_id, '_payment_response', $order_response);
-				            }
-				        }
-				    }
+                        if( !empty( $response['links'] ) && is_array( $response['links'] ) ) {
+                            foreach ( $response['links'] as $key => $links ) {
+                                if( !empty( $links['rel'] ) && 'self' === $links['rel'] && !empty( $links['href'] ) ) {
+                                    $order_response = $Paypal_request->request($links['href'], array(
+                                        'method' => 'GET',
+                                        'timeout' => 60,
+                                        'redirection' => 5,
+                                        'httpversion' => '1.1',
+                                        'blocking' => true,
+                                        'headers' => array(
+                                            'Content-Type' => 'application/json',
+                                            'Authorization' => 'Bearer ' . $Paypal_request->get_access_token(),
+                                        ),
+                                    ), 'order_response', $transaction_id);
+                                    $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
+                                    update_post_meta($transaction_id, '_payment_response', $order_response);
+                                }
+                            }
+                        }
 
-				    update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
-					usb_swiper_set_session('usb_swiper_woo_create_transaction_id', $response['id']);
-					wp_send_json( array( 'orderID' => $response['id'] ), 200 );
+                        update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
+                        usb_swiper_set_session('usb_swiper_woo_create_transaction_id', $response['id']);
 
-				} else{
-					//wp_delete_post($transaction_id);
-				    $message_name = !empty( $response['name'] ) ? $response['name'] :'';
-				    $message = !empty( $response['message'] ) ? $response['message'] :'';
-				    $details = !empty( $response['details'][0] ) ? $response['details'][0] :'';
+                        $settings = get_option( 'usb_swiper_settings' );
 
-					wp_send_json( array(
-					        'status' => 'error',
+                        $response = array(
+                            'orderID' => $response['id']
+                        );
+
+                        wp_send_json( $response, 200 );
+
+                    } else {
+                        //wp_delete_post($transaction_id);
+                        $message_name = !empty( $response['name'] ) ? $response['name'] :'';
+                        $message = !empty( $response['message'] ) ? $response['message'] :'';
+                        $details = !empty( $response['details'][0] ) ? $response['details'][0] :'';
+
+                        wp_send_json( array(
+                            'status' => 'error',
                             'message' => !empty( $details['description'] ) ? $details['description'] : $message,
                             'message_type' => !empty( $details['issue'] ) ? $details['issue'] : $message_name,
-                    ), 200 );
-				}
+                        ), 200 );
+                    }
+
+                } elseif( !empty( $invoice_payment ) ) {
+                    $email_args = array(
+                        'invoice' => true,
+                        'customer_name' => wp_strip_all_tags($display_name)
+                    );
+                    $this->send_emails($transaction_id, $email_args);
+                    wp_send_json( array('invoiceUrl' => wc_get_account_endpoint_url( 'view-transaction' ) . $transaction_id), 200 );
+                }
 			}
 		}
 
@@ -695,6 +819,21 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			    $transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
 
+                $redirect_url =  esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) );
+                if( empty( $transaction_id ) ) {
+                    $woo_transaction = usb_swiper_get_session('usb_swiper_woo_transaction_id');
+                    $transaction_id = !empty( $_REQUEST['pbi_transaction_id'] ) ? sanitize_text_field( $_REQUEST['pbi_transaction_id'] ) : "";
+                    if( !empty( $transaction_id ) ){
+                        $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
+                        if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && empty($woo_transaction) ){
+                            usb_swiper_set_session('usb_swiper_woo_transaction_id', $transaction_id);
+                        }
+                    }
+                }else{
+                    $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
+                }
+
+
 			    $Paypal_request = Usb_Swiper_Paypal_request::instance();
 			    $response = $Paypal_request->handle_cc_transaction_request($paypal_transaction_id);
 
@@ -702,6 +841,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			    $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
 			    update_post_meta($transaction_id, '_payment_status', $payment_status);
+
+                if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
+                    $settings = usb_swiper_get_settings('general');
+                    $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+                    $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => $transaction_id, 'status' => $payment_status)))), get_the_permalink( $paybyinvoice_id ) );
+                    if( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ){
+                        update_post_meta($transaction_id, '_payment_status', 'PAID');
+                    } else {
+                        update_post_meta($transaction_id, '_payment_status', 'PENDING');
+                    }
+                }
 
 			    if( !empty( $response['payment_source'] )) {
 
@@ -724,7 +874,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				    wp_send_json( array(
 					    'result' => 'success',
-					    'redirect' => esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) ),
+					    'redirect' => $redirect_url,
                     ), 200 );
 			    } else{
 			        //wp_delete_post($transaction_id);
@@ -738,6 +888,61 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    wp_send_json( $response, 200 );
 		    }
 		}
+
+        /**
+         * Pay by invoice method
+         *
+         * @param $transaction_id
+         * @return void
+         */
+        public function pay_by_invoice_transaction($transaction_id) {
+
+            if( !class_exists('Usb_Swiper_Paypal_request') ) {
+                include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+            }
+
+            $Paypal_request = Usb_Swiper_Paypal_request::instance();
+            $response = $Paypal_request->create_transaction_request($transaction_id);
+
+            if( !empty( $response['id'] )) {
+
+                if( !empty( $response['links'] ) && is_array( $response['links'] ) ) {
+                    foreach ( $response['links'] as $key => $links ) {
+                        if( !empty( $links['rel'] ) && 'self' === $links['rel'] && !empty( $links['href'] ) ) {
+                            $order_response = $Paypal_request->request($links['href'], array(
+                                'method' => 'GET',
+                                'timeout' => 60,
+                                'redirection' => 5,
+                                'httpversion' => '1.1',
+                                'blocking' => true,
+                                'headers' => array(
+                                    'Content-Type' => 'application/json',
+                                    'Authorization' => 'Bearer '.$Paypal_request->get_access_token(),
+                                ),
+                            ), 'order_response', $transaction_id);
+                            $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
+                            update_post_meta($transaction_id, '_payment_response', $order_response);
+                        }
+                    }
+                }
+
+                update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
+                usb_swiper_set_session('usb_swiper_woo_create_transaction_id', $response['id']);
+                wp_send_json( array( 'orderID' => $response['id'] ), 200 );
+
+            } else{
+                //wp_delete_post($transaction_id);
+                $message_name = !empty( $response['name'] ) ? $response['name'] :'';
+                $message = !empty( $response['message'] ) ? $response['message'] :'';
+                $details = !empty( $response['details'][0] ) ? $response['details'][0] :'';
+
+                wp_send_json( array(
+                    'status' => 'error',
+                    'message' => !empty( $details['description'] ) ? $details['description'] : $message,
+                    'message_type' => !empty( $details['issue'] ) ? $details['issue'] : $message_name,
+                ), 200 );
+            }
+        }
 
 		/**
          * Capture authorize transaction.
@@ -789,7 +994,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				        $Paypal_request = Usb_Swiper_Paypal_request::instance();
 
 				        $order_total = get_post_meta($post_id,'GrandTotal',true);
-				        $platform_fees = usbswiper_get_platform_fees( $order_total );
+                        $transaction_type = get_post_meta($post_id,'_transaction_type', true);
+				        $platform_fees = usbswiper_get_platform_fees( $order_total, strtolower($transaction_type),$post_id );
 				        $body_request = array();
 				        if( !empty( $platform_fees ) && $platform_fees > 0 ) {
 
@@ -883,6 +1089,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $args = array(
                     'transaction_id' => $transaction_id,
+                    'is_email' => true,
                 );
 
                 usb_swiper_get_template( 'wc-transaction-history.php', $args );
@@ -895,6 +1102,50 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		    return apply_filters('usb_swiper_get_email_content', $email_content);
 		}
 
+        /**
+         * Get email content for invoice.
+         *
+         * @since 1.0.0
+         *
+         * @param $transaction_id
+         * @param array $args
+         *
+         * @return mixed|void
+         */
+        public function get_invoice_email_content( $transaction_id, $args = array() ) {
+
+            $email_heading = !empty( $args['email_heading'] ) ? $args['email_heading'] : '';
+            $display_name = !empty( $args['display_name'] ) ? $args['display_name'] : '';
+            ob_start();
+
+            wc_get_template( 'emails/email-header.php', array( 'email_heading' => $email_heading ) );
+
+
+            $payment_link = '';
+            if( !empty($args['payment_link']) && (bool)$args['payment_link'] ){
+                $settings = usb_swiper_get_settings('general');
+                $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+                $payment_link = add_query_arg(array('invoice-session'=>base64_encode(json_encode(array('id' => $transaction_id, 'status' => false))) ),get_the_permalink( $paybyinvoice_id ));
+            }
+
+            $args = array(
+                'transaction_id' => $transaction_id,
+                'payment_link' =>  $payment_link,
+                'display_name' => $display_name,
+                'is_email' => true,
+            );
+
+            usb_swiper_get_template( 'wc-transaction-history.php', $args );
+
+            wc_get_template( 'emails/email-footer.php' );
+
+            $email_content = ob_get_contents();
+            ob_get_clean();
+
+            return apply_filters('usb_swiper_get_email_content', $email_content);
+        }
+
+
 		/**
          * Transaction Email send to admin and user.
          *
@@ -902,7 +1153,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
 		 * @param $transaction_id
 		 */
-		public function send_emails( $transaction_id ) {
+		public function send_emails( $transaction_id, $args = array(), $attachment = ''  ) {
 
 		    if( empty( $transaction_id)) {
 		        return;
@@ -921,26 +1172,46 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		    if( !empty( $transaction_author ) && $transaction_author > 0 ) {
 			    $user_info = get_user_by( 'id', $transaction_author );
 			    $author_email = !empty( $user_info->user_email ) ? $user_info->user_email : '';
+                $author_name = !empty( $user_info->display_name ) ? $user_info->display_name : '';
 		    }
 
 		    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
 			$BillingEmail = !empty( $BillingEmail ) ? $BillingEmail : $author_email;
+            $BillingName = !empty( $args['customer_name'] ) ? $args['customer_name'] : '' ;
+            $BillingName = !empty( $BillingName ) ? $BillingName : '';
 
             //send email to admin,
 			$admin_email = array( get_option('admin_email'), );
 			$site_title = get_option('blogname');
 			$admin_subject = sprintf(__("[%s]: New Transaction #%s",'usb-swiper'),$site_title,$transaction_id);
-			$admin_content = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
+            $admin_content = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
+            if( !empty( $args['invoice'] ) && (bool)$args['invoice'] ){
+                $admin_subject = sprintf(__("[%s]: New Invoice #%s",'usb-swiper'),$site_title,$transaction_id);
+                $admin_content = $this->get_invoice_email_content($transaction_id, array('email_heading' => sprintf(__('New Invoice: #%s','usb-swiper'), $transaction_id), 'display_name' => $author_name));
+            }
 			$admin_content = $WC_Email->format_string($admin_content);
 			$admin_content = $WC_Email->style_inline($admin_content);
 			wp_mail($admin_email, $admin_subject, $admin_content, $get_headers);
 
 			//send email to user,
 			$user_subject = sprintf( __("Your %s transaction has been received!",'usb-swiper'), $site_title);
-			$user_content = $this->get_email_content($transaction_id, array('email_heading' => __('Thank you for your Transaction','usb-swiper')));
+            $user_content = $this->get_email_content($transaction_id, array('email_heading' => __('Thank you for your Transaction','usb-swiper')));
+            if( !empty( $args['invoice'] ) && (bool)$args['invoice'] ){
+                $user_subject = sprintf(__("Your %s invoice has been created!",'usb-swiper'),$site_title);
+                $payment_status = get_post_meta(  $transaction_id, '_payment_status', true);
+                $payment_status = !empty( $payment_status ) && strtolower($payment_status) === 'pending';
+                $user_content = $this->get_invoice_email_content($transaction_id, array('email_heading' => __('Thank you for your Invoice','usb-swiper'), 'payment_link' => $payment_status, 'display_name' => $BillingName));
+            }
 			$user_content = $WC_Email->format_string($user_content);
 			$user_content = $WC_Email->style_inline($user_content);
-			wp_mail($BillingEmail, $user_subject, $user_content, $get_headers);
+
+            $attachment = apply_filters('usb_swiper_email_attachment', $attachment, $transaction_id);
+
+            if( !empty( $attachment ) ){
+                wp_mail($BillingEmail, $user_subject, $user_content, $get_headers, $attachment);
+            }else{
+                wp_mail($BillingEmail, $user_subject, $user_content, $get_headers);
+            }
 		}
 
 		/**
@@ -1255,9 +1526,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $response = get_post_meta( $transaction_id, '_payment_response', true);
                     $order_status = !empty( $response['status'] ) ? $response['status'] : '';
                     $order_intent = !empty( $response['intent'] ) ? $response['intent'] : '';
-
                     update_post_meta($transaction_id, '_payment_status', 'FAILED');
                     update_post_meta($transaction_id, '_payment_status_notes', $message);
+                    $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
+                    if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
+                        update_post_meta($transaction_id, '_payment_status', 'PENDING');
+                    }
+
 
                     $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
                     $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
@@ -1309,6 +1584,155 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 		}
 
-	}
+        /**
+         * Append HTML on click of add item in vt-product-wrapper
+         * @since   1.1.9
+         *
+         */
+        function add_vt_product_wrapper() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            $html = '';
+            $data_id = '';
 
+            if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS','usb-swiper');
+                $data_id = ! empty( $_POST['data-id'] ) ? (int)$_POST['data-id'] : 0;
+                $html = get_product_html($data_id);
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'html' => $html,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Append product list in search fields
+         * @since   1.1.9
+         *
+         */
+        function vt_search_product() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            $product_option = array();
+
+            if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS', 'usb-swiper');
+                $product_key = ! empty( $_POST['product-key'] ) ? $_POST['product-key'] : '';
+                $data = '';
+
+                $products = new WP_Query(array(
+                    'post_type' => 'product',
+                    'posts_per_page' => -1,
+                    'author' => get_current_user_id(),
+                    'order' => 'DESC',
+                    's' => $product_key
+                ));
+
+                if (!empty($products->posts)) {
+                    foreach ( $products->posts as $product ) {
+                        $data .= "<span class='product-item' data-id='$product->ID'>$product->post_title</span>";
+                    }
+                }
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'product_select' => $data,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Append product price in input fields.
+         * @since   1.1.9
+         *
+         */
+        function vt_add_product_value_in_inputs() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            $product_name = '';
+            $product_price = '';
+
+            if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS', 'usb-swiper');
+                $product_id = !empty($_POST['product-id']) ? $_POST['product-id'] : '';
+
+                $product = wc_get_product( $product_id );
+
+                $product_name = $product->get_name();
+                $product_price = $product->get_regular_price();
+
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'product_name' => $product_name,
+                'product_price' => $product_price,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        function usb_swiper_pay_by_invoice( $args ) {
+
+            $args = shortcode_atts( array(
+                'notifications' => maybe_unserialize(get_transient('get_vt_connection_response')),
+                'invoice_id' => ''
+            ), $args, 'usb_swiper_pay_by_invoice' );
+
+            ob_start();
+            $settings = usb_swiper_get_settings('general');
+            $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+            $by_link = false;
+            if( !empty($paybyinvoice_id) && is_page($paybyinvoice_id) ) {
+                $by_link = true;
+                $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
+                $args['invoice_id'] = !empty( $invoice_session->id ) ? $invoice_session->id :'';
+                $args['invoice_status'] = !empty( $invoice_session->status ) ? $invoice_session->status :'';
+            }
+
+            if( usb_swiper_allow_user_by_role('administrator') || (bool)$by_link ) {
+                usb_swiper_get_template( 'vt-pay-by-invoice.php', $args );
+            }
+
+            $form = ob_get_contents();
+
+            ob_get_clean();
+
+            return $form;
+        }
+
+        public function manage_invoice_pdf_attachment( $attachment, $transaction_id ) {
+
+            $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
+
+            if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice') {
+
+                require_once USBSWIPER_PLUGIN_DIR.'/library/usb-swiper-invoice-pdf.php';
+
+                $Usb_Swiper_Invoice_PDF = new Usb_Swiper_Invoice_PDF();
+                $get_attachment = $Usb_Swiper_Invoice_PDF->generate_invoice($transaction_id);
+                $attachment = !empty( $get_attachment['invoice_path'] ) ? $get_attachment['invoice_path'] : '';
+            }
+
+            return $attachment;
+        }
+	}
 }

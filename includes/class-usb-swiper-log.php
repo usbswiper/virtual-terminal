@@ -164,6 +164,13 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			return $logs;
 		}
 
+        /**
+         * Get PayPal onboarding log files.
+         *
+         * @since 1.0.0
+         *
+         * @return array
+         */
 		public function get_log_files() {
 
 			$upload_dir = wp_upload_dir();
@@ -184,6 +191,14 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			return !empty( $files ) ? array_reverse($files) : array();
 		}
 
+        /**
+         * Get log content.
+         *
+         * @since 1.0.0
+         *
+         * @param string $log Get log file.
+         * @return string get log content.
+         */
 		public function get_log_content( $log ) {
 
 			if( empty( $log ) ) {

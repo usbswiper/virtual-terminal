@@ -1,6 +1,7 @@
+body { background: #fafafa; }
 body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-row {width: 100%;display: flex;}
-.vt-row .vt-col {width: calc(100% - 24px);display: block;background: #FFF;padding: 20px;box-shadow: 0 0 10px #CCC;margin: 0 10px;border-radius: 10px;}
+.vt-row .vt-col {width: calc(100% - 24px);display: block;background: #FFF;padding: 20px;border: 1px solid #e0e6ed;box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);margin: 0 10px;border-radius: 10px;}
 .vt-row .vt-col:first-child {margin-left: 0;}
 .vt-row .vt-col:last-child {margin-right: 0;}
 .vt-row .vt-col-10 {width: calc(10% - 12px);}
@@ -80,68 +81,51 @@ p.signature-text{display: none;}
 .show-me-only-in-print{display: none ;}
 .transaction-table-header{text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
 .transaction-column{width: calc(50% - 15px);}
+.vt-button-primary {color: #fff !important;background-color: #4361ee !important;box-shadow: 0 10px 20px -10px #4361ee;padding: 0.4375rem 1.25rem !important;text-shadow: none;white-space: normal;word-wrap: break-word;touch-action: manipulation;cursor: pointer;display: inline-block;font-weight: 400;text-align: center;vertical-align: middle;border: 1px solid transparent;font-size: 1rem;line-height: 1.5;border-radius: 0.25rem;margin-top: 0 !important;transition: all .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
+.vt-button-primary:hover {box-shadow: none;transform: translateY(-3px);}
+.input-field-wrap .vt-input-field, .vt-fields-wrap .input-field-wrap .vt-input-field, .vt-fields-wrap .input-field-wrap .vt-select-field {border: 1px solid #bfc9d4;color: #3b3f5c;font-size: 15px;padding: 8px 10px;letter-spacing: 1px;height: calc(1.4em + 1.4rem + 2px);border-radius: 6px;width: 100%;}
+.vt-fields-wrap .input-field-wrap .select2-container--default .select2-selection--single {border: 1px solid #bfc9d4;border-radius: 6px;font-size: 1rem;height: 40px;}
+.vt-fields-wrap .input-field-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {color: #3b3f5c;line-height: 40px;}
+.vt-fields-wrap .input-field-wrap .select2-container--default .select2-selection--single .select2-selection__arrow {height: 40px;}
+.vt-fields-wrap .input-field-wrap .vt-input-field {height: auto;width: calc(100% - 20px);}
+.vt-fields-wrap .input-field-wrap .sign {width: auto;}
+.vt-fields-wrap .input-field-wrap .sign .vt-input-field {border-radius: 0 6px 6px 0;}
+.vt-fields-wrap .input-field-wrap .sign .vt-input-field {border-radius: 0 6px 6px 0;}
+.vt-fields-wrap .input-field-wrap .sign.after .vt-input-field {border-radius: 6px 0 0 6px;}
+.vt-product-wrapper .input-field-wrap label {color: #3b3f5c;font-size: 15px;width: auto;}
+.vt-product-wrapper .input-field-wrap .p-2, .p-2 {padding: 2px;}
+a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: none;}
+.vt-repeater-field .vt-fields-wrap {display: flex;margin: 10px 0;}
+.vt-repeater-field .input-field-wrap {margin: 0 6px;}
+.vt-repeater-field .input-field-wrap:nth-child(1) {width: calc(60% - 18px);}
+.vt-repeater-field .input-field-wrap:nth-child(2) {width: calc(20% - 12px);}
+.vt-repeater-field .input-field-wrap:nth-child(3) {margin: 0 6px;width: calc(20% - 22px);}
+.vt-repeater-field .input-field-wrap  .select2-container {width: 100% !important;}
+.vt-repeater-field svg {cursor: pointer;padding-top: 10px;}
+.vt-search-result {background: #e4e4e4;border-radius: 0 0 6px 6px;display: flex;flex-direction: column;padding: 10px;max-height: 100px;overflow: auto;}
+.vt-search-result span {cursor: pointer;}
+.transaction-filter-form .transaction-select{padding: 15px 5px;}
+.transaction-filter-form .submit{margin-top: 0 !important;}
+.vt-transaction-history.woocommerce-page .transaction-overview ul li strong{padding-left: 0px !important;}
+.transaction-overview .transaction-basic-info .w-25{width: calc(25% - 5px) !important;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}
-    .transaction-table-header{
-        text-align:left;
-        width: 50%;
-        padding: 2px !important;
-        border-bottom: 1px solid #ebebeb;
-        border-right: 1px solid #ebebeb;
-    }
-    .transaction-history-title{
-        font-size: 1.2rem !important;
-        padding: 0;
-    }
-    address{
-        margin:0 !important;
-    }
-    .address-wrap{
-        padding: 10px;border: 1px solid #ebebeb;
-        min-height:180px;
-
-    }
-
-    p{
-        margin:0 !important;
-    }
-    .hide-me-in-print{
-        display: none!important;
-    }
-    .show-me-only-in-print{
-        display: inline-block ;
-    }
-    .show-me-only-in-print ul {
-        display:inline ;
-        list-style-type: none;
-    }
-
-
-    p.signature-text{
-        padding-top: 20px;
-        display: inline;
-    }
-    header#masthead {
-        display: none;
-    }
-
-    .storefront-breadcrumb {
-        display: none;
-    }
-
-    footer#colophon {
-        display: none;
-    }
-    div#secondary {
-        display: none;
-    }
-    header.entry-header {
-        display: none;
-    }
-    nav.woocommerce-MyAccount-navigation {
-        display: none;
-    }
+    .transaction-table-header{text-align:left;width: 50%;padding: 2px !important;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
+    .transaction-history-title{font-size: 1.2rem !important;padding: 0;}
+    address{margin:0 !important;}
+    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:180px;}
+    p{margin:0 !important;}
+    .hide-me-in-print{display: none!important;}
+    .show-me-only-in-print{display: inline-block ;}
+    .show-me-only-in-print ul {display:inline ;list-style-type: none;}
+    p.signature-text{padding-top: 20px;display: inline;}
+    header#masthead {display: none;}
+    .storefront-breadcrumb {display: none;}
+    footer#colophon {display: none;}
+    div#secondary {display: none;}
+    header.entry-header {display: none;}
+    nav.woocommerce-MyAccount-navigation {display: none;}
     .edit-link {display: none;}
     .transaction-refund{display:none;}
     /*compatibility for Divi Theme*/
@@ -151,4 +135,3 @@ p.signature-text{display: none;}
     .woocommerce-MyAccount-content{width:100% !important;}
     .transaction_history_receipt_info{list-style: none;}
 }
-

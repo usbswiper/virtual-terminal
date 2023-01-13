@@ -13,7 +13,8 @@ if( $has_transactions ) : ?>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-title"><?php _e('Title','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-tid"><?php _e('Transaction ID','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-status"><?php _e('Status','usb-swiper'); ?></th>
-				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-type"><?php _e('Type','usb-swiper'); ?></th>
+                <th class="woocommerce-orders-table__header woocommerce-orders-table__header-intent"><?php _e('Intent','usb-swiper'); ?></th>
+                <th class="woocommerce-orders-table__header woocommerce-orders-table__header-type"><?php _e('Type','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-total"><?php _e('Total','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-date"><?php _e('Date','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-actions"><?php _e('Actions','usb-swiper'); ?></th>
@@ -23,35 +24,39 @@ if( $has_transactions ) : ?>
 			<?php
 			foreach ( $transactions as $transaction ) {
 
-                    $id = !empty($transaction->ID) ? esc_html( $transaction->ID ) : 0;
-                    $grand_total = get_post_meta( $id, 'GrandTotal', true );
-                    $payment_response = get_post_meta( $id, '_payment_response', true);
-                    $global_payment_status = get_post_meta( $id, '_payment_status', true);
-                    $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
-                    $payment_status = usbswiper_get_transaction_status($transaction->ID);
-				    $payment_action = usbswiper_get_transaction_type($transaction->ID);
+                $id = !empty($transaction->ID) ? esc_html( $transaction->ID ) : 0;
+                $grand_total = get_post_meta( $id, 'GrandTotal', true );
+                $payment_response = get_post_meta( $id, '_payment_response', true);
+                $global_payment_status = get_post_meta( $id, '_payment_status', true);
+                $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
+                $payment_status = usbswiper_get_transaction_status($transaction->ID);
+                $payment_action = usbswiper_get_transaction_type($transaction->ID);
+                $transaction_type = usbswiper_get_invoice_transaction_type($transaction->ID);
+                $end_point = 'view-transaction';
 
-                    if( $global_payment_status === 'FAILED' ) {
-                        $payment_status = $global_payment_status;
-                    }
+                if( $global_payment_status === 'FAILED' || $payment_status === '' || strtolower($end_point) === 'view-transaction' ) {
+                    $payment_status = $global_payment_status;
+                }
 
-                    if( !class_exists('Usb_Swiper_Paypal_request') ) {
-                        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
-                    }
+                if( !class_exists('Usb_Swiper_Paypal_request') ) {
+                    include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+                }
 
-                    $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
-                    $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $id );
-                    ?>
+                $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+                $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $id );
+                ?>
+
 				<tr class="woocommerce-transactions-table__row woocommerce-transactions-table__row--status-<?php echo !empty( $payment_status ) ? esc_attr( strtolower($payment_status) ) : ''; ?> transactions">
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo $id; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-title"><?php echo !empty($transaction->post_title) ? esc_html( $transaction->post_title ) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
-					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-status"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status(esc_attr($payment_status)) : '-'; ?></td>
-					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-type"><?php echo !empty( $payment_action ) ? strtoupper(esc_attr( $payment_action )) : '-'; ?></td>
+					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-status"><?php echo !empty( $payment_status ) ? strtoupper(usbswiper_get_payment_status(esc_attr($payment_status))) : '-'; ?></td>
+                    <td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-intent"><?php echo !empty( $payment_action ) ? strtoupper(esc_attr( $payment_action )) : '-'; ?></td>
+					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-type"><?php echo !empty( $transaction_type ) ? strtoupper(esc_attr( $transaction_type )) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-total"><?php echo !empty( $grand_total ) ? wc_price(esc_attr( $grand_total ), array('currency' => $transaction_currency)) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-date"><?php echo esc_attr( get_the_time( __( 'Y/m/d g:i a' ), $transaction ) ); ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions">
-						<a href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
+						<a href="<?php echo esc_url( wc_get_endpoint_url( $end_point, $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
                         <?php if( usbswiper_is_allow_capture( $id ) && $global_payment_status !== 'FAILED' ) {
                             $unique_id = usb_swiper_unique_id( array(
                                'type' => $payment_action,
@@ -77,6 +82,9 @@ if( $has_transactions ) : ?>
 		    if( $next_page > 1 ) {
 			    $next_args['vt-page'] = $next_page;
             }
+            if( !empty( $_GET['vt-type'] ) ){
+                $next_args['vt-type'] = sanitize_text_field( $_GET['vt-type'] );
+            }
 		    $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'transactions' ,'') );
             ?>
 			<a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url($next_page_url); ?>"><?php esc_html_e( 'Previous', 'woocommerce' ); ?></a>
@@ -87,6 +95,9 @@ if( $has_transactions ) : ?>
 			$previous_args = array(
 				'vt-page' => $previous_page,
             );
+            if( !empty( $_GET['vt-type'] ) ){
+                $previous_args['vt-type'] = sanitize_text_field( $_GET['vt-type'] );
+            }
 
 			$previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'transactions' ,'') );
             ?>

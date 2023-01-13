@@ -28,52 +28,74 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 
 			$settings = get_option( 'usb_swiper_settings' );
 
-			if( empty( $settings ) && !is_array( $settings )) {
+            $vt_page = get_page_by_title( 'Virtual Terminal' );
+            $vt_paybyinvoice_page = get_page_by_title( 'Pay By Invoice' );
 
-				$vt_page_id = wp_insert_post( array(
-					'post_title'    => __('Virtual Terminal', 'usb-swiper'),
-					'post_content'  => '[usb_swiper_vt_form]',
-					'post_status'   => 'publish',
-					'post_author'   => 1,
-					'post_type' => 'page'
-				) );
+            if( empty( $vt_page ) ){
+                $vt_page_id = wp_insert_post( array(
+                    'post_title'    => __('Virtual Terminal', 'usb-swiper'),
+                    'post_content'  => '[usb_swiper_vt_form]',
+                    'post_status'   => 'publish',
+                    'post_author'   => 1,
+                    'post_type' => 'page'
+                ) );
+            }else{
+                $vt_page_id = $vt_page->ID;
+            }
 
-				$settings = array(
-					'general' => array(
-						'virtual_terminal_page' => $vt_page_id,
-						'is_paypal_sandbox' => false,
-					),
-					'partner_fees' => array(
-						'fees' => array(
-							array(
-								'country_code' => 'AU',
-								'percentage' => '',
-							),
-							array(
-								'country_code' => 'AT',
-								'percentage' => '',
-							),
-							array(
-								'country_code' => 'DE',
-								'percentage' => '',
-							),
-							array(
-								'country_code' => 'GB',
-								'percentage' => '',
-							),
-							array(
-								'country_code' => 'US',
-								'percentage' => '',
-							),
-						)
-					),
-					'uninstall' => array(
-						'remove_data_on_uninstall' => true,
-					),
-				);
+            if( empty( $vt_paybyinvoice_page ) ){
+                $vt_paybyinvoice_page_id = wp_insert_post( array(
+                    'post_title'    => __('Pay By Invoice', 'usb-swiper'),
+                    'post_content'  => '[usb_swiper_pay_by_invoice]',
+                    'post_status'   => 'publish',
+                    'post_author'   => 1,
+                    'post_type' => 'page'
+                ) );
+            }else{
+                $vt_paybyinvoice_page_id = $vt_paybyinvoice_page->ID;
+            }
 
-				update_option('usb_swiper_settings', $settings );
-			}
+            if( empty( $settings ) && !is_array( $settings )) {
+                $settings = array(
+                    'general' => array(
+                        'virtual_terminal_page' => $vt_page_id,
+                        'vt_paybyinvoice_page' => $vt_paybyinvoice_page_id,
+                        'is_paypal_sandbox' => false,
+                    ),
+                    'partner_fees' => array(
+                        'fees' => array(
+                            array(
+                                'country_code' => 'AU',
+                                'percentage' => '',
+                            ),
+                            array(
+                                'country_code' => 'AT',
+                                'percentage' => '',
+                            ),
+                            array(
+                                'country_code' => 'DE',
+                                'percentage' => '',
+                            ),
+                            array(
+                                'country_code' => 'GB',
+                                'percentage' => '',
+                            ),
+                            array(
+                                'country_code' => 'US',
+                                'percentage' => '',
+                            ),
+                        )
+                    ),
+                    'uninstall' => array(
+                        'remove_data_on_uninstall' => true,
+                    ),
+                );
+            }
+
+            $settings['general']['virtual_terminal_page'] = !empty( $settings['general']['virtual_terminal_page'] ) ? $settings['general']['virtual_terminal_page'] : $vt_page_id;
+            $settings['general']['vt_paybyinvoice_page'] = !empty( $settings['general']['vt_paybyinvoice_page'] ) ? $settings['general']['vt_paybyinvoice_page'] : $vt_paybyinvoice_page_id;
+
+			update_option('usb_swiper_settings', $settings );
 		}
 	}
 }

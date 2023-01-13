@@ -29,6 +29,7 @@ class Usb_Swiper_Paypal_request{
 		if( !empty( $user_brand ) ) {
 			$brand_name = $user_brand;
 		}
+        $brand_name = !empty( $brand_name ) ? $brand_name : "";
 		$this->brand_name = apply_filters( 'usb_swiper_brand_name',  $brand_name);
 
 		$this->landing_page = apply_filters( 'usb_swiper_landing_page', 'NO_PREFERENCE');
@@ -270,155 +271,163 @@ class Usb_Swiper_Paypal_request{
 		return $application_context;
 	}
 
-	public function create_transaction_request( $transaction_id ) {
+    public function create_transaction_request( $transaction_id ) {
 
-		$InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
-		$reference_id = 'wc_transaction_'.$transaction_id;
+        $InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
+        $reference_id = 'wc_transaction_'.$transaction_id;
 
-		$payment_action = get_post_meta( $transaction_id,'TransactionType', true);
+        $payment_action = get_post_meta( $transaction_id,'TransactionType', true);
 
-		$intent = ($payment_action === 'authorize') ? 'AUTHORIZE' : 'CAPTURE';
-		$order_total = get_post_meta($transaction_id,'GrandTotal',true);
+        $intent = ($payment_action === 'authorize') ? 'AUTHORIZE' : 'CAPTURE';
+        $order_total = get_post_meta($transaction_id,'GrandTotal',true);
 
-		update_post_meta( $transaction_id,'_payment_action', $payment_action);
+        update_post_meta( $transaction_id,'_payment_action', $payment_action);
         update_post_meta( $transaction_id,'_environment', ($this->is_sandbox) ? 'sandbox' : 'live');
 
-		$body_request = array(
-			'intent' => $intent,
-			'application_context' => $this->application_context(),
-			'payment_method' => array('payee_preferred' => ($this->payee_preferred) ? 'IMMEDIATE_PAYMENT_REQUIRED' : 'UNRESTRICTED'),
-			'purchase_units' => array(
-				0 =>
-					array(
-						'reference_id' => $reference_id,
-						'amount' =>
-							array(
-								'currency_code' => $this->get_transaction_currency($transaction_id),
-								'value' => usb_swiper_price_formatter($order_total),
-								'breakdown' => array()
-							)
-					),
-			),
-		);
+        $body_request = array(
+            'intent' => $intent,
+            'application_context' => $this->application_context(),
+            'payment_method' => array('payee_preferred' => ($this->payee_preferred) ? 'IMMEDIATE_PAYMENT_REQUIRED' : 'UNRESTRICTED'),
+            'purchase_units' => array(
+                0 =>
+                    array(
+                        'reference_id' => $reference_id,
+                        'amount' =>
+                            array(
+                                'currency_code' => $this->get_transaction_currency($transaction_id),
+                                'value' => usb_swiper_price_formatter($order_total),
+                                'breakdown' => array()
+                            )
+                    ),
+            ),
+        );
 
-		if( !empty( $InvoiceID ) ) {
-			$body_request['purchase_units'][0]['invoice_id'] = 'VT-' . $InvoiceID;
-		}
+        if( !empty( $InvoiceID ) ) {
+            $body_request['purchase_units'][0]['invoice_id'] = 'VT-' . $InvoiceID;
+        }
 
-		$body_request['purchase_units'][0]['custom_id'] = $reference_id;
+        $body_request['purchase_units'][0]['custom_id'] = $reference_id;
 
-		$body_request['purchase_units'][0]['soft_descriptor'] = $this->soft_descriptor;
+        $body_request['purchase_units'][0]['soft_descriptor'] = $this->soft_descriptor;
 
-		$platform_fees = usbswiper_get_platform_fees( $order_total );
-		if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $payment_action ) {
+        $transaction_type = get_post_meta($transaction_id,'_transaction_type', true);
 
-			if ($this->is_sandbox) {
-				$admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
-			} else{
-				$admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
-			}
+        $platform_fees = usbswiper_get_platform_fees( $order_total, strtolower($transaction_type),$transaction_id );
+        if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $payment_action ) {
 
-			$body_request['purchase_units'][0]['payment_instruction'] =array(
-				'disbursement_mode' => 'INSTANT',
-				'platform_fees' => array(
-					array(
-						'amount' => array(
-							"currency_code" => $this->get_transaction_currency($transaction_id),
-							"value" => usb_swiper_price_formatter($platform_fees)
-						),
-						'payee' => array(
-							//'email_address' => $primary_email,
-							'merchant_id' => $admin_merchant_id,
-						),
-					)
-				),
-			);
-		}
+            if ($this->is_sandbox) {
+                $admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
+            } else{
+                $admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
+            }
 
-		$NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
+            $body_request['purchase_units'][0]['payment_instruction'] =array(
+                'disbursement_mode' => 'INSTANT',
+                'platform_fees' => array(
+                    array(
+                        'amount' => array(
+                            "currency_code" => $this->get_transaction_currency($transaction_id),
+                            "value" => usb_swiper_price_formatter($platform_fees)
+                        ),
+                        'payee' => array(
+                            //'email_address' => $primary_email,
+                            'merchant_id' => $admin_merchant_id,
+                        ),
+                    )
+                ),
+            );
+        }
 
-		if (isset($NetAmount) && $NetAmount > 0) {
-			$body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
-				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => usb_swiper_price_formatter($NetAmount),
-			);
-		}
+        $NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
 
-		$ShippingAmount = get_post_meta( $transaction_id,'ShippingAmount', true);
+        if (isset($NetAmount) && $NetAmount > 0) {
+            $body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
+                'currency_code' => $this->get_transaction_currency($transaction_id),
+                'value' => usb_swiper_price_formatter($NetAmount),
+            );
+        }
 
-		if (isset($ShippingAmount) && $ShippingAmount > 0) {
-			$body_request['purchase_units'][0]['amount']['breakdown']['shipping'] = array(
-				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => usb_swiper_price_formatter($ShippingAmount),
-			);
-		}
+        $ShippingAmount = get_post_meta( $transaction_id,'ShippingAmount', true);
 
-		$HandlingAmount = get_post_meta( $transaction_id,'HandlingAmount', true);
+        if (isset($ShippingAmount) && $ShippingAmount > 0) {
+            $body_request['purchase_units'][0]['amount']['breakdown']['shipping'] = array(
+                'currency_code' => $this->get_transaction_currency($transaction_id),
+                'value' => usb_swiper_price_formatter($ShippingAmount),
+            );
+        }
 
-		if (isset($HandlingAmount) && $HandlingAmount > 0) {
-			$body_request['purchase_units'][0]['amount']['breakdown']['handling'] = array(
-				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => usb_swiper_price_formatter($HandlingAmount),
-			);
-		}
+        $HandlingAmount = get_post_meta( $transaction_id,'HandlingAmount', true);
 
-		$TaxAmount = get_post_meta( $transaction_id,'TaxAmount', true);
+        if (isset($HandlingAmount) && $HandlingAmount > 0) {
+            $body_request['purchase_units'][0]['amount']['breakdown']['handling'] = array(
+                'currency_code' => $this->get_transaction_currency($transaction_id),
+                'value' => usb_swiper_price_formatter($HandlingAmount),
+            );
+        }
 
-		if (isset($TaxAmount) && $TaxAmount > 0) {
-			$body_request['purchase_units'][0]['amount']['breakdown']['tax_total'] = array(
-				'currency_code' => $this->get_transaction_currency($transaction_id),
-				'value' => usb_swiper_price_formatter($TaxAmount),
-			);
-		}
+        $TaxAmount = get_post_meta( $transaction_id,'TaxAmount', true);
 
-		$body_request['purchase_units'][0]['payee']['merchant_id'] = $this->merchant_id;
+        if (isset($TaxAmount) && $TaxAmount > 0) {
+            $body_request['purchase_units'][0]['amount']['breakdown']['tax_total'] = array(
+                'currency_code' => $this->get_transaction_currency($transaction_id),
+                'value' => usb_swiper_price_formatter($TaxAmount),
+            );
+        }
 
-		$ItemName = get_post_meta( $transaction_id,'ItemName', true);
-		$Notes = get_post_meta( $transaction_id,'Notes', true);
-		if( !empty( $Notes ) && strlen( $Notes ) > 127 ) {
-			$Notes = substr($Notes, 0, 127);
-		}
+        $body_request['purchase_units'][0]['payee']['merchant_id'] = $this->merchant_id;
 
-		if( !empty( $Notes ) ) {
-			$body_request['purchase_units'][0]['description'] = html_entity_decode( $Notes, ENT_NOQUOTES, 'UTF-8' );
-		}
+        $Notes = get_post_meta( $transaction_id,'Notes', true);
+        if( !empty( $Notes ) && strlen( $Notes ) > 127 ) {
+            $Notes = substr($Notes, 0, 127);
+        }
 
-		$NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
+        if( !empty( $Notes ) ) {
+            $body_request['purchase_units'][0]['description'] = html_entity_decode( $Notes, ENT_NOQUOTES, 'UTF-8' );
+        }
 
-		if( !empty( $ItemName ) ) {
-			$body_request['purchase_units'][0]['items'][0] = array(
-				'name'        => $ItemName,
-				'description' => '',
-				'sku'         => '',
-				'category'    => '',
-				'quantity'    => 1,
-				'unit_amount' =>
-					array(
-						'currency_code' => $this->get_transaction_currency( $transaction_id ),
-						'value'         => usb_swiper_price_formatter($NetAmount),
-					),
-			);
-		}
+        $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
+        $vt_products = !empty($vt_products) ? $vt_products : array();
 
-		$body_request = $this->set_payer_shipping_details($body_request, $transaction_id);
-		$body_request = $this->set_payer_details($body_request, $transaction_id);
-		$body_request = $this->remove_empty_key($body_request);
+        if( ! empty( $vt_products ) && is_array( $vt_products ) ) {
 
-		$args = array(
-			'method' => 'POST',
-			'headers' => array(
-				'Content-Type' => 'application/json',
-				'Authorization' => 'Bearer '.$this->get_access_token(),
-			),
-			'body' => json_encode($body_request),
-		);
+            $purchase_units_items = array();
 
-		$this->api_response = $this->request($this->paypal_order_api, $args, 'create_order', $transaction_id );
+            foreach ( $vt_products as $products ) {
+                $purchase_units_items[] =  array(
+                    'name'        => $products['product_name'],
+                    'description' => '',
+                    'sku'         => '',
+                    'category'    => '',
+                    'quantity'    => $products['product_quantity'],
+                    'unit_amount' => array(
+                        'currency_code' => $this->get_transaction_currency( $transaction_id ),
+                        'value'         => usb_swiper_price_formatter ( $products['product_price'] ),
+                    ),
+                );
+            }
 
-		$this->handle_paypal_debug_id($this->api_response, $transaction_id);
+            $body_request['purchase_units'][0]['items'] = $purchase_units_items;
+        }
 
-		return $this->api_response;
-	}
+        $body_request = $this->set_payer_shipping_details($body_request, $transaction_id);
+        $body_request = $this->set_payer_details($body_request, $transaction_id);
+        $body_request = $this->remove_empty_key($body_request);
+
+        $args = array(
+            'method' => 'POST',
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$this->get_access_token(),
+            ),
+            'body' => json_encode($body_request),
+        );
+
+        $this->api_response = $this->request($this->paypal_order_api, $args, 'create_order', $transaction_id );
+
+        $this->handle_paypal_debug_id($this->api_response, $transaction_id);
+
+        return $this->api_response;
+    }
 
 	public function handle_cc_transaction_request( $paypal_transaction_id ) {
 

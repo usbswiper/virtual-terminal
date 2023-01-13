@@ -1,0 +1,78 @@
+<?php
+$invoice_id = !empty($args['invoice_id']) ? (int)$args['invoice_id'] : "";
+$invoice_status = !empty($args['invoice_status']) ? $args['invoice_status'] : "";
+$transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
+$payment_status = get_post_meta($invoice_id,'_payment_status', true);
+$billing_first_name = get_post_meta($invoice_id, 'BillingFirstName', true);
+$billing_last_name = get_post_meta($invoice_id, 'BillingLastName', true);
+
+$settings = usb_swiper_get_settings('general');
+$vt_invoice_page = !empty( $settings['vt_paybyinvoice_page'] ) ? $settings['vt_paybyinvoice_page'] : '';
+
+if( !class_exists('Usb_Swiper_Paypal_request') ) {
+    include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+}
+
+?>
+
+<div id="content" class="invoice-content-main-wrap main-content woocommerce">
+    <div class="vt-form-notification">
+        <?php
+        if( !empty( $notifications ) && is_array( $notifications ) ) {
+            foreach ( $notifications as $key => $notification ) {
+                $type = !empty( $notification['type'] ) ? $notification['type'] : '';
+                $message = !empty( $notification['message'] ) ? $notification['message'] : '';
+                echo "<p class='notification {$type}'>{$message}</p>";
+            }
+        }
+        ?>
+    </div>
+    <form method="post" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
+        <div class="vt-form-contents">
+            <div class="vt-row">
+                <?php if( empty( $invoice_id ) ){ ?>
+                    <div class="vt-form-message"><?php _e('Sorry, No any invoice data found.','usb-swiper'); ?></div>
+                <?php } elseif( !empty( $payment_status ) && strtolower($payment_status) === 'paid' && !empty( $invoice_status ) && strtolower($invoice_status) == 'completed' ) {
+                    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $invoice_id ) );
+                } else { ?>
+                    <div class="d-flex">
+
+                        <?php
+                        usb_swiper_get_template( 'vt-invoice-html.php', array( 'invoice_id' => $invoice_id ) );
+
+                        if( !empty( $vt_invoice_page ) && (int)$vt_invoice_page === get_the_ID()) { ?>
+                            <div class="paypal-payment">
+                                <div class="vt-col vt-col-100 vt-col-payments">
+                                    <div class="usb-swiper-advanced-cc-form">
+                                        <div class="card-form">
+                                            <div class="vt-card-field vt-card-number">
+                                                <label for="card-number"><?php _e('Card Number','usb-swiper'); ?></label>
+                                                <div id="card-number" class="card_field"></div>
+                                            </div>
+                                            <div class="vt-card-details">
+                                                <div class="vt-card-field vt-card-field-50 vt-card-expiration-date">
+                                                    <label for="expiration-date"><?php _e('Expiration Date','usb-swiper'); ?></label>
+                                                    <div id="expiration-date" class="card_field"></div>
+                                                </div>
+                                                <div class="vt-card-field vt-card-field-50 vt-card-cvv">
+                                                    <label for="cvv"><?php _e('CVV','usb-swiper'); ?></label>
+                                                    <div id="cvv" class="card_field"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
+                                        <input type="hidden" id="transaction_id" name="transaction_id" value="<?php echo ! empty( $invoice_id ) ? $invoice_id : ''; ?>">
+                                        <input type="hidden" id="BillingFirstName" name="BillingFirstName" value="<?php echo ! empty( $BillingFirstName ) ? $BillingFirstName : ''; ?>">
+                                        <input type="hidden" id="BillingLastName" name="BillingLastName" value="<?php echo ! empty( $BillingLastName ) ? $BillingLastName : ''; ?>">
+                                        <button type="submit" class="btn btn-primary button button-primary" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                                    </div>
+                                    <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </form>
+</div>

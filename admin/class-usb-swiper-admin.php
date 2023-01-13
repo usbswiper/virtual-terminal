@@ -331,7 +331,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$columns['payment_status'] = __( 'Payment Status', 'usb-swiper');
 			$columns['payment_intent'] = __( 'Payment Intent', 'usb-swiper');
 			$columns['transaction_environment'] = __( 'Environment', 'usb-swiper');
-			$columns['date'] = $date;
+            $columns['transaction_type'] = __( 'Type', 'usb-swiper');
+            $columns['date'] = $date;
             $columns['company'] = __('Company','usb-swiper');
 
 			return $columns;
@@ -365,7 +366,10 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		        $query->set( 'meta_key', '_payment_status' );
 		        $query->set( 'orderby', 'meta_value' );
 	        }
-
+            if ( 'transaction_type' == $orderby ) {
+                $query->set( 'meta_key', '_transaction_type' );
+                $query->set( 'orderby', 'meta_value' );
+            }
 	        if ( 'grand_total' == $orderby ) {
 		        $query->set( 'meta_key', 'GrandTotal' );
 		        $query->set( 'orderby', 'meta_value_num' );
@@ -380,6 +384,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	        $columns['grand_total'] = 'grand_total';
 	        $columns['payment_status'] = 'payment_status';
 	        $columns['company'] = 'company';
+            $columns['transaction_type'] = 'transaction_type';
 	        $columns['author'] = 'author';
             return $columns;
         }
@@ -399,9 +404,10 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$payment_captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
 			$payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
 			$payment_intent = usbswiper_get_transaction_type($post_id);
+            $transaction_type = usbswiper_get_invoice_transaction_type($post_id);
 
 
-			switch ( $column ) {
+            switch ( $column ) {
                 case 'transaction_id':
                     $real_trans_id = usbswiper_get_transaction_id($post_id);
                     echo   !empty( $real_trans_id ) ? $real_trans_id : '';
@@ -417,8 +423,9 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					break;
 				case 'payment_status' :
                     $global_payment_status = get_post_meta( $post_id, '_payment_status', true);
+                    $transaction_type = get_post_meta( $post_id, '_transaction_type', true);
 				    $transaction_status = usbswiper_get_transaction_status($post_id);
-                    if( $global_payment_status === 'FAILED' ) {
+                    if( $global_payment_status === 'FAILED' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ) ) {
                         $transaction_status = $global_payment_status;
                     }
 					echo usbswiper_get_payment_status($transaction_status);
@@ -434,7 +441,9 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     $company = get_post_meta($post_id,'company',true);
                     echo $company;
                     break;
-
+                case 'transaction_type' :
+                    echo !empty( $transaction_type ) ? strtoupper($transaction_type) : '';
+                    break;
 				default;
 					echo apply_filters( 'usb_swiper_transactions_column', '' , $column, $post_id );
 			}
@@ -819,6 +828,18 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     'id' => 'vt_failure_page',
                     'name' => 'vt_failure_page',
                     'label' => __('Onboarding Failure Page', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'options' => $get_pages,
+                    'attributes' => '',
+                    'description' => '',
+                    'class' => 'regular-text',
+                    'value' => '',
+                ),array(
+                    'type' => 'select',
+                    'id' => 'vt_paybyinvoice_page',
+                    'name' => 'vt_paybyinvoice_page',
+                    'label' => __('Pay by invoice Page', 'usb-swiper'),
                     'wrapper' => false,
                     'required' => true,
                     'options' => $get_pages,
@@ -1458,8 +1479,10 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					$get_exclude_partner_users = array($user_id);
 				}
 			} else {
-				$user_key = array_search($user_id, $get_exclude_partner_users);
-				unset($get_exclude_partner_users[$user_key]);
+                if( !empty( $get_exclude_partner_users ) ) {
+                    $user_key = array_search($user_id, $get_exclude_partner_users);
+                    unset($get_exclude_partner_users[$user_key]);
+                }
 			}
 
 			update_option('get_exclude_partner_users', $get_exclude_partner_users);
