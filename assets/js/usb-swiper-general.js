@@ -8,7 +8,7 @@ jQuery( document ).ready(function( $ ) {
         $(".vt-product-wrapper").toggle();
     }
 
-    $(".vt-product-inner .close a, #vt_add_product_cancel").click(function () {
+    $(".vt-product-inner .close svg, #vt_add_product_cancel").click(function () {
         $(".vt-product-wrapper").hide();
     });
 
