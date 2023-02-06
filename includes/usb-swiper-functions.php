@@ -1465,3 +1465,26 @@ function usbswiper_get_user_name(){
 
 	return $user_name;
 }
+
+/**
+ * Function use for set the content limit after added limit.
+ *
+ * @param string $content Get content.
+ * @param int $limit Get content limit
+ * @return false|mixed
+ */
+function usbswiper_set_content_limit( $content, $limit = 120, $more = '...' ) {
+
+    if( empty( $content ) ) {
+        return false;
+    }
+
+    $content_len = strlen($content);
+
+    if( $content_len >= $limit ) {
+        $content = substr($content, 0, $limit).$more;
+    }
+
+    return $content;
+
+}

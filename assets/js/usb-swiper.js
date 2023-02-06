@@ -351,3 +351,25 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
     });
 });
+
+var imageUpload = document.querySelectorAll('.vt-image-upload-wrap')
+
+for (var i = 0, len = imageUpload.length; i < len; i++) {
+    customInput(imageUpload[i])
+}
+
+function customInput (el) {
+    const fileInput = el.querySelector('.vt-image-upload');
+    const label = document.createElement('div');
+    label.className = 'upload-image-preview';
+    el.appendChild(label);
+
+    fileInput.onchange = function () {
+        if (!fileInput.value) return
+        /*const imageLabel = fileInput.value.replace(/^.*[\\\/]/, '')*/
+        const file = fileInput.files[0];
+        const previewImage = URL.createObjectURL(file)
+        label.innerHTML = '<img src="'+previewImage+'" alt="preview">';
+
+    }
+}

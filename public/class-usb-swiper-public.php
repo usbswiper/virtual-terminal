@@ -225,6 +225,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
 					'vt_page_url' => get_the_permalink($vt_page_id),
+                    'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper'))
 				) );
             }
 
@@ -1332,7 +1333,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since   1.1.9
          *
          */
-		function redirect_on_login($user_login, WP_User $user){
+		public function redirect_on_login($user_login, WP_User $user){
 			$merchant_user_info = get_user_meta( $user->ID,'_merchant_onboarding_user',true);
 			if ( empty( $merchant_user_info ) ) {
 				wp_safe_redirect( site_url().'/my-account/' );
@@ -1345,82 +1346,59 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 		}
 
-        /**
-         * Add VT add product
-         *
-         * @return void
-         * @throws WC_Data_Exception
-         */
-        function vt_add_product() {
+        public function vt_create_update_product() {
 
             if( ! empty( $_POST['vt-add-product-form-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-form-nonce'],'vt-add-product-form') ) {
 
+                $vt_action = ! empty( $_POST['vt-product-action'] ) ?  $_POST['vt-product-action'] : '';
+                $product_id = !empty( $_POST['vt_product_id'] ) ? $_POST['vt_product_id'] : '';
                 $product_name = ! empty( $_POST['product-name'] ) ? sanitize_text_field( $_POST['product-name'] ) : '';
                 $description  = ! empty( $_POST['description'] ) ? sanitize_text_field( $_POST['description'] ) : '';
                 $price        = ! empty( $_POST['price'] ) ? sanitize_text_field( (int)$_POST['price'] ) : '';
                 $sku          = ! empty( $_POST['sku'] ) ? sanitize_text_field( $_POST['sku'] ) : '';
-                $vt_product_action = ! empty( $_POST['vt-product-action'] ) ?  $_POST['vt-product-action'] : '';
                 $images    = ! empty( $_FILES['vt-product-image'] ) ?  $_FILES['vt-product-image'] : '';
                 $images_id    = $this->vt_upload_from_path( $images );
 
-                if( ! empty( $_GET['action'] ) ) {
-                    $vt_product_action = $_GET['action'];
-                    $product_id = ! empty( $_GET['product-id'] ) ?  $_GET['product-id'] : '';
-                }
+                $product = '';
+                if( !empty( $product_id ) && !empty( $vt_action ) && 'edit' === $vt_action ) {
 
-                if( 'add' == $vt_product_action ) {
+                    $product = wc_get_product( $product_id );
+                } elseif ( !empty( $vt_action ) && 'add' === $vt_action ) {
 
                     $product = new WC_Product_Simple();
-
-                    if (!empty($product_name)) {
-                        $product->set_name($product_name);
-                    }
-
                     if (!empty($product_name)) {
                         $product->set_slug(str_replace(' ', '-', $product_name));
                     }
-                    if (!empty($price)) {
-                        $product->set_regular_price($price);
-                    }
+                }
 
-                    if (!empty($description)) {
-                        $product->set_description($description);
-                    }
+                if( !empty( $product ) ) {
 
-                    if (!empty($images_id)) {
-                        $product->set_image_id($images_id);
-                    }
-
-                    if (!empty($sku)) {
-                        $product->set_sku($sku);
-                    }
-
-                    $product->save();
-                } elseif( 'edit' == $vt_product_action && ! empty( $product_id ) ) {
-
-                    $product = wc_get_product( $product_id );
                     if (!empty($product_name)) {
                         $product->set_name($product_name);
                     }
-                    if (!empty($description)) {
-                        $product->set_description($description);
-                    }
-                    if (!empty($sku)) {
-                        $product->set_sku($sku);
-                    }
+
                     if (!empty($price)) {
                         $product->set_regular_price($price);
                     }
+
+                    if (!empty($description)) {
+                        $product->set_description($description);
+                    }
+
                     if (!empty($images_id)) {
                         $product->set_image_id($images_id);
                     }
+
+                    if (!empty($sku)) {
+                        $product->set_sku($sku);
+                    }
+
                     $product->save();
                 }
 
-                wp_redirect( site_url().'/my-account/vt-products/' );
+                wp_safe_redirect( wc_get_endpoint_url( 'vt-products', '', wc_get_page_permalink( 'myaccount' )) );
                 die();
             }
-
         }
 
         /**
@@ -1472,10 +1450,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $status = false;
             $message = __( 'Something went Wrong', 'usb-swiper');
-
+            $message_type = __('ERROR','usb-swiper');
             if( ! empty( $_POST['product_id'] ) ){
 
                 $status = true;
+                $message_type = __('SUCCESS','usb-swiper');
                 $message = __( 'Product deleted successfully', 'usb-swiper');
                 $product_id = sanitize_text_field( $_POST['product_id'] );
                 wp_delete_post($product_id);
@@ -1484,6 +1463,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $response = array(
                 'status' => $status,
                 'message' => $message,
+                'message_type' => $message_type,
             );
 
             wp_send_json( $response);
