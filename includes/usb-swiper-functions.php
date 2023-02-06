@@ -885,7 +885,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'type' => 'checkbox',
                 'id' => 'shippingDisabled',
                 'name' => 'shippingDisabled',
-                'placeholder' => __( 'Shipping Not Req.', 'usb-swiper'),
+                'label' => __( 'Shipping Not Req.', 'usb-swiper'),
                 'required' => false,
                 'value' => "true",
                 'attributes' => array(
@@ -898,7 +898,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'type' => 'checkbox',
                 'id' => 'shippingSameAsBilling',
                 'name' => 'shippingSameAsBilling',
-                'placeholder' => __( 'Same as Billing', 'usb-swiper'),
+                'label' => __( 'Same as Billing', 'usb-swiper'),
                 'required' => false,
                 'value' => "true",
                 'attributes' => array(
@@ -1582,9 +1582,11 @@ function get_product_html( $id = 0 ) {
         'wrapper_class' => 'price'
     ));
 
+    $html .='<span class="vt-remove-fields-wrap">';
     if( $id > 0 ) {
-        $html .= '<span class="vt-remove-fields-wrap"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span>';
+        $html .= '<svg viewBox="0 0 24 24" width="25" height="25" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
     }
+    $html .='</span>';
 
     $html .='</div>';
 

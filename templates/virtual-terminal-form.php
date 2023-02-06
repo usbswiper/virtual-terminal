@@ -13,7 +13,7 @@
     <form method="post" action="" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
         <div class="vt-form-contents">
             <div class="vt-row">
-                <div class="vt-col vt-col-60">
+                <div class="vt-col vt-col-60 vt-col-form-fields">
                     <fieldset>
                         <label><?php _e('Currency Information','usb-swiper'); ?></label>
                         <div class="vt-fields-wrap">
