@@ -96,7 +96,7 @@ p.signature-text{display: none;}
 .vt-product-wrapper .input-field-wrap label {color: #3b3f5c;font-size: 15px;width: auto;}
 .vt-product-wrapper .input-field-wrap .p-2, .p-2 {padding: 2px;}
 a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: none;}
-.vt-repeater-field .vt-fields-wrap {display: flex;margin: 10px 0;}
+.vt-repeater-field .vt-fields-wrap {display: flex;margin: 20px 0;}
 .vt-repeater-field .input-field-wrap {margin: 0 6px;}
 .vt-repeater-field .input-field-wrap:nth-child(1) {width: calc(60% - 18px);}
 .vt-repeater-field .input-field-wrap:nth-child(2) {width: calc(20% - 12px);}
