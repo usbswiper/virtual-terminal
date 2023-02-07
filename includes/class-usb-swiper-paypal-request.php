@@ -24,11 +24,12 @@ class Usb_Swiper_Paypal_request{
 		$this->settings = $settings;
 		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
 
-		$this->brand_name = apply_filters( 'usb_swiper_brand_name', get_bloginfo('name') );
 		$user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
-		if( !empty( $user_brand ) ) {
+        $brand_name = !empty( get_bloginfo('name') ) ? get_bloginfo('name') : "";
+        if( !empty( $user_brand ) ) {
 			$brand_name = $user_brand;
 		}
+
 		$this->brand_name = apply_filters( 'usb_swiper_brand_name',  $brand_name);
 
 		$this->landing_page = apply_filters( 'usb_swiper_landing_page', 'NO_PREFERENCE');

@@ -198,7 +198,7 @@ class Usb_Swiper {
 		$this->loader->add_filter('manage_'.$this->post_type.'_posts_columns', $plugin_admin,'transactions_post_type_columns');
 		$this->loader->add_action('manage_'.$this->post_type.'_posts_custom_column', $plugin_admin, 'transactions_column_html', 10, 2);
 		$this->loader->add_action('restrict_manage_posts', $plugin_admin, 'manage_transactions_filter');
-		$this->loader->add_filter('parse_query', $plugin_admin, 'parse_query_filter');
+		$this->loader->add_filter('request', $plugin_admin, 'request_query_filter');
 		$this->loader->add_action('usb_swiper_section_content_general', $plugin_admin, 'general_settings');
 		$this->loader->add_action('usb_swiper_section_content_partner_fees', $plugin_admin, 'partner_fees_settings');
 		$this->loader->add_action('usb_swiper_section_content_logs', $plugin_admin, 'logs_settings');

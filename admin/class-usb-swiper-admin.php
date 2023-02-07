@@ -449,32 +449,22 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		 */
 		public function manage_transactions_filter( $post_type ) {
 
-			if ( $this->post_type !== esc_attr( $post_type ) ) {
-			    return;
-			}
-
-            $get_users = get_users();
-
-			$selected = '';
-			if( isset( $_REQUEST['user_id'] ) && $_REQUEST['user_id'] > 0 ) {
-				$selected = esc_attr( $_REQUEST['user_id'] );
+            if ( $this->post_type !== esc_attr( $post_type ) ) {
+                return;
             }
-            ?>
-            <label for="user_id" class="screen-reader-text"><?php _e('Filter by user','usb-swiper'); ?></label>
-            <select name="user_id" id="user_id">
-                <option value=""><?php _e('All User Transactions','usb-swiper'); ?></option>
-                <?php
-                if( !empty($get_users) && is_array( $get_users ) ) {
 
-                    foreach ( $get_users as $key => $user ) {
-                        ?>
-                        <option <?php selected( $selected, $user->ID ); ?> value="<?php echo $user->ID; ?>"><?php echo $user->display_name; ?></option>
-                        <?php
-                    }
-                }
-                ?>
-            </select>
-            <?php
+            $selected = 0;
+            if( empty( $_GET['s'])) {
+                $selected = !empty( $_GET['author'] ) ? $_GET['author']: 0;
+            }
+
+            wp_dropdown_users(
+                array(
+                    'name' => 'author',
+                    'show_option_all' => __('All User Transactions','usb-swiper'),
+                    'selected' => $selected,
+                )
+            );
 		}
 
 		/**
@@ -486,17 +476,28 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		 *
 		 * @return $query
 		 */
-		public function parse_query_filter( $query ) {
+		public function request_query_filter( $query ) {
 
-			$current_page = isset( $_GET['post_type'] ) ? esc_attr( $_GET['post_type'] ) : '';
+            $current_page = isset( $_GET['post_type'] ) ? esc_attr( $_GET['post_type'] ) : '';
 
-		    if( is_admin() && !empty( $current_page ) && $this->post_type === $current_page ) {
+            if( is_admin() && !empty( $current_page ) && $this->post_type === $current_page ) {
 
-		        if( !empty( $_REQUEST['user_id'] ) && $_REQUEST['user_id'] > 0 ) {
-			        $query->query_vars['author'] = esc_attr( $_REQUEST['user_id'] );
-		        }
+                if( isset( $_GET['author'] ) && $_GET['author'] === '0' ) {
+                    if (empty($query['s'])) {
+                        unset($query['s']);
+                    }
+                }
 
-		    }
+                if( !empty( $_REQUEST['author'] ) && $_REQUEST['author'] > 0 ) {
+                    if (empty($query['s'])) {
+                        unset($query['s']);
+                    }
+                }
+
+                if( !empty( $_GET['s'] ) ) {
+                    $query['author'] = 0;
+                }
+            }
 
 		    return $query;
 		}
