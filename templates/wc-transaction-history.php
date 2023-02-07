@@ -101,10 +101,10 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
     <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
 
         <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
-            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id"><?php _e('Receipt ID','usb-swiper'); ?><strong style="display: block;"><?php echo $transaction_id; ?></strong></li>
-            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-date"><?php _e('Date','usb-swiper'); ?><strong style="display: block;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
-            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="payment-status"><?php _e('Status','usb-swiper'); ?><strong style="display: block;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
-            <li style="width: calc(25% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="card-details"><?php _e('Card Detail','usb-swiper'); ?><strong style="display: block;"><?php echo $credit_card_number; ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id w-25"><?php _e('Receipt ID: ','usb-swiper'); ?><strong style="display: block;float: left;width: 100%;"><?php echo $transaction_id; ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-date w-25"><?php _e('Date: ','usb-swiper'); ?><strong style="display: block;float: left;width: 100%;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;" class="payment-status w-25"><?php _e('Status: ','usb-swiper'); ?><strong style="display: block;float: left;width: 100%;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;" class="card-details w-25"><?php _e('Card Detail: ','usb-swiper'); ?><strong style="display: block;float: left;width: 100%;"><?php echo $credit_card_number; ?></strong></li>
         </ul>
     </div>
     <div class="customer-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
