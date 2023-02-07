@@ -82,16 +82,17 @@ p.signature-text{display: none;}
 .transaction-column{width: calc(50% - 15px);}
 .vt-product-wrapper {background: #0006;bottom: 0;display:none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
 .vt-product-inner {background: #FFFFFF;border-radius: 16px;max-width: 600px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 5%;left: 0;right: 0;width:calc( 100% - 20px );}
-.vt-product-wrapper .vt-product-content {display: block;height: 80vh;overflow-y: scroll;}
+.vt-product-wrapper .vt-product-content {display: block;height: 60vh;overflow-y: scroll;}
 .vt-product-content::-webkit-scrollbar {width: 3px;background-color: #FFF!important;}
 .vt-product-content::-webkit-scrollbar-track {box-shadow: inset 0 0 6px #FFF!important;}
 .vt-product-content::-webkit-scrollbar-thumb {background: #FFF!important;}
-.vt-product-lists {margin: 2rem 0;}
+.vt-product-lists {margin: 1.5rem 0;}
 .vt-product-wrapper .input-field-wrap {text-align: left;display: flex;}
 .vt-product-wrapper .input-field-wrap input {padding: 10px;}
 .vt-product-wrapper .input-field-wrap label {width: 25%;}
 #vt_product_image {overflow: hidden;opacity: 0;position: absolute;top: 0;left: 0;}
 .input-field-wrap label[for="vt_product_image"] {background: #4361ee;color: #FFF !important;padding: 10px 20px;border-radius: 20px;min-width: 150px;cursor: pointer !important;text-align: center;}
+.input-field-wrap label[for="vt_product_image"]:hover {background: #4361eef2;}
 .vt-product-wrapper .input-field-wrap {padding: 10px 0;}
 .vt-product-wrapper .button-wrap {display: block}
 .vt-product-wrapper span {color: #777777;font-size: 14px;}
@@ -132,6 +133,7 @@ table.my-account-products-listings-table {padding: 20px 0;}
 .vt-fields-wrap .input-field-wrap .sign.after .vt-input-field {border-radius: 6px 0 0 6px;}
 .vt-product-wrapper .input-field-wrap label {color: #3b3f5c;font-size: 15px;width: auto;}
 .vt-product-wrapper .input-field-wrap .p-2, .p-2 {padding: 2px;}
+.button-wrap .vt-button-primary {margin-right: 0.8rem;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}

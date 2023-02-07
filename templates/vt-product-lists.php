@@ -85,7 +85,7 @@ $add_product_form_fields = array(
 </div>
 <div class="vt-product-wrapper">
     <div class="vt-product-inner">
-        <div class="close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div class="close"><a href="<?php echo esc_url( wc_get_endpoint_url( 'vt-products', '', wc_get_page_permalink( 'myaccount' )) );?>"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></a></div>
         <div class="vt-product-content">
             <?php if( !empty( $action ) && 'view' === $action ) {
                 foreach ( $add_product_form_fields as $form_field ){
