@@ -97,12 +97,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         }
     }
     ?>
-    <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
-        <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;" class="transaction-basic-info">
-            <li style="width: calc(50% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-id w-25"><?php _e('Receipt ID: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo $transaction_id; ?></strong></li>
-            <li style="width: calc(50% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="transaction-date w-25"><?php _e('Date: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
-            <li style="width: calc(50% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="payment-status w-25"><?php _e('Status: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
-            <li style="width: calc(50% - 5px);display: inline-block;font-size: 14px;margin-bottom: 15px;" class="card-details w-25"><?php _e('Card Detail: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo $credit_card_number; ?></strong></li>
+    <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
+        <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;" class="transaction-basic-info">
+            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="transaction-id w-25"><?php _e('Receipt ID: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo $transaction_id; ?></strong></li>
+            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="transaction-date w-25"><?php _e('Date: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
+            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="payment-status w-25"><?php _e('Status: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
+            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="card-details w-25"><?php _e('Card Detail: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo $credit_card_number; ?></strong></li>
         </ul>
     </div>
     <?php
@@ -110,7 +110,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $payment_link = !empty($args['payment_link']) ? esc_url($args['payment_link']) : '';
         $display_name = !empty( $args['display_name'] ) ? esc_html($args['display_name']) : '';
         ?>
-        <div style="margin: 10px 0;padding: 0;width: 100%;display: block;">
+        <div style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;">
             <p><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
             <?php if( !empty( $payment_link ) ){ ?>
                 <p><?php echo sprintf(__('Thanks for create invoice in %s, To pay for this invoice please use the following link:','usb-swiper'), get_option('blogname')); ?></p>
@@ -122,7 +122,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         <?php
     }
     ?>
-    <div class="customer-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+    <div class="customer-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <?php
         $billingInfo = get_post_meta( $transaction_id, 'billingInfo', true);
         $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
@@ -187,8 +187,9 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 
         ?>
 
-        <!--        Receipt Information-->
-        <div style="width: calc(33% - 15px);vertical-align: top;margin-left: 10px;" class=" form-detail show-me-only-in-print">
+        <?php if( !$is_email ) { ?>
+        <!-- Receipt Information-->
+        <div style="width: calc(33% - 15px);vertical-align: top;margin-left: 10px;float: left;" class=" form-detail show-me-only-in-print">
 
             <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
                 <li class="transaction_history_receipt_info">
@@ -219,17 +220,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 </li>
             </ul>
         </div>
-        <!--        Billing Address-->
-        <div style=";display: inline-block;vertical-align: top;margin-right: 10px;<?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
+        <?php }  ?>
+        <!-- Billing Address-->
+        <div style="float: left;display: inline-block;vertical-align: top;margin-right: 10px;<?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
             <h2 class="transaction-details__title transaction-history-title"><?php _e('Billing Address','usb-swiper'); ?></h2>
             <address class="address-wrap" >
-                <p style="margin-bottom: 0"> <strong>
-                        <?php echo $company_name ;?>
-                    </strong>
-                </p>
-
+                <p style="margin-bottom: 0"><strong><?php echo $company_name ;?></strong></p>
                 <?php
-                //				Splitting the Address Values
+                // Splitting the Address Values
 
                 if (!empty($billing_address)){
 
@@ -269,7 +267,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </address>
         </div>
         <!--Shipping Address-->
-        <div  style="display: inline-block;vertical-align: top;margin-left: 10px;<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
+        <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
             <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
             <address class="address-wrap" >
                 <?php if( 'true' !== $shippingDisabled ) { ?>
@@ -325,7 +323,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </address>
         </div>
     </div>
-    <div class="transaction-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+    <div class="transaction-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Product Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
@@ -376,7 +374,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         </table>
     </div>
     <?php if( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
-        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
@@ -429,7 +427,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     </div>
     <?php } ?>
     <?php if( !empty( $Notes ) ) { ?>
-        <div class="custom-notes transaction-history-field" style="display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
+        <div class="custom-notes transaction-history-field" style="float: left;display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Notes</strong>: %s','usb-swiper'), esc_html($Notes));?></p>
         </div>
     <?php } ?>
@@ -445,13 +443,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     <?php } ?>
 
     <?php if( !empty( $status_note ) ) { ?>
-        <div class="custom-payment-notes transaction-history-field" style="display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
+        <div class="custom-payment-notes transaction-history-field" style="float: left;display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Payment Notes</strong>: %s','usb-swiper'), $status_note);?></p>
         </div>
         <style type="text/css">.custom-payment-notes p span{ margin-left:5px; }</style>
     <?php } ?>
 
-    <div class="refund-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+    <div class="refund-details transaction-history-field" style="width: 100%;float: left;display: block;margin: 0 0 10px 0;padding: 0;">
         <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
             if( !class_exists('Usb_Swiper_Paypal_request') ) {
                 include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
