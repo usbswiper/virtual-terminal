@@ -99,10 +99,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     ?>
     <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
         <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;" class="transaction-basic-info">
-            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="transaction-id w-25"><?php _e('Receipt ID: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo $transaction_id; ?></strong></li>
-            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="transaction-date w-25"><?php _e('Date: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
-            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="payment-status w-25"><?php _e('Status: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
-            <li style="width: calc(50% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;" class="card-details w-25"><?php _e('Card Detail: ','usb-swiper'); ?><strong style="display: block;padding-left: 5px;"><?php echo $credit_card_number; ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-id w-25"><span style="color:#000;font-weight: 400;"><?php _e('Receipt ID: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $transaction_id; ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-date w-25"><span style="color:#000;font-weight: 400;"><?php _e('Date: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="payment-status w-25"><span style="color:#000;font-weight: 400;"><?php _e('Status: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="card-details w-25"><span style="color:#000;font-weight: 400;"><?php _e('Card Detail: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $credit_card_number; ?></strong></li>
         </ul>
     </div>
     <?php
@@ -110,13 +110,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $payment_link = !empty($args['payment_link']) ? esc_url($args['payment_link']) : '';
         $display_name = !empty( $args['display_name'] ) ? esc_html($args['display_name']) : '';
         ?>
-        <div style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;">
-            <p><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
+        <div style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;color:#000;">
+            <p style="color:#000;"><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
             <?php if( !empty( $payment_link ) ){ ?>
-                <p><?php echo sprintf(__('Thanks for create invoice in %s, To pay for this invoice please use the following link:','usb-swiper'), get_option('blogname')); ?></p>
-                <p style="text-align: center;"><a style="background-color: #008CBA;border: none;color: white;padding: 12px 20px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;" href="<?php echo $payment_link; ?>"><?php echo __('Click to Pay', 'usb-swiper'); ?></a></p>
+                <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s, To pay for this invoice please use the following link:','usb-swiper'), get_option('blogname')); ?></p>
+                <p style="text-align: center;color:#000;"><a style="background-color: #008CBA;border: none;color: white;padding: 12px 20px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;" href="<?php echo $payment_link; ?>"><?php echo __('Click to Pay', 'usb-swiper'); ?></a></p>
             <?php } else { ?>
-                <p><?php echo sprintf(__('Thanks for create invoice in %s.','usb-swiper'), get_option('blogname')); ?></p>
+                <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s.','usb-swiper'), get_option('blogname')); ?></p>
             <?php } ?>
         </div>
         <?php
