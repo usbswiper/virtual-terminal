@@ -431,9 +431,10 @@ $send_email_form_fields = array(
 		'name' => 'billing_email',
 		'label' => __( 'Billing Email:', 'usb-swiper'),
 		'attributes' => '',
-		'description' => '',
+		'description' => __('Add multiple emails with "," separated' ,'usb-swiper'),
 		'readonly' => false,
-        'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : ''
+        'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : '',
+        'class' => 'vt-input-field',
 	),
     array(
 		'type' => 'hidden',
@@ -467,7 +468,6 @@ if( !empty( $args['is_email_html'] ) ) {
                     echo usb_swiper_get_html_field($form_field);
                 }
             ?>
-            <span><?php _e( 'Add multiple emails with "," separated', 'usb-swiper'); ?></span>
             <div class="button-wrap">
                 <button id="vt_send_email_cancel" type="reset" class="vt-button"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
                 <button id="vt_send_email_submit" type="submit" class="vt-button"><?php _e( 'Send Email', 'usb-swiper'); ?></button>
