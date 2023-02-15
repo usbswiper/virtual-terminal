@@ -341,6 +341,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         )
                     );
                 }
+
                 $transactions = new WP_Query( $transaction_args );
 				$args = array(
 					'transactions' => !empty( $transactions->posts ) ? $transactions->posts : '',
@@ -351,22 +352,26 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				);
 
 				extract( $args );
-                ?>
-                <form class="transaction-filter-form" id="transaction_filter_form">
-                    <div class="transaction-filter-wrap">
-                        <div class="transaction-field-wrap form-row form-row-first">
-                            <select name="vt-type" id="vt_type" class="transaction-select">
-                                <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
-                                <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
-                                <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Transaction','usb-swiper'); ?></option>
-                            </select>
+
+                if( !empty( $args['has_transactions'] ) ) {
+                    ?>
+                    <form class="transaction-filter-form" id="transaction_filter_form">
+                        <div class="transaction-filter-wrap">
+                            <div class="transaction-field-wrap form-row form-row-first">
+                                <select name="vt-type" id="vt_type" class="transaction-select">
+                                    <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
+                                    <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
+                                    <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Transaction','usb-swiper'); ?></option>
+                                </select>
+                            </div>
+                            <div class="transaction-field-wrap form-row form-row-last">
+                                <button type="submit" class="button button-primary"><?php _e('SEARCH','usb-swiper'); ?></button>
+                            </div>
                         </div>
-                        <div class="transaction-field-wrap form-row form-row-last">
-                            <button type="submit" class="button alt primary-button vt-button submit"><?php _e('SEARCH','usb-swiper'); ?></button>
-                        </div>
-                    </div>
-                </form>
-                <?php
+                    </form>
+                    <?php
+                }
+
 				usb_swiper_get_template('wc-transactions-lists.php', $args);
 			}
 		}

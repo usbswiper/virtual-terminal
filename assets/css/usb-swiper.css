@@ -108,6 +108,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .transaction-filter-form .submit{margin-top: 0 !important;}
 .vt-transaction-history.woocommerce-page .transaction-overview ul li strong{padding-left: 0px !important;}
 .transaction-overview .transaction-basic-info .w-25{width: calc(25% - 5px) !important;}
+.woocommerce-message.vt-transactions-info {float: left;width: 100%;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}

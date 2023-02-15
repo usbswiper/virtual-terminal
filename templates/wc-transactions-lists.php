@@ -107,7 +107,7 @@ if( $has_transactions ) : ?>
 
 <?php else : ?>
 
-	<div class="woocommerce-message woocommerce-message--info woocommerce-Message woocommerce-Message--info woocommerce-info">
+	<div class="woocommerce-message woocommerce-message--info woocommerce-info vt-transactions-info">
 		<?php esc_html_e( 'No transactions have been made.', 'usb-swiper' ); ?>
 	</div>
 
