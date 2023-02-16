@@ -81,7 +81,7 @@ $add_product_form_fields = array(
 ?>
 <div class="vt-form-notification"></div>
 <div class="vt-products" style="width: 100%;">
-    <button id="vt_add_product" class="vt-button-primary vt-add-product"><?php _e('Add Product','usb-swiper'); ?></button>
+    <button id="vt_add_product" class="vt-button vt-add-product"><?php _e('Add Product','usb-swiper'); ?></button>
 </div>
 <div class="vt-product-wrapper">
     <div class="vt-product-inner">
@@ -129,12 +129,12 @@ $add_product_form_fields = array(
                         <input type="hidden" name="vt-product-action" id="vt_product_action" value="<?php echo !empty( $action ) ? $action : 'add'; ?>">
                         <input type="hidden" name="vt-add-product-form-nonce" id="vt_add_product_form_nonce" value="<?php echo wp_create_nonce('vt-add-product-form'); ?>">
                         <input type="hidden" name="vt_product_id" value="<?php echo $product_id; ?>">
-                        <button id="vt_add_product_cancel" type="reset" class="vt-button-primary"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
+                        <button id="vt_add_product_cancel" type="reset" class="vt-button"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
                         <?php if( ! empty( $action ) && 'edit' === $action ) { ?>
                             <input type="hidden" name="vt_product_id" value="<?php echo $product_id; ?>">
-                            <button id="vt_add_product_submit" type="submit" class="vt-button-primary"><?php _e( 'Update', 'usb-swiper'); ?></button>
+                            <button id="vt_add_product_submit" type="submit" class="vt-button"><?php _e( 'Update', 'usb-swiper'); ?></button>
                         <?php } else { ?>
-                            <button id="vt_add_product_submit" type="submit" class="vt-button-primary"><?php _e( 'Add Product', 'usb-swiper'); ?></button>
+                            <button id="vt_add_product_submit" type="submit" class="vt-button"><?php _e( 'Add Product', 'usb-swiper'); ?></button>
                         <?php } ?>
                     </div>
                 </form>

@@ -42,8 +42,9 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-contents .vt-row {width: 100%;display: block;position: relative;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
 .vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 70px;bottom: auto;width: 22%;}
-.vt-button {color: #ffffff!important;border-width: 0px!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
-.vt-button-normal {color: #3D72E7 !important;border-width: 1px !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background: #FFF;padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;border-color: #3D72E7 !important;}
+.vt-button, .input-field-wrap label[for="vt_product_image"] {color: #ffffff!important;border-width: 0px!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding: 15px 30px !important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
+.input-field-wrap label[for="vt_product_image"] {text-align: center;}
+.vt-button-normal {color: #3D72E7 !important;border-width: 1px !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background: #FFF;padding: 15px 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;border-color: #3D72E7 !important;}
 .vt-button-normal:hover{border-color: #3D72E7;}
 .input-field-wrap .sign {width: 100%;position: relative;display: flex;}
 .input-field-wrap .sign .sign-symbol {padding: 9px 12px;font-size: 14px;font-weight: 400;line-height: 1;color: #555;text-align: center;background-color: #eee;border: 1px solid #ccc;border-radius: 4px 0 0 4px;display: flex;border-right: 0;align-items: center;}
@@ -91,8 +92,6 @@ p.signature-text{display: none;}
 .vt-product-wrapper .input-field-wrap input {padding: 10px;}
 .vt-product-wrapper .input-field-wrap label {width: 25%;}
 #vt_product_image {overflow: hidden;opacity: 0;position: absolute;top: 0;left: 0;}
-.input-field-wrap label[for="vt_product_image"] {background: #4361ee;color: #FFF !important;padding: 10px 20px;border-radius: 20px;min-width: 150px;cursor: pointer !important;text-align: center;}
-.input-field-wrap label[for="vt_product_image"]:hover {background: #4361eef2;}
 .vt-product-wrapper .input-field-wrap {padding: 10px 0;}
 .vt-product-wrapper .button-wrap {display: block}
 .vt-product-wrapper span {color: #777777;font-size: 14px;}
@@ -134,6 +133,7 @@ table.my-account-products-listings-table {padding: 20px 0;}
 .vt-product-wrapper .input-field-wrap label {color: #3b3f5c;font-size: 15px;width: auto;}
 .vt-product-wrapper .input-field-wrap .p-2, .p-2 {padding: 2px;}
 .button-wrap .vt-button-primary {margin-right: 0.8rem;}
+#vt_add_product_form .button-wrap .vt-button {margin-right: 0.5rem;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}
