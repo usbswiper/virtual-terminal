@@ -64,7 +64,7 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
                                         <input type="hidden" id="transaction_id" name="transaction_id" value="<?php echo ! empty( $invoice_id ) ? $invoice_id : ''; ?>">
                                         <input type="hidden" id="BillingFirstName" name="BillingFirstName" value="<?php echo ! empty( $BillingFirstName ) ? $BillingFirstName : ''; ?>">
                                         <input type="hidden" id="BillingLastName" name="BillingLastName" value="<?php echo ! empty( $BillingLastName ) ? $BillingLastName : ''; ?>">
-                                        <button type="submit" class="btn btn-primary button button-primary" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                                        <button type="submit" class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
                                     </div>
                                     <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
                                 </div>

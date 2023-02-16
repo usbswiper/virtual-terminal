@@ -490,7 +490,9 @@ jQuery( document ).ready(function( $ ) {
                     net_price = Number(net_price_array[i]) + Number(net_price);
                 }
 
-                $('#NetAmount').val(net_price);
+                $('#NetAmount').val(net_price.toFixed(2));
+                updateSalesTax();
+                updateGrandTotal();
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -515,7 +517,9 @@ jQuery( document ).ready(function( $ ) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
 
-        $('#NetAmount').val(net_price);
+        $('#NetAmount').val(net_price.toFixed(2));
+        updateSalesTax();
+        updateGrandTotal();
     });
 
 });

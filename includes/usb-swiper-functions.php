@@ -1056,7 +1056,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'required' => false,
                 'value' => __( 'Pay By Invoice', 'usb-swiper'),
                 'description' => '',
-                'class' => 'vt-button-primary',
+                'class' => 'vt-button',
             ),
         ))
     );
@@ -1607,6 +1607,7 @@ function get_product_html( $id = 0 ) {
         'description' => '',
         'readonly' => false,
         'disabled' => false,
+        'default' => 1,
         'class' => 'vt-input-field vt-product-quantity',
         'wrapper_class' => 'product_quantity'
     ));

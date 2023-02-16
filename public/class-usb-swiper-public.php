@@ -365,7 +365,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 </select>
                             </div>
                             <div class="transaction-field-wrap form-row form-row-last">
-                                <button type="submit" class="button button-primary"><?php _e('SEARCH','usb-swiper'); ?></button>
+                                <button type="submit" class="vt-button"><?php _e('SEARCH','usb-swiper'); ?></button>
                             </div>
                         </div>
                     </form>

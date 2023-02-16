@@ -51,7 +51,7 @@
                             echo get_product_html();
                             ?>
                         </div>
-                        <button type="button" id="vt_add_item" class="vt-add-item vt-button-primary"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><?php _e( 'Add Item', 'usb-swiper'); ?></button>
+                        <button type="button" id="vt_add_item" class="vt-add-item vt-button"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><?php _e( 'Add Item', 'usb-swiper'); ?></button>
                     </fieldset>
 					<?php
 					$tab_fields = usb_swiper_get_vt_tab_fields();
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
-                        <button type="submit" class="btn btn-primary button button-primary" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                        <button type="submit" class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
                     </div>
                     <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
                 </div>
