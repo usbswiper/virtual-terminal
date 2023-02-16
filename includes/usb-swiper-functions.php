@@ -1058,7 +1058,8 @@ function usbswiper_get_onboarding_user() {
  */
 function usbswiper_get_platform_fees( $cart_total ) {
 
-	if( !is_user_logged_in()){
+
+	if( !is_user_logged_in() || empty( $cart_total ) ){
 		return 0;
 	}
 
@@ -1525,4 +1526,18 @@ function get_profile_verification_content( $user_id, $user_name, $verification_t
     ob_get_clean();
 
     return apply_filters('usb_swiper_get_email_content', $email_content);
+}
+
+if( !function_exists('usb_swiper_get_field_value') ) {
+
+    function usb_swiper_get_field_value( $field , $tab ='general') {
+
+        if( empty( $field ) ) {
+            return '';
+        }
+
+        $settings = usb_swiper_get_settings($tab);
+
+        return  !empty( $settings[$field] ) ? $settings[$field]: '';
+    }
 }

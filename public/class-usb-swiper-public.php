@@ -75,9 +75,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				if (is_user_logged_in() && WC()->customer && WC()->customer->get_billing_country() && 2 === strlen(WC()->customer->get_billing_country())) {
 					$smart_js_arg['buyer-country'] = WC()->customer->get_billing_country();
 				}
-				$smart_js_arg['client-id'] = USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID;
+				$smart_js_arg['client-id'] = usb_swiper_get_field_value('sandbox_client_id');
 			} else {
-				$smart_js_arg['client-id'] = USBSWIPER_PAYPAL_PARTNER_CLIENT_ID;
+				$smart_js_arg['client-id'] = usb_swiper_get_field_value('client_id');
 			}
 
 			$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
@@ -382,38 +382,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
 
-				$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
-				if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
+                $get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
+                $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+                $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
+                $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+                $settings = usb_swiper_get_settings('general');
+                $verification_page_id = !empty( $settings['vt_verification_page'] ) ? $settings['vt_verification_page'] : 0;
 
-					$profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
-					$profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
-					$profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
-                    $settings = usb_swiper_get_settings('general');
-                    $verification_page_id = $settings['vt_verification_page'];
+                if( empty( $profile_data ) ) {
+                    ?>
+                    <p class="vt-verification-message"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.");?></p>
+                    <div class="paypal-connect-button-wrap">
+                        <p><a class="vt-button" href="<?php echo get_permalink($verification_page_id); ?>"><?php _e('Verify Profile','usb-swiper'); ?></a></p>
+                    </div>
+                    <?php
+                } else {
 
-					if( true === $profile_status) {
-						?>
-                        <div class="vt-form-login-wrap">
-                            <p><a class="vt-button" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
-                        </div>
-						<?php
-					} elseif ( ! empty( $profile_data ) ){
-                        ?>
-                        <p class="vt-verification-message"><?php _e("Thank you for submitting verification data, our team will review it. Once the account is approved, you will be able to do the transaction !");?></p>
-                        <?php
+                    if( $profile_status ) {
+
+                        if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
+                            ?>
+                            <div class="vt-form-login-wrap">
+                                <p><a class="vt-button" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
+                            </div>
+                            <?php
+                        } else {
+                            $Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
+                            echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
+                        }
                     } else {
-						?>
-                        <p class="vt-verification-message"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.");?></p>
-                        <div class="paypal-connect-button-wrap">
-                            <p><a class="vt-button" href="<?php echo get_permalink($verification_page_id); ?>"><?php _e('Verify Profile','usb-swiper'); ?></a></p>
+                        ?>
+                        <div class="paypal-connect-button-wrap vt-form-notification">
+                            <p class="vt-verification-message notification success"><?php _e("Thank you for submitting verification data, our team will review it. Once the account is approved, you will be able to do the transaction !");?></p>
                         </div>
-						<?php
-					}
+                        <?php
+                    }
+                }
 
-				} else {
-					$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
-					echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
-				}
 
 			} else {
 
@@ -513,18 +518,26 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				exit();
 			}
 
-			if( $vt_verification_page == get_the_ID() ) {
-				if ( empty( $merchant_user_info ) ) {
-					wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
-					exit();
-				} else {
-					if ( true === $profile_status ) {
-                        if( ! current_user_can( 'manage_options' ) ) {
+            if( $vt_verification_page == get_the_ID() ) {
+                $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+                $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+                $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
+
+                if( !empty( $profile_data ) || !empty( $profile_status ) ) {
+                    wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+                    exit();
+                } else {
+                    if ( !empty( $profile_status ) && empty( $merchant_user_info ) ) {
+                        wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+                        exit();
+                    } elseif( !empty( $merchant_user_info )) {
+                        if (!current_user_can('manage_options')) {
                             wp_safe_redirect(get_the_permalink($vt_page_id));
                         }
-					}
-				}
-			}
+                    }
+                }
+            }
+
 
 			if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 
@@ -852,9 +865,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				        if( !empty( $platform_fees ) && $platform_fees > 0 ) {
 
 					        if ($this->is_sandbox) {
-						        $admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
+						        $admin_merchant_id = usb_swiper_get_field_value('sandbox_merchant_id');
 					        } else{
-						        $admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
+						        $admin_merchant_id = usb_swiper_get_field_value('merchant_id');
 					        }
 
 					        $body_request['payment_instruction'] =array(
@@ -1033,6 +1046,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			$get_countries = WC()->countries->get_countries();
 		    ?>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'select',
+                    'id' => 'TransactionCurrency',
+                    'name' => 'TransactionCurrency',
+                    'label' => __( 'Currency', 'usb-swiper'),
+                    'required' => true,
+                    'options' => usbswiper_get_currency_code_options(),
+                    'default' => usbswiper_get_default_currency(),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Select',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_brand_name(),
+                    'id' => 'BrandName',
+                    'name' => 'BrandName',
+                    'label' => __( 'Brand Name', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
@@ -1105,43 +1155,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     </tr>
                 </tbody>
             </table>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-	            <?php
-	            echo  usb_swiper_get_html_field( array(
-		            'type' => 'select',
-		            'id' => 'TransactionCurrency',
-		            'name' => 'TransactionCurrency',
-		            'label' => __( 'Currency', 'usb-swiper'),
-		            'required' => true,
-		            'options' => usbswiper_get_currency_code_options(),
-		            'default' => usbswiper_get_default_currency(),
-		            'attributes' => '',
-		            'description' => '',
-		            'readonly' => false,
-		            'disabled' => false,
-		            'class' => 'woocommerce-Select',
-                    'wrapper' => false
-	            ));
-	            ?>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-				<?php
-
-				echo  usb_swiper_get_html_field( array(
-					'type' => 'text',
-					'value' => usbswiper_get_brand_name(),
-					'id' => 'BrandName',
-					'name' => 'BrandName',
-					'label' => __( 'Brand Name', 'usb-swiper'),
-					'attributes' => '',
-					'description' => '',
-					'readonly' => false,
-					'disabled' => false,
-					'class' => 'woocommerce-Input woocommerce-Input--text input-text',
-					'wrapper' => false
-				));
-				?>
-            </p>
             <div class="woocommerce-form-row paypal-disconnect-button"><?php $this->paypal_disconnect_button(); ?></div>
             <div class="clear"></div>
             <?php
@@ -1243,9 +1256,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		public function display_paypal_connect_button() {
 
             if( is_user_logged_in() ) {
-                echo '<div class="paypal-connect-button-wrap">';
                 echo do_shortcode('[usb_swiper_paypal_connect label="Connect to PayPal" after_login_label="Launch Virtual Terminal"]');
-                echo '</div>';
             }
 		}
 
@@ -1356,7 +1367,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          */
 		function redirect_on_login($user_login, WP_User $user) {
 
-			$merchant_user_info = get_user_meta( $user->ID,'_merchant_onboarding_user',true);
+            $user_id = !empty( $user->ID ) ? $user->ID : '';
+			$merchant_user_info = get_user_meta( $user_id,'_merchant_onboarding_user',true);
             $settings = usb_swiper_get_settings('general');
             $vt_page_id = ! empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
             $vt_verification_page = ! empty( $settings['vt_verification_page'] ) ? (int) $settings['vt_verification_page'] : '';
@@ -1366,14 +1378,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 				exit();
 			} else {
-	            $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+	            $profile_status = get_user_meta( $user_id,'vt_user_verification_status', true );
 	            $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
-	            if( true === $profile_status) {
-		            wp_safe_redirect( get_the_permalink( $vt_page_id ) );
+
+	            if( true === $profile_status ) {
+                    wp_safe_redirect( get_the_permalink( $vt_page_id ) );
+                    exit();
 	            } else {
-		            wp_safe_redirect( get_the_permalink( $vt_verification_page ) );
+                    wp_safe_redirect( get_the_permalink( $vt_verification_page ) );
+                    exit();
 	            }
-	            exit();
             }
 		}
 
@@ -1400,16 +1414,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $business_address = ! empty( $_POST['email-address'] ) ? sanitize_text_field( $_POST['business-address'] ) : '';
                 $redirect_url     = get_the_permalink( get_option('woocommerce_myaccount_page_id') );
 
-                $user_data = array(
-                    'name'             => $name,
-                    'phone'            => $phone,
-                    'url'              => $url,
-                    'company_name'     => $company_name,
-                    'email'            => $email,
-                    'business_address' => $business_address
-                );
+                $current_user_id = get_current_user_id();
 
-                update_user_meta( get_current_user_id(), 'verification_form_data', $user_data );
+                update_user_meta($current_user_id ,'first_name', $name);
+                update_user_meta($current_user_id ,'url', $url);
+                update_user_meta($current_user_id ,'billing_first_name', $name);
+                update_user_meta($current_user_id ,'billing_company', $company_name);
+                update_user_meta($current_user_id ,'billing_phone', $phone);
+                update_user_meta($current_user_id ,'billing_email', $email);
+                update_user_meta($current_user_id ,'billing_address_1', $business_address);
+
+                update_user_meta( $current_user_id, 'verification_form_data', true );
                 send_profile_verification_email('richard@usbswiper.com,andrew@usbswiper.com', get_current_user_id(), $name,'verification_started','Profile Verification','Profile Verification');
             }
 
@@ -1420,6 +1435,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             );
 
             wp_send_json( $response , 200 );
+        }
+
+        public function vt_email_headers( $header, $id, $header_object, $email ) {
+
+            $header .= "From: {$email->get_from_name()} <{$email->get_from_address()}>\r\n";
+
+            return $header;
         }
 	}
 }

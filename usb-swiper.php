@@ -49,49 +49,9 @@ if( !defined('USBSWIPER_BASENAME')) {
 	define('USBSWIPER_BASENAME', plugin_basename( __FILE__ ));
 }
 
-// Define PayPal partner live merchant id.
-if (!defined('USBSWIPER_PARTNER_MERCHANT_ID')) {
-	define('USBSWIPER_PARTNER_MERCHANT_ID', '4XQXFNHGHLK7J');
-}
-
-// Define PayPal partner sandbox merchant id.
-if (!defined('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID')) {
-	define('USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID', 'QEV4T5D83THAJ');
-}
-
-// Define plugin live PayPal partner client id.
-if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID')) {
-	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_ID','AWnlvx7lFixpwSaWelS7LMS2j31Gaj8-PXyTEN-89fSY7Mu0gpR2kyQWKcWWLznTD8lfMjyZzFg_OYrr');
-}
-
-// Define plugin live PayPal partner client sandbox secret.
-if( !defined('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET')) {
-	define('USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET','EA03PqvpYVxpB-Rg3tUqePcv9DmBdC_1anQOYpFjXMr2K_5pEB9LMle_tXzBD8XnBIxSiGWRmzobZ1PD');
-}
-
-// Define plugin sandbox PayPal partner client sandbox id.
-if( !defined('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID')) {
-	define('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID','AV1AYU6p6U4lJDNWthB68AJYInU2zD_9rIQS6Q-9gPNZBQk__Aak31mBqoL5RmoUQIUy4rS19OuH3dlp');
-}
-
-// Define plugin sandbox PayPal partner client sandbox secret.
-if( !defined('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_SECRET')) {
-	define('USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_SECRET','EKZN1w3VqHEezFpP6y6kQWuOFizP7297hVFI1wdM-pmoozz4uJyLKF5xl7PmpOP6aRlI_WYEqfZigGh2');
-}
-
 // Define plugin PayPal partner logo url.
 if( !defined('USBSWIPER_PAYPAL_PARTNER_LOGO')) {
-	define('USBSWIPER_PAYPAL_PARTNER_LOGO', 'https://www.usbswiper.com/img/usbswiper-logo-300x89.png');
-}
-
-// Define PayPal live attribution id.
-if( !defined('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID')) {
-	define('USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID', 'ANGELLFREEInc_SP');
-}
-
-// Define PayPal sandbox attribution id.
-if( !defined('USBSWIPER_PAYPAL_SANDBOX_PARTNER_ATTRIBUTION_ID')) {
-	define('USBSWIPER_PAYPAL_SANDBOX_PARTNER_ATTRIBUTION_ID', 'FLAVORsb-wm93913837016_MP');
+    define('USBSWIPER_PAYPAL_PARTNER_LOGO', 'https://www.usbswiper.com/img/usbswiper-logo-300x89.png');
 }
 
 /**

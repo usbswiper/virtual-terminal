@@ -1,28 +1,44 @@
 <?php
-$user_id = $args['user_id'];
-$user_name = $args['user_name'];
-$verification_type = $args['verification_type'];
+$user_id = !empty( $args['user_id'] ) ? $args['user_id'] : '';
+$user_name = !empty( $args['user_name'] ) ? $args['user_name'] : '';
+$verification_type = !empty( $args['verification_type'] ) ? $args['verification_type'] : '';
 $profile_link = add_query_arg( array( 'user_id' => $user_id ), get_edit_user_link( get_current_user_id() ));
 $settings     = usb_swiper_get_settings( 'general' );
 $vt_page_id   = ! empty( $settings['virtual_terminal_page'] ) ? (int) $settings['virtual_terminal_page'] : '';
-$vt_page_link = get_permalink( $vt_page_id );
+$vt_page_link = get_the_permalink( $vt_page_id );
+$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
+
+$merchant_name = get_user_meta($user_id ,'billing_first_name', true);
+$merchant_email = get_user_meta($user_id ,'billing_email', true);
+$merchant_phone = get_user_meta($user_id ,'billing_phone', true);
+$merchant_business_name = get_user_meta($user_id ,'billing_company', true);
+$merchant_business_address = get_user_meta($user_id ,'billing_address_1', true);
 ?>
 
 <div class="verification-email-wrapper">
-    <?php if( ! empty( $verification_type ) && 'verification_started' === $verification_type ) {?>
-    <p>Hello Admin,</p>
-    <p><?php echo $user_name;?>, has submitted profile for verification.</p>
-    <p>Kindly, visit the page for profile review: <a href="<?php echo $profile_link;?>"><?php echo $profile_link;?></a></p>
-    <p>Thank You!</p>
-    <p>--</p>
-    <p>USBSwiper Team</p>
-    <?php } elseif( ! empty( $verification_type ) && 'verification_completed' === $verification_type ) {?>
-    <p>Hello <?php echo $user_name;?>,</p>
-    <p>Your profile verification is completed. Your profile is now approved now.</p>
-    <p>Kindly, visit the page to start the transaction: <a href="<?php echo $vt_page_link;?>"><?php echo $vt_page_link;?></a></p>
-    <p>If you have any questions or concerns feel free to submit a ticket to <a href="https://usbswiper.com/support">https://usbswiper.com/support</a> and we'll get you taken care of.</p>
-    <p>Thank You!</p>
-    <p>--</p>
-    <p>USBSwiper Team</p>
+
+    <?php if( ! empty( $verification_type ) && 'verification_started' === $verification_type ) { ?>
+
+        <p><?php echo sprintf(__('Hello %s,','usb-swiper'), 'Admin'); ?></p>
+        <p><?php _e("A new merchant has applied for approval. Please review the following information and verify the merchant's account:", "usb-swiper"); ?></p>
+        <p><?php echo sprintf( __("Merchant Name: %s", "usb-swiper"), $merchant_name); ?></p>
+        <p><?php echo sprintf( __("Email Address: %s", "usb-swiper"), $merchant_email); ?></p>
+        <p><?php echo sprintf( __("Phone Number: %s", "usb-swiper"), $merchant_phone); ?></p>
+        <p><?php echo sprintf( __("Business Name: %s", "usb-swiper"), $merchant_business_name); ?></p>
+        <p><?php echo sprintf( __("Business Address: %s", "usb-swiper"), $merchant_business_address); ?></p>
+        <p><?php _e("Please underwrite this user and click below to verify them when ready.", "usb-swiper"); ?></p>
+        <p style="text-align: center;display: block;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding:15px 30px;text-decoration: none;display: inline-block;margin-bottom: 10px;cursor: pointer;" target='_blank' href="<?php echo $profile_link.'#verify_data'; ?>"><?php _e('VERIFY MERCHANT','usb-swiper'); ?></a></p>
+
+    <?php } elseif( ! empty( $verification_type ) && 'verification_completed' === $verification_type ) { ?>
+
+        <p><?php echo sprintf(__('Hi %s,','usb-swiper'), $user_name); ?></p>
+        <p><?php _e("We are pleased to inform you that your account has been verified and is ready be connected to your PayPal account.", 'usb-swiper'); ?></p>
+        <p><?php _e("Please login to your account using the credentials you provided during registration.", 'usb-swiper'); ?></p>
+        <p><?php echo sprintf( __("Then click the “%sConnect to PayPal%s” button to continue setting up your account.", 'usb-swiper') ,'<a target="_blank" href="'.get_the_permalink($myaccount_page_id).'">','</a>'); ?></p>
+        <p><?php _e("You’ll be using your Virtual Terminal within minutes!", 'usb-swiper'); ?></p>
+        <p><?php echo sprintf(__("If you have any questions or encounter any issues, please do not hesitate to contact our support team at %s.", 'usb-swiper'),'<a href="mailto:support@usbswiper.atlassian.net">support@usbswiper.atlassian.net</a>'); ?></p>
+        <p><?php _e("Thank you for choosing our service.", 'usb-swiper'); ?></p>
+        <p><?php _e("– USBSwiper Team", 'usb-swiper'); ?></p>
+
     <?php } ?>
 </div>

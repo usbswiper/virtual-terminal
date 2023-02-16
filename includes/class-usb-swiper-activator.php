@@ -51,6 +51,7 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 						'virtual_terminal_page' => $vt_page_id,
 						'vt_verification_page' => $vt_verification_page_id,
 						'is_paypal_sandbox' => false,
+						'paypal_partner_logo_url' => 'https://www.usbswiper.com/img/usbswiper-logo-300x89.png',
 					),
 					'partner_fees' => array(
 						'fees' => array(

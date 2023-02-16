@@ -38,11 +38,13 @@ class Usb_Swiper_Onboarding{
 
 		$tracking_id = usb_swiper_key_generator();
 
+        $partner_logo_url = usb_swiper_get_field_value('paypal_partner_logo_url');
+
 		return array(
 			'testmode' => $is_sandbox,
 			'tracking_id' => $tracking_id,
 			'partner_config_override' => array(
-				'partner_logo_url' => USBSWIPER_PAYPAL_PARTNER_LOGO,
+				'partner_logo_url' => !empty( $partner_logo_url ) ? $partner_logo_url : USBSWIPER_PAYPAL_PARTNER_LOGO,
 				'return_url' => apply_filters( 'usb_swiper_get_return_url', $return_url),
 				'return_url_description' => __( 'Return to your shop.', 'usb-swiper' ),
 				'show_add_credit_card' => true,
