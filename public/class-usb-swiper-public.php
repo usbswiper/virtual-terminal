@@ -1315,11 +1315,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        $message = '';
 
 	        if( ! empty( $_POST['vt-send-email-nonce'] ) && wp_verify_nonce( $_POST['vt-send-email-nonce'],'vt-send-email-form') ) {
-
                 $status            = true;
-                $message           = __( 'Transaction receipts copy has been sent via email','usb-swiper' );
                 $billing_email     = ! empty( $_POST['billing_email'] ) ? sanitize_text_field( $_POST['billing_email'] ) : '';
                 $transaction_id    = ! empty( $_POST['transaction_id'] ) ? sanitize_text_field( $_POST['transaction_id'] ) : '';
+                $message           = sprintf( __( 'Transaction(#%s) receipt copy has been sent via email.','usb-swiper' ), $transaction_id);
             }
 
             if( ! empty( $billing_email ) ) {
@@ -1347,6 +1346,24 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response , 200 );
         }
 
+        public function send_transaction_email_html() {
+
+            $status  = false;
+            $html = '';
+
+            $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
+            if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+                $status = true;
+                $html = usbswiper_send_email_recepit_html($transaction_id);
+            }
+
+            $response = array(
+                'status' => $status,
+                'html' => $html,
+            );
+
+            wp_send_json( $response , 200 );
+        }
 	}
 
 }

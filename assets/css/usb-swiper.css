@@ -91,6 +91,7 @@ p.signature-text{display: none;}
 .vt-resend-email-form-wrapper span {color: #777777;font-size: 14px;}
 .vt-resend-email-form-wrapper .close {position: absolute;width: 20px;height: 20px;right: 10px;top: 10px;cursor: pointer;}
 .vt-resend-email-form-wrapper .close svg {width: 100%;height: 100%;}
+#send_email_btn {display: flex;margin: 0;max-width: 100px;padding: 10px !important;width: 100%;justify-content: center;align-items: center;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}
