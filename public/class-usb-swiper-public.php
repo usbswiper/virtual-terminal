@@ -524,11 +524,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
 
                 if( !empty( $profile_data ) || !empty( $profile_status ) ) {
-                    wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
-                    exit();
+                    if( !current_user_can('administrator') ) {
+                        wp_safe_redirect(get_the_permalink($myaccount_page_id));
+                        exit();
+                    }
                 } else {
                     if ( !empty( $profile_status ) && empty( $merchant_user_info ) ) {
-                        wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+                            wp_safe_redirect(get_the_permalink($myaccount_page_id));
                         exit();
                     } elseif( !empty( $merchant_user_info )) {
                         if (!current_user_can('manage_options')) {

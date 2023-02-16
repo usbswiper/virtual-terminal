@@ -101,7 +101,7 @@ if( false === $profile_status && empty( $profile_data ) || ( current_user_can( '
                 }
                 ?>
                 <div class="vt-fields-wrap">
-                    <button id="vt_verification_form_submit" type="submit" class="btn btn-primary button button-primary" name="submit">Submit</button>
+                    <button id="vt_verification_form_submit" type="submit" class="vt-button" name="submit">Submit</button>
                 </div>
             </form>
         </div>
