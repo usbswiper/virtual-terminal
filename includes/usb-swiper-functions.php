@@ -1258,7 +1258,7 @@ function usbswiper_get_payment_status( $status ) {
 
 function usbswiper_get_refund_status() {
 
-	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED'));
+	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED','PAID'));
 }
 
 function get_total_refund_amount( $transaction_id ) {
