@@ -850,7 +850,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
                     $settings = usb_swiper_get_settings('general');
                     $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
-                    $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => (string)$transaction_id, 'status' => $payment_status)))), get_the_permalink( $paybyinvoice_id ) );
+                    $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => $payment_status)))), get_the_permalink( $paybyinvoice_id ) );
                     if( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ){
                         update_post_meta($transaction_id, '_payment_status', 'PAID');
                     } else {
@@ -1130,7 +1130,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if( !empty($args['payment_link']) && (bool)$args['payment_link'] ){
                 $settings = usb_swiper_get_settings('general');
                 $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
-                $payment_link = add_query_arg(array('invoice-session'=>base64_encode(json_encode(array('id' => (string)$transaction_id, 'status' => false))) ),get_the_permalink( $paybyinvoice_id ));
+                $payment_link = add_query_arg(array('invoice-session'=>base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => false))) ),get_the_permalink( $paybyinvoice_id ));
             }
 
             $args = array(
@@ -1709,7 +1709,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if( !empty($paybyinvoice_id) && is_page($paybyinvoice_id) ) {
                 $by_link = true;
                 $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
-                $args['invoice_id'] = !empty( $invoice_session->id ) ? (int)$invoice_session->id :'';
+                $args['invoice_id'] = !empty( $invoice_session->id ) ? trim($invoice_session->id, 'invoice_') :'';
                 $args['invoice_status'] = !empty( $invoice_session->status ) ? $invoice_session->status :'';
             }
 
