@@ -96,11 +96,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 'ajax_url' => admin_url( 'admin-ajax.php' ),
                 'remove_fee_message' => __( 'Are you sure you want to remove this fee?','usb-swiper' ),
             ) );
-			//Add the Select2 CSS file
-			wp_enqueue_style('select2-css', USBSWIPER_URL.'assets/css/select2.css', array(), '4.1.0-rc.0');
-
-			//Add the Select2 JavaScript file
-			wp_enqueue_script('select2-js', USBSWIPER_URL.'assets/js/select2.js', 'jquery', '4.1.0-rc.0');
 		}
 
 		/**
