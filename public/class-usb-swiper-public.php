@@ -1420,8 +1420,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $current_user_id = get_current_user_id();
 
-                update_user_meta($current_user_id ,'first_name', $name);
-                update_user_meta($current_user_id ,'url', $url);
+                wp_update_user( array(
+                    'ID' => $current_user_id,
+                    'user_url' => $url,
+                    'first_name' => $name,
+                ));
+
                 update_user_meta($current_user_id ,'billing_first_name', $name);
                 update_user_meta($current_user_id ,'billing_company', $company_name);
                 update_user_meta($current_user_id ,'billing_phone', $phone);
