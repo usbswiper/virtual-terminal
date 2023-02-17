@@ -402,13 +402,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                         if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
                             ?>
-                            <div class="vt-form-login-wrap">
+                            <div class="vt-form-login-wrap paypal-connect-button-wrap">
                                 <p><a class="vt-button" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
                             </div>
                             <?php
                         } else {
                             $Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
-                            echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
+                            echo "<div class='paypal-connect-button-wrap'>".$Usb_Swiper_PPCP->connect_to_paypal_button($args)."</div>";
                         }
                     } else {
                         ?>
