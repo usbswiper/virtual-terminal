@@ -21,17 +21,16 @@ class UsbSwiperPaypalConnectedEmail extends WC_Email {
 		$this->id = 'paypal_connected';
 
 		// this is the title in WooCommerce Email settings
-		$this->title = 'Paypal Connected';
+		$this->title = 'PayPal Connected';
 
 		// this is the description in WooCommerce email settings
-		$this->description = __( 'Email Sent when a user connects their paypal to the account', 'usb-swiper');
+		$this->description = __( 'Email Sent when a user connects their PayPal to the account', 'usb-swiper');
 
 		// these are the default heading and subject lines that can be overridden using the settings
 		$this->heading = __( 'USBSwiper VT - PayPal Account Connected Successfully', 'usb-swiper');
 		$this->subject = __( 'USBSwiper VT - PayPal Account Connected Successfully', 'usb-swiper');
 
 		// these define the locations of the templates that this email should use, we'll just use the new order template since this email is similar
-		$this->template_html  = 'paypalconnected.php';
 		$this->template_base  = USBSWIPER_PATH . 'templates/';
 		$this->template_html  = 'emails/paypalconnected.php';
 		$this->template_plain = 'emails/plain/paypalconnected.php';
@@ -103,6 +102,7 @@ class UsbSwiperPaypalConnectedEmail extends WC_Email {
 		if ( ! $user_id ) {
 			return;
 		}
+
 		if ( $user_id ) {
 			$this->object = get_user_by('ID',$user_id);
 			$this->user_email         = stripslashes( $this->object->user_email );
@@ -111,7 +111,6 @@ class UsbSwiperPaypalConnectedEmail extends WC_Email {
 
 		if($this->get_recipient()){
 			$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
-
 		}
 	}
 

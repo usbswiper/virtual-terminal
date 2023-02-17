@@ -23,17 +23,16 @@ class UsbSwiperPaypalDisconnectedEmail extends WC_Email {
 		$this->id = 'paypal_disconnected';
 
 		// this is the title in WooCommerce Email settings
-		$this->title = 'Paypal Disconnected';
+		$this->title = 'PayPal Disconnected';
 
 		// this is the description in WooCommerce email settings
-		$this->description = __('Email Sent when a user disconnects their paypal to the account', 'usb-swiper');
+		$this->description = __('Email Sent when a user disconnects their PayPal to the account', 'usb-swiper');
 
 		// these are the default heading and subject lines that can be overridden using the settings
 		$this->heading = __( 'USBSwiper VT - PayPal Account Disconnected', 'usb-swiper' );
 		$this->subject = __( 'USBSwiper VT - PayPal Account Disconnected', 'usb-swiper');
 
 		// these define the locations of the templates that this email should use
-		$this->template_html  = 'paypaldisconnected.php';
 		$this->template_base  = USBSWIPER_PATH . 'templates/';
 		$this->template_html  = 'emails/paypaldisconnected.php';
 		$this->template_plain = 'emails/plain/paypaldisconnected.php';
@@ -112,8 +111,7 @@ class UsbSwiperPaypalDisconnectedEmail extends WC_Email {
 			$this->recipient = $this->user_email;
 		}
 		if($this->get_recipient()){
-			$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
-
+            $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
 		}
 	}
 

@@ -1357,9 +1357,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			// add the email class to the list of email classes that WooCommerce loads
 			$email_classes['UsbSwiperPaypalConnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-connected-email.php';
 			$email_classes['UsbSwiperPaypalDisconnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-disconnected-email.php';
+			$email_classes['paypal_profile_verification_request'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-profile-verification-request.php';
+			$email_classes['paypal_profile_verification_completed'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-profile-verification-completed.php';
 
 			return $email_classes;
-
 		}
 
         /**
@@ -1433,7 +1434,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta($current_user_id ,'billing_address_1', $business_address);
 
                 update_user_meta( $current_user_id, 'verification_form_data', true );
-                send_profile_verification_email('richard@usbswiper.com,andrew@usbswiper.com', get_current_user_id(), $name,'verification_started','Profile Verification','Profile Verification');
+
+                $new_email = WC()->mailer()->emails['paypal_profile_verification_request'];
+                $new_email->trigger( array(
+                    'user_id' => $current_user_id,
+                    'user_name' => $name,
+                ));
             }
 
             $response = array(

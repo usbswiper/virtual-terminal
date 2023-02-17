@@ -1583,9 +1583,19 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 update_user_meta( $user_id, 'vt_user_verification_status', $user_verify_for_vt );
                 if( ! empty( $user_verify_for_vt ) ) {
                     $user_data    = get_user_by( 'id', $user_id );
-                    $user_name    = $user_data->user_firstname;
-                    $user_email   = $user_data->user_email;
-                    send_profile_verification_email($user_email, $user_id, $user_name,'verification_completed','Profile Verification Completed', 'Profile Verification Completed');
+                    $user_name    = !empty( $user_data->user_firstname ) ? $user_data->user_firstname : '';
+
+                    $is_profile_approved = get_user_meta( $user_id, '_is_paypal_profile_approved', true);
+
+                    if( !$is_profile_approved) {
+                        $new_email = WC()->mailer()->emails['paypal_profile_verification_completed'];
+                        $new_email->recipient = !empty($user_data->user_email) ? $user_data->user_email : '';
+                        $new_email->trigger(array(
+                            'user_id' => $user_id,
+                            'user_name' => $user_name,
+                        ));
+                        update_user_meta($user_id, '_is_paypal_profile_approved', true);
+                    }
                 }
             }
 		}
