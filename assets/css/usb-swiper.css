@@ -89,6 +89,7 @@ p.signature-text{display: none;}
 .vt-fields-wrap .input-field-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {color: #3b3f5c;line-height: 40px;}
 .vt-fields-wrap .input-field-wrap .select2-container--default .select2-selection--single .select2-selection__arrow {height: 40px;}
 .vt-fields-wrap .input-field-wrap .vt-input-field {height: auto;width: 100%;}
+.vt-fields-wrap .input-field-wrap .vt-input-field.error{margin-top:0; }
 .vt-fields-wrap .input-field-wrap .sign {width: auto;}
 .vt-fields-wrap .input-field-wrap .sign .vt-input-field {border-radius: 0 6px 6px 0;}
 .vt-fields-wrap .input-field-wrap .sign .vt-input-field {border-radius: 0 6px 6px 0;}

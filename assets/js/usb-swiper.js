@@ -198,7 +198,6 @@ jQuery( document ).ready(function( $ ) {
 
                 paypal.Buttons({
                     onClick: function()  {
-
                         if( $('form#ae-paypal-pos-form').valid() ) {
                             return true;
                         } else{
@@ -253,9 +252,7 @@ jQuery( document ).ready(function( $ ) {
                         }
                     }
                 }).render('#angelleye_ppcp_checkout');
-
             }
-
         }
     }
 
@@ -364,7 +361,9 @@ jQuery( document ).ready(function( $ ) {
             if (response.status) {
                 $('#vt_repeater_field').append( response.html );
                 usb_swiper_remove_loader(loader);
-                loader.removeAttr('disabled')
+                loader.removeAttr('disabled');
+                setTimeout( function () {
+                }, 1000);
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -460,13 +459,10 @@ jQuery( document ).ready(function( $ ) {
             net_price_array[index] = Number(quantity) * Number(price);
         });
 
-
         for (let i = 0; i < net_price_array.length; i++) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
 
         $('#NetAmount').val(net_price);
     });
-
-
 });

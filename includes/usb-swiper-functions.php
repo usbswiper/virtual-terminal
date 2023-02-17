@@ -543,13 +543,12 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'disabled' => false,
                 'class' => 'usbswiper-change-currency',
             ))),
-
         'product_info' => apply_filters( 'usb_swiper_product_info_fields', array(
             array(
                 'type' => 'text',
                 'id' => 'VTProduct',
                 'name' => 'VTProduct[]',
-                'required' => false,
+                'required' => true,
                 'placeholder' => __( 'Search Product', 'usb-swiper'),
                 'attributes' => '',
                 'description' => '',
@@ -563,7 +562,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'id' => 'VTProductQuantity',
                 'name' => 'VTProductQuantity[]',
                 'placeholder' => __( 'Quantity', 'usb-swiper'),
-                'required' => false,
+                'required' => true,
                 'attributes' => '',
                 'description' => '',
                 'readonly' => false,
@@ -576,7 +575,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'id' => 'VTProductPrice',
                 'name' => 'VTProductPrice[]',
                 'placeholder' => __( 'Price', 'usb-swiper'),
-                'required' => false,
+                'required' => true,
                 'attributes' => '',
                 'description' => '',
                 'readonly' => false,
@@ -1538,54 +1537,27 @@ function usbswiper_get_user_name(){
 
 function get_product_html( $id = 0 ) {
 
+    $product_info_fields = usb_swiper_get_vt_form_fields('product_info');
+
     $html = '<div id="vt_fields_wrap_'.$id.'" class="vt-fields-wrap">';
 
-    $html .= usb_swiper_get_html_field(array(
-        'type' => 'text',
-        'id' => 'VTProduct',
-        'name' => 'VTProduct[]',
-        'required' => false,
-        'placeholder' => __( 'Search Product', 'usb-swiper'),
-        'attributes' => '',
-        'description' => '',
-        'readonly' => false,
-        'disabled' => false,
-        'class' => 'vt-input-field vt-product-input',
-        'wrapper_class' => 'product'
-    ));
+    if( !empty( $product_info_fields ) && is_array( $product_info_fields ) ) {
 
-    $html .= usb_swiper_get_html_field(array(
-        'type' => 'number',
-        'id' => 'VTProductQuantity',
-        'name' => 'VTProductQuantity[]',
-        'placeholder' => __( 'Quantity', 'usb-swiper'),
-        'required' => false,
-        'attributes' => '',
-        'description' => '',
-        'readonly' => false,
-        'disabled' => false,
-        'class' => 'vt-input-field vt-product-quantity',
-        'wrapper_class' => 'product_quantity'
-    ));
-
-    $html .= usb_swiper_get_html_field(array(
-        'type' => 'number',
-        'id' => 'VTProductPrice',
-        'name' => 'VTProductPrice[]',
-        'placeholder' => __( 'Price', 'usb-swiper'),
-        'required' => false,
-        'attributes' => '',
-        'description' => '',
-        'readonly' => false,
-        'disabled' => false,
-        'class' => 'vt-input-field vt-product-price',
-        'wrapper_class' => 'price'
-    ));
+        foreach ( $product_info_fields as $product_field ) {
+            $field_id = !empty( $product_field['id'] ) ? $product_field['id'] : '';
+            if( !empty( $field_id ) ) {
+                $product_field['id'] = $field_id."_".$id;
+            }
+            $html .= usb_swiper_get_html_field($product_field);
+        }
+    }
 
     $html .='<span class="vt-remove-fields-wrap">';
+
     if( $id > 0 ) {
         $html .= '<svg viewBox="0 0 24 24" width="25" height="25" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
     }
+
     $html .='</span>';
 
     $html .='</div>';

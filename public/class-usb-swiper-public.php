@@ -596,6 +596,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				    if( !empty( $form_fields ) && is_array( $form_fields ) ) {
 				        foreach ( $form_fields as $key => $form_field ) {
 					        $field_id = !empty( $form_field['id'] ) ?  $form_field['id'] : '';
+                            if( !empty( $_POST[$field_id] ) && is_array( $_POST[$field_id] ) ) {
+                                $_POST[$field_id] = array_filter($_POST[$field_id], function($value) { return !is_null($value) && $value !== ''; });
+                            }
 					        $transaction[$field_id] = !empty( $_POST[$field_id] ) ? $_POST[$field_id] : '';
 				        }
 				    }
