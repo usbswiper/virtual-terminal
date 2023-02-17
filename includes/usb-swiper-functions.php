@@ -1467,37 +1467,6 @@ function usbswiper_get_user_name(){
 	return $user_name;
 }
 
-/**
- * Get email content for vt verification
- *
- * @param $user_id
- * @param $user_name
- * @param $verification_type
- * @param $email_heading
- * @return mixed|null
- */
-function get_profile_verification_content( $user_id, $user_name, $verification_type, $email_heading ) {
-
-    ob_start();
-
-    wc_get_template( 'emails/email-header.php', array( 'email_heading' => $email_heading ) );
-
-    $args = array(
-        'user_id' => $user_id,
-        'user_name' => $user_name,
-        'verification_type' => $verification_type
-    );
-
-    usb_swiper_get_template( 'verification-email.php', $args );
-
-    wc_get_template( 'emails/email-footer.php' );
-
-    $email_content = ob_get_contents();
-    ob_get_clean();
-
-    return apply_filters('usb_swiper_get_email_content', $email_content);
-}
-
 if( !function_exists('usb_swiper_get_field_value') ) {
 
     function usb_swiper_get_field_value( $field , $tab ='general') {
