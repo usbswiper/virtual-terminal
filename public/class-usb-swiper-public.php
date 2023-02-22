@@ -361,7 +361,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 <select name="vt-type" id="vt_type" class="transaction-select">
                                     <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
                                     <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
-                                    <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Transaction','usb-swiper'); ?></option>
+                                    <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Virtual Terminal ','usb-swiper'); ?></option>
                                 </select>
                             </div>
                             <div class="transaction-field-wrap form-row form-row-last">
@@ -801,7 +801,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         'invoice' => true,
                         'customer_name' => wp_strip_all_tags($display_name)
                     );
-                    $this->send_emails($transaction_id, $email_args);
+                    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
+                    $new_email = WC()->mailer()->emails['invoice_email_pending'];
+                    $new_email->recipient = $BillingEmail;
+                    $new_email->subject = __('Usb Swiper]: New Invoice #'.$transaction_id ,'usb-swiper');
+                    $new_email->trigger( array(
+                        'transaction_id' => $transaction_id,
+                        'email_args' => $email_args,
+                    ));
+                    //$this->send_emails($transaction_id, $email_args);
                     wp_send_json( array('invoiceUrl' => wc_get_account_endpoint_url( 'view-transaction' ) . $transaction_id), 200 );
                 }
 			}
@@ -1566,6 +1574,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			// add the email class to the list of email classes that WooCommerce loads
 			$email_classes['UsbSwiperPaypalConnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-connected-email.php';
 			$email_classes['UsbSwiperPaypalDisconnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-disconnected-email.php';
+			$email_classes['invoice_email_pending'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-pending.php';
+			$email_classes['invoice_email_pending_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-pending-admin.php';
+			$email_classes['UsbSwiperInvoiceEmailPaid'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid.php';
+			$email_classes['UsbSwiperInvoiceEmailPaidAdmin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid-admin.php';
 
 			return $email_classes;
 

@@ -69,12 +69,14 @@ jQuery( document ).ready(function( $ ) {
             var fh = $('#ae-paypal-pos-form').offset().top;
             var scroll = $(window).scrollTop();
             var formobj = $('#ae-paypal-pos-form .vt-col-payments');
-
+            var pay_by_invoice = $('#ae-paypal-pos-form .vt-col-pay-by-invoice');
 
             if (fh <= scroll) {
                 formobj.addClass('fixed');
+                pay_by_invoice.addClass('fixed');
             } else {
                 formobj.removeClass('fixed');
+                pay_by_invoice.removeClass('fixed');
             }
         });
     }

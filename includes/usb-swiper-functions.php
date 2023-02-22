@@ -137,7 +137,6 @@ function usb_swiper_get_vt_tab_fields() {
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
 		'shipping_address' => __( 'Shipping Address' ,'usb-swiper' ),
-		'pay_by_invoice' => __( 'Pay By Invoice' ,'usb-swiper' ),
 	);
 
 	return apply_filters( 'usb_swiper_get_vt_tab_fields', $tab_fields );
@@ -1033,32 +1032,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'class' => 'vt-shipping-address-field vt-input-field',
             ),
         )),
-        'pay_by_invoice' => apply_filters( 'usb_swiper_pay_by_invoice', array(
-            array(
-                'type' => 'checkbox',
-                'id' => 'PayByInvoiceDisabled',
-                'name' => 'PayByInvoiceDisabled',
-                'label' => __( 'Enable Pay By Invoice', 'usb-swiper'),
-                'required' => false,
-                'value' => "true",
-                'checked' => true,
-                'attributes' => array(
-                    'data-default-checked' => 'FALSE'
-                ),
-                'description' => '',
-                'class' => '',
-            ),
-            array(
-                'type' => 'button',
-                'id' => 'PayByInvoice',
-                'name' => 'PayByInvoice',
-                'btn_type' => 'button',
-                'required' => false,
-                'value' => __( 'Pay By Invoice', 'usb-swiper'),
-                'description' => '',
-                'class' => 'vt-button',
-            ),
-        ))
     );
 
     $form_fields = apply_filters( 'usb_swiper_get_vt_form_fields', $form_fields );

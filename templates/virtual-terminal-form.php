@@ -76,28 +76,64 @@
 					}
 					?>
                 </div>
-                <div class="vt-col vt-col-40 vt-col-payments">
-                    <div class="usb-swiper-advanced-cc-form">
-                        <div class="card-form">
-                            <div class="vt-card-field vt-card-number">
-                                <label for="card-number"><?php _e('Card Number','usb-swiper'); ?></label>
-                                <div id="card-number" class="card_field"></div>
+                <div class="vt-col-40 ">
+                    <div class="vt-col vt-col-pay-by-invoice">
+                        <fieldset>
+                            <legend><?php _e('Invoicing','usb-swiper'); ?><span class="tool" data-tip="<?php _e('Enable invoicing to send an email invoice to your buyer. They can pay the invoice using PayPal or a credit card.','usb-swiper'); ?>" tabindex="1">?</span></legend>
+
+                            <div class="vt-fields-wrap">
+                                <?php
+                                echo usb_swiper_get_html_field(array(
+                                    'type' => 'checkbox',
+                                    'id' => 'PayByInvoiceDisabled',
+                                    'name' => 'PayByInvoiceDisabled',
+                                    'label' => __( 'Enable Invoicing', 'usb-swiper'),
+                                    'required' => false,
+                                    'value' => "true",
+                                    'checked' => true,
+                                    'attributes' => array(
+                                        'data-default-checked' => 'FALSE'
+                                    ),
+                                    'description' => '',
+                                    'class' => '',
+                                ));
+                                echo usb_swiper_get_html_field(array(
+                                    'type' => 'button',
+                                    'id' => 'PayByInvoice',
+                                    'name' => 'PayByInvoice',
+                                    'btn_type' => 'button',
+                                    'required' => false,
+                                    'value' => __( 'Send Invoice', 'usb-swiper'),
+                                    'description' => '',
+                                    'class' => 'vt-button',
+                                ));
+                                ?>
                             </div>
-                            <div class="vt-card-details">
-                                <div class="vt-card-field vt-card-field-50 vt-card-expiration-date">
-                                    <label for="expiration-date"><?php _e('Expiration Date','usb-swiper'); ?></label>
-                                    <div id="expiration-date" class="card_field"></div>
-                                </div>
-                                <div class="vt-card-field vt-card-field-50 vt-card-cvv">
-                                    <label for="cvv"><?php _e('CVV','usb-swiper'); ?></label>
-                                    <div id="cvv" class="card_field"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
-                        <button type="submit" class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                        </fieldset>
                     </div>
-                    <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
+                    <div class="vt-col vt-col-payments">
+                        <div class="usb-swiper-advanced-cc-form">
+                            <div class="card-form">
+                                <div class="vt-card-field vt-card-number">
+                                    <label for="card-number"><?php _e('Card Number','usb-swiper'); ?></label>
+                                    <div id="card-number" class="card_field"></div>
+                                </div>
+                                <div class="vt-card-details">
+                                    <div class="vt-card-field vt-card-field-50 vt-card-expiration-date">
+                                        <label for="expiration-date"><?php _e('Expiration Date','usb-swiper'); ?></label>
+                                        <div id="expiration-date" class="card_field"></div>
+                                    </div>
+                                    <div class="vt-card-field vt-card-field-50 vt-card-cvv">
+                                        <label for="cvv"><?php _e('CVV','usb-swiper'); ?></label>
+                                        <div id="cvv" class="card_field"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
+                            <button type="submit" class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                        </div>
+                        <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
+                    </div>
                 </div>
             </div>
         </div>

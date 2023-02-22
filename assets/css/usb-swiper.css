@@ -2,7 +2,6 @@ body { background: #fafafa; }
 body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-row {width: 100%;display: flex;}
 .vt-row .vt-col {width: calc(100% - 24px);display: block;background: #FFF;padding: 20px;border: 1px solid #e0e6ed;box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);margin: 0 10px;border-radius: 10px;}
-.vt-row .vt-col:first-child {margin-left: 0;}
 .vt-row .vt-col:last-child {margin-right: 0;}
 .vt-row .vt-col-10 {width: calc(10% - 12px);}
 .vt-row .vt-col-20 {width: calc(20% - 12px);}
@@ -40,9 +39,12 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-notification p.notification.success {border-left-color: #00a32a;}
 .vt-form-notification p.notification span {display:block !important; }
 .vt-form-contents {width: 100%;}
-.vt-form-contents .vt-row {width: 100%;display: block;position: relative;}
+.vt-form-contents .vt-row {width: 100%;position: relative;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
-.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 70px;bottom: auto;width: 22%;}
+.vt-form-contents .vt-row .vt-col.vt-col-payments { margin-top: 20px}
+.vt-form-contents .vt-row .vt-col.vt-col-pay-by-invoice.fixed {position: fixed;top: 18%;bottom: auto;right:23.5%;width: 22%;margin: 0;}
+.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 40%;bottom: auto;right:23.5%;width: 22%;}
+.vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {top: 12%;right: 18%;width: 18%;}
 .vt-button {color: #ffffff!important;border-width: 0px!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
 .vt-button-normal {color: #3D72E7 !important;border-width: 1px !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background: #FFF;padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;border-color: #3D72E7 !important;}
 .vt-button-normal:hover{border-color: #3D72E7;}
@@ -135,4 +137,81 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .entry-title{display: none;}
     .woocommerce-MyAccount-content{width:100% !important;}
     .transaction_history_receipt_info{list-style: none;}
+}
+
+/*== start of code for tooltips ==*/
+.tool {
+    cursor: pointer;
+    position: relative;
+    background: #3e474f;
+    padding: 0px 7px;
+    border-radius: 100%;
+    margin-left: 5px;
+    color: #FFF;
+}
+
+
+/*== common styles for both parts of tool tip ==*/
+.tool::before,
+.tool::after {
+    left: 50%;
+    opacity: 0;
+    position: absolute;
+    z-index: -100;
+}
+
+.tool:hover::before,
+.tool:focus::before,
+.tool:hover::after,
+.tool:focus::after {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    z-index: 100;
+}
+
+
+/*== pointer tip ==*/
+.tool::before {
+    border-left: 1em solid transparent;
+    border-right: 1em solid transparent;
+    border-bottom: 1em solid #3e474f;
+    top: 100%;
+    content: "";
+    margin-left: -0.5em;
+    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26), opacity .65s .5s;
+    transform:  scale(.6) translateY(-90%);
+    left: 5px;
+}
+
+.tool:hover::before,
+.tool:focus::before {
+    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;
+}
+
+
+/*== speech bubble ==*/
+.tool::after {
+    background: #3E474F;
+    border-radius: .25em;
+    top: 150%;
+    color: #EDEFF0;
+    content: attr(data-tip);
+    margin-left: -8.75em;
+    padding: 1em;
+    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;
+    transform:  scale(.6) translateY(50%);
+    width: 17.5em;
+}
+
+.tool:hover::after,
+.tool:focus::after  {
+    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26);
+}
+
+@media (max-width: 760px) {
+    .tool::after {
+        font-size: .75em;
+        margin-left: -5em;
+        width: 10em;
+    }
 }
