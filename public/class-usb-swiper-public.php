@@ -410,12 +410,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             $Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
                             echo "<div class='paypal-connect-button-wrap'>".$Usb_Swiper_PPCP->connect_to_paypal_button($args)."</div>";
                         }
-                    } else {
-                        ?>
-                        <div class="paypal-connect-button-wrap vt-form-notification">
-                            <p class="vt-verification-message notification success"><?php _e("Thank you for submitting verification data, our team will review it. Once the account is approved, you will be able to do the transaction !");?></p>
-                        </div>
-                        <?php
                     }
                 }
 
@@ -431,6 +425,23 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			ob_get_clean();
 
 			return $form;
+        }
+
+        /**
+         *
+         *
+         * @return void
+         */
+        public function add_notification_for_verify_profile(){
+
+            $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+            if($profile_status === ''){
+                ?>
+                <div class="paypal-connect-button-wrap vt-form-notification">
+                    <p class="vt-verification-message notification success"><?php _e("Thank you for submitting verification data, our team will review it. Once the account is approved, you will be able to do the transaction !");?></p>
+                </div>
+                <?php
+            }
         }
 
 		/**
@@ -1411,7 +1422,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $status           = true;
                 $message          = __( 'Thank you for submitting data, Please wait for profile verification.','usb-swiper' );
-                $name             = ! empty( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
+                $first_name        = ! empty( $_POST['first_name'] ) ? sanitize_text_field( $_POST['first_name'] ) : '';
+                $last_name        = ! empty( $_POST['last_name'] ) ? sanitize_text_field( $_POST['last_name'] ) : '';
                 $phone            = ! empty( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
                 $url              = ! empty( $_POST['website-url'] ) ? sanitize_url( $_POST['website-url'] ) : '';
                 $company_name     = ! empty( $_POST['company-name'] ) ? sanitize_text_field( $_POST['company-name'] ) : '';
@@ -1424,10 +1436,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_update_user( array(
                     'ID' => $current_user_id,
                     'user_url' => $url,
-                    'first_name' => $name,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
                 ));
 
-                update_user_meta($current_user_id ,'billing_first_name', $name);
+                update_user_meta($current_user_id ,'billing_first_name', $first_name);
+                update_user_meta($current_user_id ,'billing_lats_name', $last_name);
                 update_user_meta($current_user_id ,'billing_company', $company_name);
                 update_user_meta($current_user_id ,'billing_phone', $phone);
                 update_user_meta($current_user_id ,'billing_email', $email);
@@ -1438,7 +1452,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $new_email = WC()->mailer()->emails['paypal_profile_verification_request'];
                 $new_email->trigger( array(
                     'user_id' => $current_user_id,
-                    'user_name' => $name,
+                    'user_name' => $first_name.' '.$last_name,
                 ));
             }
 
@@ -1457,5 +1471,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             return $header;
         }
+
+        /**
+         * Redirect user to verification page after register from WooCommerce account page.
+         *
+         * @return void
+         */
+        public function wc_registration_redirect() {
+            $settings = usb_swiper_get_settings('general');
+            $vt_verification_page = ! empty( $settings['vt_verification_page'] ) ? (int) $settings['vt_verification_page'] : '';
+            wp_safe_redirect(get_the_permalink($vt_verification_page));
+        }
+
 	}
 }

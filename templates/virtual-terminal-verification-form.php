@@ -2,10 +2,21 @@
 $form_fields = array(
     array(
         'type' => 'text',
-        'id' => 'name',
-        'name' => 'name',
-        'placeholder' => __('Your Name', 'usb-swiper'),
-        'label' => 'Name',
+        'id' => 'first_name',
+        'name' => 'first_name',
+        'placeholder' => __('First Name', 'usb-swiper'),
+        'label' => 'First Name',
+        'required' => true,
+        'options' => '',
+        'attributes' => '',
+        'class' => ''
+    ),
+    array(
+        'type' => 'text',
+        'id' => 'last_name',
+        'name' => 'last_name',
+        'placeholder' => __('Last Name', 'usb-swiper'),
+        'label' => 'Last Name',
         'required' => true,
         'options' => '',
         'attributes' => '',
