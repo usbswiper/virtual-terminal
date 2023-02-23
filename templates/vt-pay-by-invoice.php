@@ -35,7 +35,7 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
 
                         if( !empty( $vt_invoice_page ) && (int)$vt_invoice_page === get_the_ID()) { ?>
                             <div class="paypal-payment">
-                                <div class="vt-col vt-col-100 vt-col-payments">
+                                <div class="vt-col vt-col-100 pay-with-paypal vt-col-payments">
                                     <div class="vt-col-pay-using-paypal">
                                         <div id="smart-button-container">
                                             <div style="text-align: center;">

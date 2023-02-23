@@ -79,7 +79,7 @@
                 <div class="vt-col-40 ">
                     <div class="vt-col vt-col-pay-by-invoice">
                         <fieldset>
-                            <legend><?php _e('Invoicing','usb-swiper'); ?><span class="tool" data-tip="<?php _e('Enable invoicing to send an email invoice to your buyer. They can pay the invoice using PayPal or a credit card.','usb-swiper'); ?>" tabindex="1">?</span></legend>
+                            <label><?php _e('Invoicing','usb-swiper'); ?><span class="tool" data-tip="<?php _e('Enable invoicing to send an email invoice to your buyer. They can pay the invoice using PayPal or a credit card.','usb-swiper'); ?>" tabindex="1">?</span></label>
 
                             <div class="vt-fields-wrap">
                                 <?php
