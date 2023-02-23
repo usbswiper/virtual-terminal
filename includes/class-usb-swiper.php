@@ -190,6 +190,8 @@ class Usb_Swiper {
         $this->loader->add_filter( 'wp_ajax_vt_search_product', $plugin_public, 'vt_search_product');
         $this->loader->add_filter( 'wp_ajax_vt_add_product_value_in_inputs', $plugin_public, 'vt_add_product_value_in_inputs');
         $this->loader->add_filter('usb_swiper_email_attachment', $plugin_public, 'manage_invoice_pdf_attachment', 10, 2 );
+        $this->loader->add_action('wp_ajax_handel_pay_using_paypal_transaction', $plugin_public, 'handel_pay_using_paypal_transaction' );
+        $this->loader->add_action('wp_ajax_nopriv_handel_pay_using_paypal_transaction', $plugin_public, 'handel_pay_using_paypal_transaction');
 
 		if (!is_admin()) {
 			return;

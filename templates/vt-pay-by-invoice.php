@@ -13,6 +13,9 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
     include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 }
 
+$Paypal_request = Usb_Swiper_Paypal_request::instance();
+$response = $Paypal_request->create_transaction_request( $invoice_id,true );
+
 ?>
 
 <div id="content" class="invoice-content-main-wrap main-content woocommerce">
@@ -31,7 +34,7 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
         <div class="vt-form-contents">
             <div class="vt-row">
                 <?php if( empty( $invoice_id ) ){ ?>
-                    <div class="vt-form-message"><?php _e('Sorry, No any invoice data found.','usb-swiper'); ?></div>
+                    <div class="vt-form-message"><?php _e('Sorry, No invoice data found.','usb-swiper'); ?></div>
                 <?php } elseif( !empty( $payment_status ) && strtolower($payment_status) === 'paid' && !empty( $invoice_status ) && strtolower($invoice_status) == 'completed' ) {
                     usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $invoice_id ) );
                 } else { ?>
@@ -42,6 +45,54 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 
                         if( !empty( $vt_invoice_page ) && (int)$vt_invoice_page === get_the_ID()) { ?>
                             <div class="paypal-payment">
+                                <div class="vt-col vt-col-100 vt-col-payments">
+                                    <div class="vt-col-pay-using-paypal">
+                                        <div id="smart-button-container">
+                                            <div style="text-align: center;">
+                                                <div id="paypal-button-container"></div>
+                                                <script type="text/javascript">
+                                                    jQuery( document ).ready(function( $ ) {
+                                                        function initPayPalButton() {
+                                                            paypal.Buttons({
+                                                                style: {
+                                                                    shape: 'pill',
+                                                                    color: 'gold',
+                                                                    layout: 'vertical',
+                                                                    label: 'pay',
+                                                                },
+
+                                                                createOrder: function (data, actions) {
+                                                                    return actions.order.create(<?php echo !empty($response) ? $response : ''; ?>);
+                                                                },
+
+                                                                onApprove: function (data, actions) {
+                                                                    return actions.order.capture().then(function (orderData) {
+                                                                        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                                                                        jQuery.ajax({
+                                                                            url: usb_swiper_settings.ajax_url,
+                                                                            type: 'POST',
+                                                                            dataType: 'json',
+                                                                            data: "orderData="+JSON.stringify( orderData )+"&action=handel_pay_using_paypal_transaction",
+                                                                        }).done(function ( response ) {
+
+                                                                            if( response.status) {
+                                                                            }
+                                                                        });
+                                                                    });
+                                                                },
+
+                                                                onError: function (err) {
+                                                                    console.log(err);
+                                                                }
+                                                            }).render('#paypal-button-container');
+                                                        }
+                                                        initPayPalButton();
+                                                    });
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="vt-col vt-col-100 vt-col-payments">
                                     <div class="usb-swiper-advanced-cc-form">
                                         <div class="card-form">

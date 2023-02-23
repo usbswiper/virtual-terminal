@@ -23,7 +23,7 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
         $this->id = 'invoice_email_pending';
 
         // this is the title in WooCommerce Email settings
-        $this->title = 'Invoice Email Pending';
+        $this->title = 'Pending Invoice Email';
 
         // this is the description in WooCommerce email settings
         $this->description = __('Email Sent when a Invoice is Pending.', 'usb-swiper');
@@ -60,6 +60,7 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
                 'email'              => $this,
                 'order'              => $this->object,
                 'admin_email'        => $this->recipient,
+                'profile_args'       => $this->profile_args
             ),
             '',
             $this->template_base,
@@ -85,11 +86,22 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
                 'email'              => $this,
                 'order'              => $this->object,
                 'admin_email'        => $this->recipient,
+                'profile_args'       => $this->profile_args
             ),
             '',
             $this->template_base,
         );
 
+    }
+
+    /**
+     * Determine if the email has any attachments
+     *
+     * @return array|mixed|null
+     */
+    public function get_attachments() {
+        $attachments = $this->attachments;
+        return apply_filters( 'woocommerce_email_attachments', $attachments, $this->id, $this->object, $this );
     }
 
     /**
@@ -104,6 +116,10 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
         if ( !$args ) {
             return;
         }
+
+        $this->attachments = !empty( $args['attachment'] ) ? $args['attachment'] : '';
+
+        unset($args['attachment']);
 
         $this->profile_args = $args;
 
@@ -127,14 +143,6 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
                 'type'    => 'checkbox',
                 'label'   => __( 'Enable this email notification', 'usb-swiper' ),
                 'default' => 'yes',
-            ),
-            'recipient'          => array(
-                'title'       => __( 'Recipient', 'usb-swiper' ),
-                'type'        => 'text',
-                'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to %s.', 'usb-swiper' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
-                'placeholder' => '',
-                'default'     => '',
-                'desc_tip'    => true,
             ),
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),

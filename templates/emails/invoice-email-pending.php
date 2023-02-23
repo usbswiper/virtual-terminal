@@ -6,8 +6,10 @@ if( empty( $transaction_id)) {
     return;
 }
 
-$payment_link = '';
-if( !empty($args['payment_link']) && (bool)$args['payment_link'] ){
+do_action( 'woocommerce_email_header', $email_heading, $email );
+
+$payment_link = !empty( $args['payment_link'] ) ? $args['payment_link'] : '';
+if( empty($args['payment_link']) ){
     $settings = usb_swiper_get_settings('general');
     $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
     $payment_link = add_query_arg(array('invoice-session'=>base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => false))) ),get_the_permalink( $paybyinvoice_id ));
@@ -27,3 +29,9 @@ $args = array(
 );
 
 usb_swiper_get_template( 'wc-transaction-history.php', $args );
+
+if ( $additional_content ) {
+    echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
+}
+
+do_action( 'woocommerce_email_footer', $email );

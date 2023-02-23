@@ -271,7 +271,7 @@ class Usb_Swiper_Paypal_request{
 		return $application_context;
 	}
 
-    public function create_transaction_request( $transaction_id ) {
+    public function create_transaction_request( $transaction_id, $is_args = false ) {
 
         $InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
         $reference_id = 'wc_transaction_'.$transaction_id;
@@ -412,6 +412,10 @@ class Usb_Swiper_Paypal_request{
         $body_request = $this->set_payer_shipping_details($body_request, $transaction_id);
         $body_request = $this->set_payer_details($body_request, $transaction_id);
         $body_request = $this->remove_empty_key($body_request);
+
+        if( $is_args ) {
+            return json_encode($body_request);
+        }
 
         $args = array(
             'method' => 'POST',

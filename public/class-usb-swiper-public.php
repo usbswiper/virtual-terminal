@@ -802,14 +802,22 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         'customer_name' => wp_strip_all_tags($display_name)
                     );
                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
-                    $new_email = WC()->mailer()->emails['invoice_email_pending'];
-                    $new_email->recipient = $BillingEmail;
-                    $new_email->subject = __('Usb Swiper]: New Invoice #'.$transaction_id ,'usb-swiper');
-                    $new_email->trigger( array(
+                    $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
+
+                    $customer_email = WC()->mailer()->emails['invoice_email_pending'];
+                    $customer_email->recipient = $BillingEmail;
+                    $customer_email->trigger( array(
+                        'transaction_id' => $transaction_id,
+                        'email_args' => $email_args,
+                        'attachment' => array( $attachment ),
+                    ));
+
+                    $admin_email = WC()->mailer()->emails['invoice_email_pending_admin'];
+                    $admin_email->recipient = get_option('admin_email');
+                    $admin_email->trigger( array(
                         'transaction_id' => $transaction_id,
                         'email_args' => $email_args,
                     ));
-                    //$this->send_emails($transaction_id, $email_args);
                     wp_send_json( array('invoiceUrl' => wc_get_account_endpoint_url( 'view-transaction' ) . $transaction_id), 200 );
                 }
 			}
@@ -882,8 +890,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    if( !empty($response ) && is_array($response) && isset($response['id']) && !empty($response['id'])) {
 
 				    update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
+                    $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
+                    $BillingLastName = get_post_meta( $transaction_id,'BillingLastName', true);
+                    $display_name = $BillingFirstName . ' ' . $BillingLastName;
+                    $email_args = array(
+                        'customer_name' => wp_strip_all_tags($display_name)
+                    );
 
-			        $this->send_emails($transaction_id);
+                    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
+                    $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
+
+                    $customer_email = WC()->mailer()->emails['invoice_email_paid'];
+                    $customer_email->recipient = $BillingEmail;
+                    $customer_email->trigger( array(
+                        'transaction_id' => $transaction_id,
+                        'email_args' => $email_args,
+                        'attachment' => array( $attachment ),
+                    ));
+
+                    $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
+                    $admin_email->recipient = get_option('admin_email');
+                    $admin_email->trigger( array(
+                        'transaction_id' => $transaction_id,
+                        'email_args' => $email_args,
+                    ));
 
 				    wp_send_json( array(
 					    'result' => 'success',
@@ -1576,8 +1606,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$email_classes['UsbSwiperPaypalDisconnectedEmail'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-paypal-disconnected-email.php';
 			$email_classes['invoice_email_pending'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-pending.php';
 			$email_classes['invoice_email_pending_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-pending-admin.php';
-			$email_classes['UsbSwiperInvoiceEmailPaid'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid.php';
-			$email_classes['UsbSwiperInvoiceEmailPaidAdmin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid-admin.php';
+			$email_classes['invoice_email_paid'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid.php';
+			$email_classes['invoice_email_paid_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid-admin.php';
 
 			return $email_classes;
 
@@ -1750,6 +1780,29 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             return $attachment;
+        }
+
+        public function handel_pay_using_paypal_transaction(){
+
+            if( !class_exists('Usb_Swiper_Paypal_request') ) {
+                include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+            }
+
+            $orderData = !empty( $_POST['orderData'] ) ? $_POST['orderData'] : '';
+            $orderData_decode = !empty( $orderData ) ? json_decode($orderData) : '';
+            $order_id = !empty( $orderData->id ) ? $orderData->id : '';
+            $order_data_id = !empty( $orderData_decode->id ) ? $orderData_decode->id : '';
+            $Paypal_request = Usb_Swiper_Paypal_request::instance();
+            $Paypal_request->handle_paypal_debug_id($orderData, $transaction_id);
+            update_post_meta($transaction_id, '_payment_response', $orderData);
+
+            $redirect_url = "";
+
+            $response = array(
+                'redirect_url' => $redirect_url
+            );
+
+            wp_send_json( $response, 200 );
         }
 	}
 }

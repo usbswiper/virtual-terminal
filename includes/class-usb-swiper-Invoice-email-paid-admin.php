@@ -23,7 +23,7 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
         $this->id = 'invoice_email_paid_admin';
 
         // this is the title in WooCommerce Email settings
-        $this->title = 'Invoice Email Paid Admin';
+        $this->title = 'Paid Invoice Or Transaction Email To Admin';
 
         // this is the description in WooCommerce email settings
         $this->description = __('Email Sent when a user Paid Invoice.', 'usb-swiper');
@@ -60,6 +60,7 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
                 'email'              => $this,
                 'order'              => $this->object,
                 'admin_email'        => $this->recipient,
+                'profile_args'       => $this->profile_args
             ),
             '',
             $this->template_base,
@@ -85,6 +86,7 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
                 'email'              => $this,
                 'order'              => $this->object,
                 'admin_email'        => $this->recipient,
+                'profile_args'       => $this->profile_args
             ),
             '',
             $this->template_base,
@@ -99,17 +101,14 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
      *
      * @since 0.1
      */
-    public function trigger( $user_id ) {
+    public function trigger( $args ) {
 
-        // bail if no order ID is present
-        if ( ! $user_id ) {
+        if ( !$args ) {
             return;
         }
-        if ( $user_id ) {
-            $this->object = get_user_by('ID',$user_id);
-            $this->user_email         = stripslashes( $this->object->user_email );
-            $this->recipient = $this->user_email;
-        }
+
+        $this->profile_args = $args;
+
         if($this->get_recipient()){
             $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
 
