@@ -43,8 +43,8 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .invoice-content-main-wrap .vt-row {flex-direction: column;margin-bottom: 20px;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
 .vt-form-contents .vt-row .vt-col.vt-col-payments { margin-top: 20px}
-.vt-form-contents .vt-row .vt-col.vt-col-pay-by-invoice.fixed {position: fixed;top: 18%;bottom: auto;right:23.5%;width: 22%;margin: 0;}
-.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 40%;bottom: auto;right:23.5%;width: 22%;}
+.vt-form-contents .vt-row .vt-col.vt-col-pay-by-invoice.fixed {position: fixed;top: 18%;bottom: auto;right:22.5%;width: 22%;margin: 0;}
+.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 40%;bottom: auto;right:22.5%;width: 22%;}
 .vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {top: 20%;right: 17%;width: 18%;}
 .invoice-content-main-wrap .vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {top: 26%;right: 15%;}
 .vt-form-contents .vt-col.vt-col-100.vt-col-payments.pay-with-paypal.fixed {top: 6%;right: 15%;width: 18%;margin: 0;z-index: 99999;}
