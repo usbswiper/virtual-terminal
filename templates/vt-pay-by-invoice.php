@@ -42,6 +42,7 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                 <div id="paypal-button-container"></div>
                                                 <script type="text/javascript">
                                                     jQuery( document ).ready(function( $ ) {
+                                                        var VtForm = jQuery('form#ae-paypal-pos-form');
                                                         function initPayPalButton() {
                                                             paypal.Buttons({
                                                                 style: {
@@ -56,6 +57,14 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                 },
                                                                 onApprove: function (data, actions) {
                                                                     return actions.order.capture().then(function (orderData) {
+
+                                                                        VtForm.addClass('createOrder').block({
+                                                                            message: null,
+                                                                            overlayCSS: {
+                                                                                background: '#fff',
+                                                                                opacity: 0.6
+                                                                            }
+                                                                        });
                                                                         jQuery.ajax({
                                                                             url: usb_swiper_settings.ajax_url,
                                                                             type: 'POST',
@@ -64,11 +73,19 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                         }).done(function ( response ) {
                                                                             if( response) {
                                                                                 actions.redirect(response.redirect_url);
+                                                                                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                                                             }
                                                                         });
                                                                     });
                                                                 },
                                                                 onError: function (err) {
+                                                                    VtForm.addClass('createOrder').block({
+                                                                        message: null,
+                                                                        overlayCSS: {
+                                                                            background: '#fff',
+                                                                            opacity: 0.6
+                                                                        }
+                                                                    });
                                                                     jQuery.ajax({
                                                                         url: usb_swiper_settings.ajax_url,
                                                                         type: 'POST',
@@ -79,6 +96,7 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                             const notification = jQuery('.vt-form-notification');
                                                                             notification.html('');
                                                                             notification.append('<p class="notification error">'+response.message+'</p>');
+                                                                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                                                         }
                                                                     });
                                                                 }
