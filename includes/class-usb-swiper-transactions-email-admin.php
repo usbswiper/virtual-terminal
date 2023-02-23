@@ -2,36 +2,37 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
- * Email class for Invoice Email Pending Notification
+ * Email class for Transaction Email Notification
  *
  * @extends \WC_Email
  */
 
-class UsbSwiperInvoiceEmailPending extends WC_Email {
+class UsbSwiperTransactionEmailAdmin extends WC_Email {
 
     /**
      * Set email defaults
+     *
      */
     public function __construct() {
-        $this->customer_email = true;
+        $this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
 
         // set ID, this simply needs to be a unique name
-        $this->id = 'invoice_email_pending';
+        $this->id = 'transaction_email_admin';
 
         // this is the title in WooCommerce Email settings
-        $this->title = __('Invoice Pending Email', 'usb-swiper');
+        $this->title = __('Transaction Email for Admin', 'usb-swiper');
 
         // this is the description in WooCommerce email settings
-        $this->description = __('Email Sent when a Invoice is Pending.', 'usb-swiper');
+        $this->description = __('Email Sent to admin when a user Create Transaction.', 'usb-swiper');
 
         // these are the default heading and subject lines that can be overridden using the settings
-        $this->heading = __( 'Invoice {#transaction_id#} Pending', 'usb-swiper' );
-        $this->subject = __( 'Your UsbSwiper Invoice {#transaction_id#} Created', 'usb-swiper');
+        $this->heading = __( 'Transaction {#transaction_id#}', 'usb-swiper' );
+        $this->subject = __( 'New Transaction {#transaction_id#} Received', 'usb-swiper');
 
         // these define the locations of the templates that this email should use
         $this->template_base  = USBSWIPER_PATH . 'templates/';
-        $this->template_html  = 'emails/invoice-email-pending.php';
-        $this->template_plain = 'emails/plain/invoice-email-pending.php';
+        $this->template_html  = 'emails/transaction-email-admin.php';
+        $this->template_plain = 'emails/plain/transaction-email-admin.php';
 
         // Call parent constructor to load any other defaults not explicity defined here
         parent::__construct();
@@ -67,6 +68,7 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
      * @return string
      */
     public function get_content_plain() {
+
         return wc_get_template_html(
             $this->template_html,
             array(
@@ -81,17 +83,6 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
             '',
             $this->template_base,
         );
-
-    }
-
-    /**
-     * Determine if the email has any attachments
-     *
-     * @return array|mixed|null
-     */
-    public function get_attachments() {
-        $attachments = !empty( $this->attachments ) ? $this->attachments : array();
-        return apply_filters( 'woocommerce_email_attachments', $attachments, $this->id, $this->object, $this );
     }
 
     /**
@@ -106,10 +97,6 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
             return;
         }
 
-        $this->attachments = !empty( $args['attachment'] ) ? $args['attachment'] : '';
-
-        unset($args['attachment']);
-
         $this->profile_args = $args;
 
         if($this->get_recipient()){
@@ -120,6 +107,7 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
 
     /**
      * Admin Notify email form field.
+     *
      */
     public function init_form_fields() {
 
@@ -130,16 +118,24 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
                 'label'   => __( 'Enable this email notification', 'usb-swiper' ),
                 'default' => 'yes',
             ),
+            'recipient'          => array(
+                'title'       => __( 'Recipient', 'usb-swiper' ),
+                'type'        => 'text',
+                'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to %s.', 'usb-swiper' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
+                'placeholder' => '',
+                'default'     => '',
+                'desc_tip'    => true,
+            ),
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'Your UsbSwiper Invoice {#transaction_id#} Created', 'usb-swiper'),
+                'placeholder' => __( 'New Transaction {#transaction_id#} Received', 'usb-swiper'),
                 'default'     => '',
             ),
             'heading'            => array(
                 'title'       => __( 'Email Heading', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'Invoice {#transaction_id#} Pending', 'usb-swiper' ),
+                'placeholder' => __( 'Transaction {#transaction_id#}', 'usb-swiper' ),
                 'default'     => '',
             ),
             'additional_content' => array(
@@ -166,4 +162,4 @@ class UsbSwiperInvoiceEmailPending extends WC_Email {
     }
 }
 
-return new UsbSwiperInvoiceEmailPending();
+return new UsbSwiperTransactionEmailAdmin();

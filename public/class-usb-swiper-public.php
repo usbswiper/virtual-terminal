@@ -796,11 +796,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         ), 200 );
                     }
 
-                } elseif( !empty( $invoice_payment ) ) {
+                } elseif( !empty( $invoice_payment ) && $transaction_type === 'INVOICE' ) {
+
                     $email_args = array(
                         'invoice' => true,
-                        'customer_name' => wp_strip_all_tags($display_name)
+                        'display_name' => wp_strip_all_tags($display_name)
                     );
+
                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
                     $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
 
@@ -813,11 +815,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     ));
 
                     $admin_email = WC()->mailer()->emails['invoice_email_pending_admin'];
-                    $admin_email->recipient = get_option('admin_email');
                     $admin_email->trigger( array(
                         'transaction_id' => $transaction_id,
                         'email_args' => $email_args,
                     ));
+
                     wp_send_json( array('invoiceUrl' => wc_get_account_endpoint_url( 'view-transaction' ) . $transaction_id), 200 );
                 }
 			}
@@ -850,7 +852,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             usb_swiper_set_session('usb_swiper_woo_transaction_id', $transaction_id);
                         }
                     }
-                }else{
+                } else {
                     $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
                 }
 
@@ -894,26 +896,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $BillingLastName = get_post_meta( $transaction_id,'BillingLastName', true);
                     $display_name = $BillingFirstName . ' ' . $BillingLastName;
                     $email_args = array(
-                        'customer_name' => wp_strip_all_tags($display_name)
+                        'display_name' => wp_strip_all_tags($display_name)
                     );
 
                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
                     $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
+                    $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
 
-                    $customer_email = WC()->mailer()->emails['invoice_email_paid'];
-                    $customer_email->recipient = $BillingEmail;
-                    $customer_email->trigger( array(
-                        'transaction_id' => $transaction_id,
-                        'email_args' => $email_args,
-                        'attachment' => array( $attachment ),
-                    ));
+                    if( $transaction_type === 'INVOICE' ) {
 
-                    $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
-                    $admin_email->recipient = get_option('admin_email');
-                    $admin_email->trigger( array(
-                        'transaction_id' => $transaction_id,
-                        'email_args' => $email_args,
-                    ));
+                        $customer_email = WC()->mailer()->emails['invoice_email_paid'];
+                        $customer_email->recipient = $BillingEmail;
+                        $customer_email->trigger( array(
+                            'transaction_id' => $transaction_id,
+                            'email_args' => $email_args,
+                            'attachment' => array( $attachment ),
+                        ));
+
+                        $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
+                        $admin_email->trigger( array(
+                            'transaction_id' => $transaction_id,
+                            'email_args' => $email_args,
+                        ));
+
+                    } else {
+                        $customer_email = WC()->mailer()->emails['transaction_email'];
+                        $customer_email->recipient = $BillingEmail;
+                        $customer_email->trigger( array(
+                            'transaction_id' => $transaction_id,
+                            'email_args' => $email_args,
+                        ));
+
+                        $admin_email = WC()->mailer()->emails['transaction_email_admin'];
+                        $admin_email->trigger( array(
+                            'transaction_id' => $transaction_id,
+                            'email_args' => $email_args,
+                        ));
+                    }
 
 				    wp_send_json( array(
 					    'result' => 'success',
@@ -1188,75 +1207,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             return apply_filters('usb_swiper_get_email_content', $email_content);
         }
 
-
-		/**
-         * Transaction Email send to admin and user.
-         *
-         * @since 1.0.0
-         *
-		 * @param $transaction_id
-		 */
-		public function send_emails( $transaction_id, $args = array(), $attachment = ''  ) {
-
-		    if( empty( $transaction_id)) {
-		        return;
-		    }
-
-			if ( ! class_exists( 'WC_Email', false ) ) {
-				include_once dirname( WC_PLUGIN_FILE ) . '/includes/emails/class-wc-email.php';
-			}
-
-			$WC_Email = new WC_Email();
-			$get_headers = $WC_Email->get_headers();
-
-			$transaction = get_post($transaction_id);
-		    $transaction_author = !empty( $transaction->post_author ) ? $transaction->post_author : '';
-		    $author_email = '';
-		    if( !empty( $transaction_author ) && $transaction_author > 0 ) {
-			    $user_info = get_user_by( 'id', $transaction_author );
-			    $author_email = !empty( $user_info->user_email ) ? $user_info->user_email : '';
-                $author_name = !empty( $user_info->display_name ) ? $user_info->display_name : '';
-		    }
-
-		    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
-			$BillingEmail = !empty( $BillingEmail ) ? $BillingEmail : $author_email;
-            $BillingName = !empty( $args['customer_name'] ) ? $args['customer_name'] : '' ;
-            $BillingName = !empty( $BillingName ) ? $BillingName : '';
-
-            //send email to admin,
-			$admin_email = array( get_option('admin_email'), );
-			$site_title = get_option('blogname');
-			$admin_subject = sprintf(__("[%s]: New Transaction #%s",'usb-swiper'),$site_title,$transaction_id);
-            $admin_content = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
-            if( !empty( $args['invoice'] ) && (bool)$args['invoice'] ){
-                $admin_subject = sprintf(__("[%s]: New Invoice #%s",'usb-swiper'),$site_title,$transaction_id);
-                $admin_content = $this->get_invoice_email_content($transaction_id, array('email_heading' => sprintf(__('New Invoice: #%s','usb-swiper'), $transaction_id), 'display_name' => $author_name));
-            }
-			$admin_content = $WC_Email->format_string($admin_content);
-			$admin_content = $WC_Email->style_inline($admin_content);
-			wp_mail($admin_email, $admin_subject, $admin_content, $get_headers);
-
-			//send email to user,
-			$user_subject = sprintf( __("Your %s transaction has been received!",'usb-swiper'), $site_title);
-            $user_content = $this->get_email_content($transaction_id, array('email_heading' => __('Thank you for your Transaction','usb-swiper')));
-            if( !empty( $args['invoice'] ) && (bool)$args['invoice'] ){
-                $user_subject = sprintf(__("Your %s invoice has been created!",'usb-swiper'),$site_title);
-                $payment_status = get_post_meta(  $transaction_id, '_payment_status', true);
-                $payment_status = !empty( $payment_status ) && strtolower($payment_status) === 'pending';
-                $user_content = $this->get_invoice_email_content($transaction_id, array('email_heading' => __('Thank you for your Invoice','usb-swiper'), 'payment_link' => $payment_status, 'display_name' => $BillingName));
-            }
-			$user_content = $WC_Email->format_string($user_content);
-			$user_content = $WC_Email->style_inline($user_content);
-
-            $attachment = apply_filters('usb_swiper_email_attachment', $attachment, $transaction_id);
-
-            if( !empty( $attachment ) ){
-                wp_mail($BillingEmail, $user_subject, $user_content, $get_headers, $attachment);
-            }else{
-                wp_mail($BillingEmail, $user_subject, $user_content, $get_headers);
-            }
-		}
-
 		/**
          * After logout page redirect to home page.
          *
@@ -1269,6 +1219,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			exit();
 		}
 
+        /**
+         * Added General Information title in additional info page.
+         *
+         * @return void
+         */
 		public function wc_edit_account_form_start() {
 		    ?>
             <h2 class="wc-account-title general-info"><?php _e('General Information','usb-swiper'); ?></h2>
@@ -1576,7 +1531,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         update_post_meta($transaction_id, '_payment_status', 'PENDING');
                     }
 
-
                     $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
                     $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
                     $api_log->log('Response Order Status: '.$order_status, $transaction_id);
@@ -1608,9 +1562,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$email_classes['invoice_email_pending_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-pending-admin.php';
 			$email_classes['invoice_email_paid'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid.php';
 			$email_classes['invoice_email_paid_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid-admin.php';
+			$email_classes['transaction_email'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email.php';
+			$email_classes['transaction_email_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email-admin.php';
 
 			return $email_classes;
-
 		}
 
         /**
@@ -1627,7 +1582,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             else{
 	            wp_safe_redirect( site_url().'/virtual-terminal' );
 	            exit();
-
             }
 		}
 
@@ -1704,8 +1658,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Append product price in input fields.
-         * @since   1.1.9
          *
+         * @since   1.1.9
          */
         function vt_add_product_value_in_inputs() {
             $status = false;
@@ -1723,7 +1677,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $product_name = $product->get_name();
                 $product_price = $product->get_regular_price();
-
             }
 
             $response = array(
@@ -1782,27 +1735,125 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             return $attachment;
         }
 
-        public function handel_pay_using_paypal_transaction(){
+        /**
+         * Pay using PayPal transaction handel callback function.
+         *
+         * @return void
+         */
+        public function manage_pay_with_paypal_transaction(){
 
             if( !class_exists('Usb_Swiper_Paypal_request') ) {
                 include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
             }
 
-            $orderData = !empty( $_POST['orderData'] ) ? $_POST['orderData'] : '';
-            $orderData_decode = !empty( $orderData ) ? json_decode($orderData) : '';
-            $order_id = !empty( $orderData->id ) ? $orderData->id : '';
-            $order_data_id = !empty( $orderData_decode->id ) ? $orderData_decode->id : '';
+            $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : '';
+
             $Paypal_request = Usb_Swiper_Paypal_request::instance();
-            $Paypal_request->handle_paypal_debug_id($orderData, $transaction_id);
+
+            if( !empty( $_POST['is_error'] ) ) {
+                $order_data = ! empty( $_POST['orderData'] ) ?  explode(').', $_POST['orderData']) : '';
+                $paypal_err_response = !empty($order_data[0]) ? stripslashes(trim($order_data[0])) : '';
+                $paypal_response = !empty($order_data[1]) ? json_decode(stripslashes(trim($order_data[1]))) : '';
+                $paypal_response = object_to_array( $paypal_response );
+                $Paypal_request->handle_paypal_debug_id( $paypal_response, $transaction_id);
+                $log_arr = array(
+                    'response' => array(
+                        'code' => 400,
+                        'message' => $paypal_err_response,
+                    ),
+                    'headers' => '',
+                    'body' => json_encode($paypal_response),
+                );
+                $Paypal_request->parse_response( $log_arr, '','','order_failed',$transaction_id);
+                $error_message_type = !empty( $paypal_response['name'] ) ? $paypal_response['name'] : '';
+                $error_message = !empty( $paypal_response['message'] ) ? $paypal_response['message'] : '';
+                $response = array(
+                    'message' => sprintf('%s %s', '<strong>'.$error_message_type.'</strong>', $error_message ),
+                );
+
+                wp_send_json( $response, 200 );
+            }
+
+            $order_data = ! empty( $_POST['orderData'] ) ? json_decode( stripslashes( $_POST['orderData'] ) ) : '';
+            $orderData = object_to_array( $order_data );
+            $purchase_units = ! empty( $orderData['purchase_units'][0] ) ? $orderData['purchase_units'][0] : '';
+            if( empty( $transaction_id )) {
+                $reference_id = !empty($purchase_units['reference_id']) ? $purchase_units['reference_id'] : 0;
+                $transaction_id = !empty($reference_id) ? str_replace('wc_transaction_', '', $reference_id) : 0;
+            }
+
+            $Paypal_request->handle_paypal_debug_id( $orderData, $transaction_id);
+            $log_arr = array(
+                'response' => array(
+                    'code' => 200,
+                    'message' => '',
+                ),
+                'headers' => '',
+                'body' => json_encode($orderData),
+            );
+
+            $Paypal_request->parse_response( $log_arr, '','','capture_order',$transaction_id);
+            $order_status = !empty( $orderData['status'] ) ? $orderData['status'] : '';
+            $settings = usb_swiper_get_settings('general');
+            $pay_by_invoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+            $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => $order_status)))), get_the_permalink( $pay_by_invoice_id ) );
+
+            $payment_status = 'PENDING';
+            if( !empty( $order_status ) && strtolower( $order_status ) === 'completed' ){
+                $payment_status = 'PAID';
+            }
+
+            update_post_meta($transaction_id, '_payment_status', $payment_status);
             update_post_meta($transaction_id, '_payment_response', $orderData);
 
-            $redirect_url = "";
+            $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
+            $BillingLastName = get_post_meta( $transaction_id,'BillingLastName', true);
+            $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
+            $display_name = $BillingFirstName . ' ' . $BillingLastName;
+            $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
+
+            $email_args = array(
+                'display_name' => wp_strip_all_tags($display_name)
+            );
+
+            $customer_email = WC()->mailer()->emails['invoice_email_paid'];
+            $customer_email->recipient = $BillingEmail;
+            $customer_email->trigger( array(
+                'transaction_id' => $transaction_id,
+                'email_args' => $email_args,
+                'attachment' => array( $attachment ),
+            ));
+
+            $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
+            $admin_email->recipient = get_option('admin_email');
+            $admin_email->trigger( array(
+                'transaction_id' => $transaction_id,
+                'email_args' => $email_args,
+            ));
 
             $response = array(
                 'redirect_url' => $redirect_url
             );
 
             wp_send_json( $response, 200 );
+        }
+
+        /**
+         * Add Transaction id in email subject and heading.
+         *
+         * @param $string
+         * @param $data
+         * @return array|mixed|string|string[]
+         */
+        public function format_email_subject_and_heading( $string, $data ) {
+
+            $transaction_id = !empty( $data->profile_args['transaction_id'] ) ? $data->profile_args['transaction_id'] : '';
+
+            if( !empty( $transaction_id ) ) {
+                $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
+            }
+
+            return $string;
         }
 	}
 }

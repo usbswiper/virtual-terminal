@@ -40,6 +40,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-notification p.notification span {display:block !important; }
 .vt-form-contents {width: 100%;}
 .vt-form-contents .vt-row {width: 100%;position: relative;}
+.invoice-content-main-wrap .vt-row {flex-direction: column;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
 .vt-form-contents .vt-row .vt-col.vt-col-payments { margin-top: 20px}
 .vt-form-contents .vt-row .vt-col.vt-col-pay-by-invoice.fixed {position: fixed;top: 18%;bottom: auto;right:23.5%;width: 22%;margin: 0;}
@@ -139,7 +140,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .transaction_history_receipt_info{list-style: none;}
 }
 
-/*== start of code for tooltips ==*/
 .tool {
     cursor: pointer;
     position: relative;
@@ -150,8 +150,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     color: #FFF;
 }
 
-
-/*== common styles for both parts of tool tip ==*/
 .tool::before,
 .tool::after {
     left: 50%;
@@ -169,8 +167,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     z-index: 100;
 }
 
-
-/*== pointer tip ==*/
 .tool::before {
     border-left: 1em solid transparent;
     border-right: 1em solid transparent;
@@ -188,8 +184,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;
 }
 
-
-/*== speech bubble ==*/
 .tool::after {
     background: #3E474F;
     border-radius: .25em;

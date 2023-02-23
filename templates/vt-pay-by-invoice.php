@@ -19,17 +19,7 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
 ?>
 
 <div id="content" class="invoice-content-main-wrap main-content woocommerce">
-    <div class="vt-form-notification">
-        <?php
-        if( !empty( $notifications ) && is_array( $notifications ) ) {
-            foreach ( $notifications as $key => $notification ) {
-                $type = !empty( $notification['type'] ) ? $notification['type'] : '';
-                $message = !empty( $notification['message'] ) ? $notification['message'] : '';
-                echo "<p class='notification {$type}'>{$message}</p>";
-            }
-        }
-        ?>
-    </div>
+    <div class="vt-form-notification"></div>
     <form method="post" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
         <div class="vt-form-contents">
             <div class="vt-row">
@@ -64,25 +54,33 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                 createOrder: function (data, actions) {
                                                                     return actions.order.create(<?php echo !empty($response) ? $response : ''; ?>);
                                                                 },
-
                                                                 onApprove: function (data, actions) {
                                                                     return actions.order.capture().then(function (orderData) {
-                                                                        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
                                                                         jQuery.ajax({
                                                                             url: usb_swiper_settings.ajax_url,
                                                                             type: 'POST',
                                                                             dataType: 'json',
-                                                                            data: "orderData="+JSON.stringify( orderData )+"&action=handel_pay_using_paypal_transaction",
+                                                                            data: "orderData="+JSON.stringify( orderData )+"&action=manage_pay_with_paypal_transaction&transaction_id=<?php echo $invoice_id; ?>",
                                                                         }).done(function ( response ) {
-
-                                                                            if( response.status) {
+                                                                            if( response) {
+                                                                                actions.redirect(response.redirect_url);
                                                                             }
                                                                         });
                                                                     });
                                                                 },
-
                                                                 onError: function (err) {
-                                                                    console.log(err);
+                                                                    jQuery.ajax({
+                                                                        url: usb_swiper_settings.ajax_url,
+                                                                        type: 'POST',
+                                                                        dataType: 'json',
+                                                                        data: "orderData="+err+"&action=manage_pay_with_paypal_transaction&is_error=true&transaction_id=<?php echo $invoice_id; ?>",
+                                                                    }).done(function ( response ) {
+                                                                        if( response.message ) {
+                                                                            const notification = jQuery('.vt-form-notification');
+                                                                            notification.html('');
+                                                                            notification.append('<p class="notification error">'+response.message+'</p>');
+                                                                        }
+                                                                    });
                                                                 }
                                                             }).render('#paypal-button-container');
                                                         }

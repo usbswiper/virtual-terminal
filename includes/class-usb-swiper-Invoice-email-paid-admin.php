@@ -4,7 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Email class for Invoice Email Paid Notification
  *
- * @since 1.1.9
  * @extends \WC_Email
  */
 
@@ -13,9 +12,7 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
     /**
      * Set email defaults
      *
-     * @since 1.1.9
      */
-
     public function __construct() {
         $this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
 
@@ -23,14 +20,14 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
         $this->id = 'invoice_email_paid_admin';
 
         // this is the title in WooCommerce Email settings
-        $this->title = 'Paid Invoice Or Transaction Email To Admin';
+        $this->title = __('Invoice Paid Email For Admin', 'usb-swiper');
 
         // this is the description in WooCommerce email settings
         $this->description = __('Email Sent when a user Paid Invoice.', 'usb-swiper');
 
         // these are the default heading and subject lines that can be overridden using the settings
-        $this->heading = __( 'USBSwiper VT - Invoice Email Paid', 'usb-swiper' );
-        $this->subject = __( 'USBSwiper VT - Invoice Email Paid', 'usb-swiper');
+        $this->heading = __( 'Invoice {#transaction_id#}', 'usb-swiper' );
+        $this->subject = __( 'USBSwiper - Invoice Paid {#transaction_id#}', 'usb-swiper');
 
         // these define the locations of the templates that this email should use
         $this->template_base  = USBSWIPER_PATH . 'templates/';
@@ -47,7 +44,6 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
      * get_content_html function.
      *
      * @return string
-     * @since 1.1.9
      */
     public function get_content_html() {
         return wc_get_template_html(
@@ -58,14 +54,12 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
                 'sent_to_admin'      => false,
                 'plain_text'         => false,
                 'email'              => $this,
-                'order'              => $this->object,
                 'admin_email'        => $this->recipient,
                 'profile_args'       => $this->profile_args
             ),
             '',
             $this->template_base,
         );
-
     }
 
 
@@ -73,7 +67,6 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
      * get_content_plain function.
      *
      * @return string
-     * @since 1.1.9
      */
     public function get_content_plain() {
         return wc_get_template_html(
@@ -84,7 +77,6 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
                 'sent_to_admin'      => false,
                 'plain_text'         => true,
                 'email'              => $this,
-                'order'              => $this->object,
                 'admin_email'        => $this->recipient,
                 'profile_args'       => $this->profile_args
             ),
@@ -97,9 +89,7 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
     /**
      * Determine if the email should actually be sent and setup email merge variables
      *
-     * @param int $user_id
-     *
-     * @since 0.1
+     * @param array $args
      */
     public function trigger( $args ) {
 
@@ -111,15 +101,12 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
 
         if($this->get_recipient()){
             $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
-
         }
     }
 
 
     /**
      * Admin Notify email form field.
-     *
-     * @since 1.0.0
      */
     public function init_form_fields() {
 
@@ -141,13 +128,13 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'USBSwiper VT - Invoice Email Paid', 'usb-swiper' ),
+                'placeholder' => __( 'USBSwiper - Invoice Paid {#transaction_id#}', 'usb-swiper'),
                 'default'     => '',
             ),
             'heading'            => array(
                 'title'       => __( 'Email Heading', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'USBSwiper VT - Invoice Email Paid', 'usb-swiper' ),
+                'placeholder' => __( 'Invoice {#transaction_id#}', 'usb-swiper' ),
                 'default'     => '',
             ),
             'additional_content' => array(
@@ -172,6 +159,6 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
             ),
         );
     }
-
 }
+
 return new UsbSwiperInvoiceEmailPaidAdmin();

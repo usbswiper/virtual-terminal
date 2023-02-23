@@ -1,22 +1,18 @@
 <?php
-
-
-
-///**
-// * Filter the cart template path to use our cart.php template instead of the theme's
-// */
+/**
+* Filter the cart template path to use our cart.php template instead of the theme's
+*/
 function usbswiper_locate_email_templates( $template, $template_name, $template_path ) {
 	$basename = basename( $template );
 	if( $basename == 'paypalconnected.php' ) {
 		$template = USBSWIPER_PATH . 'templates/emails/paypalconnected.php';
 		$template_path = USBSWIPER_PATH . 'templates/emails/' ;
-
 	}
 
 	return $template;
 }
-add_filter( 'wc_get_template', 'usbswiper_locate_email_templates', 10, 3 );
 
+add_filter( 'wc_get_template', 'usbswiper_locate_email_templates', 10, 3 );
 
 /**
  * Check usb_swiper_get_settings function exists or not.
@@ -1527,7 +1523,6 @@ function usb_swiper_price_formatter( $price ) {
 /**
  * function to return user's name
  */
-
 function usbswiper_get_user_name(){
 
     $user_name = '';
@@ -1630,3 +1625,35 @@ function usb_swiper_get_invoice_status_icon( $invoice_id ) {
 
     return apply_filters( 'usb_swiper_invoice_status_icon', $icon, $invoice_id );
 }
+
+/**
+ * Convert object into array.
+ *
+ * @param object $obj
+ * @return array $response
+ */
+function object_to_array( $obj ) {
+
+    $response = array();
+    if( !empty($obj) && ( is_object($obj) || is_array($obj) )) {
+
+        if ( is_object($obj)) {
+            $obj = (array)$obj;
+        }
+
+        foreach ($obj as $key => $field) {
+
+            if ( !empty( $field ) && ( is_object( $field ) || is_array( $field ) ) ) {
+                $converted_value = object_to_array($field);
+            } else {
+                $converted_value = $field;
+            }
+
+            $response[$key] = $converted_value;
+        }
+    }
+
+    return $response;
+}
+
+
