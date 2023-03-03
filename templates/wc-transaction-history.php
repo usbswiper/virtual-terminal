@@ -7,9 +7,9 @@ $is_email = !empty( $args['is_email'] );
 
 $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits', true);
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
-$credit_card_number = $card_last_digits.' ('.$card_brand.')';
-if( empty( $card_last_digits )) {
-    $credit_card_number = __('Credit Card','usb-swiper');
+$credit_card_number = '';
+if( ! empty( $card_last_digits )) {
+    $credit_card_number = $card_last_digits.' ('.$card_brand.')';
 }
 $company_name = get_post_meta($transaction_id,'company',true);
 
@@ -102,7 +102,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-id w-25"><span style="color:#000;font-weight: 400;"><?php _e('Receipt ID: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $transaction_id; ?></strong></li>
             <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-date w-25"><span style="color:#000;font-weight: 400;"><?php _e('Date: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
             <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="payment-status w-25"><span style="color:#000;font-weight: 400;"><?php _e('Status: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
-            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="card-details w-25"><span style="color:#000;font-weight: 400;"><?php _e('Card Detail: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $credit_card_number; ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="card-details w-25"><span style="color:#000;font-weight: 400;"><?php _e('Payment Method: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $credit_card_number; ?></strong></li>
         </ul>
     </div>
     <?php
@@ -325,7 +325,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     </div>
     <div class="transaction-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Product Details','usb-swiper'); ?></h2>
-        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 20px;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
                 <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Product Name','usb-swiper'); ?></td>
@@ -347,7 +347,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             ?>
             </tbody>
         </table>
-        <h2 class="transaction-details__title transaction-history-title"><?php _e('Item Details','usb-swiper'); ?></h2>
+        <h2 class="transaction-details__title transaction-history-title"><?php _e('Order Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>

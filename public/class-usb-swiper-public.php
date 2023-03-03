@@ -680,7 +680,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$BillingFirstName = !empty( $transaction['BillingFirstName'] ) ? $transaction['BillingFirstName'] : '';
 			$BillingLastName = !empty( $transaction['BillingLastName'] ) ? $transaction['BillingLastName'] : '';
 
-			$display_name = $BillingFirstName.' '.$BillingLastName;
+			$display_name = $BillingFirstName. ' ' . $BillingLastName;
             $transaction_type = 'TRANSACTION';
 
             if( $invoice_payment ) {
@@ -800,7 +800,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                     $email_args = array(
                         'invoice' => true,
-                        'display_name' => wp_strip_all_tags($display_name)
+                        'display_name' => wp_strip_all_tags($BillingFirstName)
                     );
 
                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
@@ -904,10 +904,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				    update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
                     $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
-                    $BillingLastName = get_post_meta( $transaction_id,'BillingLastName', true);
-                    $display_name = $BillingFirstName . ' ' . $BillingLastName;
                     $email_args = array(
-                        'display_name' => wp_strip_all_tags($display_name)
+                        'display_name' => wp_strip_all_tags($BillingFirstName)
                     );
 
                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
@@ -1833,13 +1831,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             update_post_meta($transaction_id, '_payment_response', $orderData);
 
             $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
-            $BillingLastName = get_post_meta( $transaction_id,'BillingLastName', true);
             $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
-            $display_name = $BillingFirstName . ' ' . $BillingLastName;
             $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
 
             $email_args = array(
-                'display_name' => wp_strip_all_tags($display_name)
+                'display_name' => wp_strip_all_tags($BillingFirstName)
             );
 
             $customer_email = WC()->mailer()->emails['invoice_email_paid'];

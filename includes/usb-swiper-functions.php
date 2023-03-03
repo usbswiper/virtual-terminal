@@ -631,9 +631,9 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'id' => 'BillingEmail',
                 'name' => 'BillingEmail',
                 'placeholder' => __( 'Email Address', 'usb-swiper'),
-                'required' => false,
+                'required' => true,
                 'options' => array(),
-                'attributes' => array(
+                'attributes' => array(  
                     //'maxlength' => 25
                 ),
                 'class' => 'vt-input-field',
