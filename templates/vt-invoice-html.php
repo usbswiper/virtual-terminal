@@ -111,16 +111,14 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
         <div class="address" style="width: 75%;display: inline-block;vertical-align: top;float: left;">
             <h2 style="font-size: 20px;"><?php _e('Invoice To', 'usb-swiper'); ?></h2>
             <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $billing_first_name . ' ' . $billing_last_name ; ?></p>
-            <p style="margin: 0;font-size: 12px;font-weight: 600;"><?php echo !empty( $shipping_address ) ? implode(', ',$shipping_address) : implode(', ',$billing_address); ?></p>
-            <p style="margin: 0;font-size: 12px;font-weight: 600;"><?php echo $billing_email; ?></p>
-            <p style="margin: 0;font-size: 12px;font-weight: 600;"><?php echo $billing_phone_number; ?></p>
+            <?php echo ! empty( $shipping_address ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.implode(', ',$shipping_address).'</p>' : '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.implode(', ',$billing_address).'</p>'; ?>
+            <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
+            <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
         </div>
         <div class="invoice-payment" style="width: 25%;display: inline-block;vertical-align: top;float: left;text-align: left;">
             <h2 style="font-size: 20px;"><?php _e( 'Payment Status','usb-swiper'); ?></h2>
             <p style="margin: 0;font-size: 12px;font-weight: 600;">
-                <?php if( !empty( $is_email ) ) { ?>
-                    <img style="width: 80px;float: left;position: absolute;top: 0;left: 30%;" src="<?php echo usb_swiper_get_invoice_status_icon($invoice_id); ?>" alt="logo">
-                <?php } ?>
+                <img style="width: 80px;float: left;top: 0;left: 30%;" src="<?php echo usb_swiper_get_invoice_status_icon($invoice_id); ?>" alt="logo">
             </p>
         </div>
     </section>
@@ -177,12 +175,7 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
                 <tr>
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
                     <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Handling Amount:','usb-swiper'); ?></td>
-                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Handling Amount: ','usb-swiper'); ?>"><?php echo wc_price($shipping_amount, array('currency' => $handling_amount)); ?></td>
-                </tr>
-                <tr>
-                    <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
-                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Discount : ','usb-swiper') . $discount_percentage; ?></td>
-                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Discount : ','usb-swiper') . $discount_percentage; ?>"><?php echo wc_price($shipping_amount, array('currency' => $discount_amount)); ?></td>
+                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Handling Amount: ','usb-swiper'); ?>"><?php echo wc_price($shipping_amount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr class="grand-total">
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
