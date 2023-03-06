@@ -330,7 +330,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </address>
         </div>
     </div>
-    <div class="transaction-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
+    <div class="transaction-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 20px 0;padding: 0;">
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Product Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 20px;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
@@ -354,7 +354,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             ?>
             </tbody>
         </table>
-        <h2 class="transaction-details__title transaction-history-title"><?php _e('Order Details','usb-swiper'); ?></h2>
+        <h2 class="transaction-details__title transaction-history-title"><?php _e('Order Totals','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
@@ -381,7 +381,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         </table>
     </div>
     <?php if( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
-        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
+        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 20px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
