@@ -4,6 +4,11 @@ if (!class_exists('WP_List_Table')) {
      require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
  }
 
+/**
+ * The Users_List_Table class is responsible for Users table lists.
+ *
+ * @since 1.0.0
+ */
 class Users_List_Table extends WP_List_Table {
 
 	public $user_ids = array();
@@ -14,6 +19,14 @@ class Users_List_Table extends WP_List_Table {
 
         parent::__construct();
     }
+
+    /**
+     * Prepare the table html items.
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
     public function prepare_items() {
 
     
@@ -30,6 +43,14 @@ class Users_List_Table extends WP_List_Table {
         
         $this->items = $this->get_post_data();
     }
+
+    /**
+     * Get the columns titles.
+     *
+     * @since 1.0.0
+     *
+     * @return array
+     */
     public function get_columns() {
         $columns = array(
             'id'            => __( 'ID', 'bulk-featured-image'),
@@ -39,15 +60,40 @@ class Users_List_Table extends WP_List_Table {
         );
         return $columns;
     }
+
+    /**
+     * Get hidden columns
+     *
+     * @since 1.0.0
+     *
+     * @return array
+     */
     public function get_hidden_columns() {
         return array();
     }
+
+    /**
+     * Get sortable columns list.
+     *
+     * @since 1.0.0
+     *
+     * @return array[]
+     */
     public function get_sortable_columns() {
         return array(
             'user_login' => array('user_login', false),
         );
     }
-    
+
+    /**
+     * Get default columns
+     *
+     * @since 1.0.0
+     *
+     * @param array $item get item data
+     * @param string $column_name get column name
+     * @return mixed|string|void
+     */
     public function column_default( $item, $column_name ) {
         switch( $column_name ) {
             case 'id':
@@ -60,6 +106,13 @@ class Users_List_Table extends WP_List_Table {
         }
     }
 
+    /**
+     * Get the post data.
+     *
+     * @since 1.0.0
+     *
+     * @return array
+     */
     public function get_post_data() {
        
        $results = array();

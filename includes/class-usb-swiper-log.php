@@ -164,6 +164,13 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			return $logs;
 		}
 
+        /**
+         * Get the Log files.
+         *
+         * @since 1.0.0
+         *
+         * @return array
+         */
 		public function get_log_files() {
 
 			$upload_dir = wp_upload_dir();
@@ -184,6 +191,14 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			return !empty( $files ) ? array_reverse($files) : array();
 		}
 
+        /**
+         * Get the Log file content.
+         *
+         * @since 1.0.0
+         *
+         * @param string $log get log file name.
+         * @return string
+         */
 		public function get_log_content( $log ) {
 
 			if( empty( $log ) ) {

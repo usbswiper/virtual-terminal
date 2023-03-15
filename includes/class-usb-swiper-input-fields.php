@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * Check Usb_Swiper_Input_Fields class exists or not.
+ */
 if( !class_exists('Usb_Swiper_Input_Fields')) {
 
+    /**
+     * The Usb_Swiper_Input_Fields class is responsible for the all input fields html.
+     *
+     * @since 1.0.0
+     */
 	class Usb_Swiper_Input_Fields{
 
 	    public $defaults;
@@ -35,11 +42,27 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			);
 		}
 
+        /**
+         * Parse the arguments.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return array
+         */
 		public function parse_args( $args ) {
 
 			return wp_parse_args( $args, $this->defaults );
 		}
 
+        /**
+         * Get the description field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function description( $args = array() ) {
 
 			$description = !empty($args['description']) ? $args['description'] : '';
@@ -55,6 +78,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return ob_get_clean();
 		}
 
+        /**
+         * Get the input field wrapper start html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return string
+         */
 		public function wrapper_start( $args = array()) {
 
 			if( empty($args['wrapper'])) {
@@ -66,6 +97,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return '<div class="input-field-wrap '.$wrapper_class.'">';
 		}
 
+        /**
+         * Get the input field wrapper end html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return string
+         */
 		public function wrapper_end( $args = array()) {
 
 			if( empty($args['wrapper'])) {
@@ -75,6 +114,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return '</div>';
 		}
 
+        /**
+         * Get the input field label html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return string
+         */
 		public function label( $args = array()) {
 
 			if( empty($args['label'])) {
@@ -84,6 +131,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
             return '<label for="'.$args['id'].'">'.$args['label'].'</label>';
 		}
 
+        /**
+         * Get the text input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function text( $args = array() ) {
 
 			$args = $this->parse_args($args);
@@ -134,46 +189,118 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the number input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function number( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the email input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function email( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the password input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function password( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the search input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function search( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the tel input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function tel( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the color input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function color( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the date input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function date( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the url input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.s
+         * @return false|string
+         */
 		public function url( $args = array() ) {
 
 			return $this->text($args);
 		}
 
+        /**
+         * Get the textarea input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function textarea( $args ) {
 
 			$args = $this->parse_args($args);
@@ -216,6 +343,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the select input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function select( $args ) {
 
 			$args = $this->parse_args($args);
@@ -271,6 +406,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the multiselect input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function multiselect( $args ) {
 
 			$args = $this->parse_args($args);
@@ -331,6 +474,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the checkbox input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function checkbox( $args ) {
 
 			$args = $this->parse_args($args);
@@ -375,6 +526,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the multicheckbox input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function multicheckbox( $args ) {
 
 			$args = $this->parse_args($args);
@@ -413,6 +572,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the radio input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function radio( $args ) {
 
 			$args = $this->parse_args($args);
@@ -458,6 +625,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the editor input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function editor( $args ) {
 
 			$args = $this->parse_args($args);
@@ -484,6 +659,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return $html;
 		}
 
+        /**
+         * Get the hidden input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function hidden( $args = array() ) {
 
 			$args = $this->parse_args($args);
@@ -500,6 +683,14 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			return ob_get_clean();
 		}
 
+        /**
+         * Get the button input field html.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args get all arguments.
+         * @return false|string
+         */
 		public function button( $args = array()) {
 
 		    $args = $this->parse_args($args);

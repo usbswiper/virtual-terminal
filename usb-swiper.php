@@ -179,8 +179,19 @@ require_once 'includes/class-usb-swiper.php';
 
 add_action( 'plugins_loaded', 'load_usb_swiper' );
 
+
+/**
+ * Check load_usb_swiper function exists or not.
+ *
+ * @since 1.0.0
+ */
 if( !function_exists( 'load_usb_swiper' ) ) {
 
+    /**
+     * Callback function of plugins_loaded hook.
+     *
+     * @since 1.0.0
+     */
 	function load_usb_swiper() {
 
 		$plugin = new Usb_Swiper();

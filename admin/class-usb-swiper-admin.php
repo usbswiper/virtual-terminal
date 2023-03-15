@@ -336,6 +336,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 			return $columns;
 		}
+
 		/**
 		 * Set Query for Transaction Order By
 		 *
@@ -372,6 +373,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	        }
             return $query;
         }
+
 		/**
 		 * Sortable Columns in Transaction
 		 */
@@ -383,6 +385,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	        $columns['author'] = 'author';
             return $columns;
         }
+
 		/**
          * Display transactions post type custom column html.
          *
@@ -532,6 +535,13 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			return $current_menu;
 		}
 
+        /**
+         * Exclude the form tab.
+         *
+         * @since    1.0.0
+         *
+         * @return mixed|null
+         */
 		public function exclude_form_tab() {
 
 		    return apply_filters( 'usb_swiper_exclude_form_tab' , array('logs'));
@@ -893,8 +903,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          *
          * @since 1.0.0
          *
-		 * @param int $col_id
-		 * @param array $args
+		 * @param int $col_id get column id
+		 * @param array $args get all arguments
 		 *
 		 * @return false|string
 		 */
@@ -1248,7 +1258,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          *
          * @since 1.0.0
          *
-		 */
+         * @return void
+         */
 		public function logs_settings() {
 
 		    $Usb_Swiper_Log = new Usb_Swiper_Log();
@@ -1440,7 +1451,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          *
          * @since 1.0.0
          *
-		 * @param $user_id
+		 * @param int $user_id get $user_id
 		 */
 		public function save_customer_meta_fields( $user_id ) {
 
@@ -1516,6 +1527,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	            ));
             }
         }
+
 		/**
 		 * Display Excluded Users List.
 		 *

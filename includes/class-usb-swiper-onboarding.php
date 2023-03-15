@@ -1,5 +1,11 @@
 <?php
 
+
+/**
+ * he Usb_Swiper_Onboarding class is responsible for PayPal onboarding process.
+ *
+ * @since 1.0.0
+ */
 class Usb_Swiper_Onboarding{
 
 	public $is_sandbox = '';
@@ -28,6 +34,13 @@ class Usb_Swiper_Onboarding{
 		$this->api_log = new Usb_Swiper_Log();
 	}
 
+    /**
+     * Get the default settings data.
+     *
+     * @since 1.0.0
+     *
+     * @return array
+     */
 	private function default_data() {
 
 		$is_sandbox = ($this->is_sandbox) ? 'yes' : 'no';
@@ -80,6 +93,13 @@ class Usb_Swiper_Onboarding{
         );
 	}
 
+    /**
+     * Generate the signup link.
+     *
+     * @since 1.0.0
+     *
+     * @return mixed|string|null
+     */
 	public function generate_signup_link() {
 
 		$body = self::default_data();
@@ -102,6 +122,16 @@ class Usb_Swiper_Onboarding{
 		return $this->api_request->request($host_url, $args, 'signup-link' );
 	}
 
+    /**
+     * Get the PayPal signup button html.
+     *
+     * @since 1.0.0
+     *
+     * @param string $url get button url.
+     * @param int $id get id.
+     * @param string $label get the label.
+     * @return void
+     */
 	public function paypal_signup_button( $url, $id, $label ) {
 		?>
 		<a target="_blank" class="vt-button" id="<?php echo esc_attr($id); ?>" data-paypal-onboard-complete="onboardingCallback" href="<?php echo esc_url($url); ?>" data-paypal-button="true"><?php echo esc_html($label); ?></a>

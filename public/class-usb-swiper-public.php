@@ -955,6 +955,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			exit();
 		}
 
+        /**
+         * Callback function of woocommerce_edit_account_form_start hook.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
 		public function wc_edit_account_form_start() {
 		    ?>
             <h2 class="wc-account-title general-info"><?php _e('General Information','usb-swiper'); ?></h2>
@@ -1182,6 +1189,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			wp_send_json( $response , 200 );
 		}
 
+        /**
+         * Callback function of woocommerce_after_my_account and woocommerce_after_customer_login_form hook.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
 		public function display_paypal_connect_button() {
 
             if( is_user_logged_in() ) {
@@ -1191,6 +1205,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 		}
 
+        /**
+         * Callback function of woocommerce_before_edit_account_form hook.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
 		public function wc_before_edit_account_form() {
 
 			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
@@ -1221,6 +1242,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             <?php
 		}
 
+        /**
+         * Update the transaction order status.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
         public function update_order_status() {
 
             $status = false;

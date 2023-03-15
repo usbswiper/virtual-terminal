@@ -991,7 +991,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
  *
  * @since 1.0.0
  *
- * @param array $field
+ * @param array $field get field array
  *
  * @return string $html
  */
@@ -1052,7 +1052,7 @@ function usbswiper_get_onboarding_user() {
  *
  * @since 1.0.0
  *
- * @param float|int $cart_total
+ * @param float|int $cart_total get total cart value.
  *
  * @return float|int $platform_fees
  */
@@ -1100,8 +1100,20 @@ function usbswiper_get_platform_fees( $cart_total ) {
 	return !empty( $platform_fees ) ? number_format( $platform_fees, 2, '.', '' ) : 0;
 }
 
+/**
+ * Check usb_swiper_key_generator function is exists or not.
+ *
+ * @since 1.0.0
+ */
 if (!function_exists('usb_swiper_key_generator')) {
 
+    /**
+     * Get the unique key.
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
 	function usb_swiper_key_generator() {
 		$key = md5(microtime());
 		$new_key = '';
@@ -1114,9 +1126,22 @@ if (!function_exists('usb_swiper_key_generator')) {
 	}
 }
 
-
+/**
+ * check usb_swiper_set_session function is exists or not.
+ *
+ * @since 1.0.0
+ */
 if (!function_exists('usb_swiper_set_session')) {
 
+    /**
+     * Set data in WooCommerce session.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key
+     * @param array $value
+     * @return false|void
+     */
 	function usb_swiper_set_session($key, $value) {
 
 		if (!class_exists('WooCommerce') || WC()->session == null) {
@@ -1134,9 +1159,21 @@ if (!function_exists('usb_swiper_set_session')) {
 	}
 }
 
-
+/**
+ * Check usb_swiper_get_session function is exists or not.
+ *
+ * @since 1.0.0
+ */
 if (!function_exists('usb_swiper_get_session')) {
 
+    /**
+     * Get the session by key.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key get session key.
+     * @return false|mixed
+     */
 	function usb_swiper_get_session($key) {
 
 		if (!class_exists('WooCommerce') || WC()->session == null) {
@@ -1149,8 +1186,21 @@ if (!function_exists('usb_swiper_get_session')) {
 	}
 }
 
+/**
+ * Check usb_swiper_unique_id function exists or not.
+ *
+ * @since 1.0.0
+ */
 if( !function_exists('usb_swiper_unique_id')) {
 
+    /**
+     * Get the unique id.
+     *
+     * @since 1.0.0
+     *
+     * @param array $args get all arguments
+     * @return string|void
+     */
 	function usb_swiper_unique_id( $args ) {
 
 		if( empty( $args ) ) {
@@ -1174,8 +1224,21 @@ if( !function_exists('usb_swiper_unique_id')) {
 	}
 }
 
+/**
+ * Check usb_swiper_get_unique_id_data function exists or not.
+ *
+ * @since 1.0.0
+ */
 if( !function_exists( 'usb_swiper_get_unique_id_data') ) {
 
+    /**
+     * Get the unique id data.
+     *
+     * @since 1.0.0
+     *
+     * @param string $unique_id get unique id
+     * @return array|void
+     */
 	function usb_swiper_get_unique_id_data( $unique_id  ) {
 
 		if( empty( $unique_id ) ) {
@@ -1205,6 +1268,13 @@ if( !function_exists( 'usb_swiper_get_unique_id_data') ) {
 	}
 }
 
+/**
+ * Get the currency code options.
+ *
+ * @since 1.0.0
+ *
+ * @return array
+ */
 function usbswiper_get_currency_code_options() {
 
 	$currency_code_options = get_woocommerce_currencies();
@@ -1216,6 +1286,14 @@ function usbswiper_get_currency_code_options() {
 	return $currency_code_options;
 }
 
+/**
+ * Get the default currency.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id get user id
+ * @return mixed|string
+ */
 function usbswiper_get_default_currency( $user_id = 0 ) {
 
 	if( empty( $user_id ) ) {
@@ -1235,6 +1313,13 @@ function usbswiper_get_default_currency( $user_id = 0 ) {
 	return $currency;
 }
 
+/**
+ * Get the currency symbol.
+ *
+ * @since 1.0.0
+ *
+ * @return string
+ */
 function usbswiper_get_currency_symbol() {
 
 	$currency = usbswiper_get_default_currency();
@@ -1242,11 +1327,28 @@ function usbswiper_get_currency_symbol() {
 	return get_woocommerce_currency_symbol( $currency );
 }
 
+/**
+ * Get the round amount of price.
+ *
+ * @since 1.0.0
+ *
+ * @param float $price get price.
+ * @param int $precision
+ * @return string
+ */
 function usbswiper_round_amount( $price, $precision ) {
 	$round_price = round($price, $precision);
 	return number_format($round_price, $precision, '.', '');
 }
 
+/**
+ * Get the payment status.
+ *
+ * @since 1.0.0
+ *
+ * @param string $status get payment status.
+ * @return array|string|string[]
+ */
 function usbswiper_get_payment_status( $status ) {
 
 	if( empty( $status ) ) {
@@ -1256,11 +1358,26 @@ function usbswiper_get_payment_status( $status ) {
 	return str_replace( array('_','-'),' ', $status);
 }
 
+/**
+ * Get the refund status.
+ *
+ * @since 1.0.0
+ *
+ * @return mixed|null
+ */
 function usbswiper_get_refund_status() {
 
 	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED'));
 }
 
+/**
+ * get the total refund amount.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id.
+ * @return string|void
+ */
 function get_total_refund_amount( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1305,6 +1422,14 @@ function get_total_refund_amount( $transaction_id ) {
 	return !empty( $remaining_amount ) ? number_format( $remaining_amount, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'] ) : '';
 }
 
+/**
+ * Get the transaction type.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id.
+ * @return string
+ */
 function usbswiper_get_transaction_type( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1317,6 +1442,14 @@ function usbswiper_get_transaction_type( $transaction_id ) {
 	return strtoupper( $TransactionType );
 }
 
+/**
+ * Get transaction status.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id.
+ * @return mixed|string
+ */
 function usbswiper_get_transaction_status( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1340,6 +1473,14 @@ function usbswiper_get_transaction_status( $transaction_id ) {
 	return $status;
 }
 
+/**
+ * Get the intend id.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id.
+ * @return mixed|string
+ */
 function usbswiper_get_intent_id( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1351,6 +1492,14 @@ function usbswiper_get_intent_id( $transaction_id ) {
 	return !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
 }
 
+/**
+ * Get the transaction id.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id
+ * @return mixed|string
+ */
 function usbswiper_get_transaction_id( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1374,6 +1523,15 @@ function usbswiper_get_transaction_id( $transaction_id ) {
 	return $payment_transaction_id;
 }
 
+/**
+ * Get the transaction date and time.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id.
+ * @param string $type get date type
+ * @return mixed|string
+ */
 function usbswiper_get_transaction_datetime( $transaction_id, $type = 'create_time' ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1398,6 +1556,13 @@ function usbswiper_get_transaction_datetime( $transaction_id, $type = 'create_ti
 
 }
 
+/**
+ * Get locale data.
+ *
+ * @since 1.0.0
+ *
+ * @return array|string|string[]
+ */
 function usbswiper_get_locale() {
 
 	$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
@@ -1413,11 +1578,26 @@ function usbswiper_get_locale() {
 	return !empty( $country_locale['default_locale'] ) ? str_replace('_','-', $country_locale['default_locale']) : '';
 }
 
+/**
+ * Get the brand name.
+ *
+ * @since 1.0.0
+ *
+ * @return mixed|string|null
+ */
 function usbswiper_get_brand_name() {
 	$company_name = get_user_meta( get_current_user_id(),'brand_name', true);
 	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
 
+/**
+ * Check the capture is allow or not.
+ *
+ * @since 1.0.0
+ *
+ * @param int $transaction_id get transaction id
+ * @return bool
+ */
 function usbswiper_is_allow_capture( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1440,6 +1620,14 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 	return $is_allow_capture;
 }
 
+/**
+ * Get the price in format.
+ *
+ * @since 1.0.0
+ *
+ * @param float $price get price
+ * @return array|mixed|string|string[]
+ */
 function usb_swiper_price_formatter( $price ) {
 
     if( !empty( $price ) ) {
