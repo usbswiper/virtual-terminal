@@ -43,12 +43,13 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .invoice-content-main-wrap .vt-row {flex-direction: column;margin-bottom: 20px;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
 .vt-form-contents .vt-row .vt-col.vt-col-payments { margin-top: 20px}
-.vt-form-contents .vt-row .vt-col.vt-col-pay-by-invoice.fixed {position: fixed;top: 18%;bottom: auto;right:22.5%;width: 22%;margin: 0;}
-.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 40%;bottom: auto;right:22.5%;width: 22%;}
-.vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {top: 20%;right: 17%;width: 18%;}
+.vt-form-contents .vt-row .vt-col-40 { position: relative;}
+.invoice-content-main-wrap .vt-form-contents .vt-row .vt-col.vt-col-payments:first-child {margin-top: 0;}
+.invoice-content-main-wrap .vt-payment-wrapper, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper {top: 0; transition: all 1s linear;}
+.invoice-content-main-wrap .vt-payment-wrapper.fixed, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper.fixed { position: sticky;top: 18%;bottom: auto;width: 100%;margin: 0;}
 .invoice-content-main-wrap .vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {top: 26%;right: 15%;}
 .vt-form-contents .vt-col.vt-col-100.vt-col-payments.pay-with-paypal.fixed {top: 6%;right: 15%;width: 18%;margin: 0;z-index: 99999;}
-.vt-button {color: #ffffff!important;border-width: 0px!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
+.vt-button {color: #ffffff!important;border-width: 0 !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
 .vt-button-normal {color: #3D72E7 !important;border-width: 1px !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background: #FFF;padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;border-color: #3D72E7 !important;}
 .vt-button-normal:hover{border-color: #3D72E7;}
 .input-field-wrap .sign {width: calc( 100% - 10px);position: relative;display: flex;}
@@ -123,6 +124,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .tool:hover::after, .tool:focus::after  {transition: all .65s cubic-bezier(.84,-0.18,.31,1.26);}
 .vt-col-pay-by-invoice fieldset {padding: 0;border: 0;box-shadow: unset;margin: 0;}
 .woocommerce-MyAccount-content .vt-form-notification {float: left;margin: 0;}
+.vt-repeater-field .vt-fields-wrap:nth-child(2) .vt-remove-fields-wrap {pointer-events: none;}
 @media (max-width: 760px) {
     .tool::after {font-size: .75em;margin-left: -5em;width: 10em;}
 }
@@ -152,5 +154,27 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .entry-title{display: none;}
     .woocommerce-MyAccount-content{width:100% !important;}
     .transaction_history_receipt_info{list-style: none;}
+}
+
+@media only screen and (max-width: 822px) {
+    .vt-row {flex-direction: column;padding: 0 20px;}
+    .invoice-content-main-wrap .d-flex {flex-direction: column;}
+    .invoice-content-main-wrap .invoice-wrap,.invoice-content-main-wrap .paypal-payment, .vt-row .vt-col-60,.vt-row .vt-col-40 {width: 100% !important;}
+    .vt-row .vt-col-40 {margin: 20px 0;}
+    .vt-row .vt-col {margin: 0;width: 100%}
+    .vt-form-contents .vt-col.vt-col-100.vt-col-payments.pay-with-paypal.fixed,.invoice-content-main-wrap .vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {position: unset;width: 100%; margin: 10px 0;}
+    .invoice-content-main-wrap .vt-payment-wrapper.fixed, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper.fixed {position: unset;width: 100%; margin: 20px 0 0 0;}
+    .vt-fields-wrap .input-field-wrap .vt-input-field {margin: 0;width: 100%;}
+    .vt-row fieldset {width: 100%;}
+    .vt-repeater-field .vt-fields-wrap {align-items:center;flex-wrap: wrap;}
+    .vt-form-contents .paypal-payment {padding: 0;}
+    .invoice-content-main-wrap .vt-row .vt-col-100 {width: 100%;}
+}
+
+@media only screen and (max-width: 600px) {.vt-repeater-field .vt-fields-wrap {align-items:center;flex-wrap: wrap;}
+    .vt-repeater-field .input-field-wrap:nth-child(1){width: calc(100% - 12px);margin-bottom: 10px;}
+    .vt-repeater-field .input-field-wrap:nth-child(2){width: calc(50% - 12px);}
+    .vt-repeater-field .input-field-wrap:nth-child(3){width: calc(50% - 12px);}
+    .vt-repeater-field .vt-fields-wrap:has(span) .price{width: calc(43% - 12px);}
 }
 

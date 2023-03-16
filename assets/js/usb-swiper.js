@@ -70,13 +70,12 @@ jQuery( document ).ready(function( $ ) {
             var scroll = $(window).scrollTop();
             var formobj = $('#ae-paypal-pos-form .vt-col-payments');
             var pay_by_invoice = $('#ae-paypal-pos-form .vt-col-pay-by-invoice');
+            var payment_div = $('#ae-paypal-pos-form .vt-payment-wrapper');
 
             if (fh <= scroll) {
-                formobj.addClass('fixed');
-                pay_by_invoice.addClass('fixed');
+                payment_div.addClass('fixed');
             } else {
-                formobj.removeClass('fixed');
-                pay_by_invoice.removeClass('fixed');
+                payment_div.removeClass('fixed');
             }
         });
     }

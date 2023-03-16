@@ -191,7 +191,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() || ! empty( $vt_pay_by_invoice_id ) && $vt_pay_by_invoice_id === get_the_ID()) {
 
                 $sdk_obj = $this->get_paypal_sdk_obj();
-                wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
+                wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js?enable-funding=venmo' ), array(), null, false );
                 wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
 
 				wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
@@ -222,7 +222,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
 				$sdk_obj = $this->get_paypal_sdk_obj();
-				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
+				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js?enable-funding=venmo' ), array(), null, false );
 				wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
 
 				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
