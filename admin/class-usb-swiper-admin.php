@@ -1561,6 +1561,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$is_partner_fee_exclude = !empty($_POST['partner_checkbox_input']) ? true : false;
 
 			$get_exclude_partner_users = get_option('get_exclude_partner_users', array());
+            $get_exclude_partner_users = ! empty( $get_exclude_partner_users ) ? $get_exclude_partner_users : array();
 			update_user_meta( $user_id,'brand_name', sanitize_text_field( $_POST['brand_name'] ) );
 			$brand_name = get_the_author_meta( 'brand_name', $user_id );
 			if (!empty($_POST['partner_checkbox_input'])) {
