@@ -1449,7 +1449,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta($current_user_id, 'verification_form_data', true );
 
                 $brand_name = get_user_meta( get_current_user_id(),'brand_name', true);
-                if( ! empty( $brand_name ) ) {
+                if( empty( $brand_name ) ) {
                     update_user_meta($current_user_id ,'brand_name', $company_name);
                 }
 
