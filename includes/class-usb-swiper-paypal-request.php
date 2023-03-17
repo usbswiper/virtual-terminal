@@ -313,7 +313,7 @@ class Usb_Swiper_Paypal_request{
         $transaction_type = get_post_meta($transaction_id,'_transaction_type', true);
 
         $platform_fees = usbswiper_get_platform_fees( $order_total, strtolower($transaction_type),$transaction_id );
-        if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $payment_action ) {
+        if( !empty( $platform_fees ) && 'capture' == $payment_action ) {
 
             if ($this->is_sandbox) {
                 $admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
