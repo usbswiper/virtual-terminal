@@ -175,6 +175,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .vt-repeater-field .input-field-wrap:nth-child(1){width: calc(100% - 12px);margin-bottom: 10px;}
     .vt-repeater-field .input-field-wrap:nth-child(2){width: calc(50% - 12px);}
     .vt-repeater-field .input-field-wrap:nth-child(3){width: calc(50% - 12px);}
-    .vt-repeater-field .vt-fields-wrap:has(span) .price{width: calc(43% - 12px);}
+    .vt-repeater-field .vt-fields-wrap:has(svg) .price{width: calc(42% - 12px);}
 }
 
