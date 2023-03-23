@@ -25,6 +25,8 @@ if( $has_transactions ) : ?>
 			foreach ( $transactions as $transaction ) {
 
                 $id = !empty($transaction->ID) ? esc_html( $transaction->ID ) : 0;
+                $transaction_type = get_post_meta( $id, '_transaction_type', true);
+                $user_invoice_id = get_post_meta( $id, '_user_invoice_id', true);
                 $grand_total = get_post_meta( $id, 'GrandTotal', true );
                 $payment_response = get_post_meta( $id, '_payment_response', true);
                 $global_payment_status = get_post_meta( $id, '_payment_status', true);
@@ -47,7 +49,7 @@ if( $has_transactions ) : ?>
                 ?>
 
 				<tr class="woocommerce-transactions-table__row woocommerce-transactions-table__row--status-<?php echo !empty( $payment_status ) ? esc_attr( strtolower($payment_status) ) : ''; ?> transactions">
-					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo $id; ?></td>
+					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php if( 'invoice' === strtolower( $transaction_type ) ){ echo $user_invoice_id; } else { echo $id; } ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-title"><?php echo !empty($transaction->post_title) ? esc_html( $transaction->post_title ) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-status"><?php echo !empty( $payment_status ) ? strtoupper(usbswiper_get_payment_status(esc_attr($payment_status))) : '-'; ?></td>

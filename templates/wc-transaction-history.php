@@ -18,7 +18,7 @@ if( ! empty( $card_last_digits )) {
     }
 }
 $company_name = get_post_meta($transaction_id,'company',true);
-
+$user_invoice_id = get_post_meta( $transaction_id, '_user_invoice_id', true);
 $NetAmount = get_post_meta( $transaction_id, 'NetAmount', true);
 $NetAmount = usb_swiper_price_formatter($NetAmount);
 $ShippingAmount = get_post_meta( $transaction_id, 'ShippingAmount', true);
@@ -103,7 +103,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     ?>
     <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
         <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;" class="transaction-basic-info">
-            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-id w-25"><span style="color:#000;font-weight: 400;"><?php _e('Receipt ID: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $transaction_id; ?></strong></li>
+            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-id w-25"><span style="color:#000;font-weight: 400;"><?php _e('Receipt ID: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php if( 'invoice' === strtolower( $transaction_type ) ){ echo $user_invoice_id; } else { echo $transaction_id; }?></strong></li>
             <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-date w-25"><span style="color:#000;font-weight: 400;"><?php _e('Date: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
             <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="payment-status w-25"><span style="color:#000;font-weight: 400;"><?php _e('Status: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
             <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="card-details w-25"><span style="color:#000;font-weight: 400;"><?php _e('Payment Method: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $credit_card_number; ?></strong></li>

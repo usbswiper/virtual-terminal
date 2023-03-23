@@ -698,10 +698,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if( !is_wp_error( $transaction_id ) ) {
 
+                $user_invoice_id = count_user_invoice_numbers();
                 update_post_meta($transaction_id, '_transaction_type', $transaction_type);
                 update_post_meta($transaction_id, '_transaction_user_id', get_current_user_id());
+                update_post_meta($transaction_id, '_user_invoice_id', sprintf("%04d", $user_invoice_id ) );
+
                 if( !empty( $invoice_status ) ){
-                    update_post_meta($transaction_id, '_payment_status', $invoice_status);
+                    $test = sprintf("%03d", $invoice_status );
+                    update_post_meta($transaction_id, '_payment_status', $invoice_status );
                 }
 
                 wp_update_post( array(
@@ -1377,6 +1381,24 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				));
 				?>
             </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_invoice_prefix(),
+                    'id' => 'InvoicePrefix',
+                    'name' => 'InvoicePrefix',
+                    'label' => __( 'Invoice Prefix', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
             <div class="woocommerce-form-row paypal-disconnect-button"><?php $this->paypal_disconnect_button(); ?></div>
             <div class="clear"></div>
             <?php
@@ -1394,8 +1416,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if ( is_user_logged_in() ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
+				$invoice_prefix = !empty( $_POST['InvoicePrefix'] ) ? sanitize_text_field($_POST['InvoicePrefix']) : '';
 				update_user_meta( $user_id, "_primary_currency", $primary_currency );
 				update_user_meta( $user_id, "brand_name", $brand_name );
+				update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
 			}
 		}
 
@@ -1872,7 +1896,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $transaction_id = !empty( $data->profile_args['transaction_id'] ) ? $data->profile_args['transaction_id'] : '';
 
             if( !empty( $transaction_id ) ) {
-                $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
+                $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
+
+                if( 'invoice' === strtolower( $transaction_type ) ){
+                    $user_invoice_id = get_post_meta( $transaction_id,'_user_invoice_id', true );
+                    $string  = str_replace('{#transaction_id#}', '#'.$user_invoice_id, $string );
+                } else {
+                    $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
+                }
             }
 
             return $string;

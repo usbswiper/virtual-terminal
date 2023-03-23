@@ -1,5 +1,6 @@
 <?php
 $invoice_id = !empty($args['invoice_id']) ? (int)$args['invoice_id'] : "";
+$user_invoice_id = get_post_meta( $invoice_id, '_user_invoice_id', true);
 $is_email = !empty( $args['is_email'] );
 $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $invoice_id);
@@ -97,7 +98,7 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
         </div>
         <div class="invoice-date" style="width: 50%;display: inline-block;vertical-align: top;float: left;text-align: right;">
             <p class="invoice-number">
-                <span class="invoice-title" style="font-size: 20px;font-weight: bold;"><?php echo sprintf( __('Invoice: #%s', 'usb-swiper'), '<span style="color: #4361ee;">'.$invoice_id.'</span>'); ?></span>
+                <span class="invoice-title" style="font-size: 20px;font-weight: bold;"><?php echo sprintf( __('Invoice: #%s', 'usb-swiper'), '<span style="color: #4361ee;">'.$user_invoice_id.'</span>'); ?></span>
             </p>
             <p style="margin: 0" class="invoice-created-date">
                 <span style="font-weight: bold;" class="invoice-title"><?php echo  sprintf( __('Invoice Date: %s', 'usb-swiper'), '<span style="font-weight: normal;">'.get_the_date('d M Y', $invoice_id).'</span>'); ?></span>

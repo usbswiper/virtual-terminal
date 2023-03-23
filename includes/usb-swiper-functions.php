@@ -1489,6 +1489,32 @@ function usbswiper_get_brand_name() {
 	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
 
+/**
+ * Get the current user invoice prefix value.
+ *
+ * @since 1.1.17
+ *
+ * @return mixed|string
+ */
+function usbswiper_get_invoice_prefix() {
+    $invoice_prefix = get_user_meta( get_current_user_id(),'invoice_prefix', true);
+    return !empty( $invoice_prefix ) ? $invoice_prefix : '';
+}
+
+/**
+ * Create the invoice id with the prefix.
+ *
+ * @since 1.1.17
+ *
+ * @param int $transaction_id
+ * @param int $InvoiceID
+ * @return string
+ */
+function usbswiper_create_invoice_prefix($transaction_id, $InvoiceID){
+    $invoice_prefix = usbswiper_get_invoice_prefix();
+    return !empty( $invoice_prefix ) ? $invoice_prefix . $InvoiceID : 'VT-' . $transaction_id . '_' . $InvoiceID;
+}
+
 function usbswiper_is_allow_capture( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -1656,4 +1682,36 @@ function object_to_array( $obj ) {
     return $response;
 }
 
+/**
+ * This function will count invoice of user.
+ *
+ * @param int $user_id
+ * @param string $post_type
+ * @return mixed
+ */
+function count_user_invoice_numbers( $count = 0, $paged = 1 ){
 
+    if( !is_user_logged_in()) {
+        return 0;
+    }
+
+    $args = array(
+        'post_type' => 'transactions',
+        'author__in' => array( get_current_user_id() ),
+        'posts_per_page' => 2,
+        'paged' => $paged,
+        'meta_key' => '_transaction_type',
+        'meta_value' => 'INVOICE'
+    );
+
+    $query = new WP_Query( $args );
+
+    $count = $count + $query->post_count;
+
+    if( round($query->max_num_pages) > $paged ){
+        $next_page = $paged + 1;
+        $count = count_user_invoice_numbers( $count, $next_page);
+    }
+
+    return $count;
+}
