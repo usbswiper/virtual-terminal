@@ -1480,3 +1480,20 @@ if( !function_exists('usb_swiper_get_field_value') ) {
         return  !empty( $settings[$field] ) ? $settings[$field]: '';
     }
 }
+
+/**
+ * Get button background color by email domain.
+ *
+ * @since 1.1.17
+ *
+ * @param string $email_id get email id
+ * @param boolean $is_email
+ * @return string
+ */
+function get_button_background_color( $email_id, $is_email = false ) {
+    $background_color = 'linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%)';
+    if( !empty($email_id) && strpos(strtolower($email_id), '@outlook.com') !== false && $is_email){
+        $background_color = '#53a0fe';
+    }
+    return $background_color;
+}

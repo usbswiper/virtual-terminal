@@ -21,6 +21,9 @@ $merchant_business_name = get_user_meta($user_id ,'billing_company', true);
 $merchant_business_address = get_user_meta($user_id ,'billing_address_1', true);
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
+$recipient_email = !empty( $email->recipient ) ? $email->recipient : '';
+$button_background = get_button_background_color($recipient_email, true);
+
 ?>
     <div class="verification-email-wrapper">
         <p><?php echo sprintf(__('Hello %s,','usb-swiper'), 'Admin'); ?></p>
@@ -31,7 +34,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
         <p><?php echo sprintf( __("Business Name: %s", "usb-swiper"), $merchant_business_name); ?></p>
         <p><?php echo sprintf( __("Business Address: %s", "usb-swiper"), $merchant_business_address); ?></p>
         <p><?php _e("Please underwrite this user and click below to verify them when ready.", "usb-swiper"); ?></p>
-        <p style="text-align: center;display: block;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding:15px 30px;text-decoration: none;display: inline-block;margin-bottom: 10px;cursor: pointer;" target='_blank' href="<?php echo $profile_link.'#verify_data'; ?>"><?php _e('VERIFY MERCHANT','usb-swiper'); ?></a></p>
+        <p style="text-align: center;display: block;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;display: inline-block;margin-bottom: 10px;cursor: pointer;" target='_blank' href="<?php echo $profile_link.'#verify_data'; ?>"><?php _e('VERIFY MERCHANT','usb-swiper'); ?></a></p>
     </div>
 <?php
 if ( $additional_content ) {
