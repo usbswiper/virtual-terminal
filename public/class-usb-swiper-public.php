@@ -1278,6 +1278,61 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			$get_countries = WC()->countries->get_countries();
 		    ?>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'select',
+                    'id' => 'TransactionCurrency',
+                    'name' => 'TransactionCurrency',
+                    'label' => __( 'Currency', 'usb-swiper'),
+                    'required' => true,
+                    'options' => usbswiper_get_currency_code_options(),
+                    'default' => usbswiper_get_default_currency(),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Select',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_brand_name(),
+                    'id' => 'BrandName',
+                    'name' => 'BrandName',
+                    'label' => __( 'Brand Name', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_invoice_prefix(),
+                    'id' => 'InvoicePrefix',
+                    'name' => 'InvoicePrefix',
+                    'label' => __( 'Invoice Prefix', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
@@ -1350,61 +1405,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     </tr>
                 </tbody>
             </table>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-	            <?php
-	            echo  usb_swiper_get_html_field( array(
-		            'type' => 'select',
-		            'id' => 'TransactionCurrency',
-		            'name' => 'TransactionCurrency',
-		            'label' => __( 'Currency', 'usb-swiper'),
-		            'required' => true,
-		            'options' => usbswiper_get_currency_code_options(),
-		            'default' => usbswiper_get_default_currency(),
-		            'attributes' => '',
-		            'description' => '',
-		            'readonly' => false,
-		            'disabled' => false,
-		            'class' => 'woocommerce-Select',
-                    'wrapper' => false
-	            ));
-	            ?>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-				<?php
-
-				echo  usb_swiper_get_html_field( array(
-					'type' => 'text',
-					'value' => usbswiper_get_brand_name(),
-					'id' => 'BrandName',
-					'name' => 'BrandName',
-					'label' => __( 'Brand Name', 'usb-swiper'),
-					'attributes' => '',
-					'description' => '',
-					'readonly' => false,
-					'disabled' => false,
-					'class' => 'woocommerce-Input woocommerce-Input--text input-text',
-					'wrapper' => false
-				));
-				?>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-                <?php
-
-                echo  usb_swiper_get_html_field( array(
-                    'type' => 'text',
-                    'value' => usbswiper_get_invoice_prefix(),
-                    'id' => 'InvoicePrefix',
-                    'name' => 'InvoicePrefix',
-                    'label' => __( 'Invoice Prefix', 'usb-swiper'),
-                    'attributes' => '',
-                    'description' => '',
-                    'readonly' => false,
-                    'disabled' => false,
-                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
-                    'wrapper' => false
-                ));
-                ?>
-            </p>
             <div class="woocommerce-form-row paypal-disconnect-button"><?php $this->paypal_disconnect_button(); ?></div>
             <div class="clear"></div>
             <?php
@@ -1921,7 +1921,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $brand_name = !empty( $brand_name ) ? $brand_name : 'USBSwiper';
                     $string  = str_replace('{#transaction_id#}', '#'.$user_invoice_id, $string );
                     $string  = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
-                    $string  = str_replace('{#merchant_brand_name#}', '#'.$brand_name, $string );
+                    $string  = str_replace('{#merchant_brand_name#}', $brand_name, $string );
                 } else {
                     $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
                 }

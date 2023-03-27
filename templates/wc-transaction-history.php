@@ -190,45 +190,44 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 
         $ShippingPhoneNumber = get_post_meta( $transaction_id, 'ShippingPhoneNumber', true);
         $ShippingEmail = get_post_meta( $transaction_id, 'ShippingEmail', true);
-
         ?>
 
         <?php if( !$is_email ) { ?>
-        <!-- Receipt Information-->
-        <div style="width: calc(33% - 15px);vertical-align: top;margin-left: 10px;float: left;" class=" form-detail show-me-only-in-print">
+            <!-- Receipt Information-->
+            <div style="width: calc(33% - 15px);vertical-align: top;margin-left: 10px;float: left;" class=" form-detail show-me-only-in-print">
 
-            <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
-                <li class="transaction_history_receipt_info">
-                    <strong>
-                        <?php _e('Receipt ID : ','usb-swiper'); ?>
-                    </strong>
-                    <?php echo $transaction_id; ?>
-                </li>
-                <li class="transaction_history_receipt_info">
-                    <strong>
-                        <?php _e('Date : ','usb-swiper'); ?>
-                    </strong>
-                    <?php echo get_the_date('Y-m-d',$transaction_id); ?>
-                </li>
-                <li class="transaction_history_receipt_info">
-                    <strong>
-                        <?php _e('Status : ','usb-swiper'); ?>
+                <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
+                    <li class="transaction_history_receipt_info">
+                        <strong>
+                            <?php _e('Receipt ID : ','usb-swiper'); ?>
+                        </strong>
+                        <?php echo $transaction_id; ?>
+                    </li>
+                    <li class="transaction_history_receipt_info">
+                        <strong>
+                            <?php _e('Date : ','usb-swiper'); ?>
+                        </strong>
+                        <?php echo get_the_date('Y-m-d',$transaction_id); ?>
+                    </li>
+                    <li class="transaction_history_receipt_info">
+                        <strong>
+                            <?php _e('Status : ','usb-swiper'); ?>
 
-                    </strong>
+                        </strong>
 
-                    <?php echo usbswiper_get_payment_status($payment_status); ?>
-                </li>
-                <li class="transaction_history_receipt_info">
-                    <strong>
-                        <?php _e('Card Detail : ','usb-swiper'); ?>
-                    </strong><?php echo $credit_card_number; ?>
+                        <?php echo usbswiper_get_payment_status($payment_status); ?>
+                    </li>
+                    <li class="transaction_history_receipt_info">
+                        <strong>
+                            <?php _e('Card Detail : ','usb-swiper'); ?>
+                        </strong><?php echo $credit_card_number; ?>
 
-                </li>
-            </ul>
-        </div>
+                    </li>
+                </ul>
+            </div>
         <?php }  ?>
         <!-- Billing Address-->
-        <div style="float: left;display: inline-block;vertical-align: top;margin-right: 10px;<?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
+        <div style="float: left;display: inline-block;vertical-align: top;margin-right: 10px;width: calc( 50% - 10px ); <?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
             <h2 class="transaction-details__title transaction-history-title"><?php _e('Billing Address','usb-swiper'); ?></h2>
             <address class="address-wrap" >
                 <p style="margin-bottom: 0"><strong><?php echo $company_name ;?></strong></p>
@@ -254,18 +253,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     </p>
                     <?php
                 }
-                ?>
-
-
-                <?php
                 if(!empty($BillingPhoneNumber)){
                     ?>
                     <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
                     <?php
                 }
-                ?>
-
-                <?php
                 if(!empty($BillingEmail)){
                     ?>
                     <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
@@ -275,11 +267,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </address>
         </div>
         <!--Shipping Address-->
-        <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
+        <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
             <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
             <address class="address-wrap" >
-                <?php if( 'true' !== $shippingDisabled ) { ?>
-                    <?php if( 'true' !== $shippingSameAsBilling ) { ?>
+                <?php if( 'true' !== $shippingDisabled ) {
+                    if( 'true' !== $shippingSameAsBilling ) { ?>
                         <!-- Splitting the Address Values-->
                         <?php  if (!empty($shipping_address)){
 
@@ -293,10 +285,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                             $shipping_address_country  = !empty( $shipping_address['country'] ) ? $shipping_address['country'] : '' ;
                             ?>
                             <p>
-                                <?php  echo esc_attr($shipping_address_first_name) . ' ' .   esc_attr($shipping_address_last_name) . '</br>';
+                                <?php  echo esc_attr($shipping_address_first_name) . ' ' .   esc_attr($shipping_address_last_name) . ',<br/>';
                                 echo sprintf( '%s %s', ! empty( $shipping_address_street1 ) ? esc_attr($shipping_address_street1).',' : '', ! empty( $shipping_address_street2 ) ? esc_attr($shipping_address_street2) : '' ). ' <br/>';
                                 echo sprintf( '%s %s %s', ! empty( $shipping_address_city ) ? esc_attr($shipping_address_city).',' : '', ! empty( $shipping_address_state ) ? esc_attr($shipping_address_state) : '', ! empty( $shipping_address_pincode ) ? ' - '.esc_attr($shipping_address_pincode) : '' ). ' <br/>';
-                                echo esc_attr($shipping_address_country) . '</br>';
+                                echo esc_attr($shipping_address_country) . ' <br/>';
                                 ?>
                             </p>
                             <?php
@@ -306,10 +298,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                         <p class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
                     <?php } else { ?>
                         <p>
-                            <?php  echo esc_attr($billing_address_first_name) . ' ' .   esc_attr($billing_address_last_name) . '</br>';
-                            echo esc_attr($billing_address_street1) . ', ' . esc_attr($billing_address_street2) . '</br>';
-                            echo esc_attr($billing_address_city) . ', ' . esc_attr($billing_address_state) . '-' . esc_attr($billing_address_pincode) . '</br>';
-                            echo esc_attr($billing_address_country) . '</br>';
+                            <?php  echo esc_attr($billing_address_first_name) . ' ' .   esc_attr($billing_address_last_name) . ',<br/>';
+                            echo esc_attr($billing_address_street1) . ', ' . esc_attr($billing_address_street2) . '<br/>';
+                            echo esc_attr($billing_address_city) . ', ' . esc_attr($billing_address_state) . '-' . esc_attr($billing_address_pincode) . ' <br/>';
+                            echo esc_attr($billing_address_country) . ' <br/>';
                             ?>
                         </p>
                         <?php
@@ -318,17 +310,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                             <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
                             <?php
                         }
-                        ?>
-
-                        <?php
                         if(!empty($BillingEmail)){
                             ?>
                             <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
                             <?php
                         }
-                        ?>
-                    <?php } ?>
-                <?php } ?>
+                    }
+                } ?>
             </address>
         </div>
     </div>
@@ -434,13 +422,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tbody>
         </table>
     </div>
-    <?php } ?>
-    <?php if( !empty( $Notes ) ) { ?>
+    <?php }
+    if( !empty( $Notes ) ) { ?>
         <div class="custom-notes transaction-history-field" style="float: left;display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Notes</strong>: %s','usb-swiper'), esc_html($Notes));?></p>
         </div>
-    <?php } ?>
-    <?php if( strtolower($transaction_type) === 'invoice' && !$is_email ){
+    <?php }
+    if( strtolower($transaction_type) === 'invoice' && !$is_email ){
         require_once USBSWIPER_PLUGIN_DIR.'/library/usb-swiper-invoice-pdf.php';
 
         $Usb_Swiper_Invoice_PDF = new Usb_Swiper_Invoice_PDF();
@@ -448,10 +436,8 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         if( !empty($get_attachment_url['invoice_url']) ){ ?>
             <a href="<?php echo esc_url( $get_attachment_url['invoice_url'] ); ?>" class="vt-button" download><?php _e('Download invoice','usb-swiper'); ?></a>
         <?php }
-        ?>
-    <?php } ?>
-
-    <?php if( !empty( $status_note ) ) { ?>
+    }
+    if( !empty( $status_note ) ) { ?>
         <div class="custom-payment-notes transaction-history-field" style="float: left;display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Payment Notes</strong>: %s','usb-swiper'), $status_note);?></p>
         </div>
@@ -468,11 +454,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         } ?>
     </div>
     <?php if( !$is_email ) { ?>
-    <div class="custom-payment-notes signature">
-        <br/>
-        <br/>
-        <p class="signature-text"><?php _e('Signature........................................','ubs-swiper') ; ?>
-        </p>
-    </div>
+        <div class="custom-payment-notes signature" style="clear:both;">
+            <br/>
+            <br/>
+            <p class="signature-text"><?php _e('Signature........................................','ubs-swiper') ; ?>
+            </p>
+        </div>
     <?php } ?>
 </div>

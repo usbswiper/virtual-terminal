@@ -1497,8 +1497,13 @@ function usbswiper_get_brand_name() {
  *
  * @return mixed|string
  */
-function usbswiper_get_invoice_prefix() {
-    $invoice_prefix = get_user_meta( get_current_user_id(),'invoice_prefix', true);
+function usbswiper_get_invoice_prefix( $transaction_id = '' ) {
+    $current_user_id = get_current_user_id();
+    if( !empty( $transaction_id ) && (int)$transaction_id > 0 ){
+        $author_id = get_post_field( 'post_author', $transaction_id );
+        $current_user_id = ! empty( $author_id ) ? $author_id : 1;
+    }
+    $invoice_prefix = get_user_meta( $current_user_id,'invoice_prefix', true);
     return !empty( $invoice_prefix ) ? $invoice_prefix : '';
 }
 
@@ -1512,8 +1517,14 @@ function usbswiper_get_invoice_prefix() {
  * @return string
  */
 function usbswiper_create_invoice_prefix($transaction_id, $InvoiceID){
-    $invoice_prefix = usbswiper_get_invoice_prefix();
-    return !empty( $invoice_prefix ) ? $invoice_prefix . $InvoiceID : 'VT-' . $transaction_id . '_' . $InvoiceID;
+    $invoice_prefix = usbswiper_get_invoice_prefix($transaction_id);
+    $transaction_type = get_post_meta($transaction_id,'_transaction_type', true);
+
+    if( empty( $transaction_type ) || ( !empty( $transaction_type ) && strtolower( $transaction_type ) !== 'invoice' ) ){
+        $transaction_type = 'trans';
+    }
+
+    return !empty( $invoice_prefix ) ? $invoice_prefix .'_'.$transaction_type.'_'. $InvoiceID : 'VT-' . $transaction_id . '_' . $InvoiceID;
 }
 
 function usbswiper_is_allow_capture( $transaction_id ) {
