@@ -1794,22 +1794,23 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function manage_pay_with_paypal_transaction(){
+        public function manage_pay_with_paypal_transaction()
+        {
 
-            if( !class_exists('Usb_Swiper_Paypal_request') ) {
-                include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+            if (!class_exists('Usb_Swiper_Paypal_request')) {
+                include_once USBSWIPER_PATH . '/includes/class-usb-swiper-paypal-request.php';
             }
 
-            $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : '';
+            $transaction_id = !empty($_POST['transaction_id']) ? $_POST['transaction_id'] : '';
 
             $Paypal_request = Usb_Swiper_Paypal_request::instance();
 
-            if( !empty( $_POST['is_error'] ) ) {
-                $order_data = ! empty( $_POST['orderData'] ) ?  explode(').', $_POST['orderData']) : '';
+            if (!empty($_POST['is_error'])) {
+                $order_data = !empty($_POST['orderData']) ? explode(').', $_POST['orderData']) : '';
                 $paypal_err_response = !empty($order_data[0]) ? stripslashes(trim($order_data[0])) : '';
                 $paypal_response = !empty($order_data[1]) ? json_decode(stripslashes(trim($order_data[1]))) : '';
-                $paypal_response = object_to_array( $paypal_response );
-                $Paypal_request->handle_paypal_debug_id( $paypal_response, $transaction_id);
+                $paypal_response = object_to_array($paypal_response);
+                $Paypal_request->handle_paypal_debug_id($paypal_response, $transaction_id);
                 $log_arr = array(
                     'response' => array(
                         'code' => 400,
@@ -1818,25 +1819,45 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'headers' => '',
                     'body' => json_encode($paypal_response),
                 );
-                $Paypal_request->parse_response( $log_arr, '','','order_failed',$transaction_id);
-                $error_message_type = !empty( $paypal_response['name'] ) ? $paypal_response['name'] : '';
-                $error_message = !empty( $paypal_response['message'] ) ? $paypal_response['message'] : '';
+                $Paypal_request->parse_response($log_arr, '', '', 'order_failed', $transaction_id);
+                $error_message_type = !empty($paypal_response['name']) ? $paypal_response['name'] : '';
+                $error_message = !empty($paypal_response['message']) ? $paypal_response['message'] : '';
                 $response = array(
-                    'message' => sprintf('%s %s', '<strong>'.$error_message_type.'</strong>', $error_message ),
+                    'message' => sprintf('%s %s', '<strong>' . $error_message_type . '</strong>', $error_message),
                 );
 
-                wp_send_json( $response, 200 );
+                wp_send_json($response, 200);
             }
 
-            $order_data = ! empty( $_POST['orderData'] ) ? json_decode( stripslashes( $_POST['orderData'] ) ) : '';
-            $orderData = object_to_array( $order_data );
-            $purchase_units = ! empty( $orderData['purchase_units'][0] ) ? $orderData['purchase_units'][0] : '';
+            $order_data = !empty($_POST['orderData']) ? json_decode(stripslashes($_POST['orderData'])) : '';
+            $orderData = object_to_array($order_data);
+            if( !empty( $orderData['links'] ) && is_array( $orderData['links'] ) ) {
+                foreach ($orderData['links'] as $key => $links) {
+                    if (!empty($links['rel']) && 'self' === $links['rel'] && !empty($links['href'])) {
+                        $order_response = $Paypal_request->request($links['href'], array(
+                            'method' => 'GET',
+                            'timeout' => 60,
+                            'redirection' => 5,
+                            'httpversion' => '1.1',
+                            'blocking' => true,
+                            'headers' => array(
+                                'Content-Type' => 'application/json',
+                                'Authorization' => 'Bearer ' . $Paypal_request->get_access_token(),
+                            ),
+                        ), 'order_response', $transaction_id);
+                        $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
+                        update_post_meta($transaction_id, '_payment_response', $order_response);
+                    }
+                }
+            }
+
+            /*$purchase_units = ! empty( $orderData['purchase_units'][0] ) ? $orderData['purchase_units'][0] : '';
             if( empty( $transaction_id )) {
                 $reference_id = !empty($purchase_units['reference_id']) ? $purchase_units['reference_id'] : 0;
                 $transaction_id = !empty($reference_id) ? str_replace('wc_transaction_', '', $reference_id) : 0;
             }
 
-            $Paypal_request->handle_paypal_debug_id( $orderData, $transaction_id);
+            $Paypal_request->handle_paypal_debug_id( $orderData, $transaction_id);*/
             $log_arr = array(
                 'response' => array(
                     'code' => 200,
@@ -1858,7 +1879,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             update_post_meta($transaction_id, '_payment_status', $payment_status);
-            update_post_meta($transaction_id, '_payment_response', $orderData);
+            //update_post_meta($transaction_id, '_payment_response', $orderData);
 
             $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
             $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
@@ -1917,7 +1938,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $user_invoice_id = get_post_meta( $transaction_id,'_user_invoice_id', true );
                     $author_id = get_post_field( 'post_author', $transaction_id );
                     $author_id = !empty($author_id) ? $author_id : 1;
-                    $brand_name = get_post_meta( $author_id,'brand_name', true );
+                    $brand_name = get_user_meta( (int)$author_id,'brand_name', true );
                     $brand_name = !empty( $brand_name ) ? $brand_name : 'USBSwiper';
                     $string  = str_replace('{#transaction_id#}', '#'.$user_invoice_id, $string );
                     $string  = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
