@@ -828,6 +828,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
             array(
                 'type' => 'text',
                 'id' => 'BillingCity',
+                'name' => 'BillingCity',
                 'placeholder' => 'BillingCity',
                 'label' => __( 'City', 'usb-swiper'),
                 'required' => true,
@@ -1689,7 +1690,7 @@ function object_to_array( $obj ) {
  * @param string $post_type
  * @return mixed
  */
-function count_user_invoice_numbers( $count = 0, $paged = 1 ){
+function count_user_invoice_numbers( $count = 1, $paged = 1 ){
 
     if( !is_user_logged_in()) {
         return 0;
@@ -1713,5 +1714,22 @@ function count_user_invoice_numbers( $count = 0, $paged = 1 ){
         $count = count_user_invoice_numbers( $count, $next_page);
     }
 
-    return $count;
+    return $count > 0 ? $count : 1;
+}
+
+/**
+ * Get button background color by email domain.
+ *
+ * @since 1.1.17
+ *
+ * @param string $email_id get email id
+ * @param boolean $is_email
+ * @return string
+ */
+function get_button_background_color( $email_id, $is_email = false ) {
+    $background_color = 'linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%)';
+    if( !empty($email_id) && strpos(strtolower($email_id), '@outlook.com') !== false && $is_email){
+        $background_color = '#53a0fe';
+    }
+    return $background_color;
 }

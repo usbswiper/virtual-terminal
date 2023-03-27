@@ -40,6 +40,7 @@ $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
 $payment_card_number = !empty( $payment_source['card']['last_digits'] ) ? $payment_source['card']['last_digits'] : '';
 $payment_card_brand = !empty( $payment_source['card']['brand'] ) ? $payment_source['card']['brand'] : '';
 $payment_card_type = !empty( $payment_source['card']['type'] ) ? $payment_source['card']['type'] : '';
+$BillingEmail = get_post_meta( $transaction_id, 'BillingEmail', true);
 
 $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
@@ -116,9 +117,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         ?>
         <div style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;color:#000;">
             <p style="color:#000;"><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
-            <?php if( !empty( $payment_link ) ){ ?>
+            <?php if( !empty( $payment_link ) ){
+                $button_background = get_button_background_color($BillingEmail,$is_email); ?>
                 <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s, To pay for this invoice please use the following link:','usb-swiper'), get_option('blogname')); ?></p>
-                <p style="text-align: center;color:#000;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding:15px 30px;text-decoration: none;margin-bottom: 10px;cursor: pointer;" href="<?php echo $payment_link; ?>"><?php echo __('Click to Pay', 'usb-swiper'); ?></a></p>
+                <p style="text-align: center;color:#000;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;margin-bottom: 10px;cursor: pointer;" href="<?php echo $payment_link; ?>"><?php echo __('Click to Pay', 'usb-swiper'); ?></a></p>
             <?php } else { ?>
                 <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s.','usb-swiper'), get_option('blogname')); ?></p>
             <?php } ?>
@@ -135,56 +137,56 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $billing_address = array();
 
         $BillingFirstName = get_post_meta( $transaction_id, 'BillingFirstName', true);
-        if( !empty($BillingFirstName)) { $billing_address[] = $BillingFirstName; }
+        if( !empty($BillingFirstName)) { $billing_address['first_name'] = $BillingFirstName; }
 
         $BillingLastName = get_post_meta( $transaction_id, 'BillingLastName', true);
-        if( !empty($BillingLastName)) { $billing_address[] = $BillingLastName; }
+        if( !empty($BillingLastName)) { $billing_address['last_name'] = $BillingLastName; }
 
         $BillingStreet = get_post_meta( $transaction_id, 'BillingStreet', true);
-        if( !empty($BillingStreet)) { $billing_address[] = $BillingStreet; }
+        if( !empty($BillingStreet)) { $billing_address['street1'] = $BillingStreet; }
 
         $BillingStreet2 = get_post_meta( $transaction_id, 'BillingStreet2', true);
-        if( !empty($BillingStreet2)) { $billing_address[] = $BillingStreet2; }
+        if( !empty($BillingStreet2)) { $billing_address['street2'] = $BillingStreet2; }
 
         $BillingCity = get_post_meta( $transaction_id, 'BillingCity', true);
-        if( !empty($BillingCity)) { $billing_address[] = $BillingCity; }
+        if( !empty($BillingCity)) { $billing_address['city'] = $BillingCity; }
 
         $BillingState = get_post_meta( $transaction_id, 'BillingState', true);
-        if( !empty($BillingState)) { $billing_address[] = $BillingState; }
+        if( !empty($BillingState)) { $billing_address['state'] = $BillingState; }
 
         $BillingPostalCode = get_post_meta( $transaction_id, 'BillingPostalCode', true);
-        if( !empty($BillingPostalCode)) { $billing_address[] = $BillingPostalCode; }
+        if( !empty($BillingPostalCode)) { $billing_address['pincode'] = $BillingPostalCode; }
 
         $BillingCountryCode = get_post_meta( $transaction_id, 'BillingCountryCode', true);
-        if( !empty($BillingCountryCode)) { $billing_address[] = $BillingCountryCode; }
+        if( !empty($BillingCountryCode)) { $billing_address['country'] = $BillingCountryCode; }
 
         $BillingPhoneNumber = get_post_meta( $transaction_id, 'BillingPhoneNumber', true);
-        $BillingEmail = get_post_meta( $transaction_id, 'BillingEmail', true);
 
         $shipping_address = array();
+
         $ShippingFirstName = get_post_meta( $transaction_id, 'ShippingFirstName', true);
-        if( !empty( $ShippingFirstName ) ) { $shipping_address[] = $ShippingFirstName; }
+        if( !empty( $ShippingFirstName ) ) { $shipping_address['first_name'] = $ShippingFirstName; }
 
         $ShippingLastName = get_post_meta( $transaction_id, 'ShippingLastName', true);
-        if( !empty( $ShippingLastName ) ) { $shipping_address[] = $ShippingLastName; }
+        if( !empty( $ShippingLastName ) ) { $shipping_address['last_name'] = $ShippingLastName; }
 
         $ShippingStreet = get_post_meta( $transaction_id, 'ShippingStreet', true);
-        if( !empty( $ShippingStreet ) ) { $shipping_address[] = $ShippingStreet; }
+        if( !empty( $ShippingStreet ) ) { $shipping_address['street1'] = $ShippingStreet; }
 
         $ShippingStreet2 = get_post_meta( $transaction_id, 'ShippingStreet2', true);
-        if( !empty( $ShippingStreet2 ) ) { $shipping_address[] = $ShippingStreet2; }
+        if( !empty( $ShippingStreet2 ) ) { $shipping_address['street2'] = $ShippingStreet2; }
 
         $ShippingCity = get_post_meta( $transaction_id, 'ShippingCity', true);
-        if( !empty( $ShippingCity ) ) { $shipping_address[] = $ShippingCity; }
+        if( !empty( $ShippingCity ) ) { $shipping_address['city'] = $ShippingCity; }
 
         $ShippingState = get_post_meta( $transaction_id, 'ShippingState', true);
-        if( !empty( $ShippingState ) ) { $shipping_address[] = $ShippingState; }
+        if( !empty( $ShippingState ) ) { $shipping_address['state'] = $ShippingState; }
 
         $ShippingPostalCode = get_post_meta( $transaction_id, 'ShippingPostalCode', true);
-        if( !empty( $ShippingPostalCode ) ) { $shipping_address[] = $ShippingPostalCode; }
+        if( !empty( $ShippingPostalCode ) ) { $shipping_address['pincode'] = $ShippingPostalCode; }
 
         $ShippingCountryCode = get_post_meta( $transaction_id, 'ShippingCountryCode', true);
-        if( !empty( $ShippingCountryCode ) ) { $shipping_address[] = $ShippingCountryCode; }
+        if( !empty( $ShippingCountryCode ) ) { $shipping_address['country'] = $ShippingCountryCode; }
 
         $ShippingPhoneNumber = get_post_meta( $transaction_id, 'ShippingPhoneNumber', true);
         $ShippingEmail = get_post_meta( $transaction_id, 'ShippingEmail', true);
@@ -234,19 +236,19 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 // Splitting the Address Values
                 if (!empty($billing_address)){
 
-                    $billing_address_first_name =  !empty( $billing_address[0] ) ? $billing_address[0] : '' ;
-                    $billing_address_last_name = !empty( $billing_address[1] ) ? $billing_address[1] : '' ;
-                    $billing_address_street1 = !empty( $billing_address[2] ) ? $billing_address[2] : '' ;
-                    $billing_address_street2 = !empty( $billing_address[3] ) ? $billing_address[3] : '' ;
-                    $billing_address_city  = !empty( $billing_address[4] ) ? $billing_address[4] : '' ;
-                    $billing_address_state = !empty( $billing_address[5] ) ? $billing_address[5] : '' ;
-                    $billing_address_pincode  = !empty( $billing_address[6] ) ? $billing_address[6] : '' ;
-                    $billing_address_country  = !empty( $billing_address[7]) ? $billing_address[7] : '' ;
+                    $billing_address_first_name =  !empty( $billing_address['first_name'] ) ? $billing_address['first_name'] : '' ;
+                    $billing_address_last_name = !empty( $billing_address['last_name'] ) ? $billing_address['last_name'] : '' ;
+                    $billing_address_street1 = !empty( $billing_address['street1'] ) ? $billing_address['street1'] : '' ;
+                    $billing_address_street2 = !empty( $billing_address['street2'] ) ? $billing_address['street2'] : '' ;
+                    $billing_address_city  = !empty( $billing_address['city'] ) ? $billing_address['city'] : '' ;
+                    $billing_address_state = !empty( $billing_address['state'] ) ? $billing_address['state'] : '' ;
+                    $billing_address_pincode  = !empty( $billing_address['pincode'] ) ? $billing_address['pincode'] : '' ;
+                    $billing_address_country  = !empty( $billing_address['country']) ? $billing_address['country'] : '' ;
                     ?>
                     <p>
                         <?php echo esc_attr($billing_address_first_name)  . ' ' .   esc_attr($billing_address_last_name)  . ',<br/>';
                         echo sprintf( '%s %s', ! empty( $billing_address_street1 ) ? esc_attr($billing_address_street1).',' : '', ! empty( $billing_address_street2 ) ? esc_attr($billing_address_street2) : '' ). ' <br/>';
-                        echo sprintf( '%s %s %s', ! empty( $billing_address_city ) ? esc_attr($billing_address_city).',' : '', ! empty( $billing_address_city ) ? esc_attr($billing_address_city) : '', ! empty( $billing_address_pincode ) ? ' - '.esc_attr($billing_address_pincode) : '' ). ' <br/>';
+                        echo sprintf( '%s %s %s', ! empty( $billing_address_city ) ? esc_attr($billing_address_city).',' : '', ! empty( $billing_address_state ) ? esc_attr($billing_address_state) : '', ! empty( $billing_address_pincode ) ? ' - '.esc_attr($billing_address_pincode) : '' ). ' <br/>';
                         echo esc_attr($billing_address_country)  . ' <br/>';
                         ?>
                     </p>
@@ -281,14 +283,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                         <!-- Splitting the Address Values-->
                         <?php  if (!empty($shipping_address)){
 
-                            $shipping_address_first_name = !empty( $shipping_address[0] ) ? $shipping_address[0] : '' ;
-                            $shipping_address_last_name = !empty( $shipping_address[1] ) ? $shipping_address[1] : '' ;
-                            $shipping_address_street1 = !empty( $shipping_address[2] ) ? $shipping_address[2] : '' ;
-                            $shipping_address_street2 = !empty( $shipping_address[3] ) ? $shipping_address[3] : '' ;
-                            $shipping_address_city  = !empty( $shipping_address[4] ) ? $shipping_address[4] : '' ;
-                            $shipping_address_state = !empty( $shipping_address[5] ) ? $shipping_address[5] : '' ;
-                            $shipping_address_pincode  = !empty( $shipping_address[6] ) ? $shipping_address[6] : '' ;
-                            $shipping_address_country  = !empty( $shipping_address[7] ) ? $shipping_address[7] : '' ;
+                            $shipping_address_first_name = !empty( $shipping_address['first_name'] ) ? $shipping_address['first_name'] : '' ;
+                            $shipping_address_last_name = !empty( $shipping_address['last_name'] ) ? $shipping_address['last_name'] : '' ;
+                            $shipping_address_street1 = !empty( $shipping_address['street1'] ) ? $shipping_address['street1'] : '' ;
+                            $shipping_address_street2 = !empty( $shipping_address['street2'] ) ? $shipping_address['street2'] : '' ;
+                            $shipping_address_city  = !empty( $shipping_address['city'] ) ? $shipping_address['city'] : '' ;
+                            $shipping_address_state = !empty( $shipping_address['state'] ) ? $shipping_address['state'] : '' ;
+                            $shipping_address_pincode  = !empty( $shipping_address['pincode'] ) ? $shipping_address['pincode'] : '' ;
+                            $shipping_address_country  = !empty( $shipping_address['country'] ) ? $shipping_address['country'] : '' ;
                             ?>
                             <p>
                                 <?php  echo esc_attr($shipping_address_first_name) . ' ' .   esc_attr($shipping_address_last_name) . '</br>';

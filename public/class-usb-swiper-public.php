@@ -642,7 +642,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     case "create_transaction":
                         $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
 
-                        if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+                        if( !empty( $transaction_id ) && (int)$transaction_id > 0 ) {
                             $this->pay_by_invoice_transaction($transaction_id);
                         } else {
                             $this->create_new_transaction();
@@ -662,6 +662,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function create_new_transaction() {
+
 			$tab_fields = usb_swiper_get_fields_for_transaction();
             $invoice_payment = isset( $_POST['PayByInvoiceDisabled'] ) && (bool)$_POST['PayByInvoiceDisabled'] === true;
             $transaction = array();
@@ -822,10 +823,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $ignore_email = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
 
                     $admin_email = WC()->mailer()->emails['invoice_email_pending_admin'];
-                    $get_recipient = $admin_email->get_recipient();
+                    $get_recipient = '';
 
                     if( true !== (bool)$ignore_email ){
-                        $get_recipient .= ','.$current_user->user_email;
+                        $get_recipient = $current_user->user_email;
                     }
 
                     $admin_email->recipient = $get_recipient;
@@ -916,11 +917,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
                     $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
 
-                    $current_user = get_user_by('id', get_current_user_id() );
-                    $ignore_email = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
+                    $current_user_id = get_current_user_id();
+                    $current_user = get_user_by('id', $current_user_id );
+                    $ignore_email = get_user_meta( $current_user_id,'ignore_transaction_email', true );
 
                     if( $transaction_type === 'INVOICE' ) {
-
+                        if( empty( $current_user_id ) || $current_user_id < 1 ){
+                            $author_id = get_post_field( 'post_author', $transaction_id );
+                            $author_id = !empty($author_id) ? $author_id : 0;
+                            $current_user = get_user_by('id', $author_id );
+                        }
                         $customer_email = WC()->mailer()->emails['invoice_email_paid'];
                         $customer_email->recipient = $BillingEmail;
                         $customer_email->trigger( array(
@@ -1871,7 +1877,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             ));
 
             $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
-            $admin_email->recipient = get_option('admin_email');
+            $get_recipient = get_option('admin_email');
+
+            $author_id = get_post_field( 'post_author', $transaction_id );
+            $author_id = ! empty( $author_id ) ? $author_id : 1;
+            $current_user = get_user_by('id', $author_id );
+            $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
+            if( true !== (bool)$ignore_email ){
+                $get_recipient .= ','.$current_user->user_email;
+            }
+            $admin_email->recipient = $get_recipient;
             $admin_email->trigger( array(
                 'transaction_id' => $transaction_id,
                 'email_args' => $email_args,
@@ -1900,7 +1915,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 if( 'invoice' === strtolower( $transaction_type ) ){
                     $user_invoice_id = get_post_meta( $transaction_id,'_user_invoice_id', true );
+                    $author_id = get_post_field( 'post_author', $transaction_id );
+                    $author_id = !empty($author_id) ? $author_id : 1;
+                    $brand_name = get_post_meta( $author_id,'BrandName', true );
+                    $brand_name = !empty( $brand_name ) ? $brand_name : 'USBSwiper';
                     $string  = str_replace('{#transaction_id#}', '#'.$user_invoice_id, $string );
+                    $string  = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
+                    $string  = str_replace('{#merchant_brand_name#}', '#'.$brand_name, $string );
                 } else {
                     $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
                 }

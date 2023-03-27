@@ -54,7 +54,22 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                     },
 
                                                                     createOrder: function (data, actions) {
-                                                                        return actions.order.create(<?php echo !empty($response) ? $response : ''; ?>);
+
+                                                                        return fetch(usb_swiper_settings.create_transaction_url+"&transaction_id=<?php echo $invoice_id; ?>", {
+                                                                            method: 'post',
+                                                                            headers: {
+                                                                                'Content-Type': 'application/x-www-form-urlencoded'
+                                                                            },
+                                                                            body: "transaction_id=<?php echo $invoice_id; ?>",
+                                                                        }).then(function (res) {
+                                                                            return res.json();
+                                                                        }).then(function (data) {
+
+                                                                            if( data.orderID ) {
+                                                                                localStorage.setItem("vt_order_id", data.orderID);
+                                                                                return data.orderID;
+                                                                            }
+                                                                        });
                                                                     },
                                                                     onApprove: function (data, actions) {
                                                                         return actions.order.capture().then(function (orderData) {

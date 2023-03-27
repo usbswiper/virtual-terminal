@@ -27,6 +27,7 @@ $tax_amount = get_post_meta($invoice_id, 'TaxAmount', true);
 $grand_total_amount = get_post_meta($invoice_id, 'GrandTotal', true);
 $vt_products = get_post_meta($invoice_id, 'vt_products', true);
 $item_names = get_post_meta($invoice_id, 'ItemName', true);
+$invoice_notes = get_post_meta($invoice_id, 'Notes', true);
 $billing_phone_number = !empty( $billing_phone_number ) ? mobile_number_format($billing_phone_number) : '-';
 
 $billing_address = array();
@@ -188,7 +189,9 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
     </section>
     <section class="invoice-footer invoice-general" style="display: block;padding: 20px;float: left;width: 100%;border-bottom: 1px solid #CCC;">
         <div class="invoice--note">
-            <p style="margin: 0;font-weight: 600;"><?php _e('Note: Thank you for doing Business with us.','usb-swiper'); ?></p>
+            <?php if( !empty( $invoice_notes ) ){ ?>
+                <p style="margin: 0;font-weight: 600;"><?php echo sprintf( __('Note: %s', 'usb-swiper'), $invoice_notes); ?></p>
+            <?php } ?>
         </div>
     </section>
 </div>
