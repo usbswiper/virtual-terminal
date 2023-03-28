@@ -102,14 +102,22 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         }
     }
     ?>
-    <div class="hide-me-in-print transaction-overview transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
-        <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;" class="transaction-basic-info">
-            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-id w-25"><span style="color:#000;font-weight: 400;"><?php _e('Receipt ID: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php if( 'invoice' === strtolower( $transaction_type ) ){ echo $user_invoice_id; } else { echo $transaction_id; }?></strong></li>
-            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="transaction-date w-25"><span style="color:#000;font-weight: 400;"><?php _e('Date: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></strong></li>
-            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="payment-status w-25"><span style="color:#000;font-weight: 400;"><?php _e('Status: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo usbswiper_get_payment_status($payment_status); ?></strong></li>
-            <li style="width: calc(25% - 5px);float: left;display: inline-block;font-size: 14px;margin-bottom: 15px;margin-left:0;color:#000;" class="card-details w-25"><span style="color:#000;font-weight: 400;"><?php _e('Payment Method: ','usb-swiper'); ?></span><strong style="display: block;padding-left: 5px;color:#000;"><?php echo $credit_card_number; ?></strong></li>
-        </ul>
-    </div>
+    <table style="width: 100%;border-radius: 0;margin-bottom: 20px;border: 0;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
+        <tbody>
+        <tr>
+            <td class="transaction-table-product-td" style="padding: 12px 12px 12px 0;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Receipt ID: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Date: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Status: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Payment Method: ','usb-swiper'); ?></td>
+        </tr>
+        <tr>
+            <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php if( 'invoice' === strtolower( $transaction_type ) ){ echo $user_invoice_id; } else { echo $transaction_id; }?></td>
+            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></td>
+            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
+            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $credit_card_number; ?></td>
+        </tr>
+        </tbody>
+    </table>
     <?php
     if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && !empty( $payment_status ) && strtolower($payment_status) === 'pending' && ( empty( $_GET['action'] ) || $_GET['action'] !== 'edit' ) && $is_email ){
         $payment_link = !empty($args['payment_link']) ? esc_url($args['payment_link']) : '';
