@@ -258,10 +258,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 * @return string $tag
 		 */
 		public function clean_paypal_checkout_sdk_url( $tag, $handle ) {
+            $settings = usb_swiper_get_settings('general');
+            $vt_page_id = !empty($settings['virtual_terminal_page']) ? (int)$settings['virtual_terminal_page'] : '';
+            $paybyinvoice_page_id = !empty($settings['vt_paybyinvoice_page']) ? (int)$settings['vt_paybyinvoice_page'] : '';
+
+            $current_page_id = get_the_ID();
+
+
             $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
             $invoice_status = !empty( $invoice_session->status ) ? $invoice_session->status : '';
 
-			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( empty($invoice_status) || $invoice_status !== 'COMPLETED' ) ) {
+			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( ( !empty($vt_page_id) && $vt_page_id === $current_page_id ) || ( !empty($paybyinvoice_page_id) && $paybyinvoice_page_id === $current_page_id && $invoice_status !== 'COMPLETED') ) ) {
 
 				if( !class_exists('Usb_Swiper_Paypal_request') ) {
 					include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
