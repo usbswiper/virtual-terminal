@@ -258,8 +258,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 * @return string $tag
 		 */
 		public function clean_paypal_checkout_sdk_url( $tag, $handle ) {
+            $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
+            $invoice_status = !empty( $invoice_session->status ) ? $invoice_session->status : '';
 
-			if ('usb-swiper-paypal-checkout-sdk' === $handle) {
+			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( empty($invoice_status) || $invoice_status !== 'COMPLETED' ) ) {
 
 				if( !class_exists('Usb_Swiper_Paypal_request') ) {
 					include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
