@@ -14,11 +14,13 @@ $vt_page_id   = ! empty( $settings['virtual_terminal_page'] ) ? (int) $settings[
 $vt_page_link = get_the_permalink( $vt_page_id );
 $myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
 
+$user = get_user_by('id', $user_id);
+$user_web_url = !empty($user->user_url) ? sanitize_url($user->user_url) : '';
 $merchant_name = get_user_meta($user_id ,'billing_first_name', true);
 $merchant_email = get_user_meta($user_id ,'billing_email', true);
 $merchant_phone = get_user_meta($user_id ,'billing_phone', true);
 $merchant_business_name = get_user_meta($user_id ,'billing_company', true);
-$merchant_business_address = get_user_meta($user_id ,'billing_address_1', true);
+$merchant_address = get_user_address($user_id);
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
 
@@ -32,7 +34,10 @@ $button_background = get_button_background_color($recipient_email, true);
         <p><?php echo sprintf( __("Email Address: %s", "usb-swiper"), $merchant_email); ?></p>
         <p><?php echo sprintf( __("Phone Number: %s", "usb-swiper"), $merchant_phone); ?></p>
         <p><?php echo sprintf( __("Business Name: %s", "usb-swiper"), $merchant_business_name); ?></p>
-        <p><?php echo sprintf( __("Business Address: %s", "usb-swiper"), $merchant_business_address); ?></p>
+        <?php if( !empty( $user_web_url ) ){ ?>
+            <p><?php echo sprintf( __("Website URL: %s", "usb-swiper"), '<a target="_blank" src="'.$user_web_url.'">'.$user_web_url.'</a>'); ?></p>
+        <?php } ?>
+        <p><?php echo sprintf( __("Business Address: %s", "usb-swiper"), $merchant_address); ?></p>
         <p><?php _e("Please underwrite this user and click below to verify them when ready.", "usb-swiper"); ?></p>
         <p style="text-align: center;display: block;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;display: inline-block;margin-bottom: 10px;cursor: pointer;" target='_blank' href="<?php echo $profile_link.'#verify_data'; ?>"><?php _e('VERIFY MERCHANT','usb-swiper'); ?></a></p>
     </div>

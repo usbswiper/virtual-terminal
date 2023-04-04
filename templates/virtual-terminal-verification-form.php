@@ -1,4 +1,7 @@
 <?php
+$get_countries = usb_swiper_get_countries();
+$get_states = usb_swiper_get_states();
+
 $form_fields = array(
     array(
         'type' => 'text',
@@ -66,19 +69,76 @@ $form_fields = array(
 		'attributes' => '',
 		'class' => ''
 	),
-	array(
-		'type' => 'textarea',
-		'id' => 'business-address',
-		'name' => 'business-address',
-		'placeholder' => __('515 NE E St, Grants Pass, Oregon, US. B31 3UB', 'usb-swiper'),
-		'label' => 'Address of Business',
-		'required' => true,
-		'options' => '',
-		'attributes' => array(
-                'rows' => 6
+    array(
+        'type' => 'text',
+        'id' => 'billing_address_1',
+        'name' => 'billing_address_1',
+        'label' => __( 'Street', 'usb-swiper'),
+        'required' => true,
+        'attributes' => array(
+            'maxlength' => 25
         ),
-		'class' => ''
-	),
+        'description' => '',
+        'class' => 'vt-billing-address-field',
+    ),
+    array(
+        'type' => 'text',
+        'id' => 'billing_address_2',
+        'name' => 'billing_address_2',
+        'label' => __( 'Street 2', 'usb-swiper'),
+        'required' => false,
+        'attributes' => array(
+            'maxlength' => 25
+        ),
+        'description' => '',
+        'class' => 'vt-billing-address-field',
+    ),
+    array(
+        'type' => 'text',
+        'id' => 'billing_city',
+        'name' => 'billing_city',
+        'label' => __( 'City', 'usb-swiper'),
+        'required' => true,
+        'attributes' => array(
+            'maxlength' => 25
+        ),
+        'description' => '',
+        'class' => 'vt-billing-address-field',
+    ),
+    array(
+        'type' => 'select',
+        'id' => 'billing_state',
+        'name' => 'billing_state',
+        'label' => __( 'State', 'usb-swiper'),
+        'required' => true,
+        'attributes' => '',
+        'options' => $get_states,
+        'description' => '',
+        'class' => 'vt-billing-address-field',
+    ),
+    array(
+        'type' => 'text',
+        'id' => 'billing_postcode',
+        'name' => 'billing_postcode',
+        'label' => __( 'Postal Code', 'usb-swiper'),
+        'required' => true,
+        'options' => array(),
+        'attributes' => array(
+            'maxlength' => 25
+        ),
+        'class' => 'vt-billing-address-field',
+    ),
+    array(
+        'type' => 'select',
+        'id' => 'billing_country',
+        'name' => 'billing_country',
+        'label' => __( 'Country', 'usb-swiper'),
+        'required' => true,
+        'attributes' => '',
+        'options' => $get_countries,
+        'description' => '',
+        'class' => 'vt-billing-address-field',
+    ),
 	array(
 		'type' => 'hidden',
 		'id' => 'vt-verification-nonce',

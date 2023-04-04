@@ -435,10 +435,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         public function add_notification_for_verify_profile(){
 
             $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
-            if($profile_status === ''){
+
+            $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
+            if(! empty( $profile_data ) && $profile_status === ''){
                 ?>
                 <div class="paypal-connect-button-wrap vt-form-notification">
-                    <p class="vt-verification-message notification success"><?php _e("Thank you for submitting verification data, our team will review it. Once the account is approved, you will be able to do the transaction !");?></p>
+                    <p class="vt-verification-message notification success"><?php _e("Thank you for providing the additional information requested.  We will review your details and let you know the status of your approval as soon as possible.","usb-swiper");?></p>
                 </div>
                 <?php
             }
@@ -1428,7 +1430,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $url              = ! empty( $_POST['website-url'] ) ? sanitize_url( $_POST['website-url'] ) : '';
                 $company_name     = ! empty( $_POST['company-name'] ) ? sanitize_text_field( $_POST['company-name'] ) : '';
                 $email            = ! empty( $_POST['email-address'] ) ? sanitize_email( $_POST['email-address'] ) : '';
-                $business_address = ! empty( $_POST['email-address'] ) ? sanitize_text_field( $_POST['business-address'] ) : '';
+                $billing_street = ! empty( $_POST['billing_address_1'] ) ? sanitize_text_field( $_POST['billing_address_1'] ) : '';
+                $billing_street2 = ! empty( $_POST['billing_address_2'] ) ? sanitize_text_field( $_POST['billing_address_2'] ) : '';
+                $billing_city = ! empty( $_POST['billing_city'] ) ? sanitize_text_field( $_POST['billing_city'] ) : '';
+                $billing_state = ! empty( $_POST['billing_state'] ) ? sanitize_text_field( $_POST['billing_state'] ) : '';
+                $billing_postal_code = ! empty( $_POST['billing_postcode'] ) ? sanitize_text_field( $_POST['billing_postcode'] ) : '';
+                $billing_country_code = ! empty( $_POST['billing_country'] ) ? sanitize_text_field( $_POST['billing_country'] ) : '';
                 $redirect_url     = get_the_permalink( get_option('woocommerce_myaccount_page_id') );
 
                 $current_user_id = get_current_user_id();
@@ -1445,7 +1452,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta($current_user_id ,'billing_company', $company_name);
                 update_user_meta($current_user_id ,'billing_phone', $phone);
                 update_user_meta($current_user_id ,'billing_email', $email);
-                update_user_meta($current_user_id ,'billing_address_1', $business_address);
+                update_user_meta($current_user_id ,'billing_address_1', $billing_street);
+                update_user_meta($current_user_id ,'billing_address_2', $billing_street2);
+                update_user_meta($current_user_id ,'billing_city', $billing_city);
+                update_user_meta($current_user_id ,'billing_state', $billing_state);
+                update_user_meta($current_user_id ,'billing_postcode', $billing_postal_code);
+                update_user_meta($current_user_id ,'billing_country', $billing_country_code);
                 update_user_meta($current_user_id, 'verification_form_data', true );
 
                 $brand_name = get_user_meta( get_current_user_id(),'brand_name', true);

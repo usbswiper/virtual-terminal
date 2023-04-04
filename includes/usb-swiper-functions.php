@@ -1497,3 +1497,37 @@ function get_button_background_color( $email_id, $is_email = false ) {
     }
     return $background_color;
 }
+
+/**
+ * Get user address in single line.
+ *
+ * @since 1.1.17
+ *
+ * @param $user_id
+ * @return string
+ */
+function get_user_address($user_id) {
+
+    $merchant_business_street = get_user_meta($user_id ,'billing_address_1', true);
+    $merchant_business_street2 = get_user_meta($user_id ,'billing_address_2', true);
+    $merchant_business_city = get_user_meta($user_id ,'billing_city', true);
+    $merchant_business_state = get_user_meta($user_id ,'billing_state', true);
+    $merchant_business_postal_code = get_user_meta($user_id ,'billing_postcode', true);
+    $merchant_business_country_code = get_user_meta($user_id ,'billing_country', true);
+
+    $merchant_business_street = !empty( $merchant_business_street ) ? $merchant_business_street : '';
+    $merchant_business_street2 = !empty( $merchant_business_street2 ) ? $merchant_business_street2 : '';
+    $merchant_business_city = !empty( $merchant_business_city ) ? $merchant_business_city : '';
+    $merchant_business_state = !empty( $merchant_business_state ) ? $merchant_business_state : '';
+    $merchant_business_postal_code = !empty( $merchant_business_postal_code ) ? $merchant_business_postal_code : '';
+    $merchant_business_country_code = !empty( $merchant_business_country_code ) ? $merchant_business_country_code : '';
+
+    $merchant_address = $merchant_business_street;
+    $merchant_address .= !empty( $merchant_address ) ? ', '.$merchant_business_street2 : '';
+    $merchant_address .= !empty( $merchant_address ) ? ', '.$merchant_business_city : '';
+    $merchant_address .= !empty( $merchant_address ) ? ', '.$merchant_business_state : '';
+    $merchant_address .= !empty( $merchant_address ) ? ', '.$merchant_business_country_code : '';
+    $merchant_address .= !empty( $merchant_address ) ? '. '.$merchant_business_postal_code : '';
+
+    return !empty( $merchant_address ) ? $merchant_address : '';
+}
