@@ -46,7 +46,7 @@ $merchant_address = get_user_address($user_id);
         <p><?php echo sprintf( __("Then click the “%sConnect to PayPal%s” button to continue setting up your account.", 'usb-swiper') ,'<a target="_blank" href="'.get_the_permalink($myaccount_page_id).'">','</a>'); ?></p>
         <p><?php _e("You’ll be using your Virtual Terminal within minutes!", 'usb-swiper'); ?></p>
         <p><?php echo sprintf(__("If you have any questions or encounter any issues, please do not hesitate to contact our support team at %s.", 'usb-swiper'),'<a href="mailto:support@usbswiper.atlassian.net">support@usbswiper.atlassian.net</a>'); ?></p>
-        <p><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;margin-bottom: 10px;cursor: pointer;" href="<?php echo $myaccount_page_url; ?>"><?php echo __('Please login', 'usb-swiper'); ?></a></p>
+        <p style="text-align:center;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;margin-bottom: 10px;cursor: pointer;" target="_blank" href="<?php echo $myaccount_page_url; ?>"><?php echo __('Continue to PayPal Connection', 'usb-swiper'); ?></a></p>
         <p><?php _e("Thank you for choosing our service.", 'usb-swiper'); ?></p>
         <p><?php _e("– USBSwiper Team", 'usb-swiper'); ?></p>
 
