@@ -114,10 +114,15 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
             <h2 style="font-size: 20px;"><?php _e('Invoice To', 'usb-swiper'); ?></h2>
             <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $billing_first_name . ' ' . $billing_last_name ; ?></p>
             <?php
-            echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '</p>';
-            echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' - '.esc_attr($shipping_postcode) : '' ). '</p>';
-            echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.esc_attr($shipping_country)  . '</p>';
-            ?>
+            if( !empty( $shipping_address ) ){
+                echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '<br />';
+                echo sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' - '.esc_attr($shipping_postcode) : '' ). '<br />';
+                echo !empty($shipping_country) ? esc_attr($shipping_country) : '' . '</p>';
+            } else {
+                echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $BillingStreet ) ? esc_attr($BillingStreet).',' : '', ! empty( $BillingStreet2 ) ? esc_attr($BillingStreet2) : '' ). '<br />';
+                echo sprintf( '%s %s %s', ! empty( $BillingCity ) ? esc_attr($BillingCity).',' : '', ! empty( $BillingState ) ? esc_attr($BillingState) : '', ! empty( $BillingPostalCode ) ? ' - '.esc_attr($BillingPostalCode) : '' ). '<br />';
+                echo !empty($BillingCountryCode) ? esc_attr($BillingCountryCode) : '' . '</p>';
+            } ?>
             <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
             <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
         </div>

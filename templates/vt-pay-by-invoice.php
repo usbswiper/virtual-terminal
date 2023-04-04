@@ -15,7 +15,6 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 
 $Paypal_request = Usb_Swiper_Paypal_request::instance();
 $response = $Paypal_request->create_transaction_request( $invoice_id,true );
-
 ?>
 
 <div id="content" class="invoice-content-main-wrap main-content woocommerce">
@@ -25,7 +24,7 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
             <div class="vt-row">
                 <?php if( empty( $invoice_id ) ){ ?>
                     <div class="vt-form-message"><?php _e('Sorry, No invoice data found.','usb-swiper'); ?></div>
-                <?php } elseif( !empty( $payment_status ) && strtolower($payment_status) === 'paid' && !empty( $invoice_status ) && strtolower($invoice_status) == 'completed' ) {
+                <?php } elseif( !empty( $payment_status ) && strtolower($payment_status) === 'paid' ) {
                     usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $invoice_id ) );
                 } else { ?>
                     <div class="d-flex">

@@ -264,11 +264,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $current_page_id = get_the_ID();
 
-
             $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
-            $invoice_status = !empty( $invoice_session->status ) ? $invoice_session->status : '';
+            $invoice_id = !empty( $invoice_session->id ) ? $invoice_session->id : '';
+            $invoice_status = get_post_meta($invoice_id, '_payment_status', true);
 
-			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( ( !empty($vt_page_id) && $vt_page_id === $current_page_id ) || ( !empty($paybyinvoice_page_id) && $paybyinvoice_page_id === $current_page_id && $invoice_status !== 'COMPLETED') ) ) {
+			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( ( !empty($vt_page_id) && $vt_page_id === $current_page_id ) || ( !empty($paybyinvoice_page_id) && $paybyinvoice_page_id === $current_page_id && strtolower($invoice_status)  === 'paid') ) ) {
 
 				if( !class_exists('Usb_Swiper_Paypal_request') ) {
 					include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
