@@ -9,12 +9,12 @@ $is_admin = !empty( $args['is_admin'] );
 $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits', true);
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
 $credit_card_number = '';
-$global_payment_status = get_post_meta( $transaction_id, '_payment_status', true);
 $payment_status = usbswiper_get_transaction_status($transaction_id);
+
 if( ! empty( $card_last_digits )) {
     $credit_card_number = $card_last_digits.' ('.$card_brand.')';
 } else {
-    if( strtolower($global_payment_status) !== 'pending' ) {
+    if( strtolower($payment_status) !== 'pending' ) {
         $credit_card_number = __('PayPal', 'usb-swiper');
     }
 }
@@ -52,9 +52,6 @@ $payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
-if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'CREATED' && $payment_status !== 'REFUNDED') || empty($payment_status) ) {
-    $payment_status = $global_payment_status;
-}
 
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
     include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
@@ -73,7 +70,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     $author_id = get_post_field( 'post_author', $transaction_id );
     $author_id = ! empty( $author_id ) ? $author_id : 1;
     $get_current_user_id = get_current_user_id();
-    if( usbswiper_is_allow_capture( $transaction_id ) && $global_payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
+    if( usbswiper_is_allow_capture( $transaction_id ) && $payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
         $unique_id = usb_swiper_unique_id( array(
            'type' => $payment_action,
            'transaction_id' => $transaction_id,

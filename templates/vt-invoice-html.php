@@ -14,7 +14,7 @@ $merchant_brand = get_user_meta( $merchant_id,'brand_name', true);
 $merchant_brand = !empty( $merchant_brand ) ? $merchant_brand : get_bloginfo('name');
 
 $transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
-$payment_status = get_post_meta($invoice_id,'_payment_status', true);
+$payment_status = usbswiper_get_transaction_status($invoice_id);
 $billing_first_name = get_post_meta($invoice_id, 'BillingFirstName', true);
 $billing_last_name = get_post_meta($invoice_id, 'BillingLastName', true);
 $billing_email = get_post_meta($invoice_id, 'BillingEmail', true);

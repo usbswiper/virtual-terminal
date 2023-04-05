@@ -1395,6 +1395,13 @@ function usbswiper_get_transaction_status( $transaction_id ) {
 		return '';
 	}
 
+    $payment_intent = usbswiper_get_transaction_type($transaction_id);
+    $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : '';
+
+    $global_payment_status = get_post_meta( $transaction_id, '_payment_status', true);
+
+    $transaction_type = usbswiper_get_invoice_transaction_type($transaction_id);
+
 	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
 	$status = !empty( $payment_response['status'] ) ? $payment_response['status'] : '';
 
@@ -1405,11 +1412,21 @@ function usbswiper_get_transaction_status( $transaction_id ) {
 
 	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
 		$status = !empty( $captures['status']) ? $captures['status'] : '';
-	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
+        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && $payment_intent === 'authorize' && $status === 'COMPLETED' ) {
+            $status = __('Paid', 'usb-swiper');
+        }
+	} elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
 		$status = !empty( $authorizations['status']) ? $authorizations['status'] : '';
+        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && $payment_intent === 'authorize' ) {
+            $status = __('Authorized', 'usb-swiper');
+        }
 	}
 
-	return $status;
+    if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && !in_array($status , array('PARTIALLY_REFUNDED', 'CREATED', 'Authorized', 'REFUNDED', 'Paid')) )) {
+        $status = $global_payment_status;
+    }
+
+	return strtoupper($status);
 }
 
 function usbswiper_get_intent_id( $transaction_id ) {
@@ -1542,7 +1559,7 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 	$is_allow_capture = false;
 	$payment_status = usbswiper_get_transaction_status($transaction_id);
 
-	if( !empty( $payment_status ) && 'CREATED' === $payment_status ) {
+	if( !empty( $payment_status ) && ( 'CREATED' === $payment_status || 'Authorized' === $payment_status ) ) {
 		$is_allow_capture = true;
 	}
 
@@ -1647,14 +1664,15 @@ function usb_swiper_get_invoice_status_icon( $invoice_id ) {
         return;
     }
 
-    $global_payment_status = get_post_meta( $invoice_id, '_payment_status', true);
     $transaction_type = get_post_meta( $invoice_id, '_transaction_type', true);
 
     $icon = '';
 
     if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ) {
 
-        if( !empty( $global_payment_status ) && strtolower( $global_payment_status ) === 'paid' ) {
+        $payment_status = usbswiper_get_transaction_status($invoice_id);
+
+        if( !empty( $payment_status ) && strtolower( $payment_status ) === 'paid' ) {
             $icon = USBSWIPER_URL.'assets/images/paid.png';
         } else {
             $icon = USBSWIPER_URL.'assets/images/pending.png';

@@ -29,16 +29,11 @@ if( $has_transactions ) : ?>
                 $user_invoice_id = get_post_meta( $id, '_user_invoice_id', true);
                 $grand_total = get_post_meta( $id, 'GrandTotal', true );
                 $payment_response = get_post_meta( $id, '_payment_response', true);
-                $global_payment_status = get_post_meta( $id, '_payment_status', true);
                 $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
                 $payment_status = usbswiper_get_transaction_status($transaction->ID);
                 $payment_action = usbswiper_get_transaction_type($transaction->ID);
                 $transaction_type = usbswiper_get_invoice_transaction_type($transaction->ID);
                 $end_point = 'view-transaction';
-
-                if( $global_payment_status === 'FAILED' || $payment_status === '' || strtolower($end_point) === 'view-transaction' && $payment_status !== 'CREATED' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'REFUNDED') {
-                    $payment_status = $global_payment_status;
-                }
 
                 if( !class_exists('Usb_Swiper_Paypal_request') ) {
                     include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
@@ -59,7 +54,7 @@ if( $has_transactions ) : ?>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-date"><?php echo esc_attr( get_the_time( __( 'Y/m/d g:i a' ), $transaction ) ); ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions">
 						<a href="<?php echo esc_url( wc_get_endpoint_url( $end_point, $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
-                        <?php if( usbswiper_is_allow_capture( $id ) && $global_payment_status !== 'FAILED' ) {
+                        <?php if( usbswiper_is_allow_capture( $id ) && $payment_status !== 'FAILED' ) {
                             $unique_id = usb_swiper_unique_id( array(
                                'type' => $payment_action,
                                'transaction_id' => $id,

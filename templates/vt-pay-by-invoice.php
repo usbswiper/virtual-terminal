@@ -2,7 +2,7 @@
 $invoice_id = !empty($args['invoice_id']) ? (int)$args['invoice_id'] : "";
 $invoice_status = !empty($args['invoice_status']) ? $args['invoice_status'] : "";
 $transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
-$payment_status = get_post_meta($invoice_id,'_payment_status', true);
+$payment_status = usbswiper_get_transaction_status($invoice_id);
 $billing_first_name = get_post_meta($invoice_id, 'BillingFirstName', true);
 $billing_last_name = get_post_meta($invoice_id, 'BillingLastName', true);
 
@@ -25,11 +25,10 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
             <div class="vt-row">
                 <?php if( empty( $invoice_id ) ){ ?>
                     <div class="vt-form-message"><?php _e('Sorry, No invoice data found.','usb-swiper'); ?></div>
-                <?php } elseif( ( !empty( $payment_status ) && strtolower($payment_status) === 'paid' ) || usbswiper_is_allow_capture( $invoice_id ) ) {
+                <?php } elseif( ( !empty( $payment_status ) && strtolower($payment_status) === 'paid' ) ) {
                     usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $invoice_id ) );
                 } else { ?>
                     <div class="d-flex">
-
                         <?php
                         usb_swiper_get_template( 'vt-invoice-html.php', array( 'invoice_id' => $invoice_id ) );
 

@@ -276,7 +276,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
             $invoice_id = !empty( $invoice_session->id ) ? $invoice_session->id : '';
-            $invoice_status = get_post_meta($invoice_id, '_payment_status', true);
+            $invoice_status = usbswiper_get_transaction_status($invoice_id);
 
 			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( ( !empty($vt_page_id) && $vt_page_id === $current_page_id ) || ( !empty($paybyinvoice_page_id) && $paybyinvoice_page_id === $current_page_id && strtolower($invoice_status) !== 'paid') ) ) {
 
@@ -701,8 +701,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$BillingLastName = !empty( $transaction['BillingLastName'] ) ? $transaction['BillingLastName'] : '';
 
 			$display_name = $BillingFirstName. ' ' . $BillingLastName;
-            $transaction_type = 'TRANSACTION';
 
+            $transaction_type = 'TRANSACTION';
+            $invoice_status = '';
             if( $invoice_payment ) {
                 $transaction_type = 'INVOICE';
                 $invoice_status = 'PENDING';
@@ -724,7 +725,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_post_meta($transaction_id, '_user_invoice_id', sprintf("%04d", $user_invoice_id ) );
 
                 if( !empty( $invoice_status ) ){
-                    $test = sprintf("%03d", $invoice_status );
                     update_post_meta($transaction_id, '_payment_status', $invoice_status );
                 }
 
@@ -934,11 +934,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $settings = usb_swiper_get_settings('general');
                     $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
                     $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => $payment_status)))), get_the_permalink( $paybyinvoice_id ) );
-                    if( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ){
-                        update_post_meta($transaction_id, '_payment_status', 'PAID');
-                    } else {
-                        update_post_meta($transaction_id, '_payment_status', 'PENDING');
-                    }
+                    $temp_payment_status = ( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ) ? 'PAID' : 'PENDING';
+                    update_post_meta($transaction_id, '_payment_status', $temp_payment_status);
                 }
 
 			    if( !empty( $response['payment_source'] )) {
@@ -1527,14 +1524,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						            $status = true;
 							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
 							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
-                                    $global_payment_status = get_post_meta( $transaction_id, '_payment_status', true);
                                     $payment_status = usbswiper_get_transaction_status($transaction_id);
                                     $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
                                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
                                     $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
-                                    if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'REFUNDED') ) {
-                                        $payment_status = $global_payment_status;
-                                    }
                                     $refund_status = usbswiper_get_payment_status($payment_status);
                                     $email_args = array(
                                         'invoice' => true,
@@ -1973,7 +1966,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             update_post_meta($transaction_id, '_payment_status', $payment_status);
-            //update_post_meta($transaction_id, '_payment_response', $orderData);
 
             $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
             $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
