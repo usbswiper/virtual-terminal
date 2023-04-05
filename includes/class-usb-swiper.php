@@ -182,6 +182,8 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_after_my_account', $plugin_public,'display_paypal_connect_button');
 		$this->loader->add_action('wp_ajax_update_order_status', $plugin_public,'update_order_status');
 		$this->loader->add_action('wp_ajax_nopriv_update_order_status', $plugin_public,'update_order_status');
+        $this->loader->add_action('wp_ajax_vt_get_states', $plugin_public,'vt_get_states');
+        $this->loader->add_action('wp_ajax_nopriv_vt_get_states', $plugin_public,'vt_get_states');
 
 		$this->loader->add_filter( 'woocommerce_email_classes',$plugin_public, 'add_paypal_connected_email' );
 		$this->loader->add_filter( 'wp_login',$plugin_public, 'redirect_on_login',10,2 );

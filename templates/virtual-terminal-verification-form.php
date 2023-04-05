@@ -1,6 +1,6 @@
 <?php
 $get_countries = usb_swiper_get_countries();
-$get_states = usb_swiper_get_states();
+$get_states = usb_swiper_get_states('US');
 
 $form_fields = array(
     array(
@@ -73,7 +73,7 @@ $form_fields = array(
         'type' => 'text',
         'id' => 'billing_address_1',
         'name' => 'billing_address_1',
-        'label' => __( 'Street', 'usb-swiper'),
+        'label' => __( 'Address line 1', 'usb-swiper'),
         'required' => true,
         'attributes' => array(
             'maxlength' => 25
@@ -85,7 +85,7 @@ $form_fields = array(
         'type' => 'text',
         'id' => 'billing_address_2',
         'name' => 'billing_address_2',
-        'label' => __( 'Street 2', 'usb-swiper'),
+        'label' => __( 'Address line 2', 'usb-swiper'),
         'required' => false,
         'attributes' => array(
             'maxlength' => 25
@@ -109,18 +109,19 @@ $form_fields = array(
         'type' => 'select',
         'id' => 'billing_state',
         'name' => 'billing_state',
-        'label' => __( 'State', 'usb-swiper'),
+        'label' => __( 'State / County', 'usb-swiper'),
         'required' => true,
         'attributes' => '',
         'options' => $get_states,
         'description' => '',
-        'class' => 'vt-billing-address-field',
+        'default' => 'CA',
+        'class' => 'vt-billing-address-field vt-billing-states',
     ),
     array(
         'type' => 'text',
         'id' => 'billing_postcode',
         'name' => 'billing_postcode',
-        'label' => __( 'Postal Code', 'usb-swiper'),
+        'label' => __( 'Postcode / ZIP', 'usb-swiper'),
         'required' => true,
         'options' => array(),
         'attributes' => array(
@@ -132,12 +133,13 @@ $form_fields = array(
         'type' => 'select',
         'id' => 'billing_country',
         'name' => 'billing_country',
-        'label' => __( 'Country', 'usb-swiper'),
+        'label' => __( 'Country / Region', 'usb-swiper'),
         'required' => true,
         'attributes' => '',
         'options' => $get_countries,
         'description' => '',
-        'class' => 'vt-billing-address-field',
+        'default' => 'US',
+        'class' => 'vt-billing-address-field vt-billing-country',
     ),
 	array(
 		'type' => 'hidden',

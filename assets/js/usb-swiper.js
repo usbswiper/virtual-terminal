@@ -378,4 +378,44 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
     });
 
+    $(document).on('change','.vt-billing-country', function (){
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: "action=vt_get_states&billing_country="+$(this).val(),
+        }).done(function ( response ) {
+            if( response.status && response.states !== "" ) {
+                $('select.vt-billing-states').show();
+                $('.vt-billing-states.text-field').remove();
+                $('.vt-billing-states').empty().append(response.states);
+            }else {
+                var FieldName = $('.vt-billing-states').attr('name');
+                $('select.vt-billing-states').hide();
+                $('.vt-billing-states.text-field').remove();
+                $('.vt-billing-states').after("<input type='text' class='vt-billing-address-field vt-billing-states text-field' autocomplete='off' name='"+FieldName+"' id='"+FieldName+"' required='required'>");
+            }
+        });
+    });
+
+    $(document).on('change','.vt-shipping-country', function (){
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: "&action=vt_get_states&billing_country="+$(this).val(),
+        }).done(function ( response ) {
+            if( response.status && response.states !== "" ) {
+                $('select.vt-shipping-states').show();
+                $('.vt-shipping-states.text-field').remove();
+                $('.vt-shipping-states').empty().append(response.states);
+            } else {
+                var FieldName = $('.vt-billing-states').attr('name');
+                $('select.vt-shipping-states').hide();
+                $('.vt-shipping-states.text-field').remove();
+                $('.vt-shipping-states').after("<input type='text' class='vt-shipping-address-field vt-shipping-states text-field' autocomplete='off' name='"+FieldName+"' id='"+FieldName+"' required='required'>");
+            }
+        });
+    });
+
 });

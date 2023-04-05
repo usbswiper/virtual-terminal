@@ -1503,5 +1503,32 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_safe_redirect(get_the_permalink($vt_verification_page));
         }
 
+        /**
+         * Get the states based on country code.
+         *
+         * @since 1.1.17
+         *
+         * @return void
+         */
+        public function vt_get_states() {
+
+            $billing_country = !empty($_POST['billing_country']) ? sanitize_text_field($_POST['billing_country']) : 'US';
+            $billing_states = usb_swiper_get_states($billing_country);
+
+            $billing_states_html = '';
+            if( !empty( $billing_states ) && count( $billing_states ) > 0 ){
+                foreach ( $billing_states as $key => $value ){
+                    $billing_states_html .= "<option value='".$key."'>".$value."</option>";
+                }
+            }
+
+            $response = array(
+                'status' => true,
+                'states' => $billing_states_html,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
 	}
 }
