@@ -386,6 +386,7 @@ jQuery( document ).ready(function( $ ) {
                 $('.transaction-refund').show();
                 $('.refund-form-wrap').hide();
                 $('.refund-details').html('').html(response.html);
+                $('.payment-status-text').html('').html(response.refund_status);
             } else{
                 set_notification(response.message, 'error', response.message_type);
             }

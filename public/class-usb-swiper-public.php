@@ -1498,10 +1498,40 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
                                     $global_payment_status = get_post_meta( $transaction_id, '_payment_status', true);
                                     $payment_status = usbswiper_get_transaction_status($transaction_id);
+                                    $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
+                                    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
+                                    $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
                                     if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'REFUNDED') ) {
                                         $payment_status = $global_payment_status;
                                     }
                                     $refund_status = usbswiper_get_payment_status($payment_status);
+                                    $email_args = array(
+                                        'invoice' => true,
+                                        'display_name' => wp_strip_all_tags($BillingFirstName)
+                                    );
+                                    $customer_email = WC()->mailer()->emails['payment_email_refund'];
+                                    $customer_email->recipient = $BillingEmail;
+                                    $customer_email->trigger( array(
+                                        'transaction_id' => $transaction_id,
+                                        'email_args' => $email_args,
+                                        'attachment' => array( $attachment ),
+                                    ));
+
+                                    $admin_email = WC()->mailer()->emails['payment_email_refund_admin'];
+                                    $get_recipient = '';
+                                    $author_id = get_post_field( 'post_author', $transaction_id );
+                                    $author_id = ! empty( $author_id ) ? $author_id : 1;
+                                    $current_user = get_user_by('id', $author_id );
+                                    $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
+                                    if( true !== (bool)$ignore_email ){
+                                        $get_recipient = $current_user->user_email;
+                                    }
+                                    $admin_email->recipient = $get_recipient;
+                                    $admin_email->trigger( array(
+                                        'transaction_id' => $transaction_id,
+                                        'email_args' => $email_args,
+                                    ));
+
 						        } else{
 						            $message = __( 'Transaction amount not refund. Please try again.','usb-swiper');
 						            if( !empty( $response['error_description'] ) ) {
@@ -1646,8 +1676,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$email_classes['invoice_email_pending_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-pending-admin.php';
 			$email_classes['invoice_email_paid'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid.php';
 			$email_classes['invoice_email_paid_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid-admin.php';
-            $email_classes['invoice_email_refund'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-refund.php';
-            $email_classes['invoice_email_refund_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-refund-admin.php';			$email_classes['transaction_email'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email.php';
+            $email_classes['payment_email_refund'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-refund.php';
+            $email_classes['payment_email_refund_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-refund-admin.php';			$email_classes['transaction_email'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email.php';
 			$email_classes['transaction_email_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email-admin.php';
 
 			return $email_classes;
@@ -1976,6 +2006,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 } else {
                     $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
                 }
+                $string = str_replace('{#transaction_type#}',ucfirst(strtolower($transaction_type)), $string);
             }
 
             return $string;
