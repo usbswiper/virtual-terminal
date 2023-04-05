@@ -120,11 +120,6 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     }
 
     $vt_invoice_id = 'invoice' === strtolower( $transaction_type ) ? $user_invoice_id : $transaction_id;
-    $invoice_id_text = $vt_invoice_id;
-    if( $is_email ){
-        $invoice_id_text = "<a style='text-decoration: none;' href='".esc_url( wc_get_endpoint_url( 'view-transaction', $vt_invoice_id, wc_get_page_permalink( 'myaccount' ) ) )."'>".$vt_invoice_id."</a>";
-    }
-
     ?>
     <table style="width: 100%;border-radius: 0;margin-bottom: 20px;border: 0;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
         <tbody>
@@ -135,7 +130,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Payment Method: ','usb-swiper'); ?></td>
         </tr>
         <tr>
-            <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $invoice_id_text; ?></td>
+            <?php if( $is_email && $is_admin ) { ?>
+                <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><a style='text-decoration: none;' href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $vt_invoice_id, wc_get_page_permalink( 'myaccount' ) ) ); ?>"><?php echo $vt_invoice_id; ?></a></td>
+            <?php } else { ?>
+                <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $vt_invoice_id; ?></td>
+            <?php } ?>
             <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></td>
             <td class="transaction-table-product-td payment-status-text" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
             <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $credit_card_number; ?></td>
