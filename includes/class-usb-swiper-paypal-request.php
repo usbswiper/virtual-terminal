@@ -645,7 +645,9 @@ class Usb_Swiper_Paypal_request{
 
 			$response = $this->request($this->order_url.$paypal_transaction_id, $order_args, 'order_response', $transaction_id);
 			$this->handle_paypal_debug_id($response, $transaction_id);
-			update_post_meta($transaction_id,'_payment_response', $response);
+            if( !empty( $response ) ) {
+                update_post_meta($transaction_id, '_payment_response', $response);
+            }
 			return $response;
 		}
 

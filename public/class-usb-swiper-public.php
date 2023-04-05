@@ -791,7 +791,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                         ),
                                     ), 'order_response', $transaction_id);
                                     $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
-                                    update_post_meta($transaction_id, '_payment_response', $order_response);
+                                    if( !empty( $order_response ) ) {
+                                        update_post_meta($transaction_id, '_payment_response', $order_response);
+                                    }
                                 }
                             }
                         }
@@ -914,11 +916,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 ),
                             ), 'order_response', $transaction_id);
                             $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
-                            update_post_meta($transaction_id, '_payment_response', $order_response);
+                            if( !empty( $order_response ) ) {
+                                update_post_meta($transaction_id, '_payment_response', $order_response);
+                            }
                         }
                     }
                 }else{
-                    update_post_meta($transaction_id, '_payment_response', $response);
+                    if( !empty( $response ) ){
+                        update_post_meta($transaction_id, '_payment_response', $response);
+                    }
                 }
 
 			    $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
@@ -1060,7 +1066,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 ),
                             ), 'order_response', $transaction_id);
                             $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
-                            update_post_meta($transaction_id, '_payment_response', $order_response);
+                            if( !empty( $order_response ) ) {
+                                update_post_meta($transaction_id, '_payment_response', $order_response);
+                            }
                         }
                     }
                 }
@@ -1194,7 +1202,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 					        $response = $Paypal_request->request($Paypal_request->order_url.$paypal_transaction_id, $order_args, 'order_response', $post_id);
 					        $Paypal_request->handle_paypal_debug_id($response, $post_id);
-					        update_post_meta($post_id, '_payment_response', $response);
+                            if( !empty( $response ) ) {
+                                update_post_meta($post_id, '_payment_response', $response);
+                            }
 					        $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
 					        update_post_meta($post_id, '_payment_status', $payment_status);
 				        }
@@ -1928,7 +1938,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             ),
                         ), 'order_response', $transaction_id);
                         $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
-                        update_post_meta($transaction_id, '_payment_response', $order_response);
+                        if( !empty( $order_response ) ) {
+                            update_post_meta($transaction_id, '_payment_response', $order_response);
+                        }
                     }
                 }
             }

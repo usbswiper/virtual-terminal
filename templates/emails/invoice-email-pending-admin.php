@@ -21,6 +21,7 @@ $args = array(
     'transaction_id' => $transaction_id,
     'display_name' => $author_name,
     'is_email' => true,
+    'is_admin' => true,
 );
 
 usb_swiper_get_template( 'wc-transaction-history.php', $args );

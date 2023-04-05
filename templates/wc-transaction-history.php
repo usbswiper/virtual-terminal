@@ -4,6 +4,7 @@ if( empty($transaction_id)) {
 }
 
 $is_email = !empty( $args['is_email'] );
+$is_admin = !empty( $args['is_admin'] );
 
 $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits', true);
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
@@ -147,11 +148,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $display_name = !empty( $args['display_name'] ) ? esc_html($args['display_name']) : '';
         ?>
         <div style="margin: 10px 0;padding: 0;width: 100%;display: block;float: left;color:#000;">
-            <p style="color:#000;"><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
             <?php if( !empty( $payment_link ) ){
                 $button_background = get_button_background_color($BillingEmail,$is_email); ?>
                 <p style="text-align: center;color:#000;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;margin-bottom: 10px;cursor: pointer;" href="<?php echo $payment_link; ?>"><?php echo __('Click to Pay', 'usb-swiper'); ?></a></p>
             <?php } else { ?>
+                <p style="color:#000;"><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
                 <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s.','usb-swiper'), get_option('blogname')); ?></p>
             <?php } ?>
         </div>
@@ -415,7 +416,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
-                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_paypal_transaction_url($payment_transaction_id); ?>" target="_blank"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></a></td>
+                <?php
+                if( ( is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) || $_GET['action'] === 'edit' ){ ?>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_paypal_transaction_url($payment_transaction_id); ?>" target="_blank"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></a></td>
+                <?php } else { ?>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
+                <?php } ?>
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
@@ -429,7 +435,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <?php } ?>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Source','usb-swiper'); ?></th>
-                <?php if( !empty( $payment_card_number ) ) {  ?>
+                <?php if( !empty( $payment_card_number ) || ( $is_email && $is_admin ) ) {  ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo sprintf( '%s (%s) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
                 <?php } else { ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo $credit_card_number; ?></td>

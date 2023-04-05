@@ -78,7 +78,8 @@ class UsbSwiperInvoiceEmailRefundedAdmin extends WC_Email {
                 'plain_text'         => true,
                 'email'              => $this,
                 'admin_email'        => $this->recipient,
-                'profile_args'       => $this->profile_args
+                'profile_args'       => $this->profile_args,
+                'is_email'           => true
             ),
             '',
             $this->template_base,
