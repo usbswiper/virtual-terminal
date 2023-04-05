@@ -417,7 +417,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
                 <?php
-                if( ( is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) || $_GET['action'] === 'edit' ){ ?>
+                if( ( is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) || $_GET['action'] === 'edit' || ( $is_email && $is_admin ) ){ ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_paypal_transaction_url($payment_transaction_id); ?>" target="_blank"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></a></td>
                 <?php } else { ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
@@ -435,7 +435,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <?php } ?>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Source','usb-swiper'); ?></th>
-                <?php if( !empty( $payment_card_number ) || ( $is_email && $is_admin ) ) {  ?>
+                <?php if( !empty( $payment_card_number ) ) {  ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo sprintf( '%s (%s) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
                 <?php } else { ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo $credit_card_number; ?></td>
