@@ -875,10 +875,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			    $paypal_transaction_id = !empty( $_GET['paypal_transaction_id'] ) ? $_GET['paypal_transaction_id'] : '';
 
-			    $transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
                 if( !empty( $_REQUEST['transaction_id'] ) && $_REQUEST['transaction_id'] > 0 ) {
-                    $transaction_id = $_REQUEST['transaction_id'];
+                    usb_swiper_set_session('usb_swiper_woo_transaction_id', $_REQUEST['transaction_id']);
                 }
+
+			    $transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
 
                 $redirect_url =  esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) );
                 if( empty( $transaction_id ) ) {
@@ -898,7 +899,27 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    $Paypal_request = Usb_Swiper_Paypal_request::instance();
 			    $response = $Paypal_request->handle_cc_transaction_request($paypal_transaction_id);
 
-			    update_post_meta($transaction_id, '_payment_response', $response);
+                if( !empty( $response['links'] ) && is_array( $response['links'] ) && count( $response['links'] ) === 1 ) {
+                    foreach ($response['links'] as $key => $links) {
+                        if (!empty($links['rel']) && 'self' === $links['rel'] && !empty($links['href'])) {
+                            $order_response = $Paypal_request->request($links['href'], array(
+                                'method' => 'GET',
+                                'timeout' => 60,
+                                'redirection' => 5,
+                                'httpversion' => '1.1',
+                                'blocking' => true,
+                                'headers' => array(
+                                    'Content-Type' => 'application/json',
+                                    'Authorization' => 'Bearer ' . $Paypal_request->get_access_token(),
+                                ),
+                            ), 'order_response', $transaction_id);
+                            $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
+                            update_post_meta($transaction_id, '_payment_response', $order_response);
+                        }
+                    }
+                }else{
+                    update_post_meta($transaction_id, '_payment_response', $response);
+                }
 
 			    $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
 			    update_post_meta($transaction_id, '_payment_status', $payment_status);

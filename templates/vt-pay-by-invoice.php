@@ -18,7 +18,6 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
 $payment_intent = usbswiper_get_transaction_type($invoice_id);
 $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : '';
 ?>
-
 <div id="content" class="invoice-content-main-wrap main-content woocommerce">
     <div class="vt-form-notification"></div>
     <form method="post" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
@@ -26,7 +25,7 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
             <div class="vt-row">
                 <?php if( empty( $invoice_id ) ){ ?>
                     <div class="vt-form-message"><?php _e('Sorry, No invoice data found.','usb-swiper'); ?></div>
-                <?php } elseif( !empty( $payment_status ) && strtolower($payment_status) === 'paid' ) {
+                <?php } elseif( ( !empty( $payment_status ) && strtolower($payment_status) === 'paid' ) || usbswiper_is_allow_capture( $invoice_id ) ) {
                     usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $invoice_id ) );
                 } else { ?>
                     <div class="d-flex">

@@ -51,7 +51,7 @@ $payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
-if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'REFUNDED') || empty($payment_status) ) {
+if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'CREATED' && $payment_status !== 'REFUNDED') || empty($payment_status) ) {
     $payment_status = $global_payment_status;
 }
 
@@ -69,7 +69,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
     $payment_action = usbswiper_get_transaction_type($transaction_id);
     $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
-    if( usbswiper_is_allow_capture( $transaction_id ) && $global_payment_status !== 'FAILED' ) {
+    $author_id = get_post_field( 'post_author', $transaction_id );
+    $author_id = ! empty( $author_id ) ? $author_id : 1;
+    $get_current_user_id = get_current_user_id();
+    if( usbswiper_is_allow_capture( $transaction_id ) && $global_payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
         $unique_id = usb_swiper_unique_id( array(
            'type' => $payment_action,
            'transaction_id' => $transaction_id,
