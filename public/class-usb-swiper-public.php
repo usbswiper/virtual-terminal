@@ -389,9 +389,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $settings = usb_swiper_get_settings('general');
                 $verification_page_id = !empty( $settings['vt_verification_page'] ) ? $settings['vt_verification_page'] : 0;
 
-                if( empty( $profile_data ) ) {
-                    ?>
-                    <p class="vt-verification-message"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.");?></p>
+                if( empty( $profile_data ) ) { ?>
                     <div class="paypal-connect-button-wrap">
                         <p><a class="vt-button" href="<?php echo get_permalink($verification_page_id); ?>"><?php _e('Verify Profile','usb-swiper'); ?></a></p>
                     </div>
@@ -441,6 +439,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 ?>
                 <div class="paypal-connect-button-wrap vt-form-notification">
                     <p class="vt-verification-message notification success"><?php _e("Thank you for providing the additional information requested.  We will review your details and let you know the status of your approval as soon as possible.","usb-swiper");?></p>
+                </div>
+                <?php
+            }else if ( empty( $profile_data ) && $profile_status === '' ){
+                ?>
+                <div class="paypal-connect-button-wrap vt-form-notification">
+                    <p class="vt-verification-message notification warning"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.","usb-swiper");?></p>
                 </div>
                 <?php
             }

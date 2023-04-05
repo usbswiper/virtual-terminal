@@ -36,6 +36,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-notification p.notification strong {display: block;width: 100%;}
 .vt-form-notification p.notification strong {margin-right: 5px;}
 .vt-form-notification p.notification.error {border-left-color: #d63638;}
+.vt-form-notification p.notification.warning{border-left-color: #ffcc00;}
 .vt-form-notification p.notification.success {border-left-color: #00a32a;}
 .vt-form-notification p.notification span {display:block !important; }
 .vt-form-contents {width: 100%;}
