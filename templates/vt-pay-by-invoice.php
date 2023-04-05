@@ -54,6 +54,13 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
                                                                     },
 
                                                                     createOrder: function (data, actions) {
+                                                                        VtForm.addClass('processing').block({
+                                                                            message: null,
+                                                                            overlayCSS: {
+                                                                                background: '#fff',
+                                                                                opacity: 0.6
+                                                                            }
+                                                                        });
 
                                                                         return fetch(usb_swiper_settings.create_transaction_url+"&transaction_id=<?php echo $invoice_id; ?>", {
                                                                             method: 'post',
@@ -71,12 +78,8 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
                                                                         });
                                                                     },
                                                                     onApprove: function (data, actions) {
-                                                                        console.log('onApprove');
-                                                                        console.log(data);
                                                                         if (data.orderID) {
                                                                             $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + data.orderID + "&transaction_id=<?php echo $invoice_id; ?>&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
-                                                                                console.log('onResults');
-                                                                                console.log(data);
                                                                                 if( data.result === 'success' ) {
                                                                                     window.location.href = data.redirect;
                                                                                 } else{
@@ -89,8 +92,6 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
                                                                         }
                                                                     },
                                                                     onError: function (err) {
-                                                                        console.log('onError');
-                                                                        console.log(err);
                                                                         if( err ) {
                                                                             const notification = jQuery('.vt-form-notification');
                                                                             notification.html('');
