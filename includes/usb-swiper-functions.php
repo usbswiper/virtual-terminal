@@ -1550,6 +1550,7 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 		return false;
 	}
 
+    $transaction_type = get_post_meta($transaction_id,'_transaction_type', true);
 	$payment_action = usbswiper_get_transaction_type($transaction_id);
 
 	/*if( empty( $payment_action) || 'AUTHORIZE' !== $payment_action ) {
@@ -1559,8 +1560,11 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 	$is_allow_capture = false;
 	$payment_status = usbswiper_get_transaction_status($transaction_id);
 
-	if( !empty( $payment_status ) && ( 'CREATED' === $payment_status || 'Authorized' === $payment_status ) ) {
-		$is_allow_capture = true;
+    if( !empty( $payment_status ) && ( 'created' === strtolower($payment_status) || 'authorized' === strtolower($payment_status) ) ) {
+        $is_allow_capture = true;
+        if( $transaction_type === 'invoice' && 'created' === strtolower($payment_status) ) {
+            $is_allow_capture = false;
+        }
 	}
 
 	return $is_allow_capture;

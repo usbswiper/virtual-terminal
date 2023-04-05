@@ -25,7 +25,7 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
             <div class="vt-row">
                 <?php if( empty( $invoice_id ) ){ ?>
                     <div class="vt-form-message"><?php _e('Sorry, No invoice data found.','usb-swiper'); ?></div>
-                <?php } elseif( ( !empty( $payment_status ) && strtolower($payment_status) === 'paid' ) ) {
+                <?php } elseif( !empty( $payment_status ) && ( strtolower($payment_status) === 'paid' || strtolower($payment_status) === 'authorized' ) ) {
                     usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $invoice_id ) );
                 } else { ?>
                     <div class="d-flex">
