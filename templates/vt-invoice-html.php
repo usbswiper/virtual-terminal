@@ -56,6 +56,10 @@ $shipping_address = array();
 if( $shippingDisabled !== 'true') {
     $shippingSameAsBilling = get_post_meta($invoice_id, 'shippingSameAsBilling', true);
     if( $shippingSameAsBilling !== true ) {
+        $ShippingFirstName = get_post_meta( $invoice_id, 'ShippingFirstName', true);
+        if( !empty( $ShippingFirstName ) ) { $shipping_address[] = $ShippingFirstName; }
+        $ShippingLastName = get_post_meta( $invoice_id, 'ShippingLastName', true);
+        if( !empty( $ShippingLastName ) ) { $shipping_address[] = $ShippingLastName; }
         $shipping_address_1 = get_post_meta( $invoice_id,'ShippingStreet', true);
         if( !empty($shipping_address_1)) { $shipping_address[] = $shipping_address_1; }
         $shipping_address_2 = get_post_meta( $invoice_id,'ShippingStreet2', true);
@@ -68,6 +72,9 @@ if( $shippingDisabled !== 'true') {
         if( !empty($shipping_postcode)) { $shipping_address[] = $shipping_postcode; }
         $shipping_country = get_post_meta( $invoice_id,'ShippingCountryCode', true);
         if( !empty($shipping_country)) { $shipping_address[] = $shipping_country; }
+
+        $ShippingPhoneNumber = get_post_meta( $invoice_id, 'ShippingPhoneNumber', true);
+        $ShippingEmail = get_post_meta( $invoice_id, 'ShippingEmail', true);
     }
 }
 
@@ -111,20 +118,34 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
     </section>
     <section class="invoice-payment-info invoice-general" style="display: block;padding: 20px;float: left;width: 100%;border-bottom: 1px solid #CCC;">
         <div class="address" style="width: 75%;display: inline-block;vertical-align: top;float: left;">
-            <h2 style="font-size: 20px;"><?php _e('Invoice To', 'usb-swiper'); ?></h2>
-            <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $billing_first_name . ' ' . $billing_last_name ; ?></p>
-            <?php
-            if( !empty( $shipping_address ) ){
-                echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '<br />';
-                echo sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' - '.esc_attr($shipping_postcode) : '' ). '<br />';
-                echo !empty($shipping_country) ? esc_attr($shipping_country) : '' . '</p>';
-            } else {
-                echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $BillingStreet ) ? esc_attr($BillingStreet).',' : '', ! empty( $BillingStreet2 ) ? esc_attr($BillingStreet2) : '' ). '<br />';
-                echo sprintf( '%s %s %s', ! empty( $BillingCity ) ? esc_attr($BillingCity).',' : '', ! empty( $BillingState ) ? esc_attr($BillingState) : '', ! empty( $BillingPostalCode ) ? ' - '.esc_attr($BillingPostalCode) : '' ). '<br />';
-                echo !empty($BillingCountryCode) ? esc_attr($BillingCountryCode) : '' . '</p>';
-            } ?>
-            <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
-            <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
+            <div class="address" style="width: 50%;display: inline-block;vertical-align: top;float: left;">
+                <h2 style="font-size: 20px;"><?php _e('Invoice To', 'usb-swiper'); ?></h2>
+                <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $billing_first_name . ' ' . $billing_last_name ; ?></p>
+                <?php
+                if( empty( $shipping_address ) && !empty( $billing_address ) ){
+                    echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $BillingStreet ) ? esc_attr($BillingStreet).',' : '', ! empty( $BillingStreet2 ) ? esc_attr($BillingStreet2) : '' ). '<br />';
+                    echo sprintf( '%s %s %s', ! empty( $BillingCity ) ? esc_attr($BillingCity).',' : '', ! empty( $BillingState ) ? esc_attr($BillingState) : '', ! empty( $BillingPostalCode ) ? ' '.esc_attr($BillingPostalCode) : '' ). '<br />';
+                    echo !empty($BillingCountryCode) ? esc_attr($BillingCountryCode) : '' . '</p>';
+                } else {
+                    echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '<br />';
+                    echo sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' '.esc_attr($shipping_postcode) : '' ). '<br />';
+                    echo !empty($shipping_country) ? esc_attr($shipping_country) : '' . '</p>';
+                } ?>
+                <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
+                <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
+            </div>
+            <?php if( !empty( $shipping_address ) && !empty( $billing_address ) ){ ?>
+                <div class="address" style="width: 50%;display: inline-block;vertical-align: top;float: left;">
+                    <h2 style="font-size: 20px;"><?php _e('Shipping Address', 'usb-swiper'); ?></h2>
+                    <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $ShippingFirstName . ' ' . $ShippingLastName ; ?></p>
+                    <?php
+                    echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '<br />';
+                    echo sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' '.esc_attr($shipping_postcode) : '' ). '<br />';
+                    echo !empty($shipping_country) ? esc_attr($shipping_country) : '' . '</p>';
+                    echo ! empty( $ShippingEmail ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$ShippingEmail.'</p>' : '';
+                    echo ! empty( $ShippingPhoneNumber ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$ShippingPhoneNumber.'</p>' : '' ?>
+                </div>
+            <?php } ?>
         </div>
         <div class="invoice-payment" style="width: 25%;display: inline-block;vertical-align: top;float: left;text-align: left;">
             <h2 style="font-size: 20px;"><?php _e( 'Payment Status','usb-swiper'); ?></h2>

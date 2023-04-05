@@ -15,6 +15,8 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 
 $Paypal_request = Usb_Swiper_Paypal_request::instance();
 $response = $Paypal_request->create_transaction_request( $invoice_id,true );
+$payment_intent = usbswiper_get_transaction_type($invoice_id);
+$payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : '';
 ?>
 
 <div id="content" class="invoice-content-main-wrap main-content woocommerce">
@@ -63,7 +65,6 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                         }).then(function (res) {
                                                                             return res.json();
                                                                         }).then(function (data) {
-
                                                                             if( data.orderID ) {
                                                                                 localStorage.setItem("vt_order_id", data.orderID);
                                                                                 return data.orderID;
@@ -71,53 +72,36 @@ $response = $Paypal_request->create_transaction_request( $invoice_id,true );
                                                                         });
                                                                     },
                                                                     onApprove: function (data, actions) {
-                                                                        return actions.order.capture().then(function (orderData) {
-
-                                                                            VtForm.addClass('createOrder').block({
-                                                                                message: null,
-                                                                                overlayCSS: {
-                                                                                    background: '#fff',
-                                                                                    opacity: 0.6
-                                                                                }
-                                                                            });
-                                                                            jQuery.ajax({
-                                                                                url: usb_swiper_settings.ajax_url,
-                                                                                type: 'POST',
-                                                                                dataType: 'json',
-                                                                                data: "orderData="+JSON.stringify( orderData )+"&action=manage_pay_with_paypal_transaction&transaction_id=<?php echo $invoice_id; ?>",
-                                                                            }).done(function ( response ) {
-                                                                                if( response) {
-                                                                                    actions.redirect(response.redirect_url);
+                                                                        console.log('onApprove');
+                                                                        console.log(data);
+                                                                        if (data.orderID) {
+                                                                            $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + data.orderID + "&transaction_id=<?php echo $invoice_id; ?>&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
+                                                                                console.log('onResults');
+                                                                                console.log(data);
+                                                                                if( data.result === 'success' ) {
+                                                                                    window.location.href = data.redirect;
+                                                                                } else{
+                                                                                    const notification = jQuery('.vt-form-notification');
+                                                                                    notification.html('');
+                                                                                    notification.append('<p class="notification error">'+data.message+'</p>');
                                                                                     VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                                                                 }
                                                                             });
-                                                                        });
+                                                                        }
                                                                     },
                                                                     onError: function (err) {
-                                                                        VtForm.addClass('createOrder').block({
-                                                                            message: null,
-                                                                            overlayCSS: {
-                                                                                background: '#fff',
-                                                                                opacity: 0.6
-                                                                            }
-                                                                        });
-                                                                        jQuery.ajax({
-                                                                            url: usb_swiper_settings.ajax_url,
-                                                                            type: 'POST',
-                                                                            dataType: 'json',
-                                                                            data: "orderData="+err+"&action=manage_pay_with_paypal_transaction&is_error=true&transaction_id=<?php echo $invoice_id; ?>",
-                                                                        }).done(function ( response ) {
-                                                                            if( response.message ) {
-                                                                                const notification = jQuery('.vt-form-notification');
-                                                                                notification.html('');
-                                                                                notification.append('<p class="notification error">'+response.message+'</p>');
-                                                                                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
-                                                                            }
-                                                                        });
+                                                                        console.log('onError');
+                                                                        console.log(err);
+                                                                        if( err ) {
+                                                                            const notification = jQuery('.vt-form-notification');
+                                                                            notification.html('');
+                                                                            notification.append('<p class="notification error">'+err+'</p>');
+                                                                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                                                        }
                                                                     }
                                                                 }).render('#paypal-button-container');
                                                             }
-                                                            initPayPalButton();
+                                                            initPayPalButton('<?php echo $payment_intent; ?>');
                                                         });
                                                     </script>
                                                 </div>

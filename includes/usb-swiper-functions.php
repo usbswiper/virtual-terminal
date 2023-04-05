@@ -1744,3 +1744,15 @@ function get_button_background_color( $email_id, $is_email = false ) {
     }
     return $background_color;
 }
+
+function get_paypal_transaction_url( $transaction_id ) {
+
+    if( empty($transaction_id)) {
+        return '';
+    }
+
+    $settings = usb_swiper_get_settings('general');
+    $is_sandbox = !empty( $settings['is_paypal_sandbox'] ) ? '.sandbox': '';
+
+    return "https://www{$is_sandbox}.paypal.com/activity/payment/{$transaction_id}";
+}

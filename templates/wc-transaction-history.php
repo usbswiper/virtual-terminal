@@ -51,7 +51,7 @@ $payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
-if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ) ) {
+if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && $payment_status !== 'PARTIALLY_REFUNDED' && $payment_status !== 'REFUNDED') || empty($payment_status) ) {
     $payment_status = $global_payment_status;
 }
 
@@ -67,6 +67,19 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
     <?php
     $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
+    $payment_action = usbswiper_get_transaction_type($transaction_id);
+    $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+    if( usbswiper_is_allow_capture( $transaction_id ) && $global_payment_status !== 'FAILED' ) {
+        $unique_id = usb_swiper_unique_id( array(
+           'type' => $payment_action,
+           'transaction_id' => $transaction_id,
+           'paypal_transaction_id' => $payment_response['id'],
+           'nonce' => wp_create_nonce('authorize-transaction-capture')
+        )); ?>
+        <div class="transaction-refund-wrap transaction-history-field">
+            <a class="vt-button capture-transaction" href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
+        </div>
+    <?php }
     if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
         $get_refund_status = usbswiper_get_refund_status();
         if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
@@ -101,6 +114,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <?php
         }
     }
+
+    $vt_invoice_id = 'invoice' === strtolower( $transaction_type ) ? $user_invoice_id : $transaction_id;
+    $invoice_id_text = $vt_invoice_id;
+    if( $is_email ){
+        $invoice_id_text = "<a style='text-decoration: none;' href='".esc_url( wc_get_endpoint_url( 'view-transaction', $vt_invoice_id, wc_get_page_permalink( 'myaccount' ) ) )."'>".$vt_invoice_id."</a>";
+    }
+
     ?>
     <table style="width: 100%;border-radius: 0;margin-bottom: 20px;border: 0;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
         <tbody>
@@ -111,9 +131,9 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Payment Method: ','usb-swiper'); ?></td>
         </tr>
         <tr>
-            <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php if( 'invoice' === strtolower( $transaction_type ) ){ echo $user_invoice_id; } else { echo $transaction_id; }?></td>
+            <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $invoice_id_text; ?></td>
             <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></td>
-            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
+            <td class="transaction-table-product-td payment-status-text" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
             <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $credit_card_number; ?></td>
         </tr>
         </tbody>
@@ -127,7 +147,6 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <p style="color:#000;"><?php echo sprintf(__('Hello %s','usb-swiper'), $display_name); ?></p>
             <?php if( !empty( $payment_link ) ){
                 $button_background = get_button_background_color($BillingEmail,$is_email); ?>
-                <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s, To pay for this invoice please use the following link:','usb-swiper'), get_option('blogname')); ?></p>
                 <p style="text-align: center;color:#000;"><a style="display: inline-block;color: #ffffff;border-width: 0;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800;text-transform: uppercase;background:<?php echo $button_background; ?>;padding:15px 30px;text-decoration: none;margin-bottom: 10px;cursor: pointer;" href="<?php echo $payment_link; ?>"><?php echo __('Click to Pay', 'usb-swiper'); ?></a></p>
             <?php } else { ?>
                 <p style="color:#000;"><?php echo sprintf(__('Thanks for create invoice in %s.','usb-swiper'), get_option('blogname')); ?></p>
@@ -255,7 +274,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <p>
                         <?php echo esc_attr($billing_address_first_name)  . ' ' .   esc_attr($billing_address_last_name)  . ',<br/>';
                         echo sprintf( '%s %s', ! empty( $billing_address_street1 ) ? esc_attr($billing_address_street1).',' : '', ! empty( $billing_address_street2 ) ? esc_attr($billing_address_street2) : '' ). ' <br/>';
-                        echo sprintf( '%s %s %s', ! empty( $billing_address_city ) ? esc_attr($billing_address_city).',' : '', ! empty( $billing_address_state ) ? esc_attr($billing_address_state) : '', ! empty( $billing_address_pincode ) ? ' - '.esc_attr($billing_address_pincode) : '' ). ' <br/>';
+                        echo sprintf( '%s %s %s', ! empty( $billing_address_city ) ? esc_attr($billing_address_city).',' : '', ! empty( $billing_address_state ) ? esc_attr($billing_address_state) : '', ! empty( $billing_address_pincode ) ? ' '.esc_attr($billing_address_pincode) : '' ). ' <br/>';
                         echo esc_attr($billing_address_country)  . ' <br/>';
                         ?>
                     </p>
@@ -295,7 +314,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                             <p>
                                 <?php  echo esc_attr($shipping_address_first_name) . ' ' .   esc_attr($shipping_address_last_name) . ',<br/>';
                                 echo sprintf( '%s %s', ! empty( $shipping_address_street1 ) ? esc_attr($shipping_address_street1).',' : '', ! empty( $shipping_address_street2 ) ? esc_attr($shipping_address_street2) : '' ). ' <br/>';
-                                echo sprintf( '%s %s %s', ! empty( $shipping_address_city ) ? esc_attr($shipping_address_city).',' : '', ! empty( $shipping_address_state ) ? esc_attr($shipping_address_state) : '', ! empty( $shipping_address_pincode ) ? ' - '.esc_attr($shipping_address_pincode) : '' ). ' <br/>';
+                                echo sprintf( '%s %s %s', ! empty( $shipping_address_city ) ? esc_attr($shipping_address_city).',' : '', ! empty( $shipping_address_state ) ? esc_attr($shipping_address_state) : '', ! empty( $shipping_address_pincode ) ? ' '.esc_attr($shipping_address_pincode) : '' ). ' <br/>';
                                 echo esc_attr($shipping_address_country) . ' <br/>';
                                 ?>
                             </p>
@@ -378,7 +397,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tbody>
         </table>
     </div>
-    <?php if( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
+    <?php if( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
         <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 20px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
@@ -393,7 +412,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
-                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_paypal_transaction_url($payment_transaction_id); ?>" target="_blank"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></a></td>
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>

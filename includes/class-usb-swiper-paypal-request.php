@@ -274,7 +274,7 @@ class Usb_Swiper_Paypal_request{
     public function create_transaction_request( $transaction_id, $is_args = false ) {
 
         $InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
-        $reference_id = 'wc_transaction_'.$transaction_id;
+        $reference_id = 'vt_transaction_'.$transaction_id;
 
         $payment_action = get_post_meta( $transaction_id,'TransactionType', true);
 
@@ -697,4 +697,5 @@ class Usb_Swiper_Paypal_request{
 		}
 		return $refund_html;
 	}
+
 }
