@@ -1767,6 +1767,15 @@ function get_button_background_color( $email_id, $is_email = false ) {
     return $background_color;
 }
 
+/**
+ * Get the paypal transaction url.
+ *
+ * @since 1.1.17
+ *
+ * @param int $transaction_id get the transaction id.
+ *
+ * @return string return the transaction paypal url.
+ */
 function get_paypal_transaction_url( $transaction_id ) {
 
     if( empty($transaction_id)) {
@@ -1777,4 +1786,84 @@ function get_paypal_transaction_url( $transaction_id ) {
     $is_sandbox = !empty( $settings['is_paypal_sandbox'] ) ? '.sandbox': '';
 
     return "https://www{$is_sandbox}.paypal.com/activity/payment/{$transaction_id}";
+}
+
+/**
+ * Get the address in format.
+ *
+ * @since 1.1.17
+ *
+ * @param int $transaction_id get the transaction id
+ * @return array[] return the transaction billing and shipping address
+ */
+function get_transaction_address_format( $transaction_id , $args = array() ){
+
+    if( empty($transaction_id) ){
+        return '';
+    }
+
+    $billing_first_name = get_post_meta( $transaction_id, 'BillingFirstName', true);
+    $billing_first_name = !empty( $billing_first_name ) ? esc_html($billing_first_name) : '';
+    $billing_last_name = get_post_meta( $transaction_id, 'BillingLastName', true);
+    $billing_last_name = !empty( $billing_last_name ) ? esc_html($billing_last_name) : '';
+    $billing_street = get_post_meta( $transaction_id, 'BillingStreet', true);
+    $billing_street = !empty( $billing_street ) ? esc_html($billing_street) : '';
+    $billing_street2 = get_post_meta( $transaction_id, 'BillingStreet2', true);
+    $billing_street2 = !empty( $billing_street2 ) ? ', ' .esc_html($billing_street2) : '';
+    $billing_city = get_post_meta( $transaction_id, 'BillingCity', true);
+    $billing_city = !empty( $billing_city ) ? esc_html($billing_city) : '';
+    $billing_state = get_post_meta( $transaction_id, 'BillingState', true);
+    $billing_state = !empty( $billing_state ) ? ', '. esc_html($billing_state) : '';
+    $billing_postal_code = get_post_meta( $transaction_id, 'BillingPostalCode', true);
+    $billing_postal_code = !empty( $billing_postal_code ) ? esc_html($billing_postal_code) : '';
+    $billing_country_code = get_post_meta( $transaction_id, 'BillingCountryCode', true);
+    $billing_country_code = !empty( $billing_country_code ) ? esc_html($billing_country_code) : '';
+
+    $shipping_first_name = get_post_meta( $transaction_id, 'ShippingFirstName', true);
+    $shipping_first_name = !empty( $shipping_first_name ) ? esc_html($shipping_first_name) : '';
+    $shipping_last_name = get_post_meta( $transaction_id, 'ShippingLastName', true);
+    $shipping_last_name = !empty( $shipping_last_name ) ? esc_html($shipping_last_name) : '';
+    $shipping_street = get_post_meta( $transaction_id, 'ShippingStreet', true);
+    $shipping_street = !empty( $shipping_street ) ? esc_html($shipping_street) : '';
+    $shipping_street2 = get_post_meta( $transaction_id, 'ShippingStreet2', true);
+    $shipping_street2 = !empty( $shipping_street2 ) ? ', ' .esc_html($shipping_street2) : '';
+    $shipping_city = get_post_meta( $transaction_id, 'ShippingCity', true);
+    $shipping_city = !empty( $shipping_city ) ? esc_html($shipping_city) : '';
+    $shipping_state = get_post_meta( $transaction_id, 'ShippingState', true);
+    $shipping_state = !empty( $shipping_state ) ? ', '. esc_html($shipping_state) : '';
+    $shipping_postal_code = get_post_meta( $transaction_id, 'ShippingPostalCode', true);
+    $shipping_postal_code = !empty( $shipping_postal_code ) ? esc_html($shipping_postal_code) : '';
+    $shipping_country_code = get_post_meta( $transaction_id, 'ShippingCountryCode', true);
+    $shipping_country_code = !empty( $shipping_country_code ) ? esc_html($shipping_country_code) : '';
+
+    $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
+    $shippingSameAsBilling = get_post_meta( $transaction_id, 'shippingSameAsBilling', true);
+
+    $style = isset($args['is_email']) ? 'margin: 0;font-size: 12px;font-weight: 600;padding:0;' : 'padding:0;margin:0';
+    $name_text_color = isset($args['name_text_color']) ? 'color:'.$args['name_text_color'].';' : '';
+    $billing_address_html = '';
+    $billing_address_html .= "<p style='".$style.$name_text_color."'>" . $billing_first_name . ' ' . $billing_last_name . "</p>";
+    $billing_address_html .= "<p style='".$style."'>" . $billing_street . $billing_street2 . "</p>";
+    $billing_address_html .= "<p style='".$style."'>" . $billing_city . $billing_state . ' ' . $billing_postal_code . "</p>";
+    $billing_address_html .= "<p style='".$style."'>" . $billing_country_code . "</p>";
+
+    $shipping_address_html = '';
+    $shipping_address_html .= "<p style='".$style.$name_text_color."'>" . $shipping_first_name . ' ' . $shipping_last_name . "</p>";
+    $shipping_address_html .= "<p style='".$style."'>" . $shipping_street .  $shipping_street2 . "</p>";
+    $shipping_address_html .= "<p style='".$style."'>" . $shipping_city . $shipping_state . ' ' . $shipping_postal_code . "</p>";
+    $shipping_address_html .= "<p style='".$style."'>" . $shipping_country_code . "</p>";
+
+    $response = array(
+        'billing_address'=> $billing_address_html,
+        'shipping_address'=> ''
+    );
+
+    if( 'true' !== $shippingDisabled && 'true' !== $shippingSameAsBilling ){
+        $response['shipping_address'] = $shipping_address_html;
+    } elseif ( 'true' !== $shippingDisabled ) {
+        $response['shipping_address'] = $billing_address_html;
+    }
+
+    return !empty( $response ) ? $response : array();
+
 }

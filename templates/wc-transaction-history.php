@@ -157,64 +157,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     ?>
     <div class="customer-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <?php
+        $addresses = get_transaction_address_format($transaction_id);
+
         $billingInfo = get_post_meta( $transaction_id, 'billingInfo', true);
         $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
         $shippingSameAsBilling = get_post_meta( $transaction_id, 'shippingSameAsBilling', true);
 
-        $billing_address = array();
-
-        $BillingFirstName = get_post_meta( $transaction_id, 'BillingFirstName', true);
-        if( !empty($BillingFirstName)) { $billing_address['first_name'] = $BillingFirstName; }
-
-        $BillingLastName = get_post_meta( $transaction_id, 'BillingLastName', true);
-        if( !empty($BillingLastName)) { $billing_address['last_name'] = $BillingLastName; }
-
-        $BillingStreet = get_post_meta( $transaction_id, 'BillingStreet', true);
-        if( !empty($BillingStreet)) { $billing_address['street1'] = $BillingStreet; }
-
-        $BillingStreet2 = get_post_meta( $transaction_id, 'BillingStreet2', true);
-        if( !empty($BillingStreet2)) { $billing_address['street2'] = $BillingStreet2; }
-
-        $BillingCity = get_post_meta( $transaction_id, 'BillingCity', true);
-        if( !empty($BillingCity)) { $billing_address['city'] = $BillingCity; }
-
-        $BillingState = get_post_meta( $transaction_id, 'BillingState', true);
-        if( !empty($BillingState)) { $billing_address['state'] = $BillingState; }
-
-        $BillingPostalCode = get_post_meta( $transaction_id, 'BillingPostalCode', true);
-        if( !empty($BillingPostalCode)) { $billing_address['pincode'] = $BillingPostalCode; }
-
-        $BillingCountryCode = get_post_meta( $transaction_id, 'BillingCountryCode', true);
-        if( !empty($BillingCountryCode)) { $billing_address['country'] = $BillingCountryCode; }
-
         $BillingPhoneNumber = get_post_meta( $transaction_id, 'BillingPhoneNumber', true);
-
-        $shipping_address = array();
-
-        $ShippingFirstName = get_post_meta( $transaction_id, 'ShippingFirstName', true);
-        if( !empty( $ShippingFirstName ) ) { $shipping_address['first_name'] = $ShippingFirstName; }
-
-        $ShippingLastName = get_post_meta( $transaction_id, 'ShippingLastName', true);
-        if( !empty( $ShippingLastName ) ) { $shipping_address['last_name'] = $ShippingLastName; }
-
-        $ShippingStreet = get_post_meta( $transaction_id, 'ShippingStreet', true);
-        if( !empty( $ShippingStreet ) ) { $shipping_address['street1'] = $ShippingStreet; }
-
-        $ShippingStreet2 = get_post_meta( $transaction_id, 'ShippingStreet2', true);
-        if( !empty( $ShippingStreet2 ) ) { $shipping_address['street2'] = $ShippingStreet2; }
-
-        $ShippingCity = get_post_meta( $transaction_id, 'ShippingCity', true);
-        if( !empty( $ShippingCity ) ) { $shipping_address['city'] = $ShippingCity; }
-
-        $ShippingState = get_post_meta( $transaction_id, 'ShippingState', true);
-        if( !empty( $ShippingState ) ) { $shipping_address['state'] = $ShippingState; }
-
-        $ShippingPostalCode = get_post_meta( $transaction_id, 'ShippingPostalCode', true);
-        if( !empty( $ShippingPostalCode ) ) { $shipping_address['pincode'] = $ShippingPostalCode; }
-
-        $ShippingCountryCode = get_post_meta( $transaction_id, 'ShippingCountryCode', true);
-        if( !empty( $ShippingCountryCode ) ) { $shipping_address['country'] = $ShippingCountryCode; }
-
         $ShippingPhoneNumber = get_post_meta( $transaction_id, 'ShippingPhoneNumber', true);
         $ShippingEmail = get_post_meta( $transaction_id, 'ShippingEmail', true);
         ?>
@@ -239,7 +188,6 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <li class="transaction_history_receipt_info">
                         <strong>
                             <?php _e('Status : ','usb-swiper'); ?>
-
                         </strong>
 
                         <?php echo usbswiper_get_payment_status($payment_status); ?>
@@ -260,37 +208,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <p style="margin-bottom: 0"><strong><?php echo $company_name ;?></strong></p>
                 <?php
                 // Splitting the Address Values
-                if (!empty($billing_address)){
-
-                    $billing_address_first_name =  !empty( $billing_address['first_name'] ) ? $billing_address['first_name'] : '' ;
-                    $billing_address_last_name = !empty( $billing_address['last_name'] ) ? $billing_address['last_name'] : '' ;
-                    $billing_address_street1 = !empty( $billing_address['street1'] ) ? $billing_address['street1'] : '' ;
-                    $billing_address_street2 = !empty( $billing_address['street2'] ) ? $billing_address['street2'] : '' ;
-                    $billing_address_city  = !empty( $billing_address['city'] ) ? $billing_address['city'] : '' ;
-                    $billing_address_state = !empty( $billing_address['state'] ) ? $billing_address['state'] : '' ;
-                    $billing_address_pincode  = !empty( $billing_address['pincode'] ) ? $billing_address['pincode'] : '' ;
-                    $billing_address_country  = !empty( $billing_address['country']) ? $billing_address['country'] : '' ;
-                    ?>
-                    <p>
-                        <?php echo esc_attr($billing_address_first_name)  . ' ' .   esc_attr($billing_address_last_name)  . ',<br/>';
-                        echo sprintf( '%s %s', ! empty( $billing_address_street1 ) ? esc_attr($billing_address_street1).',' : '', ! empty( $billing_address_street2 ) ? esc_attr($billing_address_street2) : '' ). ' <br/>';
-                        echo sprintf( '%s %s %s', ! empty( $billing_address_city ) ? esc_attr($billing_address_city).',' : '', ! empty( $billing_address_state ) ? esc_attr($billing_address_state) : '', ! empty( $billing_address_pincode ) ? ' '.esc_attr($billing_address_pincode) : '' ). ' <br/>';
-                        echo esc_attr($billing_address_country)  . ' <br/>';
-                        ?>
-                    </p>
-                    <?php
-                }
-                if(!empty($BillingPhoneNumber)){
-                    ?>
+                echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
+                if(!empty($BillingPhoneNumber)){ ?>
                     <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
                     <?php
                 }
-                if(!empty($BillingEmail)){
-                    ?>
+                if(!empty($BillingEmail)){ ?>
                     <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
-                    <?php
-                }
-                ?>
+                <?php } ?>
             </address>
         </div>
         <!--Shipping Address-->
@@ -300,45 +225,15 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <?php if( 'true' !== $shippingDisabled ) {
                     if( 'true' !== $shippingSameAsBilling ) { ?>
                         <!-- Splitting the Address Values-->
-                        <?php  if (!empty($shipping_address)){
-
-                            $shipping_address_first_name = !empty( $shipping_address['first_name'] ) ? $shipping_address['first_name'] : '' ;
-                            $shipping_address_last_name = !empty( $shipping_address['last_name'] ) ? $shipping_address['last_name'] : '' ;
-                            $shipping_address_street1 = !empty( $shipping_address['street1'] ) ? $shipping_address['street1'] : '' ;
-                            $shipping_address_street2 = !empty( $shipping_address['street2'] ) ? $shipping_address['street2'] : '' ;
-                            $shipping_address_city  = !empty( $shipping_address['city'] ) ? $shipping_address['city'] : '' ;
-                            $shipping_address_state = !empty( $shipping_address['state'] ) ? $shipping_address['state'] : '' ;
-                            $shipping_address_pincode  = !empty( $shipping_address['pincode'] ) ? $shipping_address['pincode'] : '' ;
-                            $shipping_address_country  = !empty( $shipping_address['country'] ) ? $shipping_address['country'] : '' ;
-                            ?>
-                            <p>
-                                <?php  echo esc_attr($shipping_address_first_name) . ' ' .   esc_attr($shipping_address_last_name) . ',<br/>';
-                                echo sprintf( '%s %s', ! empty( $shipping_address_street1 ) ? esc_attr($shipping_address_street1).',' : '', ! empty( $shipping_address_street2 ) ? esc_attr($shipping_address_street2) : '' ). ' <br/>';
-                                echo sprintf( '%s %s %s', ! empty( $shipping_address_city ) ? esc_attr($shipping_address_city).',' : '', ! empty( $shipping_address_state ) ? esc_attr($shipping_address_state) : '', ! empty( $shipping_address_pincode ) ? ' '.esc_attr($shipping_address_pincode) : '' ). ' <br/>';
-                                echo esc_attr($shipping_address_country) . ' <br/>';
-                                ?>
-                            </p>
-                            <?php
-                        }
-                        ?>
+                        <?php  echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';?>
                         <p class="woocommerce-customer-details--phone"><?php echo esc_attr($ShippingPhoneNumber); ?></p>
                         <p class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
-                    <?php } else { ?>
-                        <p>
-                            <?php  echo esc_attr($billing_address_first_name) . ' ' .   esc_attr($billing_address_last_name) . ',<br/>';
-                            echo esc_attr($billing_address_street1) . ', ' . esc_attr($billing_address_street2) . '<br/>';
-                            echo esc_attr($billing_address_city) . ', ' . esc_attr($billing_address_state) . '-' . esc_attr($billing_address_pincode) . ' <br/>';
-                            echo esc_attr($billing_address_country) . ' <br/>';
-                            ?>
-                        </p>
-                        <?php
-                        if(!empty($BillingPhoneNumber)){
-                            ?>
+                    <?php } else {
+                        echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';
+                        if(!empty($BillingPhoneNumber)){ ?>
                             <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
-                            <?php
-                        }
-                        if(!empty($BillingEmail)){
-                            ?>
+                        <?php }
+                        if(!empty($BillingEmail)){ ?>
                             <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
                             <?php
                         }

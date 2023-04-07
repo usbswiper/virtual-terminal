@@ -15,8 +15,6 @@ $merchant_brand = !empty( $merchant_brand ) ? $merchant_brand : get_bloginfo('na
 
 $transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
 $payment_status = usbswiper_get_transaction_status($invoice_id);
-$billing_first_name = get_post_meta($invoice_id, 'BillingFirstName', true);
-$billing_last_name = get_post_meta($invoice_id, 'BillingLastName', true);
 $billing_email = get_post_meta($invoice_id, 'BillingEmail', true);
 $billing_phone_number = get_post_meta($invoice_id, 'BillingPhoneNumber', true);
 $net_amount = get_post_meta($invoice_id, 'NetAmount', true);
@@ -30,49 +28,11 @@ $item_names = get_post_meta($invoice_id, 'ItemName', true);
 $invoice_notes = get_post_meta($invoice_id, 'Notes', true);
 $billing_phone_number = !empty( $billing_phone_number ) ? mobile_number_format($billing_phone_number) : '-';
 
-$billing_address = array();
-
-$BillingStreet = get_post_meta( $invoice_id, 'BillingStreet', true);
-if( !empty($BillingStreet)) { $billing_address[] = $BillingStreet; }
-
-$BillingStreet2 = get_post_meta( $invoice_id, 'BillingStreet2', true);
-if( !empty($BillingStreet2)) { $billing_address[] = $BillingStreet2; }
-
-$BillingCity = get_post_meta( $invoice_id, 'BillingCity', true);
-if( !empty($BillingCity)) { $billing_address[] = $BillingCity; }
-
-$BillingState = get_post_meta( $invoice_id, 'BillingState', true);
-if( !empty($BillingState)) { $billing_address[] = $BillingState; }
-
-$BillingPostalCode = get_post_meta( $invoice_id, 'BillingPostalCode', true);
-if( !empty($BillingPostalCode)) { $billing_address[] = $BillingPostalCode; }
-
-$BillingCountryCode = get_post_meta( $invoice_id, 'BillingCountryCode', true);
-if( !empty($BillingCountryCode)) { $billing_address[] = $BillingCountryCode; }
-
 $shippingDisabled = get_post_meta( $invoice_id,'shippingDisabled', true);
 
-$shipping_address = array();
 if( $shippingDisabled !== 'true') {
     $shippingSameAsBilling = get_post_meta($invoice_id, 'shippingSameAsBilling', true);
     if( $shippingSameAsBilling !== true ) {
-        $ShippingFirstName = get_post_meta( $invoice_id, 'ShippingFirstName', true);
-        if( !empty( $ShippingFirstName ) ) { $shipping_address[] = $ShippingFirstName; }
-        $ShippingLastName = get_post_meta( $invoice_id, 'ShippingLastName', true);
-        if( !empty( $ShippingLastName ) ) { $shipping_address[] = $ShippingLastName; }
-        $shipping_address_1 = get_post_meta( $invoice_id,'ShippingStreet', true);
-        if( !empty($shipping_address_1)) { $shipping_address[] = $shipping_address_1; }
-        $shipping_address_2 = get_post_meta( $invoice_id,'ShippingStreet2', true);
-        if( !empty($shipping_address_2)) { $shipping_address[] = $shipping_address_2; }
-        $shipping_city = get_post_meta( $invoice_id,'ShippingCity', true);
-        if( !empty($shipping_city)) { $shipping_address[] = $shipping_city; }
-        $shipping_state = get_post_meta( $invoice_id,'ShippingState', true);
-        if( !empty($shipping_state)) { $shipping_address[] = $shipping_state; }
-        $shipping_postcode = get_post_meta( $invoice_id,'ShippingPostalCode', true);
-        if( !empty($shipping_postcode)) { $shipping_address[] = $shipping_postcode; }
-        $shipping_country = get_post_meta( $invoice_id,'ShippingCountryCode', true);
-        if( !empty($shipping_country)) { $shipping_address[] = $shipping_country; }
-
         $ShippingPhoneNumber = get_post_meta( $invoice_id, 'ShippingPhoneNumber', true);
         $ShippingEmail = get_post_meta( $invoice_id, 'ShippingEmail', true);
     }
@@ -88,7 +48,12 @@ $discount_amount = !empty( $discount_amount ) ? usb_swiper_price_formatter($disc
 $discount_percentage = !empty( $discount_percentage ) ? $discount_percentage : '0%';
 
 $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
+$address_args = array('is_email' => true,
+    'name_text_color'=> '#4361ee'
+);
+$addresses = get_transaction_address_format($invoice_id, $address_args);
 
+$company_name = get_post_meta($invoice_id,'company',true);
 ?>
 <div class="invoice-wrap" style="border: 1px solid #ccc;box-shadow: 0 0 10px #ccc;width: <?php echo $is_email ? '100%':'70%'; ?>">
     <section class="invoice-branding invoice-general" style="display: block;padding: 20px;float: left;width: 100%;border-bottom: 1px solid #CCC;">
@@ -120,28 +85,15 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
         <div class="address" style="width: 75%;display: inline-block;vertical-align: top;float: left;">
             <div class="address" style="width: 50%;display: inline-block;vertical-align: top;float: left;">
                 <h2 style="font-size: 20px;"><?php _e('Invoice To', 'usb-swiper'); ?></h2>
-                <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $billing_first_name . ' ' . $billing_last_name ; ?></p>
-                <?php
-                if( empty( $shipping_address ) && !empty( $billing_address ) ){
-                    echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $BillingStreet ) ? esc_attr($BillingStreet).',' : '', ! empty( $BillingStreet2 ) ? esc_attr($BillingStreet2) : '' ). '<br />';
-                    echo sprintf( '%s %s %s', ! empty( $BillingCity ) ? esc_attr($BillingCity).',' : '', ! empty( $BillingState ) ? esc_attr($BillingState) : '', ! empty( $BillingPostalCode ) ? ' '.esc_attr($BillingPostalCode) : '' ). '<br />';
-                    echo !empty($BillingCountryCode) ? esc_attr($BillingCountryCode) : '' . '</p>';
-                } else {
-                    echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '<br />';
-                    echo sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' '.esc_attr($shipping_postcode) : '' ). '<br />';
-                    echo !empty($shipping_country) ? esc_attr($shipping_country) : '' . '</p>';
-                } ?>
+                <?php echo ! empty( $company_name ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;padding:0;">'.$company_name.'</p>' : '' ?>
+                <?php echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : $addresses['shipping_address']; ?>
                 <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
                 <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
             </div>
-            <?php if( !empty( $shipping_address ) && !empty( $billing_address ) ){ ?>
+            <?php if( !empty( $addresses['shipping_address'] ) && !empty( $addresses['billing_address'] ) ){ ?>
                 <div class="address" style="width: 50%;display: inline-block;vertical-align: top;float: left;">
                     <h2 style="font-size: 20px;"><?php _e('Shipping Address', 'usb-swiper'); ?></h2>
-                    <p style="margin: 0;font-size: 14px;font-weight: 600;color:#4361ee;"><?php echo $ShippingFirstName . ' ' . $ShippingLastName ; ?></p>
-                    <?php
-                    echo '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.sprintf( '%s %s', ! empty( $shipping_address_1 ) ? esc_attr($shipping_address_1).',' : '', ! empty( $shipping_address_2 ) ? esc_attr($shipping_address_2) : '' ). '<br />';
-                    echo sprintf( '%s %s %s', ! empty( $shipping_city ) ? esc_attr($shipping_city).',' : '', ! empty( $shipping_state ) ? esc_attr($shipping_state) : '', ! empty( $shipping_postcode ) ? ' '.esc_attr($shipping_postcode) : '' ). '<br />';
-                    echo !empty($shipping_country) ? esc_attr($shipping_country) : '' . '</p>';
+                    <?php echo ( !empty( $addresses['shipping_address'] ) && !empty( $addresses['billing_address'] ) ) ? $addresses['shipping_address'] : '';
                     echo ! empty( $ShippingEmail ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$ShippingEmail.'</p>' : '';
                     echo ! empty( $ShippingPhoneNumber ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$ShippingPhoneNumber.'</p>' : '' ?>
                 </div>
@@ -168,14 +120,12 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
             <tbody>
                 <?php
                 if( !empty( $vt_products ) && is_array($vt_products) ){
-
                     foreach ($vt_products as $key => $product ){
                         $quantity = !empty($product['product_quantity']) ? (int)$product['product_quantity'] : 0;
                         $price = !empty($product['product_price']) ? (float)$product['product_price'] : 0;
                         $total_price = $quantity * $price;
                         $price = !empty( $price ) ? usb_swiper_price_formatter($price) : usb_swiper_price_formatter(0);
-                        $total_price = !empty( $total_price ) ? usb_swiper_price_formatter($total_price) : usb_swiper_price_formatter(0);
-                        ?>
+                        $total_price = !empty( $total_price ) ? usb_swiper_price_formatter($total_price) : usb_swiper_price_formatter(0); ?>
                         <tr>
                             <td style="padding:10px;text-align: center;border-left: 0;border-right: 0;border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;" class="number" data-title="<?php _e( 'S.NO','usb-swiper'); ?>"><?php echo $key+1; ?></td>
                             <td style="padding:10px;text-align: left;border-left: 0;border-right: 0;border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;" class="item" data-title="<?php _e( 'ITEMS','usb-swiper'); ?>"><?php echo !empty($product['product_name']) ? $product['product_name'] : ""; ?></td>
