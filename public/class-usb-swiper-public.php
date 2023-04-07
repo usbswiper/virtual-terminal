@@ -875,21 +875,26 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				    include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 			    }
 
-			    $paypal_transaction_id = !empty( $_GET['paypal_transaction_id'] ) ? $_GET['paypal_transaction_id'] : '';
+				$paypal_transaction_id = !empty( $_GET['paypal_transaction_id'] ) ? $_GET['paypal_transaction_id'] : '';
 
-                if( !empty( $_REQUEST['transaction_id'] ) && $_REQUEST['transaction_id'] > 0 ) {
-                    usb_swiper_set_session('usb_swiper_woo_transaction_id', $_REQUEST['transaction_id']);
-                }
+				$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
 
-			    $transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
+				if( !empty( $_REQUEST['transaction_id'] ) && $_REQUEST['transaction_id'] > 0 ) {
+					usb_swiper_set_session('usb_swiper_woo_transaction_id', 0);
+					usb_swiper_set_session('usb_swiper_woo_transaction_id', $_REQUEST['transaction_id']);
+				}
 
-				$redirect_url =  esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) );
 				if( empty( $_REQUEST['transaction_id'] )  && !empty( $_REQUEST['pbi_transaction_id'] ) ) {
+					usb_swiper_set_session('usb_swiper_woo_transaction_id', 0);
 					$transaction_type = get_post_meta( $_REQUEST['pbi_transaction_id'], '_transaction_type', true );
-					usb_swiper_set_session('usb_swiper_woo_transaction_id',  sanitize_text_field( $_REQUEST['pbi_transaction_id'] ));
+					usb_swiper_set_session('usb_swiper_woo_transaction_id',  $_REQUEST['pbi_transaction_id']);
 				} else {
 					$transaction_type = get_post_meta( $_REQUEST['transaction_id'], '_transaction_type', true );
 				}
+
+				$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
+
+				$redirect_url =  esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) );
 				
 			    $Paypal_request = Usb_Swiper_Paypal_request::instance();
 			    $response = $Paypal_request->handle_cc_transaction_request($paypal_transaction_id);
