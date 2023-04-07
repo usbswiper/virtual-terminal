@@ -383,44 +383,24 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
     });
 
-    $(document).on('change','.vt-billing-country', function (){
+    $(document).on('change','.vt-billing-country, .vt-shipping-country', function (){
+
+        var fieldId  = $(this).attr('id');
+        var fieldName  = $(this).attr('name');
+
         jQuery.ajax({
             url: usb_swiper_settings.ajax_url,
             type: 'POST',
             dataType: 'json',
-            data: "action=vt_get_states&billing_country="+$(this).val(),
+            data: "action=vt_get_states&country_code="+$(this).val()+"&field_id="+fieldId,
         }).done(function ( response ) {
-            if( response.status && response.states !== "" ) {
-                $('select.vt-billing-states').show();
-                $('.vt-billing-states.text-field').remove();
-                $('.vt-billing-states').empty().append(response.states);
-            }else {
-                var FieldName = $('.vt-billing-states').attr('name');
-                $('select.vt-billing-states').hide();
-                $('.vt-billing-states.text-field').remove();
-                $('.vt-billing-states').after("<input type='text' class='vt-billing-address-field vt-billing-states text-field' autocomplete='off' name='"+FieldName+"' id='"+FieldName+"' required='required'>");
+            if( response.state_html && response.state_html !== "" ) {
+                if(response.is_shipping) {
+                    $('.shipping-states-wrap').html('').html(response.state_html);
+                } else{
+                    $('.billing-states-wrap').html('').html(response.state_html);
+                }
             }
         });
     });
-
-    $(document).on('change','.vt-shipping-country', function (){
-        jQuery.ajax({
-            url: usb_swiper_settings.ajax_url,
-            type: 'POST',
-            dataType: 'json',
-            data: "&action=vt_get_states&billing_country="+$(this).val(),
-        }).done(function ( response ) {
-            if( response.status && response.states !== "" ) {
-                $('select.vt-shipping-states').show();
-                $('.vt-shipping-states.text-field').remove();
-                $('.vt-shipping-states').empty().append(response.states);
-            } else {
-                var FieldName = $('.vt-billing-states').attr('name');
-                $('select.vt-shipping-states').hide();
-                $('.vt-shipping-states.text-field').remove();
-                $('.vt-shipping-states').after("<input type='text' class='vt-shipping-address-field vt-shipping-states text-field' autocomplete='off' name='"+FieldName+"' id='"+FieldName+"' required='required'>");
-            }
-        });
-    });
-
 });

@@ -1512,22 +1512,81 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          */
         public function vt_get_states() {
 
-            $billing_country = !empty($_POST['billing_country']) ? sanitize_text_field($_POST['billing_country']) : 'US';
-            $billing_states = usb_swiper_get_states($billing_country);
+            $country_code = !empty($_POST['country_code']) ? sanitize_text_field($_POST['country_code']) : 'US';
+            $field_id = !empty($_POST['field_id']) ? sanitize_text_field($_POST['field_id']) : 'BillingCountryCode';
+            $get_states = usb_swiper_get_states($country_code);
 
-            $billing_states_html = '';
-            if( !empty( $billing_states ) && count( $billing_states ) > 0 ){
-                foreach ( $billing_states as $key => $value ){
-                    $billing_states_html .= "<option value='".$key."'>".$value."</option>";
-                }
-            }
+			$form_field = '';
+			$is_shipping = false;
+			if( !empty( $field_id ) && 'BillingCountryCode' === $field_id ) {
 
-            $response = array(
-                'status' => true,
-                'states' => $billing_states_html,
-            );
+				if( !empty( $get_states ) ) {
 
-            wp_send_json( $response , 200 );
+					$form_field = array(
+						'type' => 'select',
+						'id' => 'BillingState',
+						'name' => 'BillingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'options' => $get_states,
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				} else {
+
+					$form_field = array(
+						'type' => 'text',
+						'id' => 'BillingState',
+						'name' => 'BillingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				}
+			} elseif ( !empty( $field_id ) && 'ShippingCountryCode' === $field_id ) {
+
+				$is_shipping = true;
+				if( !empty( $get_states ) ) {
+
+					$form_field = array(
+						'type' => 'select',
+						'id' => 'ShippingState',
+						'name' => 'ShippingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'options' => $get_states,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-shipping-address-field vt-shipping-states',
+						'wrapper' =>  false,
+					);
+				} else {
+
+					$form_field = array(
+						'type' => 'text',
+						'id' => 'ShippingState',
+						'name' => 'ShippingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-shipping-address-field vt-shipping-states',
+						'wrapper' =>  false,
+					);
+				}
+			}
+
+			$state_html = !empty( $form_field ) ? usb_swiper_get_html_field( $form_field ) : '';
+
+            wp_send_json( array(
+				'state_html' => $state_html,
+				'is_shipping' => $is_shipping,
+			) , 200 );
         }
 
 	}

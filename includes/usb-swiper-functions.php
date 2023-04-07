@@ -471,6 +471,8 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'options' => $get_states,
 				'description' => '',
 				'class' => 'vt-billing-address-field vt-billing-states',
+                'wrapper' =>  true,
+                'wrapper_class' => 'state-field billing-states-wrap',
 			),
 			array(
 				'type' => 'text',
@@ -606,6 +608,8 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'attributes' => '',
 				'description' => '',
 				'class' => 'vt-shipping-address-field vt-shipping-states',
+                'wrapper' =>  true,
+                'wrapper_class' => 'state-field shipping-states-wrap',
 			),
 			array(
 				'type' => 'text',
