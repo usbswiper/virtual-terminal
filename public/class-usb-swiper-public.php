@@ -804,7 +804,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         $settings = get_option( 'usb_swiper_settings' );
 
                         $response = array(
-                            'orderID' => $response['id']
+                            'orderID' => $response['id'],
+                            'transaction_id' => $transaction_id,
                         );
 
                         wp_send_json( $response, 200 );

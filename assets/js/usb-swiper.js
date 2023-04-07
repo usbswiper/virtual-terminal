@@ -131,6 +131,7 @@ jQuery( document ).ready(function( $ ) {
 
                             if( data.orderID ) {
                                 localStorage.setItem("vt_order_id", data.orderID);
+                                localStorage.setItem("transaction_id", data.transaction_id);
                                 return data.orderID;
                             } else {
                                 set_notification(data.message, 'error', data.message_type);
@@ -189,11 +190,12 @@ jQuery( document ).ready(function( $ ) {
                             cardholderName: firstName + ' ' + lastName
                         }).then(
                             function (payload) {
-                                localStorage.removeItem('vt_order_id')
+                                localStorage.removeItem('vt_order_id');
                                 if (payload.orderId) {
-                                    let transaction_id = $('#transaction_id').val();
+                                    let transaction_id = localStorage.getItem("transaction_id");
                                     $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + payload.orderId + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce + "&pbi_transaction_id="+transaction_id, function (data) {
                                         if( data.result === 'success' ) {
+                                            localStorage.removeItem('transaction_id');
                                             localStorage.removeItem('Company');
                                             localStorage.removeItem('BillingFirstName');
                                             localStorage.removeItem('BillingLastName');
