@@ -115,6 +115,8 @@ $form_fields = array(
         'description' => '',
         'default' => '',
         'class' => 'vt-billing-address-field vt-billing-states',
+		'wrapper' =>  true,
+		'wrapper_class' => 'state-field billing-states-wrap',
     ),
     array(
         'type' => 'text',
