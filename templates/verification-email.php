@@ -29,7 +29,7 @@ $merchant_address = get_user_address($user_id);
         <p><?php echo sprintf( __("Phone Number: %s", "usb-swiper"), $merchant_phone); ?></p>
         <p><?php echo sprintf( __("Business Name: %s", "usb-swiper"), $merchant_business_name); ?></p>
         <?php if( !empty( $user_web_url ) ){ ?>
-            <p><?php echo sprintf( __("Website URL: %s", "usb-swiper"), '<a target="_blank" href="'.$user_web_url.'">'.$user_web_url.'</a>'); ?></p>
+            <p><?php echo sprintf( __("Website URL: %s", "usb-swiper"), '<a style="color: #15c;" target="_blank" href="'.$user_web_url.'">'.$user_web_url.'</a>'); ?></p>
         <?php } ?>
         <p><?php echo sprintf( __("Business Add ress: %s", "usb-swiper"), $merchant_address); ?></p>
         <p><?php _e("Please underwrite this user and click below to verify them when ready.", "usb-swiper"); ?></p>
