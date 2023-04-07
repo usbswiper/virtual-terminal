@@ -11,7 +11,7 @@ $form_fields = array(
         'required' => true,
         'options' => '',
         'attributes' => '',
-        'class' => ''
+        'class' => 'vt-input-field'
     ),
     array(
         'type' => 'text',
@@ -22,7 +22,7 @@ $form_fields = array(
         'required' => true,
         'options' => '',
         'attributes' => '',
-        'class' => ''
+        'class' => 'vt-input-field'
     ),
 	array(
 		'type' => 'text',
@@ -33,7 +33,7 @@ $form_fields = array(
 		'required' => true,
 		'options' => '',
 		'attributes' => '',
-		'class' => ''
+		'class' => 'vt-input-field'
 	),
 	array(
 		'type' => 'url',
@@ -44,7 +44,7 @@ $form_fields = array(
 		'required' => true,
 		'options' => '',
 		'attributes' => '',
-		'class' => ''
+		'class' => 'vt-input-field'
 	),
 	array(
 		'type' => 'text',
@@ -55,7 +55,7 @@ $form_fields = array(
 		'required' => true,
 		'options' => '',
 		'attributes' => '',
-		'class' => ''
+		'class' => 'vt-input-field'
 	),
     array(
 		'type' => 'email',
@@ -66,7 +66,7 @@ $form_fields = array(
 		'required' => true,
 		'options' => '',
 		'attributes' => '',
-		'class' => ''
+		'class' => 'vt-input-field'
 	),
     array(
         'type' => 'text',
@@ -78,7 +78,7 @@ $form_fields = array(
             'maxlength' => 25
         ),
         'description' => '',
-        'class' => 'vt-billing-address-field',
+        'class' => 'vt-billing-address-field vt-input-field',
     ),
     array(
         'type' => 'text',
@@ -90,7 +90,7 @@ $form_fields = array(
             'maxlength' => 25
         ),
         'description' => '',
-        'class' => 'vt-billing-address-field',
+        'class' => 'vt-billing-address-field vt-input-field',
     ),
     array(
         'type' => 'text',
@@ -102,7 +102,7 @@ $form_fields = array(
             'maxlength' => 25
         ),
         'description' => '',
-        'class' => 'vt-billing-address-field',
+        'class' => 'vt-billing-address-field vt-input-field',
     ),
     array(
         'type' => 'select',
@@ -114,7 +114,7 @@ $form_fields = array(
         'options' => usb_swiper_get_states($default_country),
         'description' => '',
         'default' => '',
-        'class' => 'vt-billing-address-field vt-billing-states',
+        'class' => 'vt-billing-address-field vt-select-field vt-billing-states',
 		'wrapper' =>  true,
 		'wrapper_class' => 'state-field billing-states-wrap',
     ),
@@ -128,7 +128,7 @@ $form_fields = array(
         'attributes' => array(
             'maxlength' => 25
         ),
-        'class' => 'vt-billing-address-field',
+        'class' => 'vt-billing-address-field vt-input-field',
     ),
     array(
         'type' => 'select',
@@ -140,7 +140,7 @@ $form_fields = array(
         'options' => usb_swiper_get_countries(),
         'description' => '',
         'default' => $default_country,
-        'class' => 'vt-billing-address-field vt-billing-country',
+        'class' => 'vt-billing-address-field vt-select-field vt-billing-country',
     ),
 	array(
 		'type' => 'hidden',
