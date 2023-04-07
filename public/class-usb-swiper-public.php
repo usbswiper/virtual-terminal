@@ -1042,6 +1042,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
             }
 
+			usb_swiper_set_session('usb_swiper_woo_transaction_id', 0);
+			usb_swiper_set_session('usb_swiper_woo_transaction_id', $transaction_id);
+
             $Paypal_request = Usb_Swiper_Paypal_request::instance();
             $response = $Paypal_request->create_transaction_request($transaction_id);
 
@@ -1071,7 +1074,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
                 usb_swiper_set_session('usb_swiper_woo_create_transaction_id', $response['id']);
-                wp_send_json( array( 'orderID' => $response['id'] ), 200 );
+                wp_send_json( array( 'orderID' => $response['id'], 'transaction_id' => $transaction_id ), 200 );
 
             } else{
                 //wp_delete_post($transaction_id);
