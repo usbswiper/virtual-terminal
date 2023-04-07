@@ -1531,7 +1531,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						'attributes' => '',
 						'options' => $get_states,
 						'description' => '',
-						'class' => 'vt-billing-address-field vt-billing-states',
+						'class' => 'vt-billing-address-field vt-select-field vt-billing-states',
 						'wrapper' =>  false,
 					);
 				} else {
@@ -1544,7 +1544,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						'required' => true,
 						'attributes' => '',
 						'description' => '',
-						'class' => 'vt-billing-address-field vt-billing-states',
+						'class' => 'vt-billing-address-field vt-input-field vt-billing-states',
 						'wrapper' =>  false,
 					);
 				}
@@ -1562,7 +1562,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						'options' => $get_states,
 						'attributes' => '',
 						'description' => '',
-						'class' => 'vt-shipping-address-field vt-shipping-states',
+						'class' => 'vt-shipping-address-field vt-select-field vt-shipping-states',
 						'wrapper' =>  false,
 					);
 				} else {
@@ -1575,7 +1575,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						'required' => true,
 						'attributes' => '',
 						'description' => '',
-						'class' => 'vt-shipping-address-field vt-shipping-states',
+						'class' => 'vt-shipping-address-field vt-input-field vt-shipping-states',
 						'wrapper' =>  false,
 					);
 				}
