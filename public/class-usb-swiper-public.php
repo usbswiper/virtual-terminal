@@ -1579,6 +1579,36 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						'wrapper' =>  false,
 					);
 				}
+			} elseif ( !empty( $field_id ) && 'billing_country' === $field_id ) {
+
+				if( !empty( $get_states ) ) {
+
+					$form_field = array(
+						'type' => 'select',
+						'id' => 'billing_state',
+						'name' => 'billing_state',
+						'label' => __( 'State / County', 'usb-swiper'),
+						'required' => true,
+						'options' => $get_states,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-select-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				} else {
+
+					$form_field = array(
+						'type' => 'text',
+						'id' => 'billing_state',
+						'name' => 'billing_state',
+						'label' => __( 'State / County', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-input-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				}
 			}
 
 			$state_html = !empty( $form_field ) ? usb_swiper_get_html_field( $form_field ) : '';
