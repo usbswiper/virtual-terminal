@@ -883,21 +883,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			    $transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
 
-                $redirect_url =  esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) );
-                if( empty( $transaction_id ) ) {
-                    $woo_transaction = usb_swiper_get_session('usb_swiper_woo_transaction_id');
-                    $transaction_id = !empty( $_REQUEST['pbi_transaction_id'] ) ? sanitize_text_field( $_REQUEST['pbi_transaction_id'] ) : "";
-                    if( !empty( $transaction_id ) ){
-                        $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
-                        if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && empty($woo_transaction) ){
-                            usb_swiper_set_session('usb_swiper_woo_transaction_id', $transaction_id);
-                        }
-                    }
-                } else {
-                    $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
-                }
-
-
+				$redirect_url =  esc_url( wc_get_endpoint_url( 'view-transaction', $transaction_id, wc_get_page_permalink( 'myaccount' ) ) );
+				if( empty( $_REQUEST['transaction_id'] )  && !empty( $_REQUEST['pbi_transaction_id'] ) ) {
+					usb_swiper_set_session('usb_swiper_woo_transaction_id',  sanitize_text_field( $_REQUEST['pbi_transaction_id'] ));
+				} else {
+					$transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
+				}
+				
 			    $Paypal_request = Usb_Swiper_Paypal_request::instance();
 			    $response = $Paypal_request->handle_cc_transaction_request($paypal_transaction_id);
 
