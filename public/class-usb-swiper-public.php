@@ -1003,9 +1003,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         ));
 
                         $admin_email = WC()->mailer()->emails['transaction_email_admin'];
-                        $get_recipient = $admin_email->get_recipient();
+                        $get_recipient = '';
                         if( true !== (bool)$ignore_email ){
-                            $get_recipient .= ','.$current_user->user_email;
+                            $get_recipient .= $current_user->user_email;
                         }
                         $admin_email->recipient = $get_recipient;
                         $admin_email->trigger( array(
@@ -2035,6 +2035,28 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             return $string;
+        }
+
+        /**
+         * Add admin email in header bcc.
+         *
+         * @since 1.1.17
+         *
+         * @param $header
+         * @param $email_id
+         * @param $email_for_obj
+         * @param $email_class
+         * @return mixed|string
+         */
+        public function vt_woocommerce_email_headers( $header, $email_id ){
+
+            if ( !empty( $email_id ) && $email_id === 'transaction_email_admin' ) {
+                $admin_email_id = get_option('admin_email');
+                $admin_email_id = !empty( $admin_email_id ) ? $admin_email_id : '';
+                $header .= 'Bcc: '.$admin_email_id . "\r\n";
+            }
+
+            return $header;
         }
 	}
 }

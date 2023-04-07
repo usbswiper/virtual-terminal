@@ -193,6 +193,7 @@ class Usb_Swiper {
         $this->loader->add_filter('woocommerce_email_format_string', $plugin_public, 'format_email_subject_and_heading', 10, 2 );
         $this->loader->add_action('wp_ajax_manage_pay_with_paypal_transaction', $plugin_public, 'manage_pay_with_paypal_transaction' );
         $this->loader->add_action('wp_ajax_nopriv_manage_pay_with_paypal_transaction', $plugin_public, 'manage_pay_with_paypal_transaction');
+        $this->loader->add_filter( 'woocommerce_email_headers', $plugin_public, 'vt_woocommerce_email_headers', 10, 2 );
 
 		if (!is_admin()) {
 			return;
