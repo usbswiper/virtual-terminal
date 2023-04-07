@@ -1502,11 +1502,9 @@ function usbswiper_get_product_sku( $sku, $is_display = false ) {
     $default_prefix = $user_login.'-';
 
     if( $is_display ) {
-
+        $get_product_sku = str_replace($default_prefix,'',$sku);
         if(  !empty( $prefix ) ) {
-            $get_product_sku = trim($sku, $prefix);
-        } else {
-            $get_product_sku = trim($sku, $default_prefix);
+            $get_product_sku = str_replace($prefix,'',$get_product_sku);
         }
     } else {
         if(  !empty( $prefix ) ) {
