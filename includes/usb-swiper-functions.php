@@ -1086,20 +1086,26 @@ function usb_swiper_get_html_field( $field ) {
  *
  * @return array
  */
-function usbswiper_get_onboarding_user() {
+function usbswiper_get_onboarding_user( $user_id = 0 ) {
 
-	$merchant_user = array();
+    if( empty($user_id) && is_user_logged_in() ) {
+        $user_id = get_current_user_id();
+    }
 
-	if( is_user_logged_in() ) {
-		$merchant_user = get_user_meta( get_current_user_id(),'_merchant_onboarding_user',true);
-		$merchant_user = !empty( $merchant_user ) ? json_decode(base64_decode( ($merchant_user))) : '';
-	}
+    $settings = usb_swiper_get_settings('general');
+    $vt_invoice_page_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
 
-	/*if( isset( $_COOKIE['merchant_onboarding_user'] ) && !empty( $_COOKIE['merchant_onboarding_user'] ) ) {
-		$merchant_user = json_decode(base64_decode( ($_COOKIE['merchant_onboarding_user'])));
-	}*/
+    if( $vt_invoice_page_id === get_the_ID() ) {
 
-	return !empty( $merchant_user ) ? (array)$merchant_user : '';
+        $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
+        $invoice_id = !empty( $invoice_session->id ) ? trim($invoice_session->id, 'invoice_') :'';
+        $user_id = $invoice_id ? get_post_field( 'post_author', $invoice_id ) : 0;
+    }
+
+    $merchant_user = !empty( $user_id ) ? get_user_meta( $user_id,'_merchant_onboarding_user',true) : 0;
+    $merchant_user = !empty( $merchant_user ) ? json_decode(base64_decode( ($merchant_user))) : '';
+
+    return !empty( $merchant_user ) ? (array)$merchant_user : '';
 }
 
 /**
@@ -1128,7 +1134,9 @@ function usbswiper_get_platform_fees( $cart_total, $type = 'transaction', $trans
 		return 0;
 	}
 	$billing_country = get_user_meta( $user_id, 'billing_country', true);
-	$merchant_response = usbswiper_get_onboarding_merchant_response();
+
+    $transaction_user = $transaction_id ? get_post_field( 'post_author', $transaction_id ) : 0;
+	$merchant_response = usbswiper_get_onboarding_merchant_response($transaction_user);
 	$merchant_country = !empty( $merchant_response['country'] ) ? $merchant_response['country'] :'';
 	$settings = usb_swiper_get_settings('partner_fees');
 	$fees = !empty( $settings['fees']) ? $settings['fees'] : '';

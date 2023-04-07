@@ -367,7 +367,8 @@ class Usb_Swiper_Paypal_request{
 
         $TaxAmount = get_post_meta( $transaction_id,'TaxAmount', true);
 
-        $get_merchant_data = usbswiper_get_onboarding_merchant_response();
+		$transaction_user = $transaction_id ? get_post_field( 'post_author', $transaction_id ) : 0;
+        $get_merchant_data = usbswiper_get_onboarding_merchant_response($transaction_user);
         $merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
 
         if (isset($TaxAmount) && $TaxAmount > 0) {
@@ -377,7 +378,7 @@ class Usb_Swiper_Paypal_request{
             );
         }
 
-        $body_request['purchase_units'][0]['payee']['merchant_id'] = !empty($this->merchant_id) ? $this->merchant_id : $merchant_id;
+        $body_request['purchase_units'][0]['payee']['merchant_id'] = $merchant_id;
 
         $Notes = get_post_meta( $transaction_id,'Notes', true);
         if( !empty( $Notes ) && strlen( $Notes ) > 127 ) {
