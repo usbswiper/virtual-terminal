@@ -80,7 +80,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$smart_js_arg['client-id'] = USBSWIPER_PAYPAL_PARTNER_CLIENT_ID;
 			}
 
-			$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
+			$get_merchant_data = usbswiper_get_onboarding_merchant_response();
 			$merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
 
 			if( !empty( $merchant_id ) ) {
@@ -381,7 +381,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
 
-				$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
+				$get_merchant_data = usbswiper_get_onboarding_merchant_response();
 				if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
 				    ?>
                     <div class="vt-form-login-wrap">
@@ -426,7 +426,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
 
-			    $get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
+			    $get_merchant_data = usbswiper_get_onboarding_merchant_response();
 			    if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
 				    usb_swiper_get_template( 'virtual-terminal-form.php', $args );
 			    }
@@ -967,7 +967,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function wc_edit_account_form() {
-			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+			$merchant_data = usbswiper_get_onboarding_merchant_response();
 
            if( empty( $merchant_data)) {
                return;
@@ -1193,7 +1193,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 		public function wc_before_edit_account_form() {
 
-			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+			$merchant_data = usbswiper_get_onboarding_merchant_response();
 
             if( empty( $merchant_data ) ) {
                 return;
