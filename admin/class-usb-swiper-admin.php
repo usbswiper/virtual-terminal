@@ -1319,7 +1319,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		        return;
 		    }
 
-			$merchant_data = get_user_meta( $user_id,'_merchant_onboarding_response', true);
+			$merchant_data = usbswiper_get_onboarding_merchant_response($user_id);
 			$get_countries = WC()->countries->get_countries();
 
 		    ?>

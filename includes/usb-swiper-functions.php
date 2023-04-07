@@ -1128,7 +1128,7 @@ function usbswiper_get_platform_fees( $cart_total, $type = 'transaction', $trans
 		return 0;
 	}
 	$billing_country = get_user_meta( $user_id, 'billing_country', true);
-	$merchant_response = get_user_meta( $user_id, '_merchant_onboarding_response', true);
+	$merchant_response = usbswiper_get_onboarding_merchant_response();
 	$merchant_country = !empty( $merchant_response['country'] ) ? $merchant_response['country'] :'';
 	$settings = usb_swiper_get_settings('partner_fees');
 	$fees = !empty( $settings['fees']) ? $settings['fees'] : '';
@@ -1489,7 +1489,7 @@ function usbswiper_get_transaction_datetime( $transaction_id, $type = 'create_ti
 
 function usbswiper_get_locale() {
 
-	$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+	$merchant_data = usbswiper_get_onboarding_merchant_response();
 	$country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : '';
 
 	if( empty( $country_code ) ) {
@@ -1866,4 +1866,32 @@ function get_transaction_address_format( $transaction_id , $is_email = false ){
 
     return !empty( $response ) ? $response : array();
 
+}
+
+/**
+ * Get onboarding merchant PayPal data.
+ *
+ * @param int $user_id Get user id.
+ *
+ * @return mixed|string
+ */
+function usbswiper_get_onboarding_merchant_response( $user_id = 0 ) {
+
+    if( empty( $user_id ) && is_user_logged_in() ) {
+        $user_id = get_current_user_id();
+    }
+
+    $settings = usb_swiper_get_settings('general');
+    $vt_invoice_page_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+
+    if( $vt_invoice_page_id === get_the_ID() ) {
+
+        $invoice_session = !empty($_GET['invoice-session']) ? json_decode( base64_decode($_GET['invoice-session'])) : '';
+        $invoice_id = !empty( $invoice_session->id ) ? trim($invoice_session->id, 'invoice_') :'';
+        $user_id = $invoice_id ? get_post_field( 'post_author', $invoice_id ) : 0;
+    }
+
+    $merchant_response = !empty( $user_id ) ? get_user_meta( $user_id,'_merchant_onboarding_response',true) :'';
+
+    return !empty( $merchant_response ) ? $merchant_response : '';
 }

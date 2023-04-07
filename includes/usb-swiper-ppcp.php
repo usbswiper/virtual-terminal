@@ -269,7 +269,7 @@ class Usb_Swiper_PPCP{
 
 		$tracking_response = get_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response', true);
         if( empty( $tracking_response ) ) {
-	        $merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+	        $merchant_data = usbswiper_get_onboarding_merchant_response();
 	        $tracking_id = ! empty( $merchant_data['tracking_id'] ) ? $merchant_data['tracking_id'] : '';
 
 	        if( !empty( $tracking_id ) ) {
