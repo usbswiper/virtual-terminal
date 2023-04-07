@@ -48,10 +48,8 @@ $discount_amount = !empty( $discount_amount ) ? usb_swiper_price_formatter($disc
 $discount_percentage = !empty( $discount_percentage ) ? $discount_percentage : '0%';
 
 $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
-$address_args = array('is_email' => true,
-    'name_text_color'=> '#4361ee'
-);
-$addresses = get_transaction_address_format($invoice_id, $address_args);
+
+$addresses = get_transaction_address_format($invoice_id, true);
 
 $company_name = get_post_meta($invoice_id,'company',true);
 ?>

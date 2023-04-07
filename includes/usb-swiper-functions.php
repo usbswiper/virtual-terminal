@@ -633,7 +633,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'placeholder' => __( 'Email Address', 'usb-swiper'),
                 'required' => true,
                 'options' => array(),
-                'attributes' => array(  
+                'attributes' => array(
                     //'maxlength' => 25
                 ),
                 'class' => 'vt-input-field',
@@ -1796,7 +1796,7 @@ function get_paypal_transaction_url( $transaction_id ) {
  * @param int $transaction_id get the transaction id
  * @return array[] return the transaction billing and shipping address
  */
-function get_transaction_address_format( $transaction_id , $args = array() ){
+function get_transaction_address_format( $transaction_id , $is_email = false ){
 
     if( empty($transaction_id) ){
         return '';
@@ -1839,16 +1839,16 @@ function get_transaction_address_format( $transaction_id , $args = array() ){
     $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
     $shippingSameAsBilling = get_post_meta( $transaction_id, 'shippingSameAsBilling', true);
 
-    $style = isset($args['is_email']) ? 'margin: 0;font-size: 12px;font-weight: 600;padding:0;' : 'padding:0;margin:0';
-    $name_text_color = isset($args['name_text_color']) ? 'color:'.$args['name_text_color'].';' : '';
+    $style = isset($is_email) ? 'margin: 0;font-size: 12px;font-weight: 600;padding:0;' : 'padding:0;margin:0';
+
     $billing_address_html = '';
-    $billing_address_html .= "<p style='".$style.$name_text_color."'>" . $billing_first_name . ' ' . $billing_last_name . "</p>";
+    $billing_address_html .= "<p style='".$style."'>" . $billing_first_name . ' ' . $billing_last_name . "</p>";
     $billing_address_html .= "<p style='".$style."'>" . $billing_street . $billing_street2 . "</p>";
     $billing_address_html .= "<p style='".$style."'>" . $billing_city . $billing_state . ' ' . $billing_postal_code . "</p>";
     $billing_address_html .= "<p style='".$style."'>" . $billing_country_code . "</p>";
 
     $shipping_address_html = '';
-    $shipping_address_html .= "<p style='".$style.$name_text_color."'>" . $shipping_first_name . ' ' . $shipping_last_name . "</p>";
+    $shipping_address_html .= "<p style='".$style."'>" . $shipping_first_name . ' ' . $shipping_last_name . "</p>";
     $shipping_address_html .= "<p style='".$style."'>" . $shipping_street .  $shipping_street2 . "</p>";
     $shipping_address_html .= "<p style='".$style."'>" . $shipping_city . $shipping_state . ' ' . $shipping_postal_code . "</p>";
     $shipping_address_html .= "<p style='".$style."'>" . $shipping_country_code . "</p>";
