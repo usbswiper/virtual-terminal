@@ -1,6 +1,5 @@
 <?php
-$get_countries = usb_swiper_get_countries();
-$get_states = usb_swiper_get_states('US');
+$default_country = 'US';
 
 $form_fields = array(
     array(
@@ -112,9 +111,9 @@ $form_fields = array(
         'label' => __( 'State / County', 'usb-swiper'),
         'required' => true,
         'attributes' => '',
-        'options' => $get_states,
+        'options' => usb_swiper_get_states($default_country),
         'description' => '',
-        'default' => 'CA',
+        'default' => '',
         'class' => 'vt-billing-address-field vt-billing-states',
     ),
     array(
@@ -136,9 +135,9 @@ $form_fields = array(
         'label' => __( 'Country / Region', 'usb-swiper'),
         'required' => true,
         'attributes' => '',
-        'options' => $get_countries,
+        'options' => usb_swiper_get_countries(),
         'description' => '',
-        'default' => 'US',
+        'default' => $default_country,
         'class' => 'vt-billing-address-field vt-billing-country',
     ),
 	array(

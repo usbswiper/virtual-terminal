@@ -117,7 +117,12 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 $("form#ae-paypal-pos-form").validate({
-                    rules: {},
+                    rules: {
+                        BillingEmail: {
+                            required: true,
+                            email: true
+                        }
+                    },
                     messages: {},
                     submitHandler: function(form, event) {
 

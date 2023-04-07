@@ -162,7 +162,9 @@ function usb_swiper_get_countries() {
  * @return mixed|void
  */
 function usb_swiper_get_states( $country = 'US' ) {
-    return WC()->countries->get_states( $country );
+    $get_states = WC()->countries->get_states( $country );
+
+    return !empty( $get_states ) ? array_merge( array('' => __('Select state','usb-swiper')), $get_states) : '';
 }
 
 /**
@@ -176,8 +178,10 @@ function usb_swiper_get_states( $country = 'US' ) {
  */
 function usb_swiper_get_vt_form_fields( $tab = '' ) {
 
+    $merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+    $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
 	$get_countries = usb_swiper_get_countries();
-	$get_states = usb_swiper_get_states();
+	$get_states = usb_swiper_get_states($country_code);
 
 	$form_fields = array(
 		'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
@@ -259,7 +263,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 
 		)),
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
-
 			array(
 				'type' => 'select',
 				'id' => 'TransactionType',
@@ -490,7 +493,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'attributes' => '',
 				'options' => $get_countries,
 				'description' => '',
-                'default' => 'US',
+                'default' => $country_code,
 				'class' => 'vt-billing-address-field vt-billing-country',
 			),
 			array(
@@ -623,7 +626,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'options' => $get_countries,
 				'attributes' => '',
 				'description' => '',
-                'default' => 'US',
+                'default' => $country_code,
 				'class' => 'vt-shipping-address-field vt-shipping-country',
 			),
 			array(

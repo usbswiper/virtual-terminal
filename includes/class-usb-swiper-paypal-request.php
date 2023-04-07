@@ -244,7 +244,6 @@ class Usb_Swiper_Paypal_request{
 			if( empty( $shippingDisabled) ) {
 				$shipping_preference = 'SET_PROVIDED_ADDRESS';
 			}
-
 		}
 
 		return $shipping_preference;
