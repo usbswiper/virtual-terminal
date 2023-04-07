@@ -1847,7 +1847,7 @@ function get_transaction_address_format( $transaction_id , $is_email = false ){
     $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
     $shippingSameAsBilling = get_post_meta( $transaction_id, 'shippingSameAsBilling', true);
 
-    $style = isset($is_email) ? 'margin: 0;font-size: 12px;font-weight: 600;padding:0;' : 'padding:0;margin:0';
+    $style = isset($is_email) ? 'margin: 0;font-size: 12px;padding:0;' : 'padding:0;margin:0';
 
     $billing_address_html = '';
     $billing_address_html .= "<p style='".$style."'>" . $billing_first_name . ' ' . $billing_last_name . "</p>";
