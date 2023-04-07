@@ -27,7 +27,8 @@ $add_product_form_fields = array(
         'description' => '',
         'readonly' => false,
         'value' => ! empty( $product_name ) ? $product_name : '',
-        'class' => 'vt-input-field'
+        'class' => 'vt-input-field',
+        'required' => true,
     ),
     array(
         'type' => 'textarea',
@@ -54,7 +55,8 @@ $add_product_form_fields = array(
         'class' => 'vt-input-field',
         'is_symbol' => true,
         'symbol' => usbswiper_get_currency_symbol(),
-        'symbol_wrap_class' => 'currency-sign'
+        'symbol_wrap_class' => 'currency-sign',
+        'required' => true,
     ),
     array(
         'type' => 'text',
@@ -64,7 +66,7 @@ $add_product_form_fields = array(
         'attributes' => '',
         'description' => '',
         'readonly' => false,
-        'value' => ! empty( $product_sku ) ? $product_sku : '',
+        'value' => ! empty( $product_sku ) ? usbswiper_get_product_sku($product_sku, true) : '',
         'class' => 'vt-input-field'
     ),
     array(
@@ -112,6 +114,7 @@ $add_product_form_fields = array(
                     <?php
                 }
             } else { ?>
+                <div class="vt-form-notification"></div>
                 <form id="vt_add_product_form" method="post" action="" name="vt-add-product-form" enctype="multipart/form-data">
                     <?php
                     foreach ( $add_product_form_fields as $form_field ){
@@ -131,7 +134,6 @@ $add_product_form_fields = array(
                         <input type="hidden" name="vt_product_id" value="<?php echo $product_id; ?>">
                         <button id="vt_add_product_cancel" type="reset" class="vt-button"><?php _e( 'Cancel', 'usb-swiper'); ?></button>
                         <?php if( ! empty( $action ) && 'edit' === $action ) { ?>
-                            <input type="hidden" name="vt_product_id" value="<?php echo $product_id; ?>">
                             <button id="vt_add_product_submit" type="submit" class="vt-button"><?php _e( 'Update', 'usb-swiper'); ?></button>
                         <?php } else { ?>
                             <button id="vt_add_product_submit" type="submit" class="vt-button"><?php _e( 'Add Product', 'usb-swiper'); ?></button>
@@ -172,7 +174,7 @@ $add_product_form_fields = array(
                         <?php } ?>
                     </td>
                     <td class="product-content" data-title="<?php _e('Description','usb-swiper'); ?>"><?php echo usbswiper_set_content_limit($product_data->get_description());?></td>
-                    <td class="product-sku text-center" data-title="<?php _e('SKU','usb-swiper'); ?>"><?php echo $product_data->get_sku();?></td>
+                    <td class="product-sku text-center" data-title="<?php _e('SKU','usb-swiper'); ?>"><?php echo usbswiper_get_product_sku($product_data->get_sku(), true);?></td>
                     <td class="product-actions text-center" data-title="<?php _e('Action','usb-swiper'); ?>">
                         <a title="<?php _e('View product', 'usb-swiper'); ?>" href="<?php echo esc_url(add_query_arg( array('action'=>'view', 'product-id' => $product->ID), wc_get_endpoint_url( 'vt-products', '', wc_get_page_permalink( 'myaccount' )))); ?>" class="vt_view_product" data-id="<?php echo $product->ID;?>">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>

@@ -1488,3 +1488,33 @@ function usbswiper_set_content_limit( $content, $limit = 120, $more = '...' ) {
     return $content;
 
 }
+
+function usbswiper_get_product_sku( $sku, $is_display = false ) {
+
+    if(empty($sku) || !is_user_logged_in()) {
+        return;
+    }
+
+    $current_user = wp_get_current_user();
+    $user_login = !empty( $current_user->user_login ) ? $current_user->user_login : '';
+    $prefix = get_user_meta( get_current_user_id(),'invoice_prefix', true);
+
+    $default_prefix = $user_login.'-';
+
+    if( $is_display ) {
+
+        if(  !empty( $prefix ) ) {
+            $get_product_sku = trim($sku, $prefix);
+        } else {
+            $get_product_sku = trim($sku, $default_prefix);
+        }
+    } else {
+        if(  !empty( $prefix ) ) {
+            $get_product_sku = $prefix.$sku;
+        } else {
+            $get_product_sku = $default_prefix.$sku;
+        }
+    }
+
+    return $get_product_sku;
+}

@@ -257,9 +257,7 @@ jQuery( document ).ready(function( $ ) {
                         }
                     }
                 }).render('#angelleye_ppcp_checkout');
-
             }
-
         }
     }
 
@@ -349,6 +347,34 @@ jQuery( document ).ready(function( $ ) {
         });
 
         event.preventDefault();
+    });
+
+    jQuery("form#vt_add_product_form").validate({
+        rules: {},
+        messages: {},
+        submitHandler: function (form, event) {
+            $('.vt-form-notification').empty()
+            event.preventDefault();
+
+            var fd = new FormData();
+            fd.append('action','create_update_product');
+            fd.append('fields', $('#vt_add_product_form').serialize());
+            fd.append('product_image', $('#vt_product_image')[0].files[0]);
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+            }).done(function ( response ) {
+                if(response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            });
+        }
     });
 });
 
