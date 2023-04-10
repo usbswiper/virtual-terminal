@@ -44,9 +44,14 @@ jQuery( document ).ready(function( $ ) {
         var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
         $('.vt-form-notification').empty().append(notification);
 
-
         $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
     }
+
+    $.validator.addMethod("is_email", function(value, element) {
+        connsole.log(element);
+        connsole.log(value);
+        return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/i.test(value);
+    }, usb_swiper_settings.email_validation_message);
 
     const render_cc_form = () => {
 
@@ -120,7 +125,8 @@ jQuery( document ).ready(function( $ ) {
                     rules: {
                         BillingEmail: {
                             required: true,
-                            email: true
+                            email: true,
+                            is_email: true,
                         }
                     },
                     messages: {},
@@ -356,31 +362,41 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
     });
 
-    $( "#vt_verification_form" ).submit(function( event ) {
-        var form = $(this);
-        var form_id = form.attr('id');
-        var submitButton = form.find('#vt_verification_form_submit');
-        usb_swiper_add_loader(submitButton);
-
-        jQuery.ajax({
-            url: usb_swiper_settings.ajax_url,
-            type: 'POST',
-            dataType: 'json',
-            data: $(this).serialize()+"&action=vt_verification_form",
-        }).done(function ( response ) {
-
-            if( response.status) {
-                set_notification(response.message, 'success');
-                document.getElementById(form_id).reset();
-                window.location.href = response.location_redirect
-            } else{
-                set_notification(response.message, 'error', response.message_type);
+    $("#vt_verification_form").validate({
+        rules: {
+            email_address: {
+                required: true,
+                email: true,
+                is_email: true,
             }
+        },
+        messages: {},
+        submitHandler: function(form, event) {
 
-            usb_swiper_remove_loader(submitButton);
-        });
+            event.preventDefault();
+            var currentFormObj = $("#vt_verification_form");
+            var form_id = currentFormObj.attr('id');
+            var submitButton = currentFormObj.find('#vt_verification_form_submit');
+            usb_swiper_add_loader(submitButton);
 
-        event.preventDefault();
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: currentFormObj.serialize()+"&action=vt_verification_form",
+            }).done(function ( response ) {
+
+                if( response.status) {
+                    set_notification(response.message, 'success');
+                    document.getElementById(form_id).reset();
+                    window.location.href = response.location_redirect
+                } else{
+                    set_notification(response.message, 'error', response.message_type);
+                }
+
+                usb_swiper_remove_loader(submitButton);
+            });
+        }
     });
 
     $(document).on('change','.vt-billing-country, .vt-shipping-country', function (){

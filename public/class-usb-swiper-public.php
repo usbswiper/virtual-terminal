@@ -203,6 +203,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
                     'vt_page_url' => get_the_permalink($vt_page_id),
+					'email_validation_message' => __( 'Please enter a valid email address.', 'usb-swiper' ),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 

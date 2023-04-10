@@ -59,7 +59,7 @@ $form_fields = array(
 	),
     array(
 		'type' => 'email',
-		'id' => 'email-address',
+		'id' => 'email_address',
 		'name' => 'email-address',
 		'placeholder' => __('email.address@company.com', 'usb-swiper'),
 		'label' => 'Email Address',
