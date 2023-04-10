@@ -373,7 +373,12 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             return $query;
         }
 		/**
-		 * Sortable Columns in Transaction
+         * Sortable Columns in Transaction
+         *
+         * @since 1.1.17
+         *
+         * @param array $columns get all sortable column ids
+         * @return mixed
 		 */
         public function transactions_sortable_columns($columns){
 	        $columns['transaction_id'] ='transaction_id';

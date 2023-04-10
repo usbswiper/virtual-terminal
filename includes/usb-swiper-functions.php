@@ -1451,8 +1451,9 @@ function usb_swiper_price_formatter( $price ) {
 
 /**
  * function to return user's name
+ *
+ * @since 1.1.17
  */
-
 function usbswiper_get_user_name(){
 
     $user_name = '';
@@ -1489,6 +1490,15 @@ function usbswiper_set_content_limit( $content, $limit = 120, $more = '...' ) {
 
 }
 
+/**
+ * Get the product sku.
+ *
+ * @since 1.1.17
+ *
+ * @param string $sku
+ * @param boolean $is_display
+ * @return array|string|string[]|void
+ */
 function usbswiper_get_product_sku( $sku, $is_display = false ) {
 
     if(empty($sku) || !is_user_logged_in()) {

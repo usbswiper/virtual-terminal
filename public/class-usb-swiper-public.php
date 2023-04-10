@@ -558,7 +558,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
 		/**
+         * Trigger the paypal disconnect email.
+         *
          * @since 1.0.0
+         *
+         * @param int $user_id get the user id
 		 * @return void
 		 */
         public function disconnect_email($user_id){
