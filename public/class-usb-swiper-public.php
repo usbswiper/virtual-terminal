@@ -1435,9 +1435,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
-         * This function upload file from path
+         * This function upload file from path.
          *
-         * @param $file
+         * @since 1.1.17
+         *
+         * @param string $file
          * @return int|string|WP_Error
          */
         public function vt_upload_from_path( $file ) {
@@ -1503,7 +1505,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
-         * Extend product query and show only admins products
+         * Extend product query and show only admins products.
+         *
+         * @since 1.1.17
          *
          * @param $query
          * @return void
