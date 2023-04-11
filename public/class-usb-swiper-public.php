@@ -427,7 +427,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
+         * Get profile verification notification.
          *
+         * @since 1.1.17
          *
          * @return void
          */
@@ -452,6 +454,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
 		/**
+         * Get hte Verification form.
+         *
+         * @since 1.1.17
+         *
 		 * @return false|string $form
 		 */
         public function usb_swiper_vt_verification_form(){
@@ -1383,8 +1389,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Redirects User to My Account or Virtual Terminal.
-         * @since   1.1.9
          *
+         * @since   1.1.9
          */
 		function redirect_on_login($user_login, WP_User $user) {
 
@@ -1415,12 +1421,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
         /**
-         * Save function for VT verification form data in user meta
+         * Save function for VT verification form data in user meta.
+         *
+         * @since 1.1.17
          *
          * @return void
          */
-        public function vt_verification_form_cb()
-        {
+        public function vt_verification_form_cb() {
             $status       = false;
             $message      = '';
             $redirect_url = '';
@@ -1486,6 +1493,18 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response , 200 );
         }
 
+        /**
+         * Update the email header.
+         *
+         * @since 1.1.17
+         *
+         * @param string $header
+         * @param string $id
+         * @param object $header_object
+         * @param object $email
+         *
+         * @return string
+         */
         public function vt_email_headers( $header, $id, $header_object, $email ) {
 
             $header .= "From: {$email->get_from_name()} <{$email->get_from_address()}>\r\n";
@@ -1495,6 +1514,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Redirect user to verification page after register from WooCommerce account page.
+         *
+         * @since 1.1.17
          *
          * @return void
          */

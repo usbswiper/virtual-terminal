@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
- * Email class for PayPal Connected Notification
+ * Email class for profile verification completed Notification
  *
  * @extends \WC_Email
  */
