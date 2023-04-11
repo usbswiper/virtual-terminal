@@ -1151,8 +1151,19 @@ function usbswiper_get_user_name(){
 	return $user_name;
 }
 
+/**
+ * Check usb_swiper_get_field_value function is exists or not.
+ */
 if( !function_exists('usb_swiper_get_field_value') ) {
-
+    /**
+     * Get the field value from settings.
+     *
+     * @since 1.1.17
+     *
+     * @param string $field
+     * @param string $tab
+     * @return mixed|string
+     */
     function usb_swiper_get_field_value( $field , $tab ='general') {
 
         if( empty( $field ) ) {
