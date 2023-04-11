@@ -1346,6 +1346,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response , 200 );
         }
 
+        /**
+         * Send the transaction email html.
+         *
+         * @since 1.1.17
+         *
+         * @return void
+         */
         public function send_transaction_email_html() {
 
             $status  = false;
@@ -1354,7 +1361,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
             if( !empty( $transaction_id ) && $transaction_id > 0 ) {
                 $status = true;
-                $html = usbswiper_send_email_recepit_html($transaction_id);
+                $html = usbswiper_send_email_receipt_html($transaction_id);
             }
 
             $response = array(

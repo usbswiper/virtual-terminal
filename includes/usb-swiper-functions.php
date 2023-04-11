@@ -1466,9 +1466,20 @@ function usbswiper_get_user_name(){
 	return $user_name;
 }
 
-if( !function_exists('usbswiper_send_email_recepit_html') ) {
+/**
+ * Check usbswiper_send_email_receipt_html function exists or not.
+ */
+if( !function_exists('usbswiper_send_email_receipt_html') ) {
 
-    function usbswiper_send_email_recepit_html( $transaction_id ) {
+    /**
+     * Get the email receipt html
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return string
+     */
+    function usbswiper_send_email_receipt_html( $transaction_id ) {
 
         if( empty( $transaction_id ) ) {
             return '';
