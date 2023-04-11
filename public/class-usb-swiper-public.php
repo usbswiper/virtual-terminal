@@ -113,6 +113,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         /**
          * Register end point in wc_endpoints.
          *
+         * @since 1.1.17
+         *
          * @param  $query_vars
          *
          * @return
@@ -422,7 +424,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
         /**
-         * Invoice Detail page endpoint callback method.
+         * Invoice Detail page endpoint callback method
          *
          * @since 1.0.0
          *
@@ -2030,6 +2032,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Add Transaction id in email subject and heading.
+         *
+         * @since 1.1.17
          *
          * @param string $string
          * @param object $data
