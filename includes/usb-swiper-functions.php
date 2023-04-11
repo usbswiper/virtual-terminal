@@ -1284,6 +1284,13 @@ function usbswiper_get_default_currency( $user_id = 0 ) {
 	return $currency;
 }
 
+/**
+ * Get the current login user products.
+ *
+ * @since 1.1.17
+ *
+ * @return array
+ */
 function vt_get_curent_user_products() {
 
     $product_option = array('' => __( 'Select Product', 'usb-swiper'));
