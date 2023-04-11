@@ -2,7 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
- * Email class for Invoice Email Pending Notification
+ * Email class for Invoice Email Pending Notification to admin
  *
  * @extends \WC_Email
  */
@@ -40,6 +40,8 @@ class UsbSwiperInvoiceEmailPendingAdmin extends WC_Email {
     /**
      * get_content_html function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_html() {
@@ -65,6 +67,8 @@ class UsbSwiperInvoiceEmailPendingAdmin extends WC_Email {
     /**
      * get_content_plain function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_plain() {
@@ -86,7 +90,9 @@ class UsbSwiperInvoiceEmailPendingAdmin extends WC_Email {
     }
 
     /**
-     * Determine if the email should actually be sent and setup email merge variables
+     * Determine if the email should actually be sent and setup email merge variables.
+     *
+     * @since 1.1.17
      *
      * @param array $args
      * @return void
@@ -107,6 +113,10 @@ class UsbSwiperInvoiceEmailPendingAdmin extends WC_Email {
 
     /**
      * Admin Notify email form field.
+     *
+     * @since 1.1.17
+     *
+     * @return void
      */
     public function init_form_fields() {
 

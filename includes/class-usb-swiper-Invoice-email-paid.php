@@ -11,9 +11,7 @@ class UsbSwiperInvoiceEmailPaid extends WC_Email {
 
     /**
      * Set email defaults
-     *
      */
-
     public function __construct() {
 
         $this->customer_email = true;
@@ -43,6 +41,8 @@ class UsbSwiperInvoiceEmailPaid extends WC_Email {
     /**
      * get_content_html function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_html() {
@@ -66,6 +66,8 @@ class UsbSwiperInvoiceEmailPaid extends WC_Email {
     /**
      * get_content_plain function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_plain() {
@@ -87,7 +89,9 @@ class UsbSwiperInvoiceEmailPaid extends WC_Email {
     }
 
     /**
-     * Determine if the email has any attachments
+     * Determine if the email has any attachments.
+     *
+     * @since 1.1.17
      *
      * @return array|mixed|null
      */
@@ -98,6 +102,8 @@ class UsbSwiperInvoiceEmailPaid extends WC_Email {
 
     /**
      * Determine if the email should actually be sent and setup email merge variables.
+     *
+     * @since 1.1.17
      *
      * @param array $args
      * @return void
@@ -123,6 +129,8 @@ class UsbSwiperInvoiceEmailPaid extends WC_Email {
 
     /**
      * Customer invoice email form field.
+     *
+     * @since 1.1.17
      */
     public function init_form_fields() {
 

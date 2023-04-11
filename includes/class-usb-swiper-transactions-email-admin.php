@@ -2,7 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
- * Email class for Transaction Email Notification
+ * Email class for Transaction Email Notification to admin
  *
  * @extends \WC_Email
  */
@@ -11,7 +11,6 @@ class UsbSwiperTransactionEmailAdmin extends WC_Email {
 
     /**
      * Set email defaults
-     *
      */
     public function __construct() {
         $this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
@@ -41,6 +40,8 @@ class UsbSwiperTransactionEmailAdmin extends WC_Email {
     /**
      * get_content_html function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_html() {
@@ -65,6 +66,8 @@ class UsbSwiperTransactionEmailAdmin extends WC_Email {
     /**
      * get_content_plain function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_plain() {
@@ -86,7 +89,9 @@ class UsbSwiperTransactionEmailAdmin extends WC_Email {
     }
 
     /**
-     * Determine if the email should actually be sent and setup email merge variables
+     * Determine if the email should actually be sent and setup email merge variables.
+     *
+     * @since 1.1.17
      *
      * @param array $args
      * @return void
@@ -108,6 +113,7 @@ class UsbSwiperTransactionEmailAdmin extends WC_Email {
     /**
      * Admin Notify email form field.
      *
+     * @since 1.1.17
      */
     public function init_form_fields() {
 

@@ -1031,7 +1031,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
         /**
-         * Pay by invoice method
+         * Pay by invoice method.
+         *
+         * @since 1.1.17
          *
          * @param $transaction_id
          * @return void
@@ -1711,8 +1713,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Redirects User to My Account or Virtual Terminal.
-         * @since   1.1.9
          *
+         * @since   1.1.9
          */
 		function redirect_on_login($user_login, WP_User $user){
 			$merchant_user_info = get_user_meta( $user->ID,'_merchant_onboarding_user',true);
@@ -1728,8 +1730,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Append HTML on click of add item in vt-product-wrapper
-         * @since   1.1.9
          *
+         * @since   1.1.9
          */
         function add_vt_product_wrapper() {
             $status = false;
@@ -1757,8 +1759,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Append product list in search fields
-         * @since   1.1.9
          *
+         * @since   1.1.9
          */
         function vt_search_product() {
             $status = false;
@@ -1831,6 +1833,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response , 200 );
         }
 
+        /**
+         * Get pay by invoice template.
+         *
+         * @since 1.1.17
+         *
+         * @param array $args
+         * @return false|string
+         */
         function usb_swiper_pay_by_invoice( $args ) {
 
             $args = shortcode_atts( array(
@@ -1860,6 +1870,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             return $form;
         }
 
+        /**
+         * Manage the invoice pdf attachment.
+         *
+         * @since 1.1.17
+         *
+         * @param string $attachment
+         * @param int $transaction_id
+         * @return mixed|string
+         */
         public function manage_invoice_pdf_attachment( $attachment, $transaction_id ) {
 
             $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
@@ -1878,6 +1897,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Pay using PayPal transaction handel callback function.
+         *
+         * @since 1.1.17
          *
          * @return void
          */
@@ -2010,8 +2031,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         /**
          * Add Transaction id in email subject and heading.
          *
-         * @param $string
-         * @param $data
+         * @param string $string
+         * @param object $data
          * @return array|mixed|string|string[]
          */
         public function format_email_subject_and_heading( $string, $data ) {
@@ -2044,10 +2065,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @since 1.1.17
          *
-         * @param $header
-         * @param $email_id
-         * @param $email_for_obj
-         * @param $email_class
+         * @param string $header
+         * @param string $email_id
+         *
          * @return mixed|string
          */
         public function vt_woocommerce_email_headers( $header, $email_id ){

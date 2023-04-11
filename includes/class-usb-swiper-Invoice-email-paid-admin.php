@@ -2,7 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
- * Email class for Invoice Email Paid Notification
+ * Email class for Invoice Email Paid Notification to customer
  *
  * @extends \WC_Email
  */
@@ -11,7 +11,6 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
 
     /**
      * Set email defaults
-     *
      */
     public function __construct() {
         $this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
@@ -43,6 +42,8 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
     /**
      * get_content_html function.
      *
+     * @since 1.1.17
+     *
      * @return string
      */
     public function get_content_html() {
@@ -65,6 +66,8 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
 
     /**
      * get_content_plain function.
+     *
+     * @since 1.1.17
      *
      * @return string
      */
@@ -90,6 +93,8 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
     /**
      * Determine if the email should actually be sent and setup email merge variables
      *
+     * @since 1.1.17
+     *
      * @param array $args
      */
     public function trigger( $args ) {
@@ -108,6 +113,8 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
 
     /**
      * Admin Notify email form field.
+     *
+     * @since 1.1.17
      */
     public function init_form_fields() {
 

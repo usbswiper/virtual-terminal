@@ -1,7 +1,9 @@
 <?php
 /**
-* Filter the cart template path to use our cart.php template instead of the theme's
-*/
+ * Filter the cart template path to use our cart.php template instead of the theme's
+ *
+ * @since 1.1.17
+ */
 function usbswiper_locate_email_templates( $template, $template_name, $template_path ) {
 	$basename = basename( $template );
 	if( $basename == 'paypalconnected.php' ) {
@@ -1385,6 +1387,14 @@ function usbswiper_get_transaction_type( $transaction_id ) {
 	return strtoupper( $TransactionType );
 }
 
+/**
+ * Get the invoice transaction type.
+ *
+ * @since 1.1.17
+ *
+ * @param int $transaction_id
+ * @return string
+ */
 function usbswiper_get_invoice_transaction_type( $transaction_id ) {
 
     if( empty( $transaction_id ) ) {
@@ -1603,7 +1613,18 @@ function usbswiper_get_user_name(){
 	return $user_name;
 }
 
+/**
+ * Check mobile_number_format function is exists or not.
+ */
 if( ! function_exists('mobile_number_format') ){
+    /**
+     * Get the mobile number in specific format.
+     *
+     * @since 1.1.17
+     *
+     * @param int $number
+     * @return int|string
+     */
     function mobile_number_format( $number ){
         $number = !empty( $number ) ? (int)$number : "";
         if( !empty( $number ) && preg_match( '/^(\d{3})(\d{3})(\d{4})$/', $number,  $matches ) ) {
@@ -1614,6 +1635,14 @@ if( ! function_exists('mobile_number_format') ){
     }
 }
 
+/**
+ * Get the product html.
+ *
+ * @since 1.1.17
+ *
+ * @param int $id
+ * @return string
+ */
 function get_product_html( $id = 0 ) {
 
     $html = '<div id="vt_fields_wrap_'.$id.'" class="vt-fields-wrap">';
@@ -1670,6 +1699,14 @@ function get_product_html( $id = 0 ) {
     return $html;
 }
 
+/**
+ * Get the invoice status icon.
+ *
+ * @since 1.1.17
+ *
+ * @param $invoice_id
+ * @return mixed|void|null
+ */
 function usb_swiper_get_invoice_status_icon( $invoice_id ) {
 
     if( empty( $invoice_id ) ) {
@@ -1696,6 +1733,8 @@ function usb_swiper_get_invoice_status_icon( $invoice_id ) {
 
 /**
  * Convert object into array.
+ *
+ * @since 1.1.17
  *
  * @param object $obj
  * @return array $response
@@ -1726,6 +1765,8 @@ function object_to_array( $obj ) {
 
 /**
  * This function will count invoice of user.
+ *
+ * @since 1.1.17
  *
  * @param int $user_id
  * @param string $post_type
@@ -1878,6 +1919,8 @@ function get_transaction_address_format( $transaction_id , $is_email = false ){
 
 /**
  * Get onboarding merchant PayPal data.
+ *
+ * @since 1.1.17
  *
  * @param int $user_id Get user id.
  *
