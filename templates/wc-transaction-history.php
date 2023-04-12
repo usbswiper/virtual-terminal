@@ -78,9 +78,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
            'nonce' => wp_create_nonce('authorize-transaction-capture')
         )); ?>
         <div class="transaction-refund-wrap transaction-history-field">
-            <a class="vt-button capture-transaction" href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
+            <a class="vt-button capture-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
         </div>
-    <?php }
+        <?php echo refund_confirmation_html();
+    }
     if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
         $get_refund_status = usbswiper_get_refund_status();
         if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
@@ -90,7 +91,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <div class="transaction-refund-wrap transaction-history-field">
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
                 <div class="refund-form-wrap">
-                    <form method="post" action="" name="vt_refund_form" id="vt_refund_form">
+                    <form method="post" action="" name="vt_refund_form_data" id="vt_refund_form_data">
                         <div class="refund-field">
                             <label for="transaction_amount"><?php _e('Total Amount', 'usb-swiper'); ?></label>
                             <input type="text" readonly name="transaction_amount" id="transaction_amount" value="<?php echo $GrandTotal; ?>" />
@@ -99,17 +100,41 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                             <label for="remaining_amount"><?php _e('Remaining Amount', 'usb-swiper'); ?></label>
                             <input type="text" readonly name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
                         </div>
-                        <div class="refund-field">
+                        <div class="refund-field refund-amount-field">
                             <label for="refund_amount"><?php _e('Refund Amount', 'usb-swiper'); ?></label>
                             <input type="number" min="0" step="any" max="<?php echo $refund_amount; ?>" maxlength="<?php echo $refund_amount; ?>" name="refund_amount" id="refund_amount" value="<?php echo $refund_amount; ?>" />
                         </div>
                         <div class="refund-field refund-actions">
                             <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('refund-request'); ?>">
                             <input type="hidden" name="transaction_id" id="transaction_id" value="<?php echo $transaction_id; ?>">
-                            <button type="submit" class="vt-button confirm-transaction-refund" id="transaction_refund_btn" name="transaction_refund_btn"><?php _e('Refund','usb-swiper'); ?></button>
+                            <button type="button" class="vt-button confirm-transaction-refund-notification" id="transaction_refund_btn" name="transaction_refund_btn"><?php _e('Refund','usb-swiper'); ?></button>
                             <button type="button" class="vt-button-normal cancel-refund"><?php _e('Cancel','usb-swiper'); ?></button>
                         </div>
                     </form>
+                </div>
+                <div class="vt-refund-popup-wrapper">
+                    <div class="popup-loader"></div>
+                    <div class="vt-refund-popup-inner">
+                        <div class="close">
+                            <a href="javascript:void(0);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></a>
+                        </div>
+                        <div class="vt-notification-content">
+                            <div class="input-field-wrap ">
+                                <p><?php _e('Are you sure you want to process this refund?','usb-swiper'); ?></p>
+                            </div>
+                            <div class="input-field-wrap button-wrap">
+                                <form method="post" action="" name="vt_refund_form" id="vt_refund_form">
+                                    <input type="hidden" readonly name="transaction_amount" id="transaction_amount" value="<?php echo $GrandTotal; ?>" />
+                                    <input type="hidden" readonly name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
+                                    <input type="hidden" name="refund_amount" id="refund_amount" value="" />
+                                    <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('refund-request'); ?>">
+                                    <input type="hidden" name="transaction_id" id="transaction_id" value="<?php echo $transaction_id; ?>">
+                                    <button type="submit" class="vt-button confirm-transaction-refund" id="transaction_refund_btn" name="transaction_refund_btn"><?php _e('Refund','usb-swiper'); ?></button>
+                                    <button type="button" class="vt-button-normal cancel-refund"><?php _e('Cancel','usb-swiper'); ?></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <?php

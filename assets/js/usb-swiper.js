@@ -372,7 +372,7 @@ jQuery( document ).ready(function( $ ) {
     $( "#vt_refund_form" ).submit(function( event ) {
         var form = $(this);
         var form_id = form.attr('id');
-        var submitButton = form.find('.confirm-transaction-refund');
+        var submitButton = form.find('.confirm-transaction-refund')
         usb_swiper_add_loader(submitButton);
 
         jQuery.ajax({
@@ -389,8 +389,10 @@ jQuery( document ).ready(function( $ ) {
                 $('.refund-form-wrap').hide();
                 $('.refund-details').html('').html(response.html);
                 $('.payment-status-text').html('').html(response.refund_status);
+                $(".vt-refund-popup-wrapper").hide();
             } else{
                 set_notification(response.message, 'error', response.message_type);
+                $(".vt-refund-popup-wrapper").hide();
             }
 
             usb_swiper_remove_loader(submitButton);
@@ -524,6 +526,28 @@ jQuery( document ).ready(function( $ ) {
         $('#NetAmount').val(net_price.toFixed(2));
         updateSalesTax();
         updateGrandTotal();
+    });
+
+    $(document).on("click",".capture-transaction-button",function(){
+        var link= $(this).attr('data-href');
+        $('.vt-capture-popup-wrapper .capture-transaction').attr('href',link);
+        $('.vt-capture-popup-wrapper').show();
+    });
+
+    $(document).on("click",".vt-capture-popup-wrapper #vt_capture_cancel,.vt-capture-popup-wrapper  .close a",function(){
+        $('.vt-capture-popup-wrapper .capture-transaction').attr('href',"javascript:void(0);");
+        $(".vt-capture-popup-wrapper").hide();
+    });
+
+    $(document).on("click",".confirm-transaction-refund-notification",function(){
+        var refund_amount = $(this).parent().siblings('.refund-amount-field').children('#refund_amount').val();
+        $('.vt-refund-popup-wrapper #refund_amount').val(refund_amount);
+        $(".vt-refund-popup-wrapper").show();
+    });
+
+    $(document).on("click",".vt-refund-popup-wrapper .cancel-refund,.vt-refund-popup-wrapper  .close a",function(){
+        $('.vt-refund-popup-wrapper .capture-transaction').attr('href',"javascript:void(0);");
+        $(".vt-refund-popup-wrapper").hide();
     });
 
 });

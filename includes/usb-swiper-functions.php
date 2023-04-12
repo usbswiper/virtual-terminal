@@ -1951,3 +1951,38 @@ function usbswiper_get_onboarding_merchant_response( $user_id = 0 ) {
 
     return !empty( $merchant_response ) ? $merchant_response : '';
 }
+
+/**
+ * Get the Refund confirmation popup html
+ *
+ * @since 1.1.17
+ *
+ * @return string
+ */
+function refund_confirmation_html(){
+
+    $html = '';
+    ob_start(); ?>
+
+    <div class="vt-capture-popup-wrapper">
+        <div class="popup-loader"></div>
+        <div class="vt-capture-popup-inner">
+            <div class="close">
+                <a href="javascript:void(0);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></a>
+            </div>
+            <div class="vt-notification-content">
+                <div class="input-field-wrap ">
+                    <p><?php _e('Are you sure you want to capture this authorization?','usb-swiper'); ?></p>
+                </div>
+                <div class="input-field-wrap button-wrap">
+                    <button id="vt_capture_cancel" type="reset" class="vt-button"><?php _e('Cancel','usb-swiper'); ?></button>
+                    <a class="vt-button capture-transaction" href="#"><?php _e('CAPTURE','usb-swiper'); ?></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    $html = ob_get_clean();
+
+    return !empty( $html ) ? $html : '';
+}

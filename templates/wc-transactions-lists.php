@@ -62,7 +62,7 @@ if( $has_transactions ) : ?>
                                'nonce' => wp_create_nonce('authorize-transaction-capture')
                             ));
                             ?>
-                            <a class="vt-button capture-transaction" href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
+                            <a class="vt-button capture-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
                         <?php } ?>
 					</td>
 				</tr>
@@ -71,7 +71,7 @@ if( $has_transactions ) : ?>
 			?>
 		</tbody>
 	</table>
-
+    <?php echo refund_confirmation_html(); ?>
 	<div class="woocommerce-pagination woocommerce-pagination--without-numbers woocommerce-Pagination">
 		<?php if ( 1 !== $current_page ) :
             $next_page = $current_page - 1;

@@ -125,6 +125,19 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-col-pay-by-invoice fieldset {padding: 0;border: 0;box-shadow: unset;margin: 0;}
 .woocommerce-MyAccount-content .vt-form-notification {float: left;margin: 0;}
 .vt-repeater-field .vt-fields-wrap:nth-child(2) .vt-remove-fields-wrap {pointer-events: none;}
+
+.vt-capture-popup-wrapper,.vt-refund-popup-wrapper {background: #0006;bottom: 0;display: none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
+.vt-capture-popup-inner, .vt-refund-popup-inner {background: #FFFFFF;border-radius: 16px;max-width: 350px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width: calc( 100% - 20px );}
+.vt-capture-popup-wrapper .vt-capture-popup-content,.vt-refund-popup-wrapper .vt-refund-popup-content {display: block;height: 10vh;overflow-y: scroll;}
+.vt-capture-popup-content::-webkit-scrollbar,.vt-refund-popup-content::-webkit-scrollbar {width: 3px;background-color: #FFF!important;}
+.vt-capture-popup-content::-webkit-scrollbar-track,.vt-refund-popup-content::-webkit-scrollbar-track {box-shadow: inset 0 0 6px #FFF!important;}
+.vt-capture-popup-wrapper .input-field-wrap, .vt-refund-popup-wrapper .input-field-wrap {padding: 10px 0;}
+.vt-capture-popup-wrapper .close,.vt-refund-popup-wrapper .close {cursor: pointer;position: absolute;height: 26px;right: 10px;top: 10px;margin: 0 auto;width: 26px;}
+.vt-capture-popup-wrapper .close a,.vt-refund-popup-wrapper .close a {display: block;color: #000;}
+.vt-capture-popup-wrapper .button-wrap .vt-button, .vt-refund-popup-wrapper .button-wrap .vt-button {margin-right: 0.5rem;}
+.poupup-loader span.vt-loader {top: 50%;left: 50%;position: absolute; width: 20px;height: 20px;}
+.poupup-loader {width: 100%;height: 100%;position: absolute;left: 0;top:0;border-radius: 15px 15px;background: #00000042;z-index:1}
+.vt-refund-popup-wrapper
 @media (max-width: 760px) {
     .tool::after {font-size: .75em;margin-left: -5em;width: 10em;}
 }
