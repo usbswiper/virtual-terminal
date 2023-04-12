@@ -137,7 +137,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-capture-popup-wrapper .button-wrap .vt-button, .vt-refund-popup-wrapper .button-wrap .vt-button {margin-right: 0.5rem;}
 .poupup-loader span.vt-loader {top: 50%;left: 50%;position: absolute; width: 20px;height: 20px;}
 .poupup-loader {width: 100%;height: 100%;position: absolute;left: 0;top:0;border-radius: 15px 15px;background: #00000042;z-index:1}
-.vt-refund-popup-wrapper
 @media (max-width: 760px) {
     .tool::after {font-size: .75em;margin-left: -5em;width: 10em;}
 }
