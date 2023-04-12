@@ -390,6 +390,16 @@ jQuery( document ).ready(function( $ ) {
                 $('.refund-details').html('').html(response.html);
                 $('.payment-status-text').html('').html(response.refund_status);
                 $(".vt-refund-popup-wrapper").hide();
+                if( Number(response.remain_amount) > 0 ){
+                    $('.remain-amount-input').val(response.remain_amount);
+                    $('.refund-amount-input').attr({
+                        max: response.remain_amount,
+                        maxlength: response.remain_amount
+                    });
+                }else{
+                    $('.transaction-refund-wrap').remove();
+                }
+
             } else{
                 set_notification(response.message, 'error', response.message_type);
                 $(".vt-refund-popup-wrapper").hide();
@@ -540,7 +550,7 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $(document).on("click",".confirm-transaction-refund-notification",function(){
-        var refund_amount = $(this).parent().siblings('.refund-amount-field').children('#refund_amount').val();
+        var refund_amount = $(this).parent().siblings('.refund-amount-field').children('#refund_amount_display').val();
         $('.vt-refund-popup-wrapper #refund_amount').val(refund_amount);
         $(".vt-refund-popup-wrapper").show();
     });
@@ -550,6 +560,11 @@ jQuery( document ).ready(function( $ ) {
         $(".vt-refund-popup-wrapper").hide();
     });
 
+    $(document).on("focusout",".input-field-wrap.product .vt-product-input", function (){
+        setTimeout(function() {
+            $('.input-field-wrap.product .vt-search-result').remove();
+        },300);
+    });
 });
 
 function removeInterval(){

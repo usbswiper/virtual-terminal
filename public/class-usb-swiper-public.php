@@ -1497,6 +1497,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$message_type = __('ERROR','usb-swiper');
 			$refund_html = '';
             $refund_status = '';
+            $refund_amount = '';
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
@@ -1535,6 +1536,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                     $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
                                     $attachment = apply_filters('usb_swiper_email_attachment', '', $transaction_id);
                                     $refund_status = usbswiper_get_payment_status($payment_status);
+                                    $refund_amount = get_total_refund_amount($transaction_id);
                                     $email_args = array(
                                         'invoice' => true,
                                         'display_name' => wp_strip_all_tags($BillingFirstName)
@@ -1589,6 +1591,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'message' => $message,
 				'message_type' => $message_type,
                 'refund_status' => $refund_status,
+                'remain_amount' => $refund_amount,
 				'html' => $refund_html,
 			);
 

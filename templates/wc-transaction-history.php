@@ -93,21 +93,19 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <div class="refund-form-wrap">
                     <form method="post" action="" name="vt_refund_form_data" id="vt_refund_form_data">
                         <div class="refund-field">
-                            <label for="transaction_amount"><?php _e('Total Amount', 'usb-swiper'); ?></label>
-                            <input type="text" readonly name="transaction_amount" id="transaction_amount" value="<?php echo $GrandTotal; ?>" />
+                            <label for="transaction_amount_display"><?php _e('Total Amount', 'usb-swiper'); ?></label>
+                            <input type="text" readonly name="transaction_amount_display" id="transaction_amount_display" value="<?php echo $GrandTotal; ?>" />
                         </div>
                         <div class="refund-field">
-                            <label for="remaining_amount"><?php _e('Remaining Amount', 'usb-swiper'); ?></label>
-                            <input type="text" readonly name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
+                            <label for="remaining_amount_display"><?php _e('Remaining Amount', 'usb-swiper'); ?></label>
+                            <input type="text" readonly class="remain-amount-input" name="remaining_amount_display" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
                         </div>
                         <div class="refund-field refund-amount-field">
-                            <label for="refund_amount"><?php _e('Refund Amount', 'usb-swiper'); ?></label>
-                            <input type="number" min="0" step="any" max="<?php echo $refund_amount; ?>" maxlength="<?php echo $refund_amount; ?>" name="refund_amount" id="refund_amount" value="<?php echo $refund_amount; ?>" />
+                            <label for="refund_amount_display"><?php _e('Refund Amount', 'usb-swiper'); ?></label>
+                            <input type="number" min="0" class="remain-amount-input refund-amount-input" step="any" max="<?php echo $refund_amount; ?>" maxlength="<?php echo $refund_amount; ?>" name="refund_amount_display" id="refund_amount_display" value="<?php echo $refund_amount; ?>" />
                         </div>
                         <div class="refund-field refund-actions">
-                            <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('refund-request'); ?>">
-                            <input type="hidden" name="transaction_id" id="transaction_id" value="<?php echo $transaction_id; ?>">
-                            <button type="button" class="vt-button confirm-transaction-refund-notification" id="transaction_refund_btn" name="transaction_refund_btn"><?php _e('Refund','usb-swiper'); ?></button>
+                            <button type="button" class="vt-button confirm-transaction-refund-notification" id="transaction_refund_btn_display" name="transaction_refund_btn_display"><?php _e('Refund','usb-swiper'); ?></button>
                             <button type="button" class="vt-button-normal cancel-refund"><?php _e('Cancel','usb-swiper'); ?></button>
                         </div>
                     </form>
@@ -125,7 +123,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                             <div class="input-field-wrap button-wrap">
                                 <form method="post" action="" name="vt_refund_form" id="vt_refund_form">
                                     <input type="hidden" readonly name="transaction_amount" id="transaction_amount" value="<?php echo $GrandTotal; ?>" />
-                                    <input type="hidden" readonly name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
+                                    <input type="hidden" readonly class="remain-amount-input" name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
                                     <input type="hidden" name="refund_amount" id="refund_amount" value="" />
                                     <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('refund-request'); ?>">
                                     <input type="hidden" name="transaction_id" id="transaction_id" value="<?php echo $transaction_id; ?>">

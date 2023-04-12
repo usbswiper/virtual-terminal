@@ -52,6 +52,13 @@ $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
 $addresses = get_transaction_address_format($invoice_id, true);
 
 $company_name = get_post_meta($invoice_id,'company',true);
+
+$payment_response = get_post_meta( $invoice_id, '_payment_response', true);
+$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
+$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
+$payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
+
+
 ?>
 <div class="invoice-wrap" style="border: 1px solid #ccc;box-shadow: 0 0 10px #ccc;width: <?php echo $is_email ? '100%':'70%'; ?>">
     <section class="invoice-branding invoice-general" style="display: block;padding: 20px;float: left;width: 100%;border-bottom: 1px solid #CCC;">
@@ -172,4 +179,13 @@ $company_name = get_post_meta($invoice_id,'company',true);
             <?php } ?>
         </div>
     </section>
+    <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
+        if( !class_exists('Usb_Swiper_Paypal_request') ) {
+            include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+        }
+        $Paypal_request = new Usb_Swiper_Paypal_request(); ?>
+            <section class="invoice-refund-details invoice-general" style="display: block;padding: 20px;float: left;width: 100%;border-bottom: 1px solid #CCC;">
+            <?php echo $Paypal_request->get_refund_html($invoice_id); ?>
+            </section>
+    <?php } ?>
 </div>

@@ -1723,6 +1723,10 @@ function usb_swiper_get_invoice_status_icon( $invoice_id ) {
 
         if( !empty( $payment_status ) && strtolower( $payment_status ) === 'paid' ) {
             $icon = USBSWIPER_URL.'assets/images/paid.png';
+        } else if ( !empty( $payment_status ) && strtolower( $payment_status ) === 'partially_refunded' ) {
+            $icon = USBSWIPER_URL.'assets/images/partial-refund.png';
+        } else if ( !empty( $payment_status ) && strtolower( $payment_status ) === 'refunded' ) {
+            $icon = USBSWIPER_URL.'assets/images/full-refund.png';
         } else {
             $icon = USBSWIPER_URL.'assets/images/pending.png';
         }
