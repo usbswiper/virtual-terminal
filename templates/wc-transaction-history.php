@@ -364,7 +364,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <a href="<?php echo esc_url( $get_attachment_url['invoice_url'] ); ?>" class="vt-button" download><?php _e('Download invoice','usb-swiper'); ?></a>
         <?php }
     }
-    if( !empty( $status_note ) ) { ?>
+    if( !empty( $status_note ) && ( $payment_status === 'FAILED' || $payment_status === 'PENDING' ) ) { ?>
         <div class="custom-payment-notes transaction-history-field" style="float: left;display: block;padding: 10px;border: 1px solid rgba(0,0,0,.1);margin: 10px 0;width: calc( 100% - 20px);">
             <p style="margin: 0;"> <?php echo sprintf(__('<strong>Payment Notes</strong>: %s','usb-swiper'), $status_note);?></p>
         </div>

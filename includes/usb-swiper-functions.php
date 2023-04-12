@@ -1580,7 +1580,7 @@ function usbswiper_is_allow_capture( $transaction_id ) {
 
     if( !empty( $payment_status ) && ( 'created' === strtolower($payment_status) || 'authorized' === strtolower($payment_status) ) ) {
         $is_allow_capture = true;
-        if( $transaction_type === 'invoice' && 'created' === strtolower($payment_status) ) {
+        if( strtolower($transaction_type) === 'invoice' && 'created' === strtolower($payment_status) ) {
             $is_allow_capture = false;
         }
 	}
@@ -1892,15 +1892,20 @@ function get_transaction_address_format( $transaction_id , $is_email = false ){
 
     $billing_address_html = '';
     $billing_address_html .= "<p style='".$style."'>" . $billing_first_name . ' ' . $billing_last_name . "</p>";
-    $billing_address_html .= "<p style='".$style."'>" . $billing_street . $billing_street2 . "</p>";
-    $billing_address_html .= "<p style='".$style."'>" . $billing_city . $billing_state . ' ' . $billing_postal_code . "</p>";
-    $billing_address_html .= "<p style='".$style."'>" . $billing_country_code . "</p>";
+    if( !empty($billing_street) && !empty($billing_city) ){
+        $billing_address_html .= "<p style='".$style."'>" . $billing_street . $billing_street2 . "</p>";
+        $billing_address_html .= "<p style='".$style."'>" . $billing_city . $billing_state . ' ' . $billing_postal_code . "</p>";
+        $billing_address_html .= "<p style='".$style."'>" . $billing_country_code . "</p>";
+    }
 
     $shipping_address_html = '';
     $shipping_address_html .= "<p style='".$style."'>" . $shipping_first_name . ' ' . $shipping_last_name . "</p>";
-    $shipping_address_html .= "<p style='".$style."'>" . $shipping_street .  $shipping_street2 . "</p>";
-    $shipping_address_html .= "<p style='".$style."'>" . $shipping_city . $shipping_state . ' ' . $shipping_postal_code . "</p>";
-    $shipping_address_html .= "<p style='".$style."'>" . $shipping_country_code . "</p>";
+    if( !empty($shipping_street) && !empty($shipping_city) ){
+        $shipping_address_html .= "<p style='".$style."'>" . $shipping_street .  $shipping_street2 . "</p>";
+        $shipping_address_html .= "<p style='".$style."'>" . $shipping_city . $shipping_state . ' ' . $shipping_postal_code . "</p>";
+        $shipping_address_html .= "<p style='".$style."'>" . $shipping_country_code . "</p>";
+    }
+
 
     $response = array(
         'billing_address'=> $billing_address_html,
