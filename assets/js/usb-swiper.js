@@ -48,8 +48,6 @@ jQuery( document ).ready(function( $ ) {
     }
 
     $.validator.addMethod("is_email", function(value, element) {
-        console.log(element);
-        console.log(value);
         return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/i.test(value);
     }, usb_swiper_settings.email_validation_message);
 
