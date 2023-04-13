@@ -66,7 +66,7 @@ $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $t
 			$refund_amount = get_total_refund_amount($transaction_id);
 
 			?>
-            <div>
+            <div class="send-email-btn-wrapper">
                 <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
             </div>
             <div class="transaction-refund-wrap transaction-history-field">

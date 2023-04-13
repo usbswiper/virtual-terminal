@@ -1117,6 +1117,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$message = __('Something went wrong. Please try again.','usb-swiper');
 			$message_type = __('ERROR','usb-swiper');
 			$refund_html = '';
+            $refund_status = '';
+            $refund_amount = '';
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
@@ -1150,6 +1152,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						            $status = true;
 							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
 							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
+                                    $payment_status = usbswiper_get_transaction_status($transaction_id);
+                                    $refund_status = usbswiper_get_payment_status($payment_status);
+                                    $refund_amount = get_total_refund_amount($transaction_id);
 						        } else{
 						            $message = __( 'Transaction amount not refund. Please try again.','usb-swiper');
 						            if( !empty( $response['error_description'] ) ) {
@@ -1177,6 +1182,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'message' => $message,
 				'message_type' => $message_type,
 				'html' => $refund_html,
+                'refund_status' => $refund_status,
+                'remain_amount' => $refund_amount,
 			);
 
 			wp_send_json( $response , 200 );
