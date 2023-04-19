@@ -902,6 +902,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    $Paypal_request = Usb_Swiper_Paypal_request::instance();
 			    $response = $Paypal_request->handle_cc_transaction_request($paypal_transaction_id);
 
+                $payment_source = !empty( $_GET['payment_source'] ) ? sanitize_text_field($_GET['payment_source']) : '';
+
+                update_post_meta( $transaction_id, 'payment_source', $payment_source);
+
                 if( !empty( $response['links'] ) && is_array( $response['links'] ) && count( $response['links'] ) === 1 ) {
                     foreach ($response['links'] as $key => $links) {
                         if (!empty($links['rel']) && 'self' === $links['rel'] && !empty($links['href'])) {

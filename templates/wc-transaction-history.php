@@ -10,6 +10,7 @@ $card_last_digits = get_post_meta( $transaction_id, '_payment_card_last_digits',
 $card_brand = get_post_meta( $transaction_id, '_payment_card_brand', true);
 $credit_card_number = '';
 $payment_status = usbswiper_get_transaction_status($transaction_id);
+$payment_source_type = get_post_meta( $transaction_id, 'payment_source', true );
 
 if( ! empty( $card_last_digits )) {
     $credit_card_number = $card_last_digits.' ('.$card_brand.')';
@@ -157,7 +158,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <?php } ?>
             <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></td>
             <td class="transaction-table-product-td payment-status-text" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
-            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $credit_card_number; ?></td>
+            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo !empty( $payment_source_type ) ? $payment_source_type : $credit_card_number; ?></td>
         </tr>
         </tbody>
     </table>
@@ -352,7 +353,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <?php if( !empty( $payment_card_number ) ) {  ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo sprintf( '%s (%s) - %s', $payment_card_number, $payment_card_brand, $payment_card_type); ?></td>
                 <?php } else { ?>
-                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo $credit_card_number; ?></td>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_source_type ) ? $payment_source_type : $credit_card_number; ?></td>
                 <?php } ?>
             </tr>
             <tr>

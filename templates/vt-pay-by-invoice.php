@@ -78,7 +78,7 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
                                                                     },
                                                                     onApprove: function (data, actions) {
                                                                         if (data.orderID) {
-                                                                            $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + data.orderID + "&transaction_id=<?php echo $invoice_id; ?>&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
+                                                                            $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + data.orderID + "&transaction_id=<?php echo $invoice_id; ?>&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce+"&payment_source="+data.paymentSource, function (data) {
                                                                                 if( data.result === 'success' ) {
                                                                                     window.location.href = data.redirect;
                                                                                 } else{
