@@ -1209,15 +1209,20 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 update_post_meta($post_id, '_payment_response', $response);
                             }
                             $payment_status = !empty($response['status']) ? $response['status'] : '';
-                            $transaction_type = get_post_meta($post_id, '_transaction_type', true);
-                            if (!empty($payment_status) && strtolower($payment_status) === 'completed' && !empty( $transaction_type ) && strtolower( $transaction_type ) === 'invoice' ) {
-                                $BillingFirstName = get_post_meta($post_id, 'BillingFirstName', true);
-                                $BillingEmail = get_post_meta($post_id, 'BillingEmail', true);
-                                $attachment = apply_filters('usb_swiper_email_attachment', '', $post_id);
 
-                                $email_args = array(
-                                    'display_name' => wp_strip_all_tags($BillingFirstName)
-                                );
+                            $transaction_type = get_post_meta($post_id, '_transaction_type', true);
+                            $BillingFirstName = get_post_meta($post_id, 'BillingFirstName', true);
+                            $BillingEmail = get_post_meta($post_id, 'BillingEmail', true);
+                            $author_id = get_post_field('post_author', $post_id);
+                            $author_id = !empty($author_id) ? $author_id : 1;
+                            $current_user = get_user_by('id', $author_id);
+                            $ignore_email = get_user_meta($author_id, 'ignore_transaction_email', true);
+                            $email_args = array(
+                                'display_name' => wp_strip_all_tags($BillingFirstName)
+                            );
+                            if (!empty($payment_status) && strtolower($payment_status) === 'completed' && !empty( $transaction_type ) && strtolower( $transaction_type ) === 'invoice') {
+
+                                $attachment = apply_filters('usb_swiper_email_attachment', '', $post_id);
 
                                 $customer_email = WC()->mailer()->emails['invoice_email_paid'];
                                 $customer_email->recipient = $BillingEmail;
@@ -1229,15 +1234,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                                 $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
                                 $get_recipient = '';
-                                $author_id = get_post_field('post_author', $post_id);
-                                $author_id = !empty($author_id) ? $author_id : 1;
-                                $current_user = get_user_by('id', $author_id);
-                                $ignore_email = get_user_meta($author_id, 'ignore_transaction_email', true);
                                 if (true !== (bool)$ignore_email) {
                                     $get_recipient = $current_user->user_email;
                                 }
                                 $admin_email->recipient = $get_recipient;
                                 $admin_email->trigger(array(
+                                    'transaction_id' => $post_id,
+                                    'email_args' => $email_args,
+                                ));
+                            } else if ( !empty($payment_status) && strtolower($payment_status) === 'completed' && !empty( $transaction_type ) ){
+
+                                $customer_email = WC()->mailer()->emails['transaction_email'];
+                                $customer_email->recipient = $BillingEmail;
+                                $customer_email->trigger( array(
+                                    'transaction_id' => $post_id,
+                                    'email_args' => $email_args,
+                                ));
+
+                                $admin_email = WC()->mailer()->emails['transaction_email_admin'];
+                                $get_recipient = '';
+                                if (true !== (bool)$ignore_email) {
+                                    $get_recipient = $current_user->user_email;
+                                }
+                                $admin_email->recipient = $get_recipient;
+                                $admin_email->trigger( array(
                                     'transaction_id' => $post_id,
                                     'email_args' => $email_args,
                                 ));
