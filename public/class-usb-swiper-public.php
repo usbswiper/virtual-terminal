@@ -1460,7 +1460,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 ));
 
                 update_user_meta($current_user_id ,'billing_first_name', $first_name);
-                update_user_meta($current_user_id ,'billing_lats_name', $last_name);
+                update_user_meta($current_user_id ,'billing_last_name', $last_name);
                 update_user_meta($current_user_id ,'billing_company', $company_name);
                 update_user_meta($current_user_id ,'billing_phone', $phone);
                 update_user_meta($current_user_id ,'billing_email', $email);

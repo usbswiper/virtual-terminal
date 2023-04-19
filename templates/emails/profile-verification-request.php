@@ -17,10 +17,14 @@ $myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
 $user = get_user_by('id', $user_id);
 $user_web_url = !empty($user->user_url) ? sanitize_url($user->user_url) : '';
 $merchant_name = get_user_meta($user_id ,'billing_first_name', true);
+$merchant_last_name = get_user_meta($user_id ,'billing_last_name', true);
 $merchant_email = get_user_meta($user_id ,'billing_email', true);
 $merchant_phone = get_user_meta($user_id ,'billing_phone', true);
 $merchant_business_name = get_user_meta($user_id ,'billing_company', true);
 $merchant_address = get_user_address($user_id);
+
+$merchant_last_name = !empty( $merchant_last_name ) ? $merchant_last_name : '';
+$merchant_name = !empty( $merchant_name ) ? $merchant_name . ' ' . $merchant_last_name : $merchant_last_name;
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
 
