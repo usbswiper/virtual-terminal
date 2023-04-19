@@ -90,6 +90,9 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
                                                                             });
                                                                         }
                                                                     },
+                                                                    onCancel: function (data) {
+                                                                        VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                                                    },
                                                                     onError: function (err) {
                                                                         if( err ) {
                                                                             const notification = jQuery('.vt-form-notification');

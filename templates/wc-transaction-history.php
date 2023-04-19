@@ -84,7 +84,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     }
     if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
         $get_refund_status = usbswiper_get_refund_status();
-        if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) {
+        if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) {
 
             $refund_amount = get_total_refund_amount($transaction_id);
             ?>

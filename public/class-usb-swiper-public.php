@@ -1191,24 +1191,58 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				        $Paypal_request->handle_paypal_debug_id($this->api_response, $post_id);
 				        if( !empty( $this->api_response['id'] ) ) {
 
-					        $order_args = array(
-						        'method' => 'GET',
-						        'timeout' => 60,
-						        'redirection' => 5,
-						        'httpversion' => '1.1',
-						        'blocking' => true,
-						        'headers' => array(
-							        'Content-Type' => 'application/json',
-							        'Authorization' => 'Bearer '.$Paypal_request->get_access_token(),
-						        ),
-					        );
+                            $order_args = array(
+                                'method' => 'GET',
+                                'timeout' => 60,
+                                'redirection' => 5,
+                                'httpversion' => '1.1',
+                                'blocking' => true,
+                                'headers' => array(
+                                    'Content-Type' => 'application/json',
+                                    'Authorization' => 'Bearer ' . $Paypal_request->get_access_token(),
+                                ),
+                            );
 
-					        $response = $Paypal_request->request($Paypal_request->order_url.$paypal_transaction_id, $order_args, 'order_response', $post_id);
-					        $Paypal_request->handle_paypal_debug_id($response, $post_id);
-                            if( !empty( $response ) ) {
+                            $response = $Paypal_request->request($Paypal_request->order_url . $paypal_transaction_id, $order_args, 'order_response', $post_id);
+                            $Paypal_request->handle_paypal_debug_id($response, $post_id);
+                            if (!empty($response)) {
                                 update_post_meta($post_id, '_payment_response', $response);
                             }
-					        $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
+                            $payment_status = !empty($response['status']) ? $response['status'] : '';
+                            $transaction_type = get_post_meta($post_id, '_transaction_type', true);
+                            if (!empty($payment_status) && strtolower($payment_status) === 'completed' && !empty( $transaction_type ) && strtolower( $transaction_type ) === 'invoice' ) {
+                                $BillingFirstName = get_post_meta($post_id, 'BillingFirstName', true);
+                                $BillingEmail = get_post_meta($post_id, 'BillingEmail', true);
+                                $attachment = apply_filters('usb_swiper_email_attachment', '', $post_id);
+
+                                $email_args = array(
+                                    'display_name' => wp_strip_all_tags($BillingFirstName)
+                                );
+
+                                $customer_email = WC()->mailer()->emails['invoice_email_paid'];
+                                $customer_email->recipient = $BillingEmail;
+                                $customer_email->trigger(array(
+                                    'transaction_id' => $post_id,
+                                    'email_args' => $email_args,
+                                    'attachment' => array($attachment),
+                                ));
+
+                                $admin_email = WC()->mailer()->emails['invoice_email_paid_admin'];
+                                $get_recipient = '';
+                                $author_id = get_post_field('post_author', $post_id);
+                                $author_id = !empty($author_id) ? $author_id : 1;
+                                $current_user = get_user_by('id', $author_id);
+                                $ignore_email = get_user_meta($author_id, 'ignore_transaction_email', true);
+                                if (true !== (bool)$ignore_email) {
+                                    $get_recipient = $current_user->user_email;
+                                }
+                                $admin_email->recipient = $get_recipient;
+                                $admin_email->trigger(array(
+                                    'transaction_id' => $post_id,
+                                    'email_args' => $email_args,
+                                ));
+                            }
+
 					        update_post_meta($post_id, '_payment_status', $payment_status);
 				        }
 			        }
