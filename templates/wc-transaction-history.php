@@ -77,7 +77,9 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
            'transaction_id' => $transaction_id,
            'paypal_transaction_id' => $payment_response['id'],
            'nonce' => wp_create_nonce('authorize-transaction-capture')
-        )); ?>
+        ));
+        $id = !empty( $id ) ? $id : $transaction_id
+        ?>
         <div class="transaction-refund-wrap transaction-history-field">
             <a class="vt-button capture-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
         </div>
@@ -332,7 +334,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('PayPal Transaction ID','usb-swiper'); ?></th>
                 <?php
-                if( ( is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) || $_GET['action'] === 'edit' || ( $is_email && $is_admin ) ){ ?>
+                if( ( is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id && !$is_email ) || ( !empty($_GET['action']) && sanitize_text_field($_GET['action']) === 'edit' ) || ( $is_email && $is_admin ) ){ ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_paypal_transaction_url($payment_transaction_id); ?>" target="_blank"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></a></td>
                 <?php } else { ?>
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
