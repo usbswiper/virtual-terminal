@@ -42,9 +42,12 @@ jQuery( document ).ready(function( $ ) {
         var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
         $('.vt-form-notification').empty().append(notification);
 
-
         $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
     }
+
+    $.validator.addMethod("is_email", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/i.test(value);
+    }, usb_swiper_settings.email_validation_message);
 
     const render_cc_form = () => {
 
@@ -115,7 +118,13 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 $("form#ae-paypal-pos-form").validate({
-                    rules: {},
+                    rules: {
+                        BillingEmail: {
+                            required: true,
+                            email: true,
+                            is_email: true,
+                        }
+                    },
                     messages: {},
                     submitHandler: function(form, event) {
 
@@ -332,6 +341,16 @@ jQuery( document ).ready(function( $ ) {
                 $('.transaction-refund').show();
                 $('.refund-form-wrap').hide();
                 $('.refund-details').html('').html(response.html);
+                if( Number(response.remain_amount) > 0 ){
+                    $('.remain-amount-input').val(response.remain_amount);
+                    $('.refund-amount-input').attr({
+                        max: response.remain_amount,
+                        maxlength: response.remain_amount
+                    });
+                }else{
+                    $('.transaction-refund-wrap').remove();
+                    $('.send-email-btn-wrapper').remove();
+                }
             } else{
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -340,6 +359,43 @@ jQuery( document ).ready(function( $ ) {
         });
 
         event.preventDefault();
+    });
+
+    $("#vt_verification_form").validate({
+        rules: {
+            email_address: {
+                required: true,
+                email: true,
+                is_email: true,
+            }
+        },
+        messages: {},
+        submitHandler: function (form, event) {
+
+            event.preventDefault();
+            var currentFormObj = $("#vt_verification_form");
+            var form_id = currentFormObj.attr('id');
+            var submitButton = currentFormObj.find('#vt_verification_form_submit');
+            usb_swiper_add_loader(submitButton);
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: currentFormObj.serialize() + "&action=vt_verification_form",
+            }).done(function (response) {
+
+                if (response.status) {
+                    set_notification(response.message, 'success');
+                    document.getElementById(form_id).reset();
+                    window.location.href = response.location_redirect
+                } else {
+                    set_notification(response.message, 'error', response.message_type);
+                }
+
+                usb_swiper_remove_loader(submitButton);
+            });
+        }
     });
 
     $(document).on('click','.vt-remove-fields-wrap', function (){
@@ -402,6 +458,27 @@ jQuery( document ).ready(function( $ ) {
                 }
             });
         }
+    });
+
+    $(document).on('change','.vt-billing-country, .vt-shipping-country', function (){
+
+        var fieldId  = $(this).attr('id');
+        var fieldName  = $(this).attr('name');
+
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: "action=vt_get_states&country_code="+$(this).val()+"&field_id="+fieldId,
+        }).done(function ( response ) {
+            if( response.state_html && response.state_html !== "" ) {
+                if(response.is_shipping) {
+                    $('.shipping-states-wrap').html('').html(response.state_html);
+                } else{
+                    $('.billing-states-wrap').html('').html(response.state_html);
+                }
+            }
+        });
     });
 
     $(document).on('click','.product-item', function () {

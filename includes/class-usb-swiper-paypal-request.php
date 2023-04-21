@@ -24,11 +24,12 @@ class Usb_Swiper_Paypal_request{
 		$this->settings = $settings;
 		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
 
-        $user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
-        $brand_name = !empty( get_bloginfo('name') ) ? get_bloginfo('name') : "";
+        $brand_name = get_bloginfo('name');
+		$user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
 		if( !empty( $user_brand ) ) {
 			$brand_name = $user_brand;
 		}
+
 		$this->brand_name = apply_filters( 'usb_swiper_brand_name',  $brand_name);
 
 		$this->landing_page = apply_filters( 'usb_swiper_landing_page', 'NO_PREFERENCE');
@@ -44,9 +45,9 @@ class Usb_Swiper_Paypal_request{
 			$this->paypal_refund_api = 'https://api-m.sandbox.paypal.com/v2/payments/captures/';
 			$this->auth = 'https://api-m.sandbox.paypal.com/v2/payments/authorizations/';
 			$this->generate_token_url = 'https://api-m.sandbox.paypal.com/v1/identity/generate-token';
-			$this->partner_client_id = USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID;
-			$this->partner_client_secret = USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_SECRET;
-			$this->attribution_id = USBSWIPER_PAYPAL_SANDBOX_PARTNER_ATTRIBUTION_ID;
+			$this->partner_client_id = usb_swiper_get_field_value('sandbox_client_id');
+			$this->partner_client_secret = usb_swiper_get_field_value('sandbox_client_secret');
+			$this->attribution_id = usb_swiper_get_field_value('sandbox_attribution_id');
 		} else{
 			$this->token_url = 'https://api-m.paypal.com/v1/oauth2/token';
 			$this->order_url = 'https://api-m.paypal.com/v2/checkout/orders/';
@@ -54,9 +55,9 @@ class Usb_Swiper_Paypal_request{
 			$this->paypal_refund_api = 'https://api-m.paypal.com/v2/payments/captures/';
 			$this->auth = 'https://api-m.paypal.com/v2/payments/authorizations/';
 			$this->generate_token_url = 'https://api-m.paypal.com/v1/identity/generate-token';
-			$this->partner_client_id = USBSWIPER_PAYPAL_PARTNER_CLIENT_ID;
-			$this->partner_client_secret = USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET;
-			$this->attribution_id = USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID;
+			$this->partner_client_id = usb_swiper_get_field_value('client_id');
+			$this->partner_client_secret = usb_swiper_get_field_value('client_secret');
+			$this->attribution_id = usb_swiper_get_field_value('attribution_id');
 		}
 
 		$seller_merchant_user = usbswiper_get_onboarding_user();
@@ -244,7 +245,6 @@ class Usb_Swiper_Paypal_request{
 			if( empty( $shippingDisabled) ) {
 				$shipping_preference = 'SET_PROVIDED_ADDRESS';
 			}
-
 		}
 
 		return $shipping_preference;
@@ -313,9 +313,9 @@ class Usb_Swiper_Paypal_request{
 		if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $payment_action ) {
 
 			if ($this->is_sandbox) {
-				$admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
+				$admin_merchant_id = usb_swiper_get_field_value('sandbox_merchant_id');
 			} else{
-				$admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
+				$admin_merchant_id = usb_swiper_get_field_value('merchant_id');
 			}
 
 			$body_request['purchase_units'][0]['payment_instruction'] =array(

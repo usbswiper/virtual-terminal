@@ -38,13 +38,14 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-notification p.notification strong {display: block;width: 100%;}
 .vt-form-notification p.notification strong {margin-right: 5px;}
 .vt-form-notification p.notification.error {border-left-color: #d63638;}
+.vt-form-notification p.notification.warning{border-left-color: #ffcc00;}
 .vt-form-notification p.notification.success {border-left-color: #00a32a;}
 .vt-form-notification p.notification span {display:block !important; }
 .vt-form-contents {width: 100%;}
 .vt-form-contents .vt-row {width: 100%;display: block;position: relative;}
 .vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
-.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 100px;bottom: auto;width: 25%;}
-.vt-button {color: #ffffff!important;border-width: 0!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;}
+.vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {position: fixed;top: 70px;bottom: auto;width: 22%;}
+.vt-button {color: #ffffff!important;border-width: 0!important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background-image: linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%);padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin: 10px 0;cursor: pointer;}
 .vt-button-normal {color: #3D72E7 !important;border-width: 1px !important;border-radius: 26px;letter-spacing: 1px;font-size: 13px;font-weight: 800!important;text-transform: uppercase!important;background: #FFF;padding-top: 15px!important;padding-right: 30px!important;padding-bottom: 15px!important;padding-left: 30px!important;text-decoration: none !important;display: inline-block;margin-bottom: 10px;cursor: pointer;border-color: #3D72E7 !important;}
 .vt-button-normal:hover{border-color: #3D72E7;}
 .input-field-wrap .sign {width: calc( 100% - 10px);position: relative;display: flex;}
@@ -111,6 +112,20 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-form-contents .vt-remove-fields-wrap {width: 24px;}
 .vt-form-contents .input-field-wrap input[type=number]::-webkit-inner-spin-button,
 .vt-form-contents .input-field-wrap input[type=number]::-webkit-outer-spin-button {-webkit-appearance: none;-moz-appearance: none;appearance: none;}
+.vt-verification-message {text-align: left;}
+.vt-resend-email-form {background: #0006;bottom: 0;display:none;position: fixed;top: 0;right: 0;left: 0;z-index: 999;}
+.vt-resend-email-form-wrapper {background: white;border-radius: 16px;max-width: 600px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 30%;left: 0;right: 0;}
+.vt-resend-email-form-wrapper .input-field-wrap {text-align: left;display: block;margin-bottom: 10px;}
+.vt-resend-email-form-wrapper .input-field-wrap label {width: 100%;display: block;margin-bottom: 10px;font-weight: 600;}
+.vt-resend-email-form-wrapper .input-field-wrap input {border: 1px solid #bfc9d4;color: #3b3f5c;font-size: 15px;padding: 8px 10px;letter-spacing: 1px;border-radius: 6px;width: 100%;}
+.vt-resend-email-form-wrapper .input-field-wrap .description {width: 100%;display: block;margin-top: 5px;font-weight: 400;font-style: italic;}
+.vt-resend-email-form-wrapper .button-wrap {display: block}
+.vt-resend-email-form-wrapper .button-wrap button {margin-right: 0.5rem;}
+.vt-resend-email-form-wrapper span {color: #777777;font-size: 14px;}
+.vt-resend-email-form-wrapper .close {position: absolute;width: 20px;height: 20px;right: 10px;top: 10px;cursor: pointer;}
+.vt-resend-email-form-wrapper .close svg {width: 100%;height: 100%;}
+#send_email_btn {display: flex;margin: 0;max-width: 100px;padding: 10px !important;width: 100%;justify-content: center;align-items: center;}
+
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}
