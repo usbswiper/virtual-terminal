@@ -1258,7 +1258,7 @@ function usbswiper_get_payment_status( $status ) {
 
 function usbswiper_get_refund_status() {
 
-	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED'));
+	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED','PAID'));
 }
 
 function get_total_refund_amount( $transaction_id ) {
@@ -1464,4 +1464,77 @@ function usbswiper_get_user_name(){
     }
 
 	return $user_name;
+}
+
+/**
+ * Check usbswiper_send_email_receipt_html function exists or not.
+ */
+if( !function_exists('usbswiper_send_email_receipt_html') ) {
+
+    /**
+     * Get the email receipt html
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return string
+     */
+    function usbswiper_send_email_receipt_html( $transaction_id ) {
+
+        if( empty( $transaction_id ) ) {
+            return '';
+        }
+
+        $BillingEmail = get_post_meta( $transaction_id, 'BillingEmail', true);
+
+        $send_email_form_fields = array(
+            array(
+                'type' => 'text',
+                'id' => 'billing_email',
+                'name' => 'billing_email',
+                'label' => __( 'Billing Email:', 'usb-swiper'),
+                'attributes' => '',
+                'description' => __('Add multiple emails with "," separated' ,'usb-swiper'),
+                'readonly' => false,
+                'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'hidden',
+                'id' => 'transaction_id',
+                'name' => 'transaction_id',
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'value' => $transaction_id,
+            ),
+            array(
+                'type' => 'hidden',
+                'id' => 'vt_send_email_nonce',
+                'name' => 'vt-send-email-nonce',
+                'label' => '',
+                'value' => wp_create_nonce('vt-send-email-form'),
+                'required' => false,
+            )
+        );
+
+        $html = '<div class="vt-resend-email-form">';
+            $html .='<div class="vt-resend-email-form-wrapper">';
+                $html .='<div class="close">';
+                    $html .='<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="512px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve"><path d="M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4  L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1  c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1  c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z"/></svg>';
+                $html .='</div>';
+                $html .='<form id="vt_resend_email_form" method="post" action="" name="vt-resend-email-form">';
+                        foreach ($send_email_form_fields as $form_field){
+                            $html .= usb_swiper_get_html_field($form_field);
+                        }
+                    $html .='<div class="button-wrap">';
+                        $html .='<button id="vt_send_email_cancel" type="reset" class="vt-button">'.__( 'Cancel', 'usb-swiper').'</button>';
+                        $html .='<button id="vt_send_email_submit" type="submit" class="vt-button">'.__( 'Send Email Receipt', 'usb-swiper').'</button>';
+                    $html .='</div>';
+                $html .='</form>';
+            $html .='</div>';
+        $html .='</div>';
+
+        return $html;
+    }
 }
