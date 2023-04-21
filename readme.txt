@@ -1,8 +1,8 @@
 === USBSwiper Hosted Virtual Terminal ===
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
-Tested up to: 6.0.1
-Stable tag: 1.1.17
+Tested up to: 6.2
+Stable tag: 2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,18 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 2.0 =
+* Feature - Option to enable/disable email notices to the merchant ([VT-48](https://github.com/usbswiper/virtual-terminal/pull/21))
+* Feature - Added button for resend email receipt ([VT-44](https://github.com/usbswiper/virtual-terminal/pull/22))
+* Feature - Added verification form for merchant verification before onboarding ([VT-47](https://github.com/usbswiper/virtual-terminal/pull/23))
+* Update - Update virtual terminal page UI interface ([VT-35](https://github.com/angelleye/paypal-woocommerce/pull/1800))
+* Feature - Added new product interface in my-account page ([VT-34](https://github.com/usbswiper/virtual-terminal/pull/24))
+* Feature - Select multiple product in virtual terminal form ([VT-34](https://github.com/usbswiper/virtual-terminal/pull/25))
+* Feature - Merchant able to create invoice using virtual terminal form ([VT-32](https://github.com/usbswiper/virtual-terminal/pull/26))
+* Feature - Added capability to pay via PayPal, Venmo and PayLater via Invoice payment ([VT-32](https://github.com/usbswiper/virtual-terminal/pull/26))
+* Enhancement - Refund and capture feature with popup ([VT-issues-fixes](https://github.com/usbswiper/virtual-terminal/pull/29))
+* Fix - Transaction filter not working with user. ([VT-50](https://github.com/usbswiper/virtual-terminal/pull/27))
 
 = 1.1.17 =
 * Removes public access from Transactions log (VT-45)
