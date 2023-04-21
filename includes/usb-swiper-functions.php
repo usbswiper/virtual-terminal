@@ -195,7 +195,7 @@ function usb_swiper_get_states( $country = 'US' ) {
  */
 function usb_swiper_get_vt_form_fields( $tab = '' ) {
 
-    $merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+    $merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
     $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
 	$get_countries = usb_swiper_get_countries();
 	$get_states = usb_swiper_get_states($country_code);

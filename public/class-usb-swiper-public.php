@@ -521,7 +521,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
 
-                $get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
+                $get_merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
                 $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
                 $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
                 $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
