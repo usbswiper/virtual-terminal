@@ -229,7 +229,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'vt_page_url' => get_the_permalink($vt_page_id),
 				) );
             }
-
+			wp_enqueue_script( 'usb-swiper-general', USBSWIPER_URL . 'assets/js/usb-swiper-general.js', array( 'jquery' ), $this->version, true );
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
 		}
 
@@ -350,7 +350,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    $transaction = get_post($transaction_id);
 
 			    if( !empty( $transaction->post_author ) && (int)$transaction->post_author === get_current_user_id() ) {
-				    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $transaction_id ) );
+				    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $transaction_id, 'is_email_html' => true ) );
 			    } else {
 			        $message = __( "You can't access this transaction.",'usb-swiper');
 			        echo apply_filters( 'usb_swiper_transaction_access_denied', $message);
@@ -1023,14 +1023,22 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		    $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
 			$BillingEmail = !empty( $BillingEmail ) ? $BillingEmail : $author_email;
 
-            //send email to admin,
-			$admin_email = array( get_option('admin_email'), );
-			$site_title = get_option('blogname');
-			$admin_subject = sprintf(__("[%s]: New Transaction #%s",'usb-swiper'),$site_title,$transaction_id);
-			$admin_content = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
-			$admin_content = $WC_Email->format_string($admin_content);
-			$admin_content = $WC_Email->style_inline($admin_content);
-			wp_mail($admin_email, $admin_subject, $admin_content, $get_headers);
+			//send email to admin,
+			$admin_email        = array( get_option('admin_email'), );
+			$site_title         = get_option('blogname');
+			$admin_subject      = sprintf(__("[%s]: New Transaction #%s",'usb-swiper'),$site_title,$transaction_id);
+			$admin_content      = $this->get_email_content($transaction_id, array('email_heading' => sprintf(__('New Transaction: #%s','usb-swiper'), $transaction_id)));
+			$admin_content      = $WC_Email->format_string($admin_content);
+			$admin_content      = $WC_Email->style_inline($admin_content);
+			$ignore_email       = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
+			$current_user       = wp_get_current_user();
+			$current_user_email = $current_user->user_email;
+
+            if( true !== (bool)$ignore_email ){
+                $admin_email[] = $current_user_email;
+            }
+
+            wp_mail( $admin_email, $admin_subject, $admin_content, $get_headers );
 
 			//send email to user,
 			$user_subject = sprintf( __("Your %s transaction has been received!",'usb-swiper'), $site_title);
@@ -1071,6 +1079,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
            }
 
 			$get_countries = WC()->countries->get_countries();
+			$ignore_email_checkbox = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
 		    ?>
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
                 <?php
@@ -1109,6 +1118,24 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 ));
                 ?>
             </p>
+			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+				<?php
+				echo  usb_swiper_get_html_field( array(
+					'type' => 'checkbox',
+					'id' => 'ignore_transaction_email',
+					'name' => 'ignore-transaction-email',
+					'label' => __( 'Ignore Transaction Emails', 'usb-swiper'),
+					'required' => false,
+					'attributes' => '',
+					'description' => __( 'Disable admin email notifications for transactions.', 'usb-swiper'),
+					'readonly' => false,
+					'disabled' => false,
+					'class' => 'woocommerce-checkbox',
+					'wrapper' => false,
+					'checked' => ! empty( $ignore_email_checkbox )
+				));
+				?>
+			</p>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
@@ -1198,8 +1225,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if ( is_user_logged_in() ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
+				$ignore_transaction_email = !empty( $_POST['ignore-transaction-email'] ) ? $_POST['ignore-transaction-email'] : '';
 				update_user_meta( $user_id, "_primary_currency", $primary_currency );
 				update_user_meta( $user_id, "brand_name", $brand_name );
+				update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
 			}
 		}
 
@@ -1214,6 +1243,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$message = __('Something went wrong. Please try again.','usb-swiper');
 			$message_type = __('ERROR','usb-swiper');
 			$refund_html = '';
+            $refund_status = '';
+            $refund_amount = '';
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
@@ -1247,6 +1278,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						            $status = true;
 							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
 							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
+                                    $payment_status = usbswiper_get_transaction_status($transaction_id);
+                                    $refund_status = usbswiper_get_payment_status($payment_status);
+                                    $refund_amount = get_total_refund_amount($transaction_id);
 						        } else{
 						            $message = __( 'Transaction amount not refund. Please try again.','usb-swiper');
 						            if( !empty( $response['error_description'] ) ) {
@@ -1274,6 +1308,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'message' => $message,
 				'message_type' => $message_type,
 				'html' => $refund_html,
+                'refund_status' => $refund_status,
+                'remain_amount' => $refund_amount,
 			);
 
 			wp_send_json( $response , 200 );
@@ -1418,6 +1454,74 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_safe_redirect(get_the_permalink($vt_verification_page));
                 exit();
             }
+		}
+
+		/**
+		 * Send transaction email to customer again.
+		 *
+		 * @since 1.1.17
+		 */
+		public function send_transaction_email() {
+
+			$status  = false;
+			$message = '';
+
+			if( ! empty( $_POST['vt-send-email-nonce'] ) && wp_verify_nonce( $_POST['vt-send-email-nonce'],'vt-send-email-form') ) {
+				$status            = true;
+				$billing_email     = ! empty( $_POST['billing_email'] ) ? sanitize_text_field( $_POST['billing_email'] ) : '';
+				$transaction_id    = ! empty( $_POST['transaction_id'] ) ? sanitize_text_field( $_POST['transaction_id'] ) : '';
+				$message           = sprintf( __( 'Transaction(#%s) receipt copy has been sent via email.','usb-swiper' ), $transaction_id);
+			}
+
+			if( ! empty( $billing_email ) ) {
+
+				if ( ! class_exists( 'WC_Email', false ) ) {
+					include_once dirname( WC_PLUGIN_FILE ) . '/includes/emails/class-wc-email.php';
+				}
+
+				$WC_Email     = new WC_Email();
+				$get_headers  = $WC_Email->get_headers();
+				$site_title   = get_option( 'blogname' );
+				$user_subject = sprintf( __( "Your %s transaction has been received!", 'usb-swiper' ), $site_title );
+				$user_content = $this->get_email_content( $transaction_id, array( 'email_heading' => __( 'Thank you for your Transaction', 'usb-swiper' ) ) );
+				$user_content = $WC_Email->format_string( $user_content );
+				$user_content = $WC_Email->style_inline( $user_content );
+
+				wp_mail( $billing_email, $user_subject, $user_content, $get_headers );
+			}
+
+			$response = array(
+				'status' => $status,
+				'message' => $message,
+			);
+
+			wp_send_json( $response , 200 );
+		}
+
+		/**
+		 * Send the transaction email html.
+		 *
+		 * @since 1.1.17
+		 *
+		 * @return void
+		 */
+		public function send_transaction_email_html() {
+
+			$status = false;
+			$html = '';
+
+			$transaction_id = !empty($_POST['transaction_id']) ? $_POST['transaction_id'] : 0;
+			if (!empty($transaction_id) && $transaction_id > 0) {
+				$status = true;
+				$html = usbswiper_send_email_receipt_html($transaction_id);
+			}
+
+			$response = array(
+				'status' => $status,
+				'html' => $html,
+			);
+
+			wp_send_json( $response , 200 );
 		}
 
         /**

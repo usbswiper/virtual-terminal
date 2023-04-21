@@ -29,6 +29,7 @@ class Usb_Swiper_Paypal_request{
 		if( !empty( $user_brand ) ) {
 			$brand_name = $user_brand;
 		}
+
 		$this->brand_name = apply_filters( 'usb_swiper_brand_name',  $brand_name);
 
 		$this->landing_page = apply_filters( 'usb_swiper_landing_page', 'NO_PREFERENCE');

@@ -350,6 +350,16 @@ jQuery( document ).ready(function( $ ) {
                 $('.transaction-refund').show();
                 $('.refund-form-wrap').hide();
                 $('.refund-details').html('').html(response.html);
+                if( Number(response.remain_amount) > 0 ){
+                    $('.remain-amount-input').val(response.remain_amount);
+                    $('.refund-amount-input').attr({
+                        max: response.remain_amount,
+                        maxlength: response.remain_amount
+                    });
+                }else{
+                    $('.transaction-refund-wrap').remove();
+                    $('.send-email-btn-wrapper').remove();
+                }
             } else{
                 set_notification(response.message, 'error', response.message_type);
             }
