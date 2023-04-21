@@ -19,6 +19,7 @@ ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}
 p.signature-text{display: none;}
 .show-me-only-in-print{display: none ;}
 .transaction-table-header {text-align: left;width: 50%;border: 1px solid #ebebeb;padding: 10px;}
+.transaction-table-product-td {text-align: left;border: 1px solid #ebebeb;padding: 10px;}
 .transaction-column {width: calc(50% - 30px);}
 .transaction-history-title {font-size: 22px!important;font-weight: 400!important;padding: 15px 0 !important;}
 div#transaction-log {overflow-x: scroll;}

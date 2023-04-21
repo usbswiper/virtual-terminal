@@ -2,6 +2,11 @@
 
 defined('ABSPATH') || exit;
 
+/**
+ * Paypal request class for transaction.
+ *
+ * @since 1.1.17
+ */
 class Usb_Swiper_Paypal_request{
 
 	public $is_sandbox = '';
@@ -11,6 +16,13 @@ class Usb_Swiper_Paypal_request{
 	public $generate_token_url ='';
 	protected static $_instance = null;
 
+    /**
+     * Create the self instance of the class.
+     *
+     * @since 1.1.17
+     *
+     * @return Usb_Swiper_Paypal_request|null
+     */
 	public static function instance() {
 		if (is_null(self::$_instance)) {
 			self::$_instance = new self();
@@ -18,14 +30,19 @@ class Usb_Swiper_Paypal_request{
 		return self::$_instance;
 	}
 
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since 1.1.17
+     */
 	public function __construct() {
 
 		$settings = usb_swiper_get_settings('general');
 		$this->settings = $settings;
 		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
 
-		$user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
         $brand_name = !empty( get_bloginfo('name') ) ? get_bloginfo('name') : "";
+		$user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
         if( !empty( $user_brand ) ) {
 			$brand_name = $user_brand;
 		}
@@ -45,9 +62,9 @@ class Usb_Swiper_Paypal_request{
 			$this->paypal_refund_api = 'https://api-m.sandbox.paypal.com/v2/payments/captures/';
 			$this->auth = 'https://api-m.sandbox.paypal.com/v2/payments/authorizations/';
 			$this->generate_token_url = 'https://api-m.sandbox.paypal.com/v1/identity/generate-token';
-			$this->partner_client_id = USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID;
-			$this->partner_client_secret = USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_SECRET;
-			$this->attribution_id = USBSWIPER_PAYPAL_SANDBOX_PARTNER_ATTRIBUTION_ID;
+			$this->partner_client_id = usb_swiper_get_field_value('sandbox_client_id');
+			$this->partner_client_secret = usb_swiper_get_field_value('sandbox_client_secret');
+			$this->attribution_id = usb_swiper_get_field_value('sandbox_attribution_id');
 		} else{
 			$this->token_url = 'https://api-m.paypal.com/v1/oauth2/token';
 			$this->order_url = 'https://api-m.paypal.com/v2/checkout/orders/';
@@ -55,9 +72,9 @@ class Usb_Swiper_Paypal_request{
 			$this->paypal_refund_api = 'https://api-m.paypal.com/v2/payments/captures/';
 			$this->auth = 'https://api-m.paypal.com/v2/payments/authorizations/';
 			$this->generate_token_url = 'https://api-m.paypal.com/v1/identity/generate-token';
-			$this->partner_client_id = USBSWIPER_PAYPAL_PARTNER_CLIENT_ID;
-			$this->partner_client_secret = USBSWIPER_PAYPAL_PARTNER_CLIENT_SECRET;
-			$this->attribution_id = USBSWIPER_PAYPAL_PARTNER_ATTRIBUTION_ID;
+			$this->partner_client_id = usb_swiper_get_field_value('client_id');
+			$this->partner_client_secret = usb_swiper_get_field_value('client_secret');
+			$this->attribution_id = usb_swiper_get_field_value('attribution_id');
 		}
 
 		$seller_merchant_user = usbswiper_get_onboarding_user();
@@ -67,6 +84,13 @@ class Usb_Swiper_Paypal_request{
 		$this->api_log = new Usb_Swiper_Log();
 	}
 
+    /**
+     * Generate the request id.
+     *
+     * @since 1.1.17
+     *
+     * @return string
+     */
 	public function generate_request_id() {
 		static $pid = -1;
 		static $addr = -1;
@@ -86,6 +110,13 @@ class Usb_Swiper_Paypal_request{
 		return $addr . $pid . $_SERVER['REQUEST_TIME'] . mt_rand(0, 0xffff);
 	}
 
+    /**
+     * Get the paypal authentication assertion.
+     *
+     * @since 1.1.17
+     *
+     * @return string
+     */
 	public function get_paypal_auth_assertion() {
 		$temp = array( "alg" => "none" );
 		$returnData = base64_encode(json_encode($temp)) . '.';
@@ -97,6 +128,13 @@ class Usb_Swiper_Paypal_request{
 		return $returnData;
 	}
 
+    /**
+     * Get the generated token.
+     *
+     * @since 1.1.17
+     *
+     * @return mixed|string|void
+     */
 	public function get_generate_token() {
 		try {
 			$args = array(
@@ -120,6 +158,13 @@ class Usb_Swiper_Paypal_request{
 		}
 	}
 
+    /**
+     * Get the access token.
+     *
+     * @since 1.1.17
+     *
+     * @return mixed|string
+     */
 	public function get_access_token() {
 
 		$args = array(
@@ -138,6 +183,17 @@ class Usb_Swiper_Paypal_request{
 		return !empty( $response['access_token'] ) ? $response['access_token'] : '';
 	}
 
+    /**
+     * Request API call of paypal.
+     *
+     * @since 1.1.17
+     *
+     * @param string $url
+     * @param array $args
+     * @param string $action_name
+     * @param string $log_file
+     * @return mixed|string|void|null
+     */
 	public function request( $url, $args, $action_name = 'default', $log_file = '' ) {
 
 		try {
@@ -156,6 +212,18 @@ class Usb_Swiper_Paypal_request{
 		}
 	}
 
+    /**
+     * Parse response of the API call.
+     *
+     * @since 1.1.17
+     *
+     * @param object $paypal_api_response
+     * @param string $url
+     * @param array $request
+     * @param string $action_name
+     * @param string $log_file
+     * @return mixed|string|void
+     */
 	public function parse_response($paypal_api_response, $url, $request, $action_name, $log_file= '') {
 
 		try {
@@ -207,6 +275,15 @@ class Usb_Swiper_Paypal_request{
 		}
 	}
 
+    /**
+     * Handle the debug id.
+     *
+     * @since 1.1.17
+     *
+     * @param object $response
+     * @param int $transaction_id
+     * @return void
+     */
 	public function handle_paypal_debug_id( $response, $transaction_id ) {
 
 		if(empty( $transaction_id ) ) {
@@ -219,6 +296,14 @@ class Usb_Swiper_Paypal_request{
 		}
 	}
 
+    /**
+     * Get the transaction currency.
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return mixed|string
+     */
 	public function get_transaction_currency( $transaction_id ){
 
 		$currency_code = get_woocommerce_currency();
@@ -233,6 +318,13 @@ class Usb_Swiper_Paypal_request{
 		return $currency_code;
 	}
 
+    /**
+     * get the shipping preference.
+     *
+     * @since 1.1.17
+     *
+     * @return string
+     */
 	public function shipping_preference() {
 
 		$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
@@ -245,12 +337,18 @@ class Usb_Swiper_Paypal_request{
 			if( empty( $shippingDisabled) ) {
 				$shipping_preference = 'SET_PROVIDED_ADDRESS';
 			}
-
 		}
 
 		return $shipping_preference;
 	}
 
+    /**
+     * Get the application context.
+     *
+     * @since 1.1.17
+     *
+     * @return array
+     */
 	public function application_context() {
 
 		$application_context = array(
@@ -271,6 +369,14 @@ class Usb_Swiper_Paypal_request{
 		return $application_context;
 	}
 
+    /**
+     * Create the transaction request.
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return mixed|string|null
+     */
 	public function create_transaction_request( $transaction_id ) {
 
 		$InvoiceID = get_post_meta( $transaction_id,'InvoiceID', true);
@@ -314,9 +420,9 @@ class Usb_Swiper_Paypal_request{
 		if( !empty( $platform_fees ) && $platform_fees > 0 && 'capture' == $payment_action ) {
 
 			if ($this->is_sandbox) {
-				$admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
+				$admin_merchant_id = usb_swiper_get_field_value('sandbox_merchant_id');
 			} else{
-				$admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
+				$admin_merchant_id = usb_swiper_get_field_value('merchant_id');
 			}
 
 			$body_request['purchase_units'][0]['payment_instruction'] =array(
@@ -374,7 +480,6 @@ class Usb_Swiper_Paypal_request{
 
 		$body_request['purchase_units'][0]['payee']['merchant_id'] = $this->merchant_id;
 
-		$ItemName = get_post_meta( $transaction_id,'ItemName', true);
 		$Notes = get_post_meta( $transaction_id,'Notes', true);
 		if( !empty( $Notes ) && strlen( $Notes ) > 127 ) {
 			$Notes = substr($Notes, 0, 127);
@@ -384,21 +489,48 @@ class Usb_Swiper_Paypal_request{
 			$body_request['purchase_units'][0]['description'] = html_entity_decode( $Notes, ENT_NOQUOTES, 'UTF-8' );
 		}
 
-		$NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
+        $vt_product = get_post_meta( $transaction_id,'VTProduct', true);
+        $vt_product_quantity = get_post_meta( $transaction_id,'VTProductQuantity', true);
+        $vt_product_price = get_post_meta( $transaction_id,'VTProductPrice', true);
+        $vt_products = array();
 
-		if( !empty( $ItemName ) ) {
-			$body_request['purchase_units'][0]['items'][0] = array(
-				'name'        => $ItemName,
-				'description' => '',
-				'sku'         => '',
-				'category'    => '',
-				'quantity'    => 1,
-				'unit_amount' =>
-					array(
-						'currency_code' => $this->get_transaction_currency( $transaction_id ),
-						'value'         => usb_swiper_price_formatter($NetAmount),
-					),
-			);
+        if( !empty( $vt_product ) && is_array( $vt_product ) ) {
+
+            for ($i = 0; $i < count($vt_product); $i++) {
+
+                $product = !empty($vt_product[$i]) ? $vt_product[$i] : '';
+                $quantity = !empty($vt_product_quantity[$i]) ? $vt_product_quantity[$i] : 1;
+                $price = !empty($vt_product_price[$i]) ? $vt_product_price[$i] : '';
+
+                $vt_products[] = array(
+                    'product_name' => $product,
+                    'product_quantity' => $quantity,
+                    'product_price' => $price
+                );
+            }
+        }
+
+        update_post_meta( $transaction_id, 'vt_products', $vt_products );
+
+		if( ! empty( $vt_products ) && is_array( $vt_products ) ) {
+
+            $purchase_units_items = array();
+
+            foreach ( $vt_products as $products ) {
+                $purchase_units_items[] =  array(
+                    'name'        => $products['product_name'],
+                    'description' => '',
+                    'sku'         => '',
+                    'category'    => '',
+                    'quantity'    => $products['product_quantity'],
+                    'unit_amount' => array(
+                        'currency_code' => $this->get_transaction_currency( $transaction_id ),
+                        'value'         => usb_swiper_price_formatter ( $products['product_price'] ),
+                    ),
+                );
+            }
+
+			$body_request['purchase_units'][0]['items'] = $purchase_units_items;
 		}
 
 		$body_request = $this->set_payer_shipping_details($body_request, $transaction_id);
@@ -421,6 +553,14 @@ class Usb_Swiper_Paypal_request{
 		return $this->api_response;
 	}
 
+    /**
+     * Handle the cc transaction request.
+     *
+     * @since 1.1.17
+     *
+     * @param int $paypal_transaction_id
+     * @return mixed|string|null
+     */
 	public function handle_cc_transaction_request( $paypal_transaction_id ) {
 
 		$transaction_id = usb_swiper_get_session('usb_swiper_woo_transaction_id');
@@ -467,6 +607,15 @@ class Usb_Swiper_Paypal_request{
 		return $this->api_response;
 	}
 
+    /**
+     * Set the payer shipping details.
+     *
+     * @since 1.1.17
+     *
+     * @param array $body_request
+     * @param int $transaction_id
+     * @return array
+     */
 	public function set_payer_shipping_details( $body_request, $transaction_id ) {
 
 		$shippingDisabled = get_post_meta( $transaction_id,'shippingDisabled', true);
@@ -511,6 +660,15 @@ class Usb_Swiper_Paypal_request{
 		return $body_request;
 	}
 
+    /**
+     * Set the payer details.
+     *
+     * @since 1.1.17
+     *
+     * @param array $body_request
+     * @param int $transaction_id
+     * @return array
+     */
 	public function set_payer_details( $body_request, $transaction_id ) {
 
 		$first_name = get_post_meta( $transaction_id,'BillingFirstName', true);
@@ -552,6 +710,14 @@ class Usb_Swiper_Paypal_request{
 		return $body_request;
 	}
 
+    /**
+     * Remove the empty key from array.
+     *
+     * @since 1.1.17
+     *
+     * @param array $data
+     * @return array|mixed
+     */
 	public function remove_empty_key( $data ) {
 		$original = $data;
 		$data = array_filter($data);
@@ -561,6 +727,14 @@ class Usb_Swiper_Paypal_request{
 		return $original === $data ? $data : self::remove_empty_key($data);
 	}
 
+    /**
+     * Get the decimal digits
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return int
+     */
 	public function get_decimal_digits( $transaction_id ) {
 		$currency_code = $this->get_transaction_currency( $transaction_id );
 
@@ -572,6 +746,15 @@ class Usb_Swiper_Paypal_request{
 		return $decimal_digits;
 	}
 
+    /**
+     * create refund request.
+     *
+     * @since 1.1.17
+     *
+     * @param string $request_url
+     * @param array $args
+     * @return mixed|string|null
+     */
 	public function refund_request( $request_url, $args ) {
 
 		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
@@ -632,6 +815,14 @@ class Usb_Swiper_Paypal_request{
 		return $this->api_response;
 	}
 
+    /**
+     * Get the refund html structure.
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return false|string
+     */
 	public function get_refund_html( $transaction_id ) {
 
 		$refund_html = '';
