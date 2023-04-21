@@ -285,10 +285,23 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
          *
          * @since 1.0.0
          *
-         * @param array $args get all arguments.s
+         * @param array $args get all arguments.
          * @return false|string
          */
 		public function url( $args = array() ) {
+
+			return $this->text($args);
+		}
+
+		/**
+		 * Get the file input field html.
+ 		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $args get all arguments.
+		 * @return false|string
+		 */
+		public function file( $args = array() ) {
 
 			return $this->text($args);
 		}

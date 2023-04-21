@@ -6,6 +6,7 @@ do_action( 'usb_swiper_before_transactions', $has_transactions );
 
 if( $has_transactions ) : ?>
 
+    <div class="vt-form-notification"></div>
 	<table class="woocommerce-transactions-table woocommerce-MyAccount-transactions shop_table shop_table_responsive my_account_transactions account-transactions-table">
 		<thead>
 			<tr>
@@ -30,10 +31,11 @@ if( $has_transactions ) : ?>
                     $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
                     $payment_status = usbswiper_get_transaction_status($transaction->ID);
 				    $payment_action = usbswiper_get_transaction_type($transaction->ID);
-
                     if( $global_payment_status === 'FAILED' ) {
                         $payment_status = $global_payment_status;
                     }
+
+                    $get_refund_status = usbswiper_get_refund_status();
 
                     if( !class_exists('Usb_Swiper_Paypal_request') ) {
                         include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
@@ -61,6 +63,10 @@ if( $has_transactions ) : ?>
                             ));
                             ?>
                             <a class="vt-button capture-transaction" href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
+                        <?php } ?>
+
+                        <?php if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status)) { ?>
+                            <button id="send_email_btn_<?php echo $id; ?>" data-transaction_id="<?php echo $id; ?>" class="vt-button send-email-btn" title="<?php _e('Send Email Receipt','usb-swiper'); ?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></button>
                         <?php } ?>
 					</td>
 				</tr>

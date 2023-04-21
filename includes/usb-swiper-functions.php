@@ -2,9 +2,9 @@
 
 
 
-///**
-// * Filter the cart template path to use our cart.php template instead of the theme's
-// */
+/**
+ * Filter the cart template path to use our cart.php template instead of the theme's
+ */
 function usbswiper_locate_email_templates( $template, $template_name, $template_path ) {
 	$basename = basename( $template );
 	if( $basename == 'paypalconnected.php' ) {
@@ -132,7 +132,6 @@ function usb_swiper_get_vt_tab_fields() {
 
 	$tab_fields = array(
 		//'swiper' => __( 'Swipe Card' ,'usb-swiper' ),
-		'currency_info' => __( 'Currency Information' ,'usb-swiper' ),
 		'personal_info' => __( 'Buyer Information' ,'usb-swiper' ),
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
@@ -140,6 +139,18 @@ function usb_swiper_get_vt_tab_fields() {
 	);
 
 	return apply_filters( 'usb_swiper_get_vt_tab_fields', $tab_fields );
+}
+
+function usb_swiper_get_fields_for_transaction() {
+
+    return array(
+        'currency_info' => __( 'Currency Information' ,'usb-swiper' ),
+        'personal_info' => __( 'Buyer Information' ,'usb-swiper' ),
+        'product_info' => __( 'Product Information' ,'usb-swiper' ),
+        'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
+        'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
+        'shipping_address' => __( 'Shipping Address' ,'usb-swiper' ),
+    );
 }
 
 /**
@@ -151,254 +162,7 @@ function usb_swiper_get_vt_tab_fields() {
  */
 function usb_swiper_get_countries() {
 
-	return apply_filters( 'usb_swiper_get_countries', array(
-		'' => __('Choose a country','usb-swiper'),
-		'US' => __('United States','usb-swiper'),
-		'GB' => __('United Kingdom','usb-swiper'),
-		'AF' => __('Afghanistan','usb-swiper'),
-		'AX' => __('Aland Islands','usb-swiper'),
-		'AL' => __('Albania','usb-swiper'),
-		'DZ' => __('Algeria','usb-swiper'),
-		'AS' => __('American Samoa','usb-swiper'),
-		'AD' => __('Andorra','usb-swiper'),
-		'AO' => __('Angola','usb-swiper'),
-		'AI' => __('Anguilla','usb-swiper'),
-		'AQ' => __('Antarctica','usb-swiper'),
-		'AG' => __('Antigua & Barbuda','usb-swiper'),
-		'AR' => __('Argentina','usb-swiper'),
-		'AM' => __('Armenia','usb-swiper'),
-		'AW' => __('Aruba','usb-swiper'),
-		'AU' => __('Australia','usb-swiper'),
-		'AT' => __('Austria','usb-swiper'),
-		'AZ' => __('Azerbaijan','usb-swiper'),
-		'BS' => __('Bahamas','usb-swiper'),
-		'BH' => __('Bahrain','usb-swiper'),
-		'BD' => __('Bangladesh','usb-swiper'),
-		'BB' => __('Barbados','usb-swiper'),
-		'BY' => __('Belarus','usb-swiper'),
-		'BE' => __('Belgium','usb-swiper'),
-		'BZ' => __('Belize','usb-swiper'),
-		'BJ' => __('Benin','usb-swiper'),
-		'BM' => __('Bermuda','usb-swiper'),
-		'BT' => __('Bhutan','usb-swiper'),
-		'BO' => __('Bolivia','usb-swiper'),
-		'BA' => __('Bosnia & Herzegovina','usb-swiper'),
-		'BW' => __('Botswana','usb-swiper'),
-		'BV' => __('Bouvet Island','usb-swiper'),
-		'BR' => __('Brazil','usb-swiper'),
-		'IO' => __('British Indian Ocean Territory','usb-swiper'),
-		'BN' => __('Brunei Darussalam','usb-swiper'),
-		'BG' => __('Bulgaria','usb-swiper'),
-		'BF' => __('Burkina Faso','usb-swiper'),
-		'BI' => __('Burundi','usb-swiper'),
-		'KH' => __('Cambodia','usb-swiper'),
-		'CM' => __('Cameroon','usb-swiper'),
-		'CA' => __('Canada','usb-swiper'),
-		'CV' => __('Cape Verde','usb-swiper'),
-		'KY' => __('Cayman Islands','usb-swiper'),
-		'CF' => __('Central African Rep','usb-swiper'),
-		'TD' => __('Chad','usb-swiper'),
-		'CL' => __('Chile','usb-swiper'),
-		'CN' => __('China','usb-swiper'),
-		'CX' => __('Christmas Island','usb-swiper'),
-		'CC' => __('Cocos (Keeling) Islands','usb-swiper'),
-		'CO' => __('Colombia','usb-swiper'),
-		'KM' => __('Comoros','usb-swiper'),
-		'CG' => __('Congo','usb-swiper'),
-		'CK' => __('Cook Islands','usb-swiper'),
-		'CR' => __('Costa Rica','usb-swiper'),
-		'CI' => __("Côte d'Ivoire",'usb-swiper'),
-		'HR' => __('Croatia','usb-swiper'),
-		'CU' => __('Cuba','usb-swiper'),
-		'CY' => __('Cyprus','usb-swiper'),
-		'CZ' => __('Czech Republic','usb-swiper'),
-		'CD' => __('Dem Rep of Congo (Zaire)','usb-swiper'),
-		'DK' => __('Denmark','usb-swiper'),
-		'DJ' => __('Djibouti','usb-swiper'),
-		'DM' => __('Dominica','usb-swiper'),
-		'DO' => __('Dominican Republic','usb-swiper'),
-		'EC' => __('Ecuador','usb-swiper'),
-		'EG' => __('Egypt','usb-swiper'),
-		'SV' => __('El Salvador','usb-swiper'),
-		'GQ' => __('Equatorial Guinea','usb-swiper'),
-		'ER' => __('Eritrea','usb-swiper'),
-		'EE' => __('Estonia','usb-swiper'),
-		'ET' => __('Ethiopia','usb-swiper'),
-		'FK' => __('Falkland Islands (Malvinas)','usb-swiper'),
-		'FO' => __('Faeroe Islands','usb-swiper'),
-		'FJ' => __('Fiji','usb-swiper'),
-		'FI' => __('Finland','usb-swiper'),
-		'FR' => __('France','usb-swiper'),
-		'GF' => __('French Guiana','usb-swiper'),
-		'PF' => __('French Polynesia/Tahiti','usb-swiper'),
-		'TF' => __('French Southern Territories','usb-swiper'),
-		'GA' => __('Gabon','usb-swiper'),
-		'GM' => __('Gambia','usb-swiper'),
-		'GE' => __('Georgia','usb-swiper'),
-		'DE' => __('Germany','usb-swiper'),
-		'GH' => __('Ghana','usb-swiper'),
-		'GI' => __('Gibraltar','usb-swiper'),
-		'GR' => __('Greece','usb-swiper'),
-		'GL' => __('Greenland','usb-swiper'),
-		'GD' => __('Grenada','usb-swiper'),
-		'GP' => __('Guadeloupe','usb-swiper'),
-		'GU' => __('Guam','usb-swiper'),
-		'GT' => __('Guatemala','usb-swiper'),
-		'GG' => __('Guernsey','usb-swiper'),
-		'GN' => __('Guinea','usb-swiper'),
-		'GW' => __('Guinea-Bissau','usb-swiper'),
-		'GY' => __('Guyana','usb-swiper'),
-		'HT' => __('Haiti','usb-swiper'),
-		'HM' => __('Heard Island & McDonald Islands','usb-swiper'),
-		'VA' => __('Holy See (Vatican City State)','usb-swiper'),
-		'HN' => __('Honduras','usb-swiper'),
-		'HK' => __('Hong Kong','usb-swiper'),
-		'HU' => __('Hungary','usb-swiper'),
-		'IS' => __('Iceland','usb-swiper'),
-		'IN' => __('India','usb-swiper'),
-		'ID' => __('Indonesia','usb-swiper'),
-		'IR' => __('Iran','usb-swiper'),
-		'IQ' => __('Iraq','usb-swiper'),
-		'IE' => __('Ireland','usb-swiper'),
-		'IM' => __('Isle of Man','usb-swiper'),
-		'IL' => __('Israel','usb-swiper'),
-		'IT' => __('Italy','usb-swiper'),
-		'CI' => __('Ivory Coast','usb-swiper'),
-		'JM' => __('Jamaica','usb-swiper'),
-		'JP' => __('Japan','usb-swiper'),
-		'JE' => __('Jersey','usb-swiper'),
-		'JO' => __('Jordan','usb-swiper'),
-		'KZ' => __('Kazakhstan','usb-swiper'),
-		'KE' => __('Kenya','usb-swiper'),
-		'KI' => __('Kiribati','usb-swiper'),
-		'KP' => __('Korea, Democratic Republic of','usb-swiper'),
-		'KR' => __('Korea, Republic of','usb-swiper'),
-		'KW' => __('Kuwait','usb-swiper'),
-		'KG' => __('Kyrgyzstan','usb-swiper'),
-		'LA' => __('Laos','usb-swiper'),
-		'LV' => __('Latvia','usb-swiper'),
-		'LB' => __('Lebanon','usb-swiper'),
-		'LS' => __('Lesotho','usb-swiper'),
-		'LR' => __('Liberia','usb-swiper'),
-		'LY' => __('Libya','usb-swiper'),
-		'LI' => __('Liechtenstein','usb-swiper'),
-		'LT' => __('Lithuania','usb-swiper'),
-		'LU' => __('Luxembourg','usb-swiper'),
-		'MO' => __('Macau','usb-swiper'),
-		'MK' => __('Macedonia','usb-swiper'),
-		'MG' => __('Madagascar','usb-swiper'),
-		'MW' => __('Malawi','usb-swiper'),
-		'MY' => __('Malaysia','usb-swiper'),
-		'MV' => __('Maldives','usb-swiper'),
-		'ML' => __('Mali','usb-swiper'),
-		'MT' => __('Malta','usb-swiper'),
-		'MH' => __('Marshall Islands','usb-swiper'),
-		'MQ' => __('Martinique','usb-swiper'),
-		'MR' => __('Mauritania','usb-swiper'),
-		'MU' => __('Mauritius','usb-swiper'),
-		'MX' => __('Mexico','usb-swiper'),
-		'FM' => __('Micronesia','usb-swiper'),
-		'MD' => __('Moldova','usb-swiper'),
-		'MC' => __('Monaco','usb-swiper'),
-		'MN' => __('Mongolia','usb-swiper'),
-		'MS' => __('Montserrat','usb-swiper'),
-		'MA' => __('Morocco','usb-swiper'),
-		'MZ' => __('Mozambique','usb-swiper'),
-		'MM' => __('Myanmar','usb-swiper'),
-		'NA' => __('Namibia','usb-swiper'),
-		'NR' => __('Nauru','usb-swiper'),
-		'NP' => __('Nepal','usb-swiper'),
-		'NL' => __('Netherlands','usb-swiper'),
-		'AN' => __('Netherlands Antilles','usb-swiper'),
-		'NC' => __('New Caledonia','usb-swiper'),
-		'NZ' => __('New Zealand','usb-swiper'),
-		'NI' => __('Nicaragua','usb-swiper'),
-		'NE' => __('Niger','usb-swiper'),
-		'NG' => __('Nigeria','usb-swiper'),
-		'NU' => __('Niue','usb-swiper'),
-		'NF' => __('Norfolk Island','usb-swiper'),
-		'MP' => __('Northern Mariana Islands','usb-swiper'),
-		'NO' => __('Norway','usb-swiper'),
-		'OM' => __('Oman','usb-swiper'),
-		'PK' => __('Pakistan','usb-swiper'),
-		'PW' => __('Palau','usb-swiper'),
-		'PS' => __('Palestinian Territory','usb-swiper'),
-		'PA' => __('Panama','usb-swiper'),
-		'PG' => __('Papua New Guinea','usb-swiper'),
-		'PY' => __('Paraguay','usb-swiper'),
-		'PE' => __('Peru','usb-swiper'),
-		'PH' => __('Philippines','usb-swiper'),
-		'PN' => __('Pitcairn','usb-swiper'),
-		'PL' => __('Poland','usb-swiper'),
-		'PT' => __('Portugal','usb-swiper'),
-		'PR' => __('Puerto Rico','usb-swiper'),
-		'QA' => __('Qatar','usb-swiper'),
-		'RE' => __('Reunion Is.','usb-swiper'),
-		'RO' => __('Romania','usb-swiper'),
-		'RU' => __('Russia','usb-swiper'),
-		'RW' => __('Rwanda','usb-swiper'),
-		'SH' => __('Saint Helena','usb-swiper'),
-		'KN' => __('Saint Kitts & Nevis','usb-swiper'),
-		'LC' => __('Saint Lucia','usb-swiper'),
-		'PM' => __('Saint Pierre & Miquelon','usb-swiper'),
-		'VC' => __('Saint Vincent & Grenadines','usb-swiper'),
-		'AS' => __('Samoa (Amer.)','usb-swiper'),
-		'WS' => __('Samoa (Western)','usb-swiper'),
-		'SM' => __('San Marino','usb-swiper'),
-		'KN' => __('Sao Tome & Principe','usb-swiper'),
-		'SA' => __('Saudi Arabia','usb-swiper'),
-		'SN' => __('Senegal','usb-swiper'),
-		'CS' => __('Serbia & Montenegro','usb-swiper'),
-		'SC' => __('Seychelles','usb-swiper'),
-		'SL' => __('Sierra Leone','usb-swiper'),
-		'SG' => __('Singapore','usb-swiper'),
-		'SK' => __('Slovakia','usb-swiper'),
-		'SI' => __('Slovenia','usb-swiper'),
-		'SB' => __('Solomon Islands','usb-swiper'),
-		'ZA' => __('South Africa','usb-swiper'),
-		'GS' => __('South Georgia & S. Sandwich Islands','usb-swiper'),
-		'ES' => __('Spain','usb-swiper'),
-		'LK' => __('Sri Lanka','usb-swiper'),
-		'SD' => __('Sudan','usb-swiper'),
-		'SR' => __('Suriname','usb-swiper'),
-		'SR' => __('Svalbard & Jan Mayen','usb-swiper'),
-		'SZ' => __('Swaziland','usb-swiper'),
-		'SE' => __('Sweden','usb-swiper'),
-		'CH' => __('Switzerland','usb-swiper'),
-		'SY' => __('Syria','usb-swiper'),
-		'TW' => __('Taiwan','usb-swiper'),
-		'TJ' => __('Tajikistan','usb-swiper'),
-		'TZ' => __('Tanzania','usb-swiper'),
-		'TH' => __('Thailand','usb-swiper'),
-		'TL' => __('Timor-Leste','usb-swiper'),
-		'TG' => __('Togo','usb-swiper'),
-		'TK' => __('Tokelau','usb-swiper'),
-		'TO' => __('Tonga','usb-swiper'),
-		'TT' => __('Trinidad & Tobago','usb-swiper'),
-		'TN' => __('Tunisia','usb-swiper'),
-		'TR' => __('Turkey','usb-swiper'),
-		'TM' => __('Turkmenistan','usb-swiper'),
-		'TC' => __('Turks & Caicos Islands','usb-swiper'),
-		'TV' => __('Tuvalu','usb-swiper'),
-		'UG' => __('Uganda','usb-swiper'),
-		'UA' => __('Ukraine','usb-swiper'),
-		'AE' => __('United Arab Emirates','usb-swiper'),
-		'GB' => __('United Kingdom','usb-swiper'),
-		'US' => __('United States','usb-swiper'),
-		'UM' => __('United States Minor Outlying Islands','usb-swiper'),
-		'UY' => __('Uruguay','usb-swiper'),
-		'UZ' => __('Uzbekistan','usb-swiper'),
-		'VU' => __('Vanuatu','usb-swiper'),
-		'VE' => __('Venezuela','usb-swiper'),
-		'VN' => __('Vietnam','usb-swiper'),
-		'VG' => __('Virgin Islands, British','usb-swiper'),
-		'VI' => __('Virgin Islands, US','usb-swiper'),
-		'WF' => __('Wallis & Futuna Isle','usb-swiper'),
-		'EH' => __('Western Sahara','usb-swiper'),
-		'YE' => __('Yemen','usb-swiper'),
-		'ZM' => __('Zambia','usb-swiper'),
-		'ZW' => __('Zimbabwe','usb-swiper'),
-	));
+    return WC()->countries->get_allowed_countries();
 }
 
 /**
@@ -408,86 +172,10 @@ function usb_swiper_get_countries() {
  *
  * @return mixed|void
  */
-function usb_swiper_get_states() {
+function usb_swiper_get_states( $country = 'US' ) {
+    $get_states = WC()->countries->get_states( $country );
 
-	return apply_filters( 'usb_swiper_get_states', array(
-		'' => __('Choose a state','usb-swiper'),
-		'AL' => __('Alabama','usb-swiper'),
-		'AK' => __('Alaska','usb-swiper'),
-		'AS' => __('American Samoa','usb-swiper'),
-		'AZ' => __('Arizona','usb-swiper'),
-		'AR' => __('Arkansas','usb-swiper'),
-		'CA' => __('California','usb-swiper'),
-		'CO' => __('Colorado','usb-swiper'),
-		'CT' => __('Connecticut','usb-swiper'),
-		'DE' => __('Delaware','usb-swiper'),
-		'DC' => __('District Of Columbia','usb-swiper'),
-		'FM' => __('Federated States Of Micronesia','usb-swiper'),
-		'FL' => __('Florida','usb-swiper'),
-		'GA' => __('Georgia','usb-swiper'),
-		'GU' => __('Guam','usb-swiper'),
-		'HI' => __('Hawaii','usb-swiper'),
-		'ID' => __('Idaho','usb-swiper'),
-		'IL' => __('Illinois','usb-swiper'),
-		'IN' => __('Indiana','usb-swiper'),
-		'IA' => __('Iowa','usb-swiper'),
-		'KS' => __('Kansas','usb-swiper'),
-		'KY' => __('Kentucky','usb-swiper'),
-		'LA' => __('Louisiana','usb-swiper'),
-		'ME' => __('Maine','usb-swiper'),
-		'MH' => __('Marshall Islands','usb-swiper'),
-		'MD' => __('Maryland','usb-swiper'),
-		'MA' => __('Massachusetts','usb-swiper'),
-		'MI' => __('Michigan','usb-swiper'),
-		'MN' => __('Minnesota','usb-swiper'),
-		'MS' => __('Mississippi','usb-swiper'),
-		'MO' => __('Missouri','usb-swiper'),
-		'MT' => __('Montana','usb-swiper'),
-		'NE' => __('Nebraska','usb-swiper'),
-		'NV' => __('Nevada','usb-swiper'),
-		'NH' => __('New Hampshire','usb-swiper'),
-		'NJ' => __('New Jersey','usb-swiper'),
-		'NM' => __('New Mexico','usb-swiper'),
-		'NY' => __('New York','usb-swiper'),
-		'NC' => __('North Carolina','usb-swiper'),
-		'ND' => __('North Dakota','usb-swiper'),
-		'MP' => __('Northern Mariana Islands','usb-swiper'),
-		'OH' => __('Ohio','usb-swiper'),
-		'OK' => __('Oklahoma','usb-swiper'),
-		'OR' => __('Oregon','usb-swiper'),
-		'PW' => __('Palau','usb-swiper'),
-		'PA' => __('Pennsylvania','usb-swiper'),
-		'PR' => __('Puerto Rico','usb-swiper'),
-		'RI' => __('Rhode Island','usb-swiper'),
-		'SC' => __('South Carolina','usb-swiper'),
-		'SD' => __('South Dakota','usb-swiper'),
-		'TN' => __('Tennessee','usb-swiper'),
-		'TX' => __('Texas','usb-swiper'),
-		'UT' => __('Utah','usb-swiper'),
-		'VT' => __('Vermont','usb-swiper'),
-		'VI' => __('Virgin Islands','usb-swiper'),
-		'VA' => __('Virginia','usb-swiper'),
-		'WA' => __('Washington','usb-swiper'),
-		'WV' => __('West Virginia','usb-swiper'),
-		'WI' => __('Wisconsin','usb-swiper'),
-		'WY' => __('Wyoming','usb-swiper'),
-		'AA' => __('Armed Forces Americas','usb-swiper'),
-		'AE' => __('Armed Forces','usb-swiper'),
-		'AP' => __('Armed Forces Pacific','usb-swiper'),
-		'AB' => __('Alberta','usb-swiper'),
-		'BC' => __('British Columbia','usb-swiper'),
-		'MB' => __('Manitoba','usb-swiper'),
-		'NB' => __('New Brunswick','usb-swiper'),
-		'NF' => __('Newfoundland and Labrador','usb-swiper'),
-		'NT' => __('Northwest Territories','usb-swiper'),
-		'NS' => __('Nova Scotia','usb-swiper'),
-		'NU' => __('Nunavut','usb-swiper'),
-		'ON' => __('Ontario','usb-swiper'),
-		'PE' => __('Prince Edward Island','usb-swiper'),
-		'QC' => __('Quebec','usb-swiper'),
-		'SK' => __('Saskatchewan','usb-swiper'),
-		'YK' => __('Yukon','usb-swiper'),
-	));
+    return !empty( $get_states ) ? array_merge( array('' => __('Select state','usb-swiper')), $get_states) : '';
 }
 
 /**
@@ -501,90 +189,131 @@ function usb_swiper_get_states() {
  */
 function usb_swiper_get_vt_form_fields( $tab = '' ) {
 
+    $merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
+    $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
 	$get_countries = usb_swiper_get_countries();
-	$get_states = usb_swiper_get_states();
+	$get_states = usb_swiper_get_states($country_code);
 
-	$form_fields = array(
-		'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
-			array(
-				'type' => 'password',
-				'id' => 'swiper',
-				'name' => 'swiper',
-				'label' => __( 'Click to Swipe', 'usb-swiper'),
-				'required' => false,
-				'attributes' =>'',
-				'class' => '',
-				'description' => sprintf( __( 'Note: A %1$sUSB credit card reader%2$s is required for swipe functionality.','usb-swiper'), '<a target="_blank" href="https://www.usbswiper.com/usbswiper-usb-magnetic-stripe-credit-card-reader.html?utm_source=angelleye&utm_medium=paypal-pos&utm_campaign=usbswiper">' ,'</a>')
-			)
-		)),
-		'currency_info' => apply_filters( 'usb_swiper_payment_info_fields1', array(
-			array(
-				'type' => 'select',
-				'id' => 'TransactionCurrency',
-				'name' => 'TransactionCurrency',
-				'label' => __( 'Currency', 'usb-swiper'),
-				'required' => true,
-				'options' => usbswiper_get_currency_code_options(),
-				'default' => usbswiper_get_default_currency(),
-				'attributes' => '',
-				'description' => '',
-				'readonly' => false,
-				'disabled' => false,
-				'class' => 'usbswiper-change-currency',
-			))),
-		'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
-			array(
-				'type' => 'text',
-				'id' => 'company',
-				'name' => 'company',
-				'label' => __( 'Company Name', 'usb-swiper'),
-				'required' => false,
-				'options' => array(),
-				'attributes' => array(
-					//'maxlength' => 25
-				),
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingFirstName',
-				'name' => 'BillingFirstName',
-				'label' => __( 'First Name', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 35
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingLastName',
-				'name' => 'BillingLastName',
-				'label' => __( 'Last Name', 'usb-swiper'),
-				'required' => true,
-				'attributes' => array(
-					'maxlength' => 35
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
-				'type' => 'text',
-				'id' => 'BillingEmail',
-				'name' => 'BillingEmail',
-				'label' => __( 'Email Address', 'usb-swiper'),
-				'required' => false,
-				'options' => array(),
-				'attributes' => array(
-					//'maxlength' => 25
-				),
-				'class' => '',
-			),
-
+    $form_fields = array(
+        'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
+            array(
+                'type' => 'password',
+                'id' => 'swiper',
+                'name' => 'swiper',
+                'label' => __( 'Click to Swipe', 'usb-swiper'),
+                'required' => false,
+                'attributes' =>'',
+                'class' => 'vt-input-field',
+                'description' => sprintf( __( 'Note: A %1$sUSB credit card reader%2$s is required for swipe functionality.','usb-swiper'), '<a target="_blank" href="https://www.usbswiper.com/usbswiper-usb-magnetic-stripe-credit-card-reader.html?utm_source=angelleye&utm_medium=paypal-pos&utm_campaign=usbswiper">' ,'</a>')
+            )
+        )),
+        'currency_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
+            array(
+                'type' => 'select',
+                'id' => 'TransactionCurrency',
+                'name' => 'TransactionCurrency',
+                'label' => __( 'Currency', 'usb-swiper'),
+                'required' => true,
+                'options' => usbswiper_get_currency_code_options(),
+                'default' => usbswiper_get_default_currency(),
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'usbswiper-change-currency',
+            ))),
+        'product_info' => apply_filters( 'usb_swiper_product_info_fields', array(
+            array(
+                'type' => 'text',
+                'id' => 'VTProduct',
+                'name' => 'VTProduct[]',
+                'required' => true,
+                'placeholder' => __( 'Search Product', 'usb-swiper'),
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-input-field vt-product-input',
+                'wrapper_class' => 'product'
+            ),
+            array(
+                'type' => 'number',
+                'id' => 'VTProductQuantity',
+                'name' => 'VTProductQuantity[]',
+                'placeholder' => __( 'Quantity', 'usb-swiper'),
+                'required' => true,
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-input-field vt-product-quantity',
+                'wrapper_class' => 'product_quantity'
+            ),
+            array(
+                'type' => 'number',
+                'id' => 'VTProductPrice',
+                'name' => 'VTProductPrice[]',
+                'placeholder' => __( 'Price', 'usb-swiper'),
+                'required' => true,
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => 'vt-input-field vt-product-price',
+                'wrapper_class' => 'price'
+            )
+            )),
+        'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
+            array(
+                'type' => 'text',
+                'id' => 'company',
+                'name' => 'company',
+                'placeholder' => __( 'Company Name', 'usb-swiper'),
+                'required' => false,
+                'options' => array(),
+                'attributes' => array(
+                    //'maxlength' => 25
+                ),
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingFirstName',
+                'name' => 'BillingFirstName',
+                'placeholder' => __( 'First Name', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 35
+                ),
+                'description' => '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingLastName',
+                'name' => 'BillingLastName',
+                'placeholder' => __( 'Last Name', 'usb-swiper'),
+                'required' => true,
+                'attributes' => array(
+                    'maxlength' => 35
+                ),
+                'description' => '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'text',
+                'id' => 'BillingEmail',
+                'name' => 'BillingEmail',
+                'placeholder' => __( 'Email Address', 'usb-swiper'),
+                'required' => false,
+                'options' => array(),
+                'attributes' => array(
+                    //'maxlength' => 25
+                ),
+                'class' => 'vt-input-field',
+            ),
 		)),
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
-
 			array(
 				'type' => 'select',
 				'id' => 'TransactionType',
@@ -792,7 +521,9 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'attributes' => '',
 				'options' => $get_states,
 				'description' => '',
-				'class' => 'vt-billing-address-field',
+				'class' => 'vt-billing-address-field vt-billing-states',
+                'wrapper' =>  true,
+                'wrapper_class' => 'state-field billing-states-wrap',
 			),
 			array(
 				'type' => 'text',
@@ -815,7 +546,8 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'attributes' => '',
 				'options' => $get_countries,
 				'description' => '',
-				'class' => 'vt-billing-address-field',
+                'default' => $country_code,
+				'class' => 'vt-billing-address-field vt-billing-country',
 			),
 			array(
 				'type' => 'text',
@@ -926,7 +658,9 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'options' => $get_states,
 				'attributes' => '',
 				'description' => '',
-				'class' => 'vt-shipping-address-field',
+				'class' => 'vt-shipping-address-field vt-shipping-states',
+                'wrapper' =>  true,
+                'wrapper_class' => 'state-field shipping-states-wrap',
 			),
 			array(
 				'type' => 'text',
@@ -947,7 +681,8 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'options' => $get_countries,
 				'attributes' => '',
 				'description' => '',
-				'class' => 'vt-shipping-address-field',
+                'default' => $country_code,
+				'class' => 'vt-shipping-address-field vt-shipping-country',
 			),
 			array(
 				'type' => 'text',
@@ -1058,7 +793,8 @@ function usbswiper_get_onboarding_user() {
  */
 function usbswiper_get_platform_fees( $cart_total ) {
 
-	if( !is_user_logged_in()){
+
+	if( !is_user_logged_in() || empty( $cart_total ) ){
 		return 0;
 	}
 
@@ -1314,6 +1050,33 @@ function usbswiper_get_default_currency( $user_id = 0 ) {
 }
 
 /**
+ * Get the current login user products.
+ *
+ * @since 1.1.17
+ *
+ * @return array
+ */
+function vt_get_curent_user_products() {
+
+    $product_option = array('' => __( 'Select Product', 'usb-swiper'));
+
+    $products = new WP_Query( array(
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+        'author' => get_current_user_id(),
+        'order' => 'DESC',
+    ));
+
+    if( ! empty( $products->posts ) ) {
+        foreach ( $products->posts as $product ) {
+            $product_option[$product->ID] = $product->post_title;
+        }
+    }
+
+    return $product_option;
+}
+
+/**
  * Get the currency symbol.
  *
  * @since 1.0.0
@@ -1367,7 +1130,7 @@ function usbswiper_get_payment_status( $status ) {
  */
 function usbswiper_get_refund_status() {
 
-	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED'));
+	return apply_filters('usbswiper_get_refund_status', array('COMPLETED','PARTIALLY_REFUNDED','PAID'));
 }
 
 /**
@@ -1639,8 +1402,9 @@ function usb_swiper_price_formatter( $price ) {
 
 /**
  * function to return user's name
+ *
+ * @since 1.1.17
  */
-
 function usbswiper_get_user_name(){
 
     $user_name = '';
@@ -1652,4 +1416,251 @@ function usbswiper_get_user_name(){
     }
 
 	return $user_name;
+}
+
+/**
+ * Function use for set the content limit after added limit.
+ *
+ * @param string $content Get content.
+ * @param int $limit Get content limit
+ * @return false|mixed
+ */
+function usbswiper_set_content_limit( $content, $limit = 120, $more = '...' ) {
+
+    if( empty( $content ) ) {
+        return false;
+    }
+
+    $content_len = strlen($content);
+
+    if( $content_len >= $limit ) {
+        $content = substr($content, 0, $limit).$more;
+    }
+
+    return $content;
+
+}
+
+/**
+ * Get the product sku.
+ *
+ * @since 1.1.17
+ *
+ * @param string $sku
+ * @param boolean $is_display
+ * @return array|string|string[]|void
+ */
+function usbswiper_get_product_sku( $sku, $is_display = false ) {
+
+    if(empty($sku) || !is_user_logged_in()) {
+        return;
+    }
+
+    $current_user = wp_get_current_user();
+    $user_login = !empty( $current_user->user_login ) ? $current_user->user_login : '';
+    $prefix = get_user_meta( get_current_user_id(),'invoice_prefix', true);
+
+    $default_prefix = $user_login.'-';
+
+    if( $is_display ) {
+        $get_product_sku = str_replace($default_prefix,'',$sku);
+        if(  !empty( $prefix ) ) {
+            $get_product_sku = str_replace($prefix,'',$get_product_sku);
+        }
+    } else {
+        if(  !empty( $prefix ) ) {
+            $get_product_sku = $prefix.$sku;
+        } else {
+            $get_product_sku = $default_prefix.$sku;
+        }
+    }
+
+    return $get_product_sku;
+}
+
+/**
+ * Get the product html.
+ *
+ * @since 1.1.17
+ *
+ * @param int $id
+ * @return string $html
+ */
+function get_product_html( $id = 0 ) {
+
+    $product_info_fields = usb_swiper_get_vt_form_fields('product_info');
+
+    $html = '<div id="vt_fields_wrap_' . $id . '" class="vt-fields-wrap">';
+
+    if (!empty($product_info_fields) && is_array($product_info_fields)) {
+
+        foreach ($product_info_fields as $product_field) {
+            $field_id = !empty($product_field['id']) ? $product_field['id'] : '';
+            if (!empty($field_id)) {
+                $product_field['id'] = $field_id . "_" . $id;
+            }
+            $html .= usb_swiper_get_html_field($product_field);
+        }
+    }
+
+    $html .= '<span class="vt-remove-fields-wrap">';
+
+    if ($id > 0) {
+        $html .= '<svg viewBox="0 0 24 24" width="25" height="25" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+    }
+
+    $html .= '</span>';
+
+    $html .= '</div>';
+
+    return $html;
+}
+
+/**
+ * Check usb_swiper_get_field_value function is exists or not.
+ */
+if( !function_exists('usb_swiper_get_field_value') ) {
+    /**
+     * Get the field value from settings.
+     *
+     * @since 1.1.17
+     *
+     * @param string $field
+     * @param string $tab
+     * @return mixed|string
+     */
+    function usb_swiper_get_field_value( $field , $tab ='general') {
+
+        if( empty( $field ) ) {
+            return '';
+        }
+
+        $settings = usb_swiper_get_settings($tab);
+
+        return  !empty( $settings[$field] ) ? $settings[$field]: '';
+    }
+}
+
+/**
+ * Get button background color by email domain.
+ *
+ * @since 1.1.17
+ *
+ * @param string $email_id get email id
+ * @param boolean $is_email
+ * @return string
+ */
+function get_button_background_color( $email_id, $is_email = false ) {
+    $background_color = 'linear-gradient(243deg,#3D72E7 0%,#53a0fe 100%)';
+    if( !empty($email_id) && strpos(strtolower($email_id), '@outlook.com') !== false && $is_email){
+        $background_color = '#53a0fe';
+    }
+    return $background_color;
+}
+
+/**
+ * Get user address in single line.
+ *
+ * @since 1.1.17
+ *
+ * @param $user_id
+ * @return string
+ */
+function get_user_address($user_id) {
+
+    $merchant_business_street = get_user_meta($user_id, 'billing_address_1', true);
+    $merchant_business_street2 = get_user_meta($user_id, 'billing_address_2', true);
+    $merchant_business_city = get_user_meta($user_id, 'billing_city', true);
+    $merchant_business_state = get_user_meta($user_id, 'billing_state', true);
+    $merchant_business_postal_code = get_user_meta($user_id, 'billing_postcode', true);
+    $merchant_business_country_code = get_user_meta($user_id, 'billing_country', true);
+
+    $merchant_business_street = !empty($merchant_business_street) ? $merchant_business_street : '';
+    $merchant_business_street2 = !empty($merchant_business_street2) ? $merchant_business_street2 : '';
+    $merchant_business_city = !empty($merchant_business_city) ? $merchant_business_city : '';
+    $merchant_business_state = !empty($merchant_business_state) ? $merchant_business_state : '';
+    $merchant_business_postal_code = !empty($merchant_business_postal_code) ? $merchant_business_postal_code : '';
+    $merchant_business_country_code = !empty($merchant_business_country_code) ? $merchant_business_country_code : '';
+
+    $merchant_address = $merchant_business_street;
+    $merchant_address .= !empty($merchant_address) ? ', ' . $merchant_business_street2 : '';
+    $merchant_address .= !empty($merchant_address) ? ', ' . $merchant_business_city : '';
+    $merchant_address .= !empty($merchant_address) ? ', ' . $merchant_business_state : '';
+    $merchant_address .= !empty($merchant_address) ? ', ' . $merchant_business_country_code : '';
+    $merchant_address .= !empty($merchant_address) ? '. ' . $merchant_business_postal_code : '';
+
+    return !empty($merchant_address) ? $merchant_address : '';
+}
+
+/**
+ * Check usbswiper_send_email_receipt_html function exists or not.
+ */
+if( !function_exists('usbswiper_send_email_receipt_html') ) {
+
+    /**
+     * Get the email receipt html
+     *
+     * @since 1.1.17
+     *
+     * @param int $transaction_id
+     * @return string
+     */
+    function usbswiper_send_email_receipt_html( $transaction_id ) {
+
+        if( empty( $transaction_id ) ) {
+            return '';
+        }
+
+        $BillingEmail = get_post_meta( $transaction_id, 'BillingEmail', true);
+
+        $send_email_form_fields = array(
+            array(
+                'type' => 'text',
+                'id' => 'billing_email',
+                'name' => 'billing_email',
+                'label' => __( 'Billing Email:', 'usb-swiper'),
+                'attributes' => '',
+                'description' => __('Add multiple emails with "," separated' ,'usb-swiper'),
+                'readonly' => false,
+                'value' => ! empty( $BillingEmail ) ? esc_attr( $BillingEmail ) : '',
+                'class' => 'vt-input-field',
+            ),
+            array(
+                'type' => 'hidden',
+                'id' => 'transaction_id',
+                'name' => 'transaction_id',
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'value' => $transaction_id,
+            ),
+            array(
+                'type' => 'hidden',
+                'id' => 'vt_send_email_nonce',
+                'name' => 'vt-send-email-nonce',
+                'label' => '',
+                'value' => wp_create_nonce('vt-send-email-form'),
+                'required' => false,
+            )
+        );
+
+        $html = '<div class="vt-resend-email-form">';
+            $html .='<div class="vt-resend-email-form-wrapper">';
+                $html .='<div class="close">';
+                    $html .='<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="512px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve"><path d="M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4  L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1  c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1  c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z"/></svg>';
+                $html .='</div>';
+                $html .='<form id="vt_resend_email_form" method="post" action="" name="vt-resend-email-form">';
+                        foreach ($send_email_form_fields as $form_field){
+                            $html .= usb_swiper_get_html_field($form_field);
+                        }
+                    $html .='<div class="button-wrap">';
+                        $html .='<button id="vt_send_email_cancel" type="reset" class="vt-button">'.__( 'Cancel', 'usb-swiper').'</button>';
+                        $html .='<button id="vt_send_email_submit" type="submit" class="vt-button">'.__( 'Send Email Receipt', 'usb-swiper').'</button>';
+                    $html .='</div>';
+                $html .='</form>';
+            $html .='</div>';
+        $html .='</div>';
+
+        return $html;
+    }
 }

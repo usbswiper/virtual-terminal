@@ -96,14 +96,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 'ajax_url' => admin_url( 'admin-ajax.php' ),
                 'remove_fee_message' => __( 'Are you sure you want to remove this fee?','usb-swiper' ),
             ) );
-			//Add the Select2 CSS file
-			wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0');
-
-			//Add the Select2 JavaScript file
-			wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', 'jquery', '4.1.0-rc.0');
-
-			//Add a JavaScript file to initialize the Select2 elements
-			wp_enqueue_script('select2-init', '/wp-content/plugins/select-2-tutorial/select2-init.js', 'jquery', '4.1.0-rc.0');
 		}
 
 		/**
@@ -375,7 +367,12 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
         }
 
 		/**
-		 * Sortable Columns in Transaction
+         * Sortable Columns in Transaction
+         *
+         * @since 1.1.17
+         *
+         * @param array $columns get all sortable column ids
+         * @return mixed
 		 */
         public function transactions_sortable_columns($columns){
 	        $columns['transaction_id'] ='transaction_id';
@@ -452,32 +449,22 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		 */
 		public function manage_transactions_filter( $post_type ) {
 
-			if ( $this->post_type !== esc_attr( $post_type ) ) {
-			    return;
-			}
-
-            $get_users = get_users();
-
-			$selected = '';
-			if( isset( $_REQUEST['user_id'] ) && $_REQUEST['user_id'] > 0 ) {
-				$selected = esc_attr( $_REQUEST['user_id'] );
+            if ( $this->post_type !== esc_attr( $post_type ) ) {
+                return;
             }
-            ?>
-            <label for="user_id" class="screen-reader-text"><?php _e('Filter by user','usb-swiper'); ?></label>
-            <select name="user_id" id="user_id">
-                <option value=""><?php _e('All User Transactions','usb-swiper'); ?></option>
-                <?php
-                if( !empty($get_users) && is_array( $get_users ) ) {
 
-                    foreach ( $get_users as $key => $user ) {
-                        ?>
-                        <option <?php selected( $selected, $user->ID ); ?> value="<?php echo $user->ID; ?>"><?php echo $user->display_name; ?></option>
-                        <?php
-                    }
-                }
-                ?>
-            </select>
-            <?php
+            $selected = 0;
+            if( empty( $_GET['s'])) {
+                $selected = !empty( $_GET['author'] ) ? $_GET['author']: 0;
+            }
+
+            wp_dropdown_users(
+                array(
+                    'name' => 'author',
+                    'show_option_all' => __('All User Transactions','usb-swiper'),
+                    'selected' => $selected,
+                )
+            );
 		}
 
 		/**
@@ -489,17 +476,28 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		 *
 		 * @return $query
 		 */
-		public function parse_query_filter( $query ) {
+		public function request_query_filter( $query ) {
 
-			$current_page = isset( $_GET['post_type'] ) ? esc_attr( $_GET['post_type'] ) : '';
+            $current_page = isset( $_GET['post_type'] ) ? esc_attr( $_GET['post_type'] ) : '';
 
-		    if( is_admin() && !empty( $current_page ) && $this->post_type === $current_page ) {
+            if( is_admin() && !empty( $current_page ) && $this->post_type === $current_page ) {
 
-		        if( !empty( $_REQUEST['user_id'] ) && $_REQUEST['user_id'] > 0 ) {
-			        $query->query_vars['author'] = esc_attr( $_REQUEST['user_id'] );
-		        }
+                if( isset( $_GET['author'] ) && $_GET['author'] === '0' ) {
+                    if (empty($query['s'])) {
+                        unset($query['s']);
+                    }
+                }
 
-		    }
+                if( !empty( $_REQUEST['author'] ) && $_REQUEST['author'] > 0 ) {
+                    if (empty($query['s'])) {
+                        unset($query['s']);
+                    }
+                }
+
+                if( !empty( $_GET['s'] ) ) {
+                    $query['author'] = 0;
+                }
+            }
 
 		    return $query;
 		}
@@ -824,6 +822,19 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'class' => 'regular-text',
 				    'value' => '',
 			    ),
+			    array(
+				    'type' => 'select',
+				    'id' => 'vt_verification_page',
+				    'name' => 'vt_verification_page',
+				    'label' => __('VT Verification Page', 'usb-swiper'),
+				    'wrapper' => false,
+				    'required' => true,
+				    'options' => $get_pages,
+				    'attributes' => '',
+				    'description' => '',
+				    'class' => 'regular-text',
+				    'value' => '',
+			    ),
                 array(
                     'type' => 'select',
                     'id' => 'vt_failure_page',
@@ -849,6 +860,114 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'class' => 'regular-text',
 				    'value' => 'true',
 			    ),
+                array(
+                    'type' => 'text',
+                    'id' => 'sandbox_merchant_id',
+                    'name' => 'sandbox_merchant_id',
+                    'label' => __('Sandbox Merchant ID', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter sandbox partner merchant id.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-sandbox',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'merchant_id',
+                    'name' => 'merchant_id',
+                    'label' => __('Merchant ID', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter partner merchant id.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-live',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'sandbox_client_id',
+                    'name' => 'sandbox_client_id',
+                    'label' => __('Sandbox Client ID', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter sandbox partner client id.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-sandbox',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'client_id',
+                    'name' => 'client_id',
+                    'label' => __('Client ID', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter partner client id.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-live',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'sandbox_client_secret',
+                    'name' => 'sandbox_client_secret',
+                    'label' => __('Sandbox Client Secret', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter sandbox partner client secret.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-sandbox',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'client_secret',
+                    'name' => 'client_secret',
+                    'label' => __('Client Secret', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter partner client secret.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-live',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'sandbox_attribution_id',
+                    'name' => 'sandbox_attribution_id',
+                    'label' => __('Sandbox Attribution ID', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter sandbox partner Attribution ID.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-sandbox',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'attribution_id',
+                    'name' => 'attribution_id',
+                    'label' => __('Attribution ID', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => true,
+                    'attributes' => '',
+                    'description' => __( 'Enter partner Attribution ID.','usb-swiper' ),
+                    'class' => 'regular-text paypal-is-live',
+                    'value' => 'true',
+                ),
+                array(
+                    'type' => 'text',
+                    'id' => 'paypal_partner_logo_url',
+                    'name' => 'paypal_partner_logo_url',
+                    'label' => __('Partner Logo URL', 'usb-swiper'),
+                    'wrapper' => false,
+                    'required' => false,
+                    'attributes' => '',
+                    'description' => __( 'Enter partner Logo URL. Default logo url https://www.usbswiper.com/img/usbswiper-logo-300x89.png','usb-swiper' ),
+                    'class' => 'regular-text',
+                    'value' => 'true',
+                ),
             );
 
 		    return apply_filters('usb_swiper_get_general_fields', $fields);
@@ -863,7 +982,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 			$settings = usb_swiper_get_settings('general');
 			$get_fields = self::get_general_fields();
-
 		    ?>
             <table class="form-table">
                 <tbody>
@@ -1460,6 +1578,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			$is_partner_fee_exclude = !empty($_POST['partner_checkbox_input']) ? true : false;
 
 			$get_exclude_partner_users = get_option('get_exclude_partner_users', array());
+            $get_exclude_partner_users = ! empty( $get_exclude_partner_users ) ? $get_exclude_partner_users : array();
 			update_user_meta( $user_id,'brand_name', sanitize_text_field( $_POST['brand_name'] ) );
 			$brand_name = get_the_author_meta( 'brand_name', $user_id );
 			if (!empty($_POST['partner_checkbox_input'])) {
@@ -1474,6 +1593,29 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			}
 
 			update_option('get_exclude_partner_users', $get_exclude_partner_users);
+
+            if( ! empty( $_POST['user-verify-vt-nonce'] ) && wp_verify_nonce( $_POST['user-verify-vt-nonce'],'user-verify-vt-nonce') ) {
+
+                $user_verify_for_vt = ! empty( $_POST['user-verify-for-vt'] );
+
+                update_user_meta( $user_id, 'vt_user_verification_status', $user_verify_for_vt );
+                if( ! empty( $user_verify_for_vt ) ) {
+                    $user_data    = get_user_by( 'id', $user_id );
+                    $user_name    = !empty( $user_data->user_firstname ) ? $user_data->user_firstname : '';
+
+                    $is_profile_approved = get_user_meta( $user_id, '_is_paypal_profile_approved', true);
+
+                    if( !$is_profile_approved) {
+                        $new_email = WC()->mailer()->emails['paypal_profile_verification_completed'];
+                        $new_email->recipient = !empty($user_data->user_email) ? $user_data->user_email : '';
+                        $new_email->trigger(array(
+                            'user_id' => $user_id,
+                            'user_name' => $user_name,
+                        ));
+                        update_user_meta($user_id, '_is_paypal_profile_approved', true);
+                    }
+                }
+            }
 		}
 
         /**
@@ -1551,5 +1693,31 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				//end wp list table
 			}//main end if
 		}
+
+        /**
+         * Adding verification tab fields in user edit page
+         *
+         * @param $user
+         * @return void|null
+         */
+        public function register_settings_for_vt_verification($user)
+        {
+	        if ( ! current_user_can( 'edit_users' ) ) {
+		        return null;
+	        }
+
+	        $user_id = ! empty( $user->ID ) ? $user->ID : 0;
+            $verification_status = get_user_meta( $user_id, 'vt_user_verification_status', true );
+            ?>
+            <h3 id="verify_data"><?php _e('Verification Form Data','usb-swiper'); ?></h3>
+            <table class="form-table">
+                <tr>
+                    <th><label><?php _e('Verify User for VT','usb-swiper'); ?></label></th>
+                    <td><input type="checkbox" name="user-verify-for-vt" <?php echo checked(true, $verification_status); ?> value="user-verify-for-vt"></td>
+                    <td><input type="hidden" name="user-verify-vt-nonce" value="<?php echo wp_create_nonce('user-verify-vt-nonce'); ?>">
+                </tr>
+            </table>
+            <?php
+        }
 	}
 }
