@@ -26,41 +26,53 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 		 */
 		public static function activate() {
 
-			$settings = get_option( 'usb_swiper_settings' );
+            $settings = get_option( 'usb_swiper_settings' );
 
-            $vt_page = get_page_by_title( 'Virtual Terminal' );
-            $vt_paybyinvoice_page = get_page_by_title( 'Pay By Invoice' );
+            if( empty( $settings ) ) {
 
-            if( empty( $vt_page ) ){
-                $vt_page_id = wp_insert_post( array(
-                    'post_title'    => __('Virtual Terminal', 'usb-swiper'),
-                    'post_content'  => '[usb_swiper_vt_form]',
-                    'post_status'   => 'publish',
-                    'post_author'   => 1,
-                    'post_type' => 'page'
-                ) );
-            }else{
-                $vt_page_id = $vt_page->ID;
-            }
+                $vt_page = get_page_by_title('Virtual Terminal');
+                $vt_page_id = !empty( $vt_page->ID ) ? $vt_page->ID : 0;
+                if( empty( $vt_page ) ) {
+                    $vt_page_id = wp_insert_post(array(
+                        'post_title' => __('Virtual Terminal', 'usb-swiper'),
+                        'post_content' => '[usb_swiper_vt_form]',
+                        'post_status' => 'publish',
+                        'post_author' => 1,
+                        'post_type' => 'page'
+                    ));
+                }
 
-            if( empty( $vt_paybyinvoice_page ) ){
-                $vt_paybyinvoice_page_id = wp_insert_post( array(
-                    'post_title'    => __('Pay By Invoice', 'usb-swiper'),
-                    'post_content'  => '[usb_swiper_pay_by_invoice]',
-                    'post_status'   => 'publish',
-                    'post_author'   => 1,
-                    'post_type' => 'page'
-                ) );
-            }else{
-                $vt_paybyinvoice_page_id = $vt_paybyinvoice_page->ID;
-            }
+                $vt_verification_page = get_page_by_title('Virtual Terminal Verification');
+                $vt_verification_page_id = !empty( $vt_verification_page->ID ) ? $vt_verification_page->ID : 0;
+                if( empty( $vt_verification_page ) ) {
+                    $vt_verification_page_id = wp_insert_post(array(
+                        'post_title' => __('Virtual Terminal Verification', 'usb-swiper'),
+                        'post_content' => '[usb_swiper_vt_verification_form]',
+                        'post_status' => 'publish',
+                        'post_author' => 1,
+                        'post_type' => 'page'
+                    ));
+                }
 
-            if( empty( $settings ) && !is_array( $settings )) {
+                $vt_paybyinvoice_page = get_page_by_title( 'Pay By Invoice' );
+                $vt_paybyinvoice_page_id = !empty( $vt_paybyinvoice_page->ID ) ? $vt_paybyinvoice_page->ID : 0;
+                if( empty( $vt_paybyinvoice_page ) ){
+                    $vt_paybyinvoice_page_id = wp_insert_post( array(
+                        'post_title'    => __('Pay By Invoice', 'usb-swiper'),
+                        'post_content'  => '[usb_swiper_pay_by_invoice]',
+                        'post_status'   => 'publish',
+                        'post_author'   => 1,
+                        'post_type' => 'page'
+                    ) );
+                }
+
                 $settings = array(
                     'general' => array(
                         'virtual_terminal_page' => $vt_page_id,
+                        'vt_verification_page' => $vt_verification_page_id,
                         'vt_paybyinvoice_page' => $vt_paybyinvoice_page_id,
                         'is_paypal_sandbox' => false,
+                        'paypal_partner_logo_url' => 'https://www.usbswiper.com/img/usbswiper-logo-300x89.png',
                     ),
                     'partner_fees' => array(
                         'fees' => array(
@@ -90,12 +102,9 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
                         'remove_data_on_uninstall' => true,
                     ),
                 );
+
+                update_option('usb_swiper_settings', $settings);
             }
-
-            $settings['general']['virtual_terminal_page'] = !empty( $settings['general']['virtual_terminal_page'] ) ? $settings['general']['virtual_terminal_page'] : $vt_page_id;
-            $settings['general']['vt_paybyinvoice_page'] = !empty( $settings['general']['vt_paybyinvoice_page'] ) ? $settings['general']['vt_paybyinvoice_page'] : $vt_paybyinvoice_page_id;
-
-			update_option('usb_swiper_settings', $settings );
 		}
 	}
 }

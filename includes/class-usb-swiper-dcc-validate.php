@@ -2,10 +2,22 @@
 
 defined('ABSPATH') || exit;
 
+/**
+ * The Usb_Swiper_Dcc_validate class is responsible for all card data validation.
+ *
+ * @since 1.0.0
+ */
 class Usb_Swiper_Dcc_validate {
 
 	protected static $_instance = null;
 
+    /**
+     * Create the self instance of class.
+     *
+     * @since 1.0.0
+     *
+     * @return Usb_Swiper_Dcc_validate|null
+     */
 	public static function instance() {
 		if (is_null(self::$_instance)) {
 			self::$_instance = new self();
@@ -13,6 +25,13 @@ class Usb_Swiper_Dcc_validate {
 		return self::$_instance;
 	}
 
+    /**
+     * Get allowed country currency matrix.
+     *
+     * @since 1.0.0
+     *
+     * @var string[][]
+     */
 	private $allowed_country_currency_matrix = array(
 		'AU' => array(
 			'AUD',
@@ -132,6 +151,13 @@ class Usb_Swiper_Dcc_validate {
 		),
 	);
 
+    /**
+     * Get the country card matrix.
+     *
+     * @since 1.0.0
+     *
+     * @var array
+     */
 	private $country_card_matrix = array(
 		'AU' => array(
 			'mastercard' => array(),
@@ -171,6 +197,13 @@ class Usb_Swiper_Dcc_validate {
 		),
 	);
 
+    /**
+     * Get the currency of selected country.
+     *
+     * @since 1.0.0
+     *
+     * @return bool
+     */
 	public function for_country_currency() {
 		$country = $this->country();
 		$currency = get_woocommerce_currency();
@@ -181,6 +214,13 @@ class Usb_Swiper_Dcc_validate {
 		return $applies;
 	}
 
+    /**
+     * Validate the card details.
+     *
+     * @since 1.0.0
+     *
+     * @return array
+     */
 	public function valid_cards() {
 		$country = $this->country();
 		$cards = array();
@@ -203,6 +243,14 @@ class Usb_Swiper_Dcc_validate {
 		return $cards;
 	}
 
+    /**
+     * Check whether the card is valid or not.
+     *
+     * @since 1.0.0
+     *
+     * @param array $card get card details.
+     * @return bool
+     */
 	public function can_process_card($card) {
 		$country = $this->country();
 		if (!isset($this->country_card_matrix[$country])) {
@@ -216,6 +264,13 @@ class Usb_Swiper_Dcc_validate {
 		return empty($supported_currencies) || in_array($currency, $supported_currencies, true);
 	}
 
+    /**
+     * Get base country of from WooCommerce.
+     *
+     * @since 1.0.0
+     *
+     * @return mixed
+     */
 	private function country() {
 		$region = wc_get_base_location();
 		$country = $region['country'];

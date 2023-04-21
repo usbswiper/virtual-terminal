@@ -75,9 +75,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				if (is_user_logged_in() && WC()->customer && WC()->customer->get_billing_country() && 2 === strlen(WC()->customer->get_billing_country())) {
 					$smart_js_arg['buyer-country'] = WC()->customer->get_billing_country();
 				}
-				$smart_js_arg['client-id'] = USBSWIPER_PAYPAL_SANDBOX_PARTNER_CLIENT_ID;
+				$smart_js_arg['client-id'] = usb_swiper_get_field_value('sandbox_client_id');
 			} else {
-				$smart_js_arg['client-id'] = USBSWIPER_PAYPAL_PARTNER_CLIENT_ID;
+				$smart_js_arg['client-id'] = usb_swiper_get_field_value('client_id');
 			}
 
 			$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
@@ -186,21 +186,50 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			$settings = usb_swiper_get_settings('general');
 			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+			$vt_verification_page_id = !empty( $settings['vt_verification_page'] ) ? (int)$settings['vt_verification_page'] : '';
+			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
             $vt_pay_by_invoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
-            $myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
-            if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() || ! empty( $vt_pay_by_invoice_id ) && $vt_pay_by_invoice_id === get_the_ID()) {
+
+			if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() || ( ! empty( $vt_verification_page_id ) && $vt_verification_page_id === get_the_ID() ) || ( ! empty( $vt_pay_by_invoice_id ) && $vt_pay_by_invoice_id === get_the_ID() ) ) {
 
                 $sdk_obj = $this->get_paypal_sdk_obj();
                 wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js?enable-funding=venmo' ), array(), null, false );
                 wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
 
 				wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
+				wp_enqueue_style( 'select2', USBSWIPER_URL . 'assets/css/select2.min.css' );
 				wp_enqueue_script( 'bootstrap-min', USBSWIPER_URL . 'assets/js/bootstrap.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'bootstrap-switch', USBSWIPER_URL . 'assets/js/bootstrap-switch.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'pos-functions', USBSWIPER_URL . 'assets/js/pos-functions.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'validate-credit-card-number', USBSWIPER_URL . 'assets/js/validate-credit-card-number.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'parse-track-data', USBSWIPER_URL . 'assets/js/parse-track-data.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'autoNumeric', USBSWIPER_URL . 'assets/js/autoNumeric.js', array( 'jquery' ), $this->version, true );
+				wp_enqueue_script( 'jquery-validate', USBSWIPER_URL . 'assets/js/jquery.validate.min.js', array( 'jquery' ), $this->version, true );
+				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
+				wp_enqueue_script( 'select2', USBSWIPER_URL . 'assets/js/select2.min.js', array( 'jquery' ), $this->version, true );
+
+				wp_localize_script( $this->plugin_name, 'usb_swiper_settings', array(
+					'ajax_url' => admin_url( 'admin-ajax.php' ),
+					'usb_swiper_transaction_nonce' => wp_create_nonce('usb_swiper_process_transaction'),
+					'three_d_secure_contingency' => apply_filters('usb_swiper_three_d_secure_contingency', 'SCA_WHEN_REQUIRED'),
+					'create_transaction_url' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_transaction', 'utm_nooverride' => '1', 'from' => 'vt_transaction' ), WC()->api_request_url( 'usb_swiper_transaction' ) ),
+					'cc_capture' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'cc_capture', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
+					'style_color' => apply_filters('usb_swiper_smart_button_style_color','gold'),
+					'style_shape' => apply_filters('usb_swiper_smart_button_style_shape','rect'),
+					'style_height' => apply_filters('usb_swiper_smart_button_style_height',''),
+					'style_label' => apply_filters('usb_swiper_smart_button_style_label','paypal'),
+					'style_layout' => apply_filters('usb_swiper_smart_button_style_layout','vertical'),
+					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
+					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
+                    'vt_page_url' => get_the_permalink($vt_page_id),
+					'email_validation_message' => __( 'Please enter a valid email address.', 'usb-swiper' ),
+				) );
+			} elseif ( $myaccount_page_id === get_the_ID() ) {
+
+				$sdk_obj = $this->get_paypal_sdk_obj();
+				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
+				wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
+
 				wp_enqueue_script( 'jquery-validate', USBSWIPER_URL . 'assets/js/jquery.validate.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
 
@@ -217,32 +246,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_layout' => apply_filters('usb_swiper_smart_button_style_layout','vertical'),
 					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
-                    'vt_page_url' => get_the_permalink($vt_page_id),
-				) );
-			} elseif ( $myaccount_page_id === get_the_ID() ) {
-
-				$sdk_obj = $this->get_paypal_sdk_obj();
-				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js?enable-funding=venmo' ), array(), null, false );
-				wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
-
-				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
-
-				wp_localize_script( $this->plugin_name, 'usb_swiper_settings', array(
-					'ajax_url' => admin_url( 'admin-ajax.php' ),
-					'usb_swiper_transaction_nonce' => wp_create_nonce('usb_swiper_process_transaction'),
-					'three_d_secure_contingency' => apply_filters('usb_swiper_three_d_secure_contingency', 'SCA_WHEN_REQUIRED'),
-					'create_transaction_url' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_transaction', 'utm_nooverride' => '1', 'from' => 'vt_transaction' ), WC()->api_request_url( 'usb_swiper_transaction' ) ),
-					'cc_capture' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'cc_capture', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
-					'style_color' => apply_filters('usb_swiper_smart_button_style_color','gold'),
-					'style_shape' => apply_filters('usb_swiper_smart_button_style_shape','rect'),
-					'style_height' => apply_filters('usb_swiper_smart_button_style_height',''),
-					'style_label' => apply_filters('usb_swiper_smart_button_style_label','paypal'),
-					'style_layout' => apply_filters('usb_swiper_smart_button_style_layout','vertical'),
-					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
-					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
 					'vt_page_url' => get_the_permalink($vt_page_id),
+                    'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper'))
 				) );
             }
+
+			wp_enqueue_script( 'usb-swiper-general', USBSWIPER_URL . 'assets/js/usb-swiper-general.js', array( 'jquery' ), $this->version, true );
             wp_enqueue_style( 'pay-by-invoice', USBSWIPER_URL . 'assets/css/pay-by-invoice.css', array(), $this->version, 'all' );
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
 		}
@@ -294,6 +303,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				unset( $menu_links['customer-logout'] );
 
 				$menu_links['transactions']    = __( 'Transactions', 'usb-swiper' );
+				    $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
 				$menu_links['customer-logout'] = $logout;
 			}
 
@@ -307,8 +317,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function endpoint_init() {
 
-			add_rewrite_endpoint( 'transactions', EP_PAGES );
+			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
+            add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
 		}
 
 		/**
@@ -394,7 +405,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    $transaction = get_post($transaction_id);
 
 			    if( !empty( $transaction->post_author ) && (int)$transaction->post_author === get_current_user_id() ) {
-				    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $transaction_id ) );
+				    usb_swiper_get_template( 'wc-transaction-history.php', array( 'transaction_id' => $transaction_id, 'is_email_html' => true ) );
 			    } else {
 			        $message = __( "You can't access this transaction.",'usb-swiper');
 			        echo apply_filters( 'usb_swiper_transaction_access_denied', $message);
@@ -429,6 +440,41 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
         }
 
+        /**
+         * VT-Products endpoint callback method.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
+        public function vt_products_endpoint_cb() {
+
+            if (usb_swiper_allow_user_by_role('administrator') || usb_swiper_allow_user_by_role('customer')) {
+
+                $current_page = !empty($_GET['vt-page']) ? $_GET['vt-page'] : 1;
+
+                $products = new WP_Query(array(
+                    'post_type' => 'product',
+                    'posts_per_page' => !empty(get_option('posts_per_page')) ? get_option('posts_per_page') : 10,
+                    'paged' => $current_page,
+                    'author' => get_current_user_id(),
+                    'order' => 'DESC',
+                ));
+
+                $args = array(
+                    'product' => !empty($products->posts) ? $products->posts : '',
+                    'current_page' => absint($current_page),
+                    'max_num_pages' => !empty($products->max_num_pages) ? $products->max_num_pages : '',
+                    'has_product' => 0 < $products->have_posts(),
+                    'paginate' => true,
+                );
+
+                extract($args);
+
+                usb_swiper_get_template('vt-product-lists.php', $args);
+            }
+        }
+
 		/**
          * Create connect to PayPal button.
          *
@@ -447,25 +493,42 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'label' => '',
                 'label2' => __('Login with PayPal','usb-swiper'),
                 'after_login_label' => __('Launch Virtual Terminal','usb-swiper'),
-                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): site_url().'/my-account/',
+                'after_login_url' => !empty( $vt_page_id )? get_the_permalink($vt_page_id): get_the_permalink( get_option('woocommerce_myaccount_page_id') ),
             ), $args );
 
 			ob_start();
 
 			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
 
-				$get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
-				if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
-				    ?>
-                    <div class="vt-form-login-wrap">
-                        <p><a class="vt-button" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
+                $get_merchant_data = get_user_meta(get_current_user_id(), '_merchant_onboarding_response', true);
+                $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+                $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
+                $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+                $settings = usb_swiper_get_settings('general');
+                $verification_page_id = !empty( $settings['vt_verification_page'] ) ? $settings['vt_verification_page'] : 0;
+
+                if( empty( $profile_data ) ) { ?>
+                    <div class="paypal-connect-button-wrap">
+                        <p><a class="vt-button" href="<?php echo get_permalink($verification_page_id); ?>"><?php _e('Verify Profile','usb-swiper'); ?></a></p>
                     </div>
                     <?php
+                } else {
 
-				} else {
-					$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
-					echo $Usb_Swiper_PPCP->connect_to_paypal_button($args);
-				}
+                    if( $profile_status ) {
+
+                        if( !empty( $get_merchant_data ) && is_array( $get_merchant_data )) {
+                            ?>
+                            <div class="vt-form-login-wrap paypal-connect-button-wrap">
+                                <p><a class="vt-button" href="<?php echo !empty( $args['after_login_url'] ) ? $args['after_login_url'] : get_the_permalink($vt_page_id); ?>"><?php echo !empty( $args['after_login_label'] ) ? $args['after_login_label'] : __('Launch to Terminal','usb-swiper'); ?></a></p>
+                            </div>
+                            <?php
+                        } else {
+                            $Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
+                            echo "<div class='paypal-connect-button-wrap'>".$Usb_Swiper_PPCP->connect_to_paypal_button($args)."</div>";
+                        }
+                    }
+                }
+
 
 			} else {
 
@@ -478,6 +541,53 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			ob_get_clean();
 
 			return $form;
+        }
+
+        /**
+         * Get profile verification notification.
+         *
+         * @since 1.1.17
+         *
+         * @return void
+         */
+        public function add_notification_for_verify_profile(){
+
+            $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+
+            $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
+            if(! empty( $profile_data ) && $profile_status === ''){
+                ?>
+                <div class="paypal-connect-button-wrap vt-form-notification">
+                    <p class="vt-verification-message notification success"><?php _e("Thank you for providing the additional information requested.  We will review your details and let you know the status of your approval as soon as possible.","usb-swiper");?></p>
+                </div>
+                <?php
+            }else if ( empty( $profile_data ) && $profile_status === '' ){
+                ?>
+                <div class="paypal-connect-button-wrap vt-form-notification">
+                    <p class="vt-verification-message notification warning"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.","usb-swiper");?></p>
+                </div>
+                <?php
+            }
+        }
+
+		/**
+         * Get hte Verification form.
+         *
+         * @since 1.1.17
+         *
+		 * @return false|string $form
+		 */
+        public function usb_swiper_vt_verification_form(){
+
+	        ob_start();
+
+            usb_swiper_get_template( 'virtual-terminal-verification-form.php' );
+
+	        $form = ob_get_contents();
+
+	        ob_get_clean();
+
+	        return $form;
         }
 
 		/**
@@ -519,14 +629,19 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function template_redirect() {
 
-            $settings = usb_swiper_get_settings('general');
-
-			if( is_admin() || ( !empty($_GET['et_fb']) && '1' == $_GET['et_fb'] )) {
+			if( is_admin() || ( !empty($_GET['et_fb']) && '1' == $_GET['et_fb'] ) ) {
 		        return;
 		    }
 
-			$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+			$settings = usb_swiper_get_settings('general');
+			$vt_page_id = ! empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+			$vt_verification_page = ! empty( $settings['vt_verification_page'] ) ? (int) $settings['vt_verification_page'] : '';
+
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
+			$merchant_user_info = get_user_meta( get_current_user_id(),'_merchant_onboarding_user',true);
+			$profile_status = get_user_meta( get_current_user_id(), 'vt_user_verification_status', true );
+			$profile_status = filter_var( $profile_status, FILTER_VALIDATE_BOOLEAN );
+
 			if( is_user_logged_in() ) {
 
 			    if( ( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) || ( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) ) {
@@ -535,12 +650,50 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    }
 			}
 
-			if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
+			if( isset( $_GET['_nonce'] ) && !empty( $_GET['_nonce'] ) && wp_verify_nonce( esc_attr( $_GET['_nonce'] ), 'disconnect-to-paypal' ) && isset($_GET['ppcp'] ) && !empty( $_GET['ppcp'] ) && '1' === $_GET['ppcp'] && !empty( $_GET['type'] ) && 'disconnect' === $_GET['type'] ) {
+				delete_user_meta( get_current_user_id(),'_merchant_onboarding_response');
+				delete_user_meta( get_current_user_id(),'_merchant_onboarding_user');
+				delete_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response');
+				$this->disconnect_email(get_current_user_id());
+				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
+				wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+				exit();
+			}
+
+            if( $vt_verification_page == get_the_ID() ) {
+                $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+                $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+                $profile_data = get_user_meta( get_current_user_id(),'verification_form_data', true );
+
+                if( !empty( $profile_data ) || !empty( $profile_status ) ) {
+                    if( !current_user_can('administrator') ) {
+                        wp_safe_redirect(get_the_permalink($myaccount_page_id));
+                        exit();
+                    }
+                } else {
+                    if ( !empty( $profile_status ) && empty( $merchant_user_info ) ) {
+                            wp_safe_redirect(get_the_permalink($myaccount_page_id));
+                        exit();
+                    } elseif( !empty( $merchant_user_info )) {
+                        if (!current_user_can('manage_options')) {
+                            wp_safe_redirect(get_the_permalink($vt_page_id));
+                        }
+                    }
+                }
+            }
+
+
+			if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 
 				if( isset($_REQUEST['merchantId']) && !empty( esc_attr( $_REQUEST['merchantId'] ) ) ) {
 
 					$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
 					$Usb_Swiper_PPCP->create_user();
+				}
+
+				if ( ! empty( $merchant_user_info ) && false === $profile_status ) {
+					wp_safe_redirect( get_the_permalink( $vt_verification_page ) );
+					exit();
 				}
 
 				if( isset( $_GET['_nonce'] ) && !empty( $_GET['_nonce'] ) && wp_verify_nonce( esc_attr( $_GET['_nonce'] ), 'login-with-paypal' ) && isset($_GET['ppcp'] ) && !empty( $_GET['ppcp'] ) && '1' === $_GET['ppcp'] ) {
@@ -551,21 +704,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						if ( !empty( $user_info ) &&  isset( $user_info->ID ) && $user_info->ID > 0) {
 
 							wc_set_customer_auth_cookie( $user_info->ID );
-							wp_safe_redirect(get_the_permalink($vt_page_id));
+							wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 							exit();
 						}
 					}
 				}
-			}
-
-			if( isset( $_GET['_nonce'] ) && !empty( $_GET['_nonce'] ) && wp_verify_nonce( esc_attr( $_GET['_nonce'] ), 'disconnect-to-paypal' ) && isset($_GET['ppcp'] ) && !empty( $_GET['ppcp'] ) && '1' === $_GET['ppcp'] && !empty( $_GET['type'] ) && 'disconnect' === $_GET['type'] ) {
-				delete_user_meta( get_current_user_id(),'_merchant_onboarding_response');
-				delete_user_meta( get_current_user_id(),'_merchant_onboarding_user');
-				delete_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response');
-                $this->disconnect_email(get_current_user_id());
-				//setcookie( 'merchant_onboarding_user', '', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
-				wp_safe_redirect(site_url().'/my-account/');
-				exit();
 			}
 
 			if( !empty( $_GET['action'] ) && 'capture' === $_GET['action'] && !empty( $_GET['unique_id'] ) ) {
@@ -576,7 +719,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if( !is_user_logged_in()) {
 
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
-					wp_safe_redirect(site_url().'/wp-login.php');
+					wp_safe_redirect( site_url().'/wp-login.php' );
 					exit();
 				}
 			} elseif ( is_user_logged_in() ) {
@@ -584,7 +727,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 					$merchant_user_info = usbswiper_get_onboarding_user();
 					if ( empty( $merchant_user_info ) ) {
-						wp_safe_redirect( site_url() . '/my-account/' );
+						wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
 						exit();
 					}
 				}
@@ -592,7 +735,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
 		/**
+         * Trigger the paypal disconnect email.
+         *
          * @since 1.0.0
+         *
+         * @param int $user_id get the user id
 		 * @return void
 		 */
         public function disconnect_email($user_id){
@@ -662,6 +809,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function create_new_transaction() {
+
 			$tab_fields = usb_swiper_get_fields_for_transaction();
             $invoice_payment = isset( $_POST['PayByInvoiceDisabled'] ) && (bool)$_POST['PayByInvoiceDisabled'] === true;
             $transaction = array();
@@ -671,6 +819,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				    if( !empty( $form_fields ) && is_array( $form_fields ) ) {
 				        foreach ( $form_fields as $key => $form_field ) {
 					        $field_id = !empty( $form_field['id'] ) ?  $form_field['id'] : '';
+                            if( !empty( $_POST[$field_id] ) && is_array( $_POST[$field_id] ) ) {
+                                $_POST[$field_id] = array_filter($_POST[$field_id], function($value) { return !is_null($value) && $value !== ''; });
+                            }
 					        $transaction[$field_id] = !empty( $_POST[$field_id] ) ? $_POST[$field_id] : '';
 				        }
 				    }
@@ -1090,9 +1241,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				        if( !empty( $platform_fees ) && $platform_fees > 0 ) {
 
 					        if ($this->is_sandbox) {
-						        $admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
+						        $admin_merchant_id = usb_swiper_get_field_value('sandbox_merchant_id');
 					        } else{
-						        $admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
+						        $admin_merchant_id = usb_swiper_get_field_value('merchant_id');
 					        }
 
 					        $body_request['payment_instruction'] =array(
@@ -1250,6 +1401,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         /**
          * Added General Information title in additional info page.
          *
+         * @since 1.0.0
+         *
          * @return void
          */
 		public function wc_edit_account_form_start() {
@@ -1271,7 +1424,63 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
            }
 
 			$get_countries = WC()->countries->get_countries();
+			$ignore_email_checkbox = get_user_meta( get_current_user_id(),'ignore_transaction_email', true );
 		    ?>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'select',
+                    'id' => 'TransactionCurrency',
+                    'name' => 'TransactionCurrency',
+                    'label' => __( 'Currency', 'usb-swiper'),
+                    'required' => true,
+                    'options' => usbswiper_get_currency_code_options(),
+                    'default' => usbswiper_get_default_currency(),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Select',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_brand_name(),
+                    'id' => 'BrandName',
+                    'name' => 'BrandName',
+                    'label' => __( 'Brand Name', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
+			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+				<?php
+				echo  usb_swiper_get_html_field( array(
+					'type' => 'checkbox',
+					'id' => 'ignore_transaction_email',
+					'name' => 'ignore-transaction-email',
+					'label' => __( 'Ignore Transaction Emails', 'usb-swiper'),
+					'required' => false,
+					'attributes' => '',
+					'description' => __( 'Disable admin email notifications for transactions.', 'usb-swiper'),
+					'readonly' => false,
+					'disabled' => false,
+					'class' => 'woocommerce-checkbox',
+					'wrapper' => false,
+					'checked' => ! empty( $ignore_email_checkbox )
+				));
+				?>
+			</p>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
@@ -1344,61 +1553,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     </tr>
                 </tbody>
             </table>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-	            <?php
-	            echo  usb_swiper_get_html_field( array(
-		            'type' => 'select',
-		            'id' => 'TransactionCurrency',
-		            'name' => 'TransactionCurrency',
-		            'label' => __( 'Currency', 'usb-swiper'),
-		            'required' => true,
-		            'options' => usbswiper_get_currency_code_options(),
-		            'default' => usbswiper_get_default_currency(),
-		            'attributes' => '',
-		            'description' => '',
-		            'readonly' => false,
-		            'disabled' => false,
-		            'class' => 'woocommerce-Select',
-                    'wrapper' => false
-	            ));
-	            ?>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-				<?php
-
-				echo  usb_swiper_get_html_field( array(
-					'type' => 'text',
-					'value' => usbswiper_get_brand_name(),
-					'id' => 'BrandName',
-					'name' => 'BrandName',
-					'label' => __( 'Brand Name', 'usb-swiper'),
-					'attributes' => '',
-					'description' => '',
-					'readonly' => false,
-					'disabled' => false,
-					'class' => 'woocommerce-Input woocommerce-Input--text input-text',
-					'wrapper' => false
-				));
-				?>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-                <?php
-
-                echo  usb_swiper_get_html_field( array(
-                    'type' => 'text',
-                    'value' => usbswiper_get_invoice_prefix(),
-                    'id' => 'InvoicePrefix',
-                    'name' => 'InvoicePrefix',
-                    'label' => __( 'Invoice Prefix', 'usb-swiper'),
-                    'attributes' => '',
-                    'description' => '',
-                    'readonly' => false,
-                    'disabled' => false,
-                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
-                    'wrapper' => false
-                ));
-                ?>
-            </p>
             <div class="woocommerce-form-row paypal-disconnect-button"><?php $this->paypal_disconnect_button(); ?></div>
             <div class="clear"></div>
             <?php
@@ -1416,10 +1570,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if ( is_user_logged_in() ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
-				$invoice_prefix = !empty( $_POST['InvoicePrefix'] ) ? sanitize_text_field($_POST['InvoicePrefix']) : '';
-				update_user_meta( $user_id, "_primary_currency", $primary_currency );
-				update_user_meta( $user_id, "brand_name", $brand_name );
-				update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
+                $invoice_prefix = !empty( $_POST['InvoicePrefix'] ) ? sanitize_text_field($_POST['InvoicePrefix']) : '';
+                $ignore_transaction_email = !empty( $_POST['ignore-transaction-email'] ) ? $_POST['ignore-transaction-email'] : '';
+                update_user_meta( $user_id, "_primary_currency", $primary_currency );
+                update_user_meta( $user_id, "brand_name", $brand_name );
+                update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
+                update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
 			}
 		}
 
@@ -1434,6 +1590,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$message = __('Something went wrong. Please try again.','usb-swiper');
 			$message_type = __('ERROR','usb-swiper');
 			$refund_html = '';
+            $refund_status = '';
+            $refund_amount = '';
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
@@ -1467,6 +1625,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						            $status = true;
 							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
 							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
+                                    $payment_status = usbswiper_get_transaction_status($transaction_id);
+                                    $refund_status = usbswiper_get_payment_status($payment_status);
+                                    $refund_amount = get_total_refund_amount($transaction_id);
 						        } else{
 						            $message = __( 'Transaction amount not refund. Please try again.','usb-swiper');
 						            if( !empty( $response['error_description'] ) ) {
@@ -1494,20 +1655,34 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'message' => $message,
 				'message_type' => $message_type,
 				'html' => $refund_html,
+                'refund_status' => $refund_status,
+                'remain_amount' => $refund_amount,
 			);
 
 			wp_send_json( $response , 200 );
 		}
 
+        /**
+         * Callback function of woocommerce_after_my_account and woocommerce_after_customer_login_form hook.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
 		public function display_paypal_connect_button() {
 
             if( is_user_logged_in() ) {
-                echo '<div class="paypal-connect-button-wrap">';
                 echo do_shortcode('[usb_swiper_paypal_connect label="Connect to PayPal" after_login_label="Launch Virtual Terminal"]');
-                echo '</div>';
             }
 		}
 
+        /**
+         * Callback function of woocommerce_before_edit_account_form hook.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
 		public function wc_before_edit_account_form() {
 
 			$merchant_data = get_user_meta( get_current_user_id(),'_merchant_onboarding_response', true);
@@ -1538,6 +1713,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             <?php
 		}
 
+        /**
+         * Update the transaction order status.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
         public function update_order_status() {
 
             $status = false;
@@ -1612,33 +1794,233 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$email_classes['invoice_email_paid_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-Invoice-email-paid-admin.php';
 			$email_classes['transaction_email'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email.php';
 			$email_classes['transaction_email_admin'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-transactions-email-admin.php';
+			$email_classes['paypal_profile_verification_request'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-profile-verification-request.php';
+			$email_classes['paypal_profile_verification_completed'] =  include USBSWIPER_PATH . 'includes/class-usb-swiper-profile-verification-completed.php';
 
 			return $email_classes;
 		}
 
         /**
          * Redirects User to My Account or Virtual Terminal.
-         * @since   1.1.9
          *
+         * @since   1.1.9
          */
-		function redirect_on_login($user_login, WP_User $user){
-			$merchant_user_info = get_user_meta( $user->ID,'_merchant_onboarding_user',true);
-			if ( empty( $merchant_user_info ) ) {
-				wp_safe_redirect( site_url().'/my-account/' );
-				exit();
-			}
-            else{
-	            wp_safe_redirect( site_url().'/virtual-terminal' );
-	            exit();
+		public function redirect_on_login($user_login, $user) {
+
+            $user_id = !empty( $user->ID ) ? $user->ID : '';
+
+            $settings = usb_swiper_get_settings('general');
+            $vt_page_id = ! empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+            $vt_verification_page = ! empty( $settings['vt_verification_page'] ) ? (int) $settings['vt_verification_page'] : '';
+            $myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
+
+            $merchant_user_info = get_user_meta( $user_id,'_merchant_onboarding_user',true);
+            $profile_status = get_user_meta( $user_id,'vt_user_verification_status', true );
+            $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+            $profile_data = get_user_meta( $user_id,'verification_form_data', true );
+
+			if( !empty( $profile_status ) && !empty( $profile_data ) ) {
+
+                if ( !empty( $merchant_user_info ) ) {
+                    wp_safe_redirect( get_the_permalink( $vt_page_id ) );
+                    exit();
+                } else {
+                    wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+                    exit();
+                }
+            } else {
+                wp_safe_redirect(get_the_permalink($vt_verification_page));
+                exit();
             }
 		}
 
+		/**
+		 * Create and update product.
+		 *
+		 * @return void
+		 */
+        public function vt_create_update_product() {
+
+			$status = false;
+			$message = __('Something went wrong. Please try again.','usb-swiper');
+			$message_type = __('ERROR','usb-swiper');
+
+			parse_str($_POST['fields'], $fields);
+
+			if( ! empty( $fields['vt-add-product-form-nonce'] ) && wp_verify_nonce( $fields['vt-add-product-form-nonce'],'vt-add-product-form') ) {
+
+				$vt_action = ! empty( $fields['vt-product-action'] ) ?  sanitize_text_field( $fields['vt-product-action']) : '';
+				$product_id = !empty( $fields['vt_product_id'] ) ? sanitize_text_field( $fields['vt_product_id']) : '';
+				$product_name = ! empty( $fields['product-name'] ) ? sanitize_text_field( $fields['product-name'] ) : '';
+				$description  = ! empty( $fields['description'] ) ? sanitize_text_field( $fields['description'] ) : '';
+				$price        = ! empty( $fields['price'] ) ? sanitize_text_field( $fields['price'] ) : '';
+				$sku          = ! empty( $fields['sku'] ) ? sanitize_text_field( $fields['sku'] ) : '';
+
+				$images    = ! empty( $_FILES['product_image'] ) ?  $_FILES['product_image'] : '';
+				$images_id = !empty( $images ) ? $this->vt_upload_from_path( $images ) : 0;
+
+				try {
+					$product = '';
+					if( !empty( $product_id ) && !empty( $vt_action ) && 'edit' === $vt_action ) {
+						$product = wc_get_product( $product_id );
+					} elseif ( !empty( $vt_action ) && 'add' === $vt_action ) {
+
+						$product = new WC_Product_Simple();
+						if (!empty($product_name)) {
+							$product->set_slug(str_replace(' ', '-', $product_name));
+						}
+					}
+
+					if( !empty( $product ) ) {
+
+						if (!empty($product_name)) {
+							$product->set_name($product_name);
+						}
+
+						if (!empty($price)) {
+							$product->set_regular_price($price);
+						}
+
+						if (!empty($description)) {
+							$product->set_description($description);
+						}
+
+						if (!empty($images_id)) {
+							$product->set_image_id($images_id);
+						}
+
+						if (!empty($sku)) {
+							$get_sku = usbswiper_get_product_sku($sku);
+							$product->set_sku($get_sku);
+						}
+
+						$product->save();
+					}
+					$status = true;
+					$message = __('Product created successfully.','usb-swiper');
+					$message_type = __('SUCCESS','usb-swiper');
+				} catch(Exception $e) {
+					$message = $e->getMessage();
+				}
+			} else {
+				$status = false;
+				$message = __('Nonce not verified. Please try again.','usb-swiper');
+			}
+
+			wp_send_json(
+				array(
+					'status' => $status,
+					'redirect_url' => wc_get_endpoint_url( 'vt-products', '', wc_get_page_permalink( 'myaccount' )),
+					'message' => $message,
+					'message_type' => $message_type,
+				)
+			);
+        }
+
+        /**
+         * This function upload file from path.
+         *
+         * @since 1.1.17
+         *
+         * @param string $file
+         * @return int|string|WP_Error
+         */
+        public function vt_upload_from_path( $file ) {
+
+            $attach_id = '';
+
+            if ( ! function_exists( 'wp_crop_image' ) ) {
+                include( ABSPATH . 'wp-admin/includes/image.php' );
+            }
+
+            if ( ! empty( $file['tmp_name'] ) ) {
+
+                $upload = wp_upload_bits( $file['name'], null, file_get_contents( $file['tmp_name'] ) );
+
+                if ( $upload['error'] === false ) {
+
+                    $attachment = array(
+                        'post_mime_type' => $upload['type'],
+                        'post_title' => $file['name'],
+                        'post_content' => '',
+                        'post_status' => 'inherit'
+                    );
+
+                    $attach_id = wp_insert_attachment( $attachment, $upload['file'] );
+
+                    if( ! empty( $attach_id ) && $attach_id > 0 ) {
+                        $attach_data = wp_generate_attachment_metadata($attach_id, $upload['file']);
+
+                        wp_update_attachment_metadata($attach_id, $attach_data);
+                    }
+                }
+            }
+
+            return $attach_id;
+        }
+
+        /**
+         * Delete product of current users from database
+         *
+         * @return void
+         */
+        public function vt_delete_product_cb() {
+
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+            if( ! empty( $_POST['product_id'] ) ){
+
+                $status = true;
+                $message_type = __('SUCCESS','usb-swiper');
+                $message = __( 'Product deleted successfully', 'usb-swiper');
+                $product_id = sanitize_text_field( $_POST['product_id'] );
+                wp_delete_post($product_id);
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+            );
+
+            wp_send_json( $response);
+        }
+
+        /**
+         * Extend product query and show only admins products.
+         *
+         * @since 1.1.17
+         *
+         * @param $query
+         * @return void
+         */
+        public function extend_product_query( $query ) {
+
+            $args = array(
+                'role'    => 'administrator',
+                'order'   => 'ASC'
+            );
+            $admin_ids = array();
+
+            $users = get_users( $args );
+            if( ! empty( $users ) ) {
+
+                foreach ($users as $user ) {
+                    $admin_ids[] = $user->ID;
+                }
+            }
+
+            $query->set( 'author__in', $admin_ids );
+        }
+
         /**
          * Append HTML on click of add item in vt-product-wrapper
-         * @since   1.1.9
-         *
+		 *
+         * @since 1.1.9
          */
-        function add_vt_product_wrapper() {
+        public function add_vt_product_wrapper() {
+
             $status = false;
             $message = __( 'Something went Wrong', 'usb-swiper');
             $message_type = __('ERROR','usb-swiper');
@@ -1662,12 +2044,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response , 200 );
         }
 
-        /**
-         * Append product list in search fields
-         * @since   1.1.9
-         *
-         */
-        function vt_search_product() {
+		/**
+		 * Append product list in search fields
+		 *
+		 * @since 1.1.9
+		 *
+		 * @return void
+		 */
+        public function vt_search_product() {
             $status = false;
             $message = __( 'Something went Wrong', 'usb-swiper');
             $message_type = __('ERROR','usb-swiper');
@@ -1706,10 +2090,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
         /**
          * Append product price in input fields.
-         *
+		 *
          * @since   1.1.9
          */
-        function vt_add_product_value_in_inputs() {
+        public function vt_add_product_value_in_inputs() {
+
             $status = false;
             $message = __( 'Something went Wrong', 'usb-swiper');
             $message_type = __('ERROR','usb-swiper');
@@ -1738,7 +2123,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_send_json( $response , 200 );
         }
 
-        function usb_swiper_pay_by_invoice( $args ) {
+        /**
+         * Get pay by invoice template.
+         *
+         * @since 1.1.17
+         *
+         * @param array $args
+         * @return false|string
+         */
+        public function usb_swiper_pay_by_invoice( $args ) {
 
             $args = shortcode_atts( array(
                 'notifications' => maybe_unserialize(get_transient('get_vt_connection_response')),
@@ -1767,6 +2160,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             return $form;
         }
 
+        /**
+         * Manage the invoice pdf attachment.
+         *
+         * @since 1.1.17
+         *
+         * @param string $attachment
+         * @param int $transaction_id
+         * @return mixed|string
+         */
         public function manage_invoice_pdf_attachment( $attachment, $transaction_id ) {
 
             $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
@@ -1907,6 +2309,295 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             return $string;
+        }
+
+		/**
+		 * Send transaction email to customer again.
+		 *
+		 * @since 1.1.17
+		 */
+		public function send_transaction_email() {
+
+			$status  = false;
+			$message = '';
+
+			if( ! empty( $_POST['vt-send-email-nonce'] ) && wp_verify_nonce( $_POST['vt-send-email-nonce'],'vt-send-email-form') ) {
+				$status            = true;
+				$billing_email     = ! empty( $_POST['billing_email'] ) ? sanitize_text_field( $_POST['billing_email'] ) : '';
+				$transaction_id    = ! empty( $_POST['transaction_id'] ) ? sanitize_text_field( $_POST['transaction_id'] ) : '';
+				$message           = sprintf( __( 'Transaction(#%s) receipt copy has been sent via email.','usb-swiper' ), $transaction_id);
+			}
+
+			if( ! empty( $billing_email ) ) {
+
+				if ( ! class_exists( 'WC_Email', false ) ) {
+					include_once dirname( WC_PLUGIN_FILE ) . '/includes/emails/class-wc-email.php';
+				}
+
+				$WC_Email     = new WC_Email();
+				$get_headers  = $WC_Email->get_headers();
+				$site_title   = get_option( 'blogname' );
+				$user_subject = sprintf( __( "Your %s transaction has been received!", 'usb-swiper' ), $site_title );
+				$user_content = $this->get_email_content( $transaction_id, array( 'email_heading' => __( 'Thank you for your Transaction', 'usb-swiper' ) ) );
+				$user_content = $WC_Email->format_string( $user_content );
+				$user_content = $WC_Email->style_inline( $user_content );
+
+				wp_mail( $billing_email, $user_subject, $user_content, $get_headers );
+			}
+
+			$response = array(
+				'status' => $status,
+				'message' => $message,
+			);
+
+			wp_send_json( $response , 200 );
+		}
+
+		/**
+		 * Send the transaction email html.
+		 *
+		 * @since 1.1.17
+		 *
+		 * @return void
+		 */
+		public function send_transaction_email_html() {
+
+			$status = false;
+			$html = '';
+
+			$transaction_id = !empty($_POST['transaction_id']) ? $_POST['transaction_id'] : 0;
+			if (!empty($transaction_id) && $transaction_id > 0) {
+				$status = true;
+				$html = usbswiper_send_email_receipt_html($transaction_id);
+			}
+
+			$response = array(
+				'status' => $status,
+				'html' => $html,
+			);
+
+			wp_send_json( $response , 200 );
+		}
+
+        /**
+         * Save function for VT verification form data in user meta.
+         *
+         * @since 1.1.17
+         *
+         * @return void
+         */
+        public function vt_verification_form_cb() {
+            $status       = false;
+            $message      = '';
+            $redirect_url = '';
+
+            if( ! empty( $_POST['vt-verification-nonce'] ) && wp_verify_nonce( $_POST['vt-verification-nonce'],'vt-verification-form') ) {
+
+                $status           = true;
+                $message          = __( 'Thank you for submitting data, Please wait for profile verification.','usb-swiper' );
+                $first_name        = ! empty( $_POST['first_name'] ) ? sanitize_text_field( $_POST['first_name'] ) : '';
+                $last_name        = ! empty( $_POST['last_name'] ) ? sanitize_text_field( $_POST['last_name'] ) : '';
+                $phone            = ! empty( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+                $url              = ! empty( $_POST['website-url'] ) ? sanitize_url( $_POST['website-url'] ) : '';
+                $company_name     = ! empty( $_POST['company-name'] ) ? sanitize_text_field( $_POST['company-name'] ) : '';
+                $email            = ! empty( $_POST['email-address'] ) ? sanitize_email( $_POST['email-address'] ) : '';
+                $billing_street = ! empty( $_POST['billing_address_1'] ) ? sanitize_text_field( $_POST['billing_address_1'] ) : '';
+                $billing_street2 = ! empty( $_POST['billing_address_2'] ) ? sanitize_text_field( $_POST['billing_address_2'] ) : '';
+                $billing_city = ! empty( $_POST['billing_city'] ) ? sanitize_text_field( $_POST['billing_city'] ) : '';
+                $billing_state = ! empty( $_POST['billing_state'] ) ? sanitize_text_field( $_POST['billing_state'] ) : '';
+                $billing_postal_code = ! empty( $_POST['billing_postcode'] ) ? sanitize_text_field( $_POST['billing_postcode'] ) : '';
+                $billing_country_code = ! empty( $_POST['billing_country'] ) ? sanitize_text_field( $_POST['billing_country'] ) : '';
+                $redirect_url     = get_the_permalink( get_option('woocommerce_myaccount_page_id') );
+
+                $current_user_id = get_current_user_id();
+
+                wp_update_user( array(
+                    'ID' => $current_user_id,
+                    'user_url' => $url,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                ));
+
+                update_user_meta($current_user_id ,'billing_first_name', $first_name);
+                update_user_meta($current_user_id ,'billing_last_name', $last_name);
+                update_user_meta($current_user_id ,'billing_company', $company_name);
+                update_user_meta($current_user_id ,'billing_phone', $phone);
+                update_user_meta($current_user_id ,'billing_email', $email);
+                update_user_meta($current_user_id ,'billing_address_1', $billing_street);
+                update_user_meta($current_user_id ,'billing_address_2', $billing_street2);
+                update_user_meta($current_user_id ,'billing_city', $billing_city);
+                update_user_meta($current_user_id ,'billing_state', $billing_state);
+                update_user_meta($current_user_id ,'billing_postcode', $billing_postal_code);
+                update_user_meta($current_user_id ,'billing_country', $billing_country_code);
+                update_user_meta($current_user_id, 'verification_form_data', true );
+
+                $brand_name = get_user_meta( get_current_user_id(),'brand_name', true);
+                if( empty( $brand_name ) ) {
+                    update_user_meta($current_user_id ,'brand_name', $company_name);
+                }
+
+                $new_email = WC()->mailer()->emails['paypal_profile_verification_request'];
+                $new_email->trigger( array(
+                    'user_id' => $current_user_id,
+                    'user_name' => $first_name.' '.$last_name,
+                ));
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'location_redirect' => $redirect_url
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Update the email header.
+         *
+         * @since 1.1.17
+         *
+         * @param string $header
+         * @param string $id
+         * @param object $header_object
+         * @param object $email
+         *
+         * @return string
+         */
+        public function vt_email_headers( $header, $id, $header_object, $email ) {
+
+            $header .= "From: {$email->get_from_name()} <{$email->get_from_address()}>\r\n";
+
+            return $header;
+        }
+
+        /**
+         * Redirect user to verification page after register from WooCommerce account page.
+         *
+         * @since 1.1.17
+         *
+         * @return void
+         */
+        public function wc_registration_redirect() {
+            $settings = usb_swiper_get_settings('general');
+            $vt_verification_page = ! empty( $settings['vt_verification_page'] ) ? (int) $settings['vt_verification_page'] : '';
+            wp_safe_redirect(get_the_permalink($vt_verification_page));
+        }
+
+        /**
+         * Get the states based on country code.
+         *
+         * @since 1.1.17
+         *
+         * @return void
+         */
+        public function vt_get_states() {
+
+            $country_code = !empty($_POST['country_code']) ? sanitize_text_field($_POST['country_code']) : 'US';
+            $field_id = !empty($_POST['field_id']) ? sanitize_text_field($_POST['field_id']) : 'BillingCountryCode';
+            $get_states = usb_swiper_get_states($country_code);
+
+			$form_field = '';
+			$is_shipping = false;
+			if( !empty( $field_id ) && 'BillingCountryCode' === $field_id ) {
+
+				if( !empty( $get_states ) ) {
+
+					$form_field = array(
+						'type' => 'select',
+						'id' => 'BillingState',
+						'name' => 'BillingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'options' => $get_states,
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-select-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				} else {
+
+					$form_field = array(
+						'type' => 'text',
+						'id' => 'BillingState',
+						'name' => 'BillingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-input-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				}
+			} elseif ( !empty( $field_id ) && 'ShippingCountryCode' === $field_id ) {
+
+				$is_shipping = true;
+				if( !empty( $get_states ) ) {
+
+					$form_field = array(
+						'type' => 'select',
+						'id' => 'ShippingState',
+						'name' => 'ShippingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'options' => $get_states,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-shipping-address-field vt-select-field vt-shipping-states',
+						'wrapper' =>  false,
+					);
+				} else {
+
+					$form_field = array(
+						'type' => 'text',
+						'id' => 'ShippingState',
+						'name' => 'ShippingState',
+						'label' => __( 'State', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-shipping-address-field vt-input-field vt-shipping-states',
+						'wrapper' =>  false,
+					);
+				}
+			} elseif ( !empty( $field_id ) && 'billing_country' === $field_id ) {
+
+				if( !empty( $get_states ) ) {
+
+					$form_field = array(
+						'type' => 'select',
+						'id' => 'billing_state',
+						'name' => 'billing_state',
+						'label' => __( 'State / County', 'usb-swiper'),
+						'required' => true,
+						'options' => $get_states,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-select-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				} else {
+
+					$form_field = array(
+						'type' => 'text',
+						'id' => 'billing_state',
+						'name' => 'billing_state',
+						'label' => __( 'State / County', 'usb-swiper'),
+						'required' => true,
+						'attributes' => '',
+						'description' => '',
+						'class' => 'vt-billing-address-field vt-input-field vt-billing-states',
+						'wrapper' =>  false,
+					);
+				}
+			}
+
+			$state_html = !empty( $form_field ) ? usb_swiper_get_html_field( $form_field ) : '';
+
+            wp_send_json( array(
+				'state_html' => $state_html,
+				'is_shipping' => $is_shipping,
+			) , 200 );
         }
 	}
 }
