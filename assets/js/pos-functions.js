@@ -16,7 +16,7 @@ jQuery(function( $ ) {
         }
 
         /* Bootstrap Switch Plugin on checkboxes for POS form */
-        if(jQuery('#ae-paypal-pos-form').html().length != 0)
+        if(jQuery('#ae-paypal-pos-form').html() !== undefined && jQuery('#ae-paypal-pos-form').html().length != 0)
         {
             jQuery("#ae-paypal-pos-form .checkbox").each(function() {
                 jQuery(this).bootstrapSwitch();

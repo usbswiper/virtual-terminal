@@ -1,3 +1,8 @@
+<?php
+$profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+$profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+if( true === $profile_status) {
+?>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
         <?php
@@ -13,7 +18,46 @@
     <form method="post" action="" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
         <div class="vt-form-contents">
             <div class="vt-row">
-                <div class="vt-col vt-col-60">
+                <div class="vt-col vt-col-60 vt-col-form-fields">
+                    <fieldset>
+                        <label><?php _e('Currency Information','usb-swiper'); ?></label>
+                        <div class="vt-fields-wrap">
+                            <?php echo usb_swiper_get_html_field( array(
+                                'type' => 'select',
+                                'id' => 'TransactionCurrency',
+                                'name' => 'TransactionCurrency',
+                                'placeholder' => __( 'Currency', 'usb-swiper'),
+                                'required' => true,
+                                'options' => usbswiper_get_currency_code_options(),
+                                'default' => usbswiper_get_default_currency(),
+                                'attributes' => '',
+                                'description' => '',
+                                'readonly' => false,
+                                'disabled' => false,
+                                'class' => 'usbswiper-change-currency vt-select-field',
+                            ) ); ?>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <label><?php _e('Product Information','usb-swiper'); ?></label>
+                        <div id="vt_repeater_field" class="vt-repeater-field">
+                            <?php
+                            echo usb_swiper_get_html_field(array(
+                                'type' => 'hidden',
+                                'id' => 'vt_add_product_nonce',
+                                'name' => 'vt_add_product_nonce',
+                                'required' => false,
+                                'attributes' => '',
+                                'description' => '',
+                                'readonly' => false,
+                                'disabled' => false,
+                                'value' => wp_create_nonce('vt_add_product_nonce')
+                            ));
+                            echo get_product_html();
+                            ?>
+                        </div>
+                        <button type="button" id="vt_add_item" class="vt-add-item vt-button-primary"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><?php _e( 'Add Item', 'usb-swiper'); ?></button>
+                    </fieldset>
 					<?php
 					$tab_fields = usb_swiper_get_vt_tab_fields();
 					if( !empty( $tab_fields ) && is_array( $tab_fields ) ) {
@@ -21,7 +65,7 @@
 							$form_fields = usb_swiper_get_vt_form_fields( $tab_key );
 							?>
                             <fieldset>
-                                <legend><?php echo !empty( $tab_field ) ? $tab_field : ''; ?></legend>
+                                <label><?php echo !empty( $tab_field ) ? $tab_field : ''; ?></label>
                                 <div class="vt-fields-wrap">
 									<?php
 									if( !empty( $form_fields ) && is_array( $form_fields ) ) {
@@ -56,7 +100,7 @@
                             </div>
                         </div>
                         <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
-                        <button type="submit" class="btn btn-primary button button-primary" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                        <button type="submit" class="vt-button-primary" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
                     </div>
                     <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
                 </div>
@@ -64,3 +108,6 @@
         </div>
     </form>
 </div>
+<?php
+}
+?>

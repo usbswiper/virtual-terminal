@@ -30,18 +30,38 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 
 			if( empty( $settings ) && !is_array( $settings )) {
 
-				$vt_page_id = wp_insert_post( array(
-					'post_title'    => __('Virtual Terminal', 'usb-swiper'),
-					'post_content'  => '[usb_swiper_vt_form]',
-					'post_status'   => 'publish',
-					'post_author'   => 1,
-					'post_type' => 'page'
-				) );
+                $vt_page = get_page_by_title('Virtual Terminal');
+                if( empty( $vt_page ) ) {
+                    $vt_page_id = wp_insert_post(array(
+                        'post_title' => __('Virtual Terminal', 'usb-swiper'),
+                        'post_content' => '[usb_swiper_vt_form]',
+                        'post_status' => 'publish',
+                        'post_author' => 1,
+                        'post_type' => 'page'
+                    ));
+                } else {
+                    $vt_page_id = $vt_page->ID;
+                }
+
+                $vt_verification_page = get_page_by_title('Virtual Terminal Verification');
+                if( empty( $vt_verification_page ) ) {
+                    $vt_verification_page_id = wp_insert_post(array(
+                        'post_title' => __('Virtual Terminal Verification', 'usb-swiper'),
+                        'post_content' => '[usb_swiper_vt_verification_form]',
+                        'post_status' => 'publish',
+                        'post_author' => 1,
+                        'post_type' => 'page'
+                    ));
+                } else {
+                    $vt_verification_page_id = $vt_verification_page->ID;
+                }
 
 				$settings = array(
 					'general' => array(
 						'virtual_terminal_page' => $vt_page_id,
+						'vt_verification_page' => $vt_verification_page_id,
 						'is_paypal_sandbox' => false,
+						'paypal_partner_logo_url' => 'https://www.usbswiper.com/img/usbswiper-logo-300x89.png',
 					),
 					'partner_fees' => array(
 						'fees' => array(
