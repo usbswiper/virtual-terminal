@@ -89,8 +89,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $get_refund_status = usbswiper_get_refund_status();
         if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) {
 
-            $refund_amount = get_total_refund_amount($transaction_id);
-            ?>
+			$refund_amount = get_total_refund_amount($transaction_id);
+			?>
+            <div class="send-email-btn-wrapper">
+                <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
+            </div>
             <div class="transaction-refund-wrap transaction-history-field">
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
                 <div class="refund-form-wrap">
@@ -235,11 +238,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <?php
                 // Splitting the Address Values
                 echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
-                if(!empty($BillingPhoneNumber)){ ?>
+                if( !empty( $BillingPhoneNumber ) ) { ?>
                     <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
                     <?php
                 }
-                if(!empty($BillingEmail)){ ?>
+                if( !empty( $BillingEmail ) ) { ?>
                     <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
                 <?php } ?>
             </address>

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * The Usb_Swiper_PPCP class is responsible for PPCP.
+ *
+ * @since 1.0.0
+ */
 class Usb_Swiper_PPCP{
 
 	public $is_sandbox = '';
@@ -23,6 +28,14 @@ class Usb_Swiper_PPCP{
 		$this->api_log = new Usb_Swiper_Log();
 	}
 
+    /**
+     * Connect to PayPal button.
+     *
+     * @since 1.0.0
+     *
+     * @param array $attributes get all attributes.
+     * @return false|string
+     */
 	public function connect_to_paypal_button( $attributes ) {
 
 		ob_start();
@@ -69,6 +82,13 @@ class Usb_Swiper_PPCP{
 		return $paypal_button;
 	}
 
+    /**
+     * Get the signup link.
+     *
+     * @since 1.0.0
+     *
+     * @return false|mixed|void
+     */
 	public function get_signup_link() {
 
 		try {
@@ -89,10 +109,18 @@ class Usb_Swiper_PPCP{
 		}
 	}
 
+    /**
+     * Get the onboarding status by merchant id.
+     *
+     * @since 1.0.0
+     *
+     * @param int $merchant_id get merchant id
+     * @return false|mixed|string|null
+     */
 	public function get_onboarding_status( $merchant_id ) {
 
 		$this->host = ( $this->is_sandbox) ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
-		$partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
+		$partner_merchant_id = ( $this->is_sandbox) ? usb_swiper_get_field_value('sandbox_merchant_id') : usb_swiper_get_field_value('merchant_id');
 
 		try {
 
@@ -121,6 +149,14 @@ class Usb_Swiper_PPCP{
 		}
 	}
 
+    /**
+     * Create new user by email id.
+     *
+     * @since 1.0.0
+     *
+     * @param string $merchant_email get merchant email.
+     * @return int|string|WP_Error
+     */
 	public function create_new_user_by_email( $merchant_email ) {
 
 		$user_info = get_user_by( 'email', $merchant_email );
@@ -153,6 +189,14 @@ class Usb_Swiper_PPCP{
 		return $user_id;
 	}
 
+    /**
+     * Check merchant is applicable or not.
+     *
+     * @since 1.0.0
+     *
+     * @param array $response get api response.
+     * @return bool
+     */
     public function is_merchant_applicable( $response ) {
 
         $is_applicable = false;
@@ -176,6 +220,13 @@ class Usb_Swiper_PPCP{
         return $is_applicable;
     }
 
+    /**
+     * Create user for PayPal merchant.
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
 	public function create_user() {
 
 
@@ -265,6 +316,13 @@ class Usb_Swiper_PPCP{
 		}
 	}
 
+    /**
+     * Handle onboarding user.
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
 	public function handle_onboarding_user() {
 
 		$tracking_response = get_user_meta( get_current_user_id(),'_merchant_onboarding_tracking_response', true);
@@ -275,7 +333,7 @@ class Usb_Swiper_PPCP{
 	        if( !empty( $tracking_id ) ) {
 
 		        $this->host = ( $this->is_sandbox) ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
-		        $partner_merchant_id = ( $this->is_sandbox) ? USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID : USBSWIPER_PARTNER_MERCHANT_ID;
+		        $partner_merchant_id = ( $this->is_sandbox) ? usb_swiper_get_field_value('sandbox_merchant_id') : usb_swiper_get_field_value('merchant_id');
 
 		        try {
 

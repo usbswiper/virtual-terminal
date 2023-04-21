@@ -165,7 +165,7 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 		}
 
         /**
-         * Get PayPal onboarding log files.
+         * Get the Log files.
          *
          * @since 1.0.0
          *
@@ -192,12 +192,12 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 		}
 
         /**
-         * Get log content.
+         * Get the Log file content.
          *
          * @since 1.0.0
          *
-         * @param string $log Get log file.
-         * @return string get log content.
+         * @param string $log get log file name.
+         * @return string
          */
 		public function get_log_content( $log ) {
 

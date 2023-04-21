@@ -8,7 +8,6 @@ jQuery( document ).ready(function( $ ) {
     var HandlingAmount = localStorage.getItem('HandlingAmount');
     var TaxRate = localStorage.getItem('TaxRate');
     var InvoiceNumber = localStorage.getItem('InvoiceNumber');
-    var ItemName = localStorage.getItem('ItemName');
     var Notes = localStorage.getItem('Notes');
     if (company !== null) $('#company').val(company);
     if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
@@ -22,7 +21,6 @@ jQuery( document ).ready(function( $ ) {
         $('#TaxRate').val(TaxRate);
     }
     if (InvoiceNumber !== null) $('#InvoiceID').val(InvoiceNumber);
-    if (ItemName !== null) $('#ItemName').val(ItemName);
     if (Notes !== null) $('#Notes').val(Notes);
 
     $(document).on('click','#PayByInvoice', function (){
@@ -84,9 +82,12 @@ jQuery( document ).ready(function( $ ) {
         var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
         $('.vt-form-notification').empty().append(notification);
 
-
         $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
     }
+
+    $.validator.addMethod("is_email", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/i.test(value);
+    }, usb_swiper_settings.email_validation_message);
 
     const render_cc_form = () => {
 
@@ -165,7 +166,13 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 VtForm.validate({
-                    rules: {},
+                    rules: {
+                        BillingEmail: {
+                            required: true,
+                            email: true,
+                            is_email: true,
+                        }
+                    },
                     messages: {},
                     submitHandler: function(form, event) {
 
@@ -205,7 +212,6 @@ jQuery( document ).ready(function( $ ) {
                                             localStorage.removeItem('HandlingAmount');
                                             localStorage.removeItem('TaxRate');
                                             localStorage.removeItem('InvoiceNumber');
-                                            localStorage.removeItem('ItemName');
                                             localStorage.removeItem('Notes');
                                             window.location.href = data.redirect;
                                         } else{
@@ -250,7 +256,6 @@ jQuery( document ).ready(function( $ ) {
 
                 paypal.Buttons({
                     onClick: function()  {
-
                         if( VtForm.valid() ) {
                             return true;
                         } else{
@@ -295,7 +300,6 @@ jQuery( document ).ready(function( $ ) {
                                     localStorage.removeItem('HandlingAmount');
                                     localStorage.removeItem('TaxRate');
                                     localStorage.removeItem('InvoiceNumber');
-                                    localStorage.removeItem('ItemName');
                                     localStorage.removeItem('Notes');
                                     window.location.href = data.redirect;
                                 } else{
@@ -316,7 +320,7 @@ jQuery( document ).ready(function( $ ) {
         current_obj.append('<span class="vt-loader"></span>');
     };
 
-    const usb_swiper_remove_loader = ( current_obj) => {
+    const usb_swiper_remove_loader = ( current_obj ) => {
         current_obj.children('.vt-loader').remove();
     };
 
@@ -330,7 +334,6 @@ jQuery( document ).ready(function( $ ) {
         var TaxRate = $('#TaxRate').val();
         var InvoiceNumber = $('#InvoiceID').val();
         var Company = $('#company').val();
-        var ItemName = $('#ItemName').val();
         var Notes = $('#Notes').val();
         localStorage.setItem('Company', Company);
         localStorage.setItem('BillingFirstName', BillingFirstName);
@@ -341,7 +344,6 @@ jQuery( document ).ready(function( $ ) {
         localStorage.setItem('HandlingAmount', HandlingAmount);
         localStorage.setItem('TaxRate', TaxRate);
         localStorage.setItem('InvoiceNumber', InvoiceNumber);
-        localStorage.setItem('ItemName', ItemName);
         localStorage.setItem('Notes', Notes);
 
         $('form#ae-paypal-pos-form').addClass('processing').block({
@@ -398,8 +400,8 @@ jQuery( document ).ready(function( $ ) {
                     });
                 }else{
                     $('.transaction-refund-wrap').remove();
+                    $('.send-email-btn-wrapper').remove();
                 }
-
             } else{
                 set_notification(response.message, 'error', response.message_type);
                 $(".vt-refund-popup-wrapper").hide();
@@ -409,6 +411,71 @@ jQuery( document ).ready(function( $ ) {
         });
 
         event.preventDefault();
+    });
+
+    jQuery("form#vt_add_product_form").validate({
+        rules: {},
+        messages: {},
+        submitHandler: function (form, event) {
+            $('.vt-form-notification').empty()
+            event.preventDefault();
+
+            var fd = new FormData();
+            fd.append('action', 'create_update_product');
+            fd.append('fields', $('#vt_add_product_form').serialize());
+            fd.append('product_image', $('#vt_product_image')[0].files[0]);
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+            }).done(function (response) {
+                if (response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            });
+        }
+    });
+
+    $("#vt_verification_form").validate({
+        rules: {
+            email_address: {
+                required: true,
+                email: true,
+                is_email: true,
+            }
+        },
+        messages: {},
+        submitHandler: function(form, event) {
+
+            event.preventDefault();
+            var currentFormObj = $("#vt_verification_form");
+            var form_id = currentFormObj.attr('id');
+            var submitButton = currentFormObj.find('#vt_verification_form_submit');
+            usb_swiper_add_loader(submitButton);
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: currentFormObj.serialize()+"&action=vt_verification_form",
+            }).done(function ( response ) {
+
+                if( response.status) {
+                    set_notification(response.message, 'success');
+                    document.getElementById(form_id).reset();
+                    window.location.href = response.location_redirect
+                } else{
+                    set_notification(response.message, 'error', response.message_type);
+                }
+
+                usb_swiper_remove_loader(submitButton);
+            });
+        }
     });
 
     $(document).on('click','.vt-remove-fields-wrap', function (){
@@ -430,7 +497,7 @@ jQuery( document ).ready(function( $ ) {
             if (response.status) {
                 $('#vt_repeater_field').append( response.html );
                 usb_swiper_remove_loader(loader);
-                loader.removeAttr('disabled')
+                loader.removeAttr('disabled');
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -438,7 +505,6 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $(document).on('keyup','.vt-product-input', function () {
-
         let search_val = $(this).val();
         let vt_product_input = $(this);
         let nonce = $('#vt_add_product_nonce').val();
@@ -469,6 +535,27 @@ jQuery( document ).ready(function( $ ) {
                 }
             });
         }
+    });
+
+    $(document).on('change','.vt-billing-country, .vt-shipping-country', function (){
+
+        var fieldId  = $(this).attr('id');
+        var fieldName  = $(this).attr('name');
+
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: "action=vt_get_states&country_code="+$(this).val()+"&field_id="+fieldId,
+        }).done(function ( response ) {
+            if( response.state_html && response.state_html !== "" ) {
+                if(response.is_shipping) {
+                    $('.shipping-states-wrap').html('').html(response.state_html);
+                } else{
+                    $('.billing-states-wrap').html('').html(response.state_html);
+                }
+            }
+        });
     });
 
     $(document).on('click','.product-item', function () {
@@ -528,7 +615,6 @@ jQuery( document ).ready(function( $ ) {
             net_price_array[index] = Number(quantity) * Number(price);
         });
 
-
         for (let i = 0; i < net_price_array.length; i++) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
@@ -567,6 +653,27 @@ jQuery( document ).ready(function( $ ) {
     });
 });
 
-function removeInterval(){
+function removeInterval( LoaderInterval ) {
     clearInterval(LoaderInterval);
+}
+
+var imageUpload = document.querySelectorAll('.vt-image-upload-wrap')
+
+for (var i = 0, len = imageUpload.length; i < len; i++) {
+    customInput(imageUpload[i])
+}
+
+function customInput (el) {
+    const fileInput = el.querySelector('.vt-image-upload');
+    const label = document.createElement('div');
+    label.className = 'upload-image-preview';
+    el.appendChild(label);
+
+    fileInput.onchange = function () {
+        if (!fileInput.value) return
+        /*const imageLabel = fileInput.value.replace(/^.*[\\\/]/, '')*/
+        const file = fileInput.files[0];
+        const previewImage = URL.createObjectURL(file)
+        label.innerHTML = '<img src="'+previewImage+'" alt="preview">';
+    }
 }

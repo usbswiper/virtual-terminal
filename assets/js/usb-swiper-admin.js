@@ -3,6 +3,7 @@ jQuery( document ).ready(function( $ ) {
         placeholder: "Choose Users",
         width: "50%"
     });
+
     $(document).on('click','.add-new-partner-fee-btn', function (){
 
         var current_obj = $(this);
@@ -90,13 +91,19 @@ jQuery( document ).ready(function( $ ) {
         notification.html('').html(notification_html);
     }
 
-    /*$( "input#is_paypal_sandbox" ).change(function() {
+    $( "input#is_paypal_sandbox" ).change(function() {
+        const liveField =  $('input.paypal-is-live');
+        const sandboxField =  $('input.paypal-is-sandbox');
         if($(this).prop('checked') === true){
-            $('input.paypal-is-live').parents('tr').hide();
-            $('input.paypal-is-sandbox').parents('tr').show();
+            liveField.parents('tr').hide();
+            liveField.removeAttr('required');
+            sandboxField.parents('tr').show();
+            sandboxField.attr('required', true);
         } else{
-            $('input.paypal-is-live').parents('tr').show();
-            $('input.paypal-is-sandbox').parents('tr').hide();
+            liveField.parents('tr').show();
+            liveField.attr('required', true);
+            sandboxField.parents('tr').hide();
+            sandboxField.removeAttr('required');
         }
-    }).change();*/
+    }).change();
 });

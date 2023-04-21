@@ -1,3 +1,8 @@
+<?php
+$profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
+$profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
+if( true === $profile_status) {
+?>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
         <?php
@@ -13,7 +18,7 @@
     <form method="post" action="" class="HostedFields" name="ae-paypal-pos-form" id="ae-paypal-pos-form" enctype="multipart/form-data">
         <div class="vt-form-contents">
             <div class="vt-row">
-                <div class="vt-col vt-col-60">
+                <div class="vt-col vt-col-60 vt-col-form-fields">
                     <fieldset>
                         <label><?php _e('Currency Information','usb-swiper'); ?></label>
                         <div class="vt-fields-wrap">
@@ -60,7 +65,7 @@
 							$form_fields = usb_swiper_get_vt_form_fields( $tab_key );
 							?>
                             <fieldset>
-                                <legend><?php echo !empty( $tab_field ) ? $tab_field : ''; ?></legend>
+                                <label><?php echo !empty( $tab_field ) ? $tab_field : ''; ?></label>
                                 <div class="vt-fields-wrap">
 									<?php
 									if( !empty( $form_fields ) && is_array( $form_fields ) ) {
@@ -141,3 +146,6 @@
         </div>
     </form>
 </div>
+<?php
+}
+?>
