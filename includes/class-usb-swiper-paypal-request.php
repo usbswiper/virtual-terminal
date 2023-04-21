@@ -421,11 +421,11 @@ class Usb_Swiper_Paypal_request{
         $platform_fees = usbswiper_get_platform_fees( $order_total, strtolower($transaction_type),$transaction_id );
         if( !empty( $platform_fees ) && 'capture' == $payment_action ) {
 
-            if ($this->is_sandbox) {
-                $admin_merchant_id = USBSWIPER_SANDBOX_PARTNER_MERCHANT_ID;
-            } else{
-                $admin_merchant_id = USBSWIPER_PARTNER_MERCHANT_ID;
-            }
+			if ($this->is_sandbox) {
+				$admin_merchant_id = usb_swiper_get_field_value('sandbox_merchant_id');
+			} else {
+				$admin_merchant_id = usb_swiper_get_field_value('merchant_id');
+			}
 
             $body_request['purchase_units'][0]['payment_instruction'] =array(
                 'disbursement_mode' => 'INSTANT',

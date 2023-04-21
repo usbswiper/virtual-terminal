@@ -443,18 +443,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'class' => '',
 			),
 			array(
-				'type' => 'text',
-				'id' => 'ItemName',
-				'name' => 'ItemName',
-				'label' => __( 'ItemName', 'usb-swiper'),
-				'required' => false,
-				'attributes' => array(
-					'maxlength' => '70'
-				),
-				'description' => '',
-				'class' => '',
-			),
-			array(
 				'type' => 'textarea',
 				'id' => 'Notes',
 				'name' => 'Notes',
@@ -1773,7 +1761,7 @@ function object_to_array( $obj ) {
  *
  * @return int|mixed
  */
-function count_user_invoice_numbers( $count = 0, $paged = 1 ) {
+function count_user_invoice_numbers( $count = 1, $paged = 1 ) {
 
     if (!is_user_logged_in()) {
         return 0;
@@ -1782,7 +1770,7 @@ function count_user_invoice_numbers( $count = 0, $paged = 1 ) {
     $args = array(
         'post_type' => 'transactions',
         'author__in' => array(get_current_user_id()),
-        'posts_per_page' => 2,
+        'posts_per_page' => 100,
         'paged' => $paged,
         'meta_key' => '_transaction_type',
         'meta_value' => 'INVOICE'

@@ -36,10 +36,6 @@ if( $has_transactions ) : ?>
                 $transaction_type = usbswiper_get_invoice_transaction_type($transaction->ID);
                 $end_point = 'view-transaction';
 
-                if( $global_payment_status === 'FAILED' || $payment_status === '' || strtolower($end_point) === 'view-transaction' ) {
-                    $payment_status = $global_payment_status;
-                }
-
 				$get_refund_status = usbswiper_get_refund_status();
 
                 if( !class_exists('Usb_Swiper_Paypal_request') ) {

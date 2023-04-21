@@ -187,6 +187,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     <div class="customer-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <?php
         $addresses = get_transaction_address_format($transaction_id);
+        $address_style = isset($is_email) ? 'margin: 0;font-size: 12px;padding:0;' : 'padding:0;margin:0';
 
         $billingInfo = get_post_meta( $transaction_id, 'billingInfo', true);
         $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
@@ -239,11 +240,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 // Splitting the Address Values
                 echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
                 if( !empty( $BillingPhoneNumber ) ) { ?>
-                    <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
+                    <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
                     <?php
                 }
                 if( !empty( $BillingEmail ) ) { ?>
-                    <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+                    <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
                 <?php } ?>
             </address>
         </div>
@@ -255,15 +256,15 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     if( 'true' !== $shippingSameAsBilling ) { ?>
                         <!-- Splitting the Address Values-->
                         <?php  echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';?>
-                        <p class="woocommerce-customer-details--phone"><?php echo esc_attr($ShippingPhoneNumber); ?></p>
-                        <p class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
+                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo esc_attr($ShippingPhoneNumber); ?></p>
+                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
                     <?php } else {
                         echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';
                         if(!empty($BillingPhoneNumber)){ ?>
-                            <p class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
+                            <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
                         <?php }
                         if(!empty($BillingEmail)){ ?>
-                            <p class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+                            <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
                             <?php
                         }
                     }
