@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.2
-Stable tag: 2.0
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -37,7 +37,7 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
-= 2.0 =
+= 2.0.0 =
 * Feature - Option to enable/disable email notices to the merchant ([VT-48](https://github.com/usbswiper/virtual-terminal/pull/21))
 * Feature - Added button for resend email receipt ([VT-44](https://github.com/usbswiper/virtual-terminal/pull/22))
 * Feature - Added verification form for merchant verification before onboarding ([VT-47](https://github.com/usbswiper/virtual-terminal/pull/23))
