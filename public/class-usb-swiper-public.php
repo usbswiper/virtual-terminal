@@ -582,7 +582,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     <p class="vt-verification-message notification success"><?php _e("Thank you for providing the additional information requested.  We will review your details and let you know the status of your approval as soon as possible.","usb-swiper");?></p>
                 </div>
                 <?php
-            }else if ( empty( $profile_data ) && $profile_status === '' ){
+            } else if ( empty( $profile_data ) && $profile_status === '' ) {
                 ?>
                 <div class="paypal-connect-button-wrap vt-form-notification">
                     <p class="vt-verification-message notification warning"><?php _e("Thanks so much! Just one more step and you’ll be all set. Because of all the credit card fraud happening everywhere, we just need to verify the merchants who onboard with us. This saves everyone money by making sure we only allow legitimate businesses to process credit cards through our system.","usb-swiper");?></p>
@@ -1989,19 +1989,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
             $profile_data = get_user_meta( $user_id,'verification_form_data', true );
 
-			if( !empty( $profile_status ) && !empty( $profile_data ) ) {
-
-                if ( !empty( $merchant_user_info ) ) {
-                    wp_safe_redirect( get_the_permalink( $vt_page_id ) );
-                    exit();
-                } else {
-                    wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
-                    exit();
-                }
-            } else {
-                wp_safe_redirect(get_the_permalink($vt_verification_page));
-                exit();
-            }
+			if( !empty( $merchant_user_info ) && empty( $profile_status ) && empty( $profile_data ) ) {
+				wp_safe_redirect( get_the_permalink( $myaccount_page_id ) );
+				exit();
+			} elseif ( !empty( $merchant_user_info ) && !empty( $profile_status ) && !empty( $profile_data ) ) {
+				wp_safe_redirect( get_the_permalink( $vt_page_id ) );
+				exit();
+			} else {
+				wp_safe_redirect(get_the_permalink($vt_verification_page));
+				exit();
+			}
 		}
 
 		/**
