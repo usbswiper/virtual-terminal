@@ -1618,10 +1618,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 $user_verify_for_vt = ! empty( $_POST['user-verify-for-vt'] );
 
                 update_user_meta( $user_id, 'vt_user_verification_status', $user_verify_for_vt );
+
                 if( ! empty( $user_verify_for_vt ) ) {
                     $user_data    = get_user_by( 'id', $user_id );
                     $user_name    = !empty( $user_data->user_firstname ) ? $user_data->user_firstname : '';
-
+                    update_user_meta( $user_id, 'verification_form_data', true );
                     $is_profile_approved = get_user_meta( $user_id, '_is_paypal_profile_approved', true);
 
                     if( !$is_profile_approved) {
