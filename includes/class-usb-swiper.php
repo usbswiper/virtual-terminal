@@ -156,7 +156,7 @@ class Usb_Swiper {
 		$plugin_admin = new Usb_Swiper_Admin($this->plugin_name, $this->version );
 		$plugin_public = new Usb_Swiper_Public($this->plugin_name, $this->version );
 
-		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts', PHP_INT_MAX );
 		$this->loader->add_filter('script_loader_tag', $plugin_public,'clean_paypal_checkout_sdk_url', 10, 2);
 		$this->loader->add_action('init', $plugin_admin, 'register_transactions_post_type');
 		$this->loader->add_action('init', $plugin_public, 'endpoint_init');

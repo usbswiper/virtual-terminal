@@ -188,6 +188,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
 		/**
+		 * Dequeue PayPal sdk scripts in VT selected pages and endpoint.
+		 *
+		 * @since 2.0.1
+		 *
+		 * @return void
+		 */
+		public function dequeue_script() {
+
+			$settings = usb_swiper_get_settings('general');
+
+			$allow_pages = [];
+			$allow_pages[] = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
+			$allow_pages[] = !empty( $settings['vt_verification_page'] ) ? (int)$settings['vt_verification_page'] : '';
+			$allow_pages[] = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+
+			$allow_pages = apply_filters( 'usb_swiper_dequeue_script_allow_pages', $allow_pages );
+
+			if( ( !empty( $allow_pages ) && is_array( $allow_pages ) && in_array( get_the_ID(), $allow_pages ) ) || is_wc_endpoint_url('view-transaction') || is_wc_endpoint_url('transactions')  ) {
+				wp_dequeue_script('angelleye-paypal-checkout-sdk');
+				wp_dequeue_script('angelleye-paypal-checkout-sdk-async');
+			}
+		}
+
+		/**
 		 * Register and enqueue style and script in public area.
          *
          * @since 1.0.0
@@ -201,6 +225,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$vt_verification_page_id = !empty( $settings['vt_verification_page'] ) ? (int)$settings['vt_verification_page'] : '';
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
             $vt_pay_by_invoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
+
+			/**
+			 * Dequeue script before VT script enqueue.
+			 *
+			 * @since 2.0.1
+			 */
+			$this->dequeue_script();
 
 			if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() || ( ! empty( $vt_verification_page_id ) && $vt_verification_page_id === get_the_ID() ) || ( ! empty( $vt_pay_by_invoice_id ) && $vt_pay_by_invoice_id === get_the_ID() ) ) {
 
