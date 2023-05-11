@@ -166,13 +166,6 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 VtForm.validate({
-                    rules: {
-                        BillingEmail: {
-                            required: true,
-                            email: true,
-                            is_email: true,
-                        }
-                    },
                     messages: {},
                     submitHandler: function(form, event) {
 
@@ -413,9 +406,20 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
     });
 
+
     jQuery("form#vt_add_product_form").validate({
-        rules: {},
-        messages: {},
+        rules: {
+            price: {
+                required: true,
+                min: 1
+            }
+        },
+        messages: {
+            price: {
+                min: usb_swiper_settings.product_min_price
+            }
+
+        },
         submitHandler: function (form, event) {
             $('.vt-form-notification').empty()
             event.preventDefault();
@@ -480,6 +484,24 @@ jQuery( document ).ready(function( $ ) {
 
     $(document).on('click','.vt-remove-fields-wrap', function (){
         $(this).parent().remove();
+
+        let net_price_array = [];
+        let net_price = '';
+        $( ".vt-product-quantity" ).each(function(index) {
+            let quantity_class = $(this);
+            let quantity = $(this).val();
+            let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
+            let price = $('#'+wrapper_id).children('.price').children('input').val();
+            net_price_array[index] = Number(quantity) * Number(price);
+        });
+
+        for (let i = 0; i < net_price_array.length; i++) {
+            net_price = Number(net_price_array[i]) + Number(net_price);
+        }
+
+        $('#NetAmount').val(net_price.toFixed(2));
+        updateSalesTax();
+        updateGrandTotal();
     });
 
     $(document).on('click','#vt_add_item', function () {

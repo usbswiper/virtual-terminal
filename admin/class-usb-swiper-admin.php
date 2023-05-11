@@ -1678,15 +1678,47 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 	        }
 
             if ( 'transactions' == $query->get('post_type' ) && $query->is_search()){
+
                 $query->set('transaction_search', true);
 	            $query->set('meta_query', array(
-		            'relation' => 'AND',
-		            array(
-			            'key'     => '_payment_response',
-			            'value'   => $query->get('s'),
-			            'compare' => 'LIKE',
-		            ),
-	            ));
+                    'relation' => 'OR',
+                    array(
+                        'key'     => '_payment_response',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                    array(
+                        'key'     => '_payment_status',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                    array(
+                        'key'     => 'TransactionType',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                    array(
+                        'key'     => '_environment',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                    array(
+                        'key'     => 'company',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                    array(
+                        'key'     => 'GrandTotal',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                    array(
+                        'key'     => '_transaction_type',
+                        'value'   => $query->get('s'),
+                        'compare' => 'LIKE',
+                    ),
+                ));
+
             }
         }
 

@@ -48,7 +48,9 @@ $add_product_form_fields = array(
         'id' => 'price',
         'name' => 'price',
         'placeholder' => __( 'Price:', 'usb-swiper'),
-        'attributes' => '',
+        'attributes' => array(
+                'min' => 1
+        ),
         'description' => '',
         'readonly' => false,
         'value' => ! empty( $product_price ) ? $product_price : '',

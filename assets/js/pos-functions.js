@@ -81,9 +81,11 @@ jQuery(function( $ ) {
             if(state) {
                 $('#PayByInvoice').show();
                 $('.vt-col-payments').hide();
+                $('#BillingEmail').prop('required',true);
             } else {
                 $('#PayByInvoice').hide();
                 $('.vt-col-payments').show();
+                $('#BillingEmail').prop('required',false);
             }
             return false;
         });

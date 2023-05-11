@@ -290,7 +290,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_tagline' => apply_filters('usb_swiper_smart_button_style_tagline','yes'),
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
 					'vt_page_url' => get_the_permalink($vt_page_id),
-                    'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper'))
+                    'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper')),
+                    'product_min_price' => apply_filters( 'usb_swiper_add_product_min_price_message',__('Value must be greater than or equal to $1.00','usb-swiper'))
 				) );
             }
 
@@ -862,6 +863,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function create_new_transaction() {
 
+            $current_user_id = get_current_user_id();
+
+            if( empty($current_user_id) ){
+                wp_send_json( array(
+                    'status' => 'error',
+                    'message' => __("You are not able to create a transaction without a login.",'usb-swiper'),
+                    'message_type' => __("ERROR",'usb-swiper'),
+                ), 200 );
+            }
 			$tab_fields = usb_swiper_get_fields_for_transaction();
             $invoice_payment = isset( $_POST['PayByInvoiceDisabled'] ) && (bool)$_POST['PayByInvoiceDisabled'] === true;
             $transaction = array();
@@ -896,7 +906,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'post_title'   => wp_strip_all_tags($display_name),
 				'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
 				'post_status'  => 'publish',
-				'post_author'  => get_current_user_id(),
+				'post_author'  => $current_user_id,
 				'post_type'   => 'transactions',
             ));
 
