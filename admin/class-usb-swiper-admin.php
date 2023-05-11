@@ -1649,12 +1649,16 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          */
         public function transaction_search_query_replace(  $where, $query ){
 
+            global $wpdb;
+
 	        $transaction_search = !empty( $query->query_vars['transaction_search'] ) ? $query->query_vars['transaction_search'] : '';
 
             if ( '1' == $transaction_search){
 
+                $table_prefix = $wpdb->prefix;
+
 	            $where = preg_replace('/\s+/', '', $where);
-	            $where = str_replace("AND((wp_postmeta.meta_key='_payment_response'", "OR((wp_postmeta.meta_key='_payment_response'", $where);
+	            $where = str_replace("AND(({$table_prefix}postmeta.meta_key='_payment_response'", "OR(({$table_prefix}postmeta.meta_key='_payment_response'", $where);
 	            $where = str_replace( 'AND', ' AND ', $where);
 	            $where = str_replace( 'OR', ' OR ', $where);
 	            $where = str_replace( 'LIKE', ' LIKE ', $where);
