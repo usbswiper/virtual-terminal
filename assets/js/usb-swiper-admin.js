@@ -134,4 +134,10 @@ jQuery( document ).ready(function( $ ) {
             sandboxField.removeAttr('required');
         }
     }).change();
+
+    $('[data-tooltip]').each(function() {
+        var tooltip = $(this).attr('data-tooltip');
+        $(this).wrap('<div class="tooltip"></div>');
+        $(this).after('<span class="tooltiptext">' + tooltip + '</span>');
+    });
 });

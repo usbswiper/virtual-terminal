@@ -23,6 +23,11 @@ p.signature-text{display: none;}
 .transaction-column {width: calc(50% - 30px);}
 .transaction-history-title {font-size: 22px!important;font-weight: 400!important;padding: 15px 0 !important;}
 div#transaction-log {overflow-x: scroll;}
+.tooltip {position: relative;display: inline-block;}
+.tooltip-label{display:inline-flex;}
+.tooltip:after {font-family: Dashicons;font-weight: 400;font-variant: normal;text-transform: none;line-height: 2;-webkit-font-smoothing: antialiased;margin: 0;text-indent: 0;position: absolute;top: 0;left: 0;width: 100%;height: 100%;text-align: center;content: "\f223";cursor: help;}
+.tooltip .tooltiptext {visibility: hidden;width: 300px;background-color: #555;color: #fff;text-align: center;border-radius: 6px;padding: 10px;position: absolute;z-index: 1;bottom: 125%;left: 50%;margin-left: -60px;opacity: 0;transition: opacity 0.3s;font-size: 12px;}
+.tooltip:hover .tooltiptext {visibility: visible;opacity: 1;}
 @media print {
     p.signature-text{display: inline;}
 }

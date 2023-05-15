@@ -1356,9 +1356,19 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          *
          * @return void
          */
-        public function advanced_settings() { ?>
+        public function advanced_settings() {
+            ?>
             <div class="usb-swiper-sync-status">
-                <a href="javascript:void(0);" id="vt_sync_status" data-nonce="<?php echo wp_create_nonce('_vt_sync_transaction_status')?>" class="vt_sync_status button button-primary"><?php _e('Update Transaction status', 'usb-swiper'); ?></a>
+                <table class="form-table">
+                    <tr>
+                        <th>
+                            <label for="brand_name" class="tooltip-label"><?php _e('Virtual Terminal Transaction Status Update','usb-swiper' ); ?>:<span class="vt-help-tip" data-tooltip="<?php _e('We are fetching the previous transaction status from PayPal Array, now we have created the function, so that Admin can use the filter in the Transaction. In order to do that, we need to update all the existing transaction status.','usb-swiper'); ?>"></span></label>
+                        </th>
+                        <td>
+                            <a href="javascript:void(0);" id="vt_sync_status" data-nonce="<?php echo wp_create_nonce('_vt_sync_transaction_status')?>" class="vt_sync_status button button-primary"><?php _e('Update Transaction status', 'usb-swiper'); ?></a>
+                        </td>
+                    </tr>
+                </table>
             </div>
          <?php }
 
