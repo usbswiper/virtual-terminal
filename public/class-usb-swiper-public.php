@@ -1151,7 +1151,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $settings = usb_swiper_get_settings('general');
                     $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
                     $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => $payment_status)))), get_the_permalink( $paybyinvoice_id ) );
-                    $temp_payment_status = ( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ) ? 'PAID' : 'PENDING';
+                    $temp_payment_status = ( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ) ? usbswiper_get_transaction_status($transaction_id) : 'PENDING';
                     update_post_meta($transaction_id, '_payment_status', $temp_payment_status);
                 }
 

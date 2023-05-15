@@ -1262,12 +1262,12 @@ function usbswiper_get_transaction_status( $transaction_id ) {
 
 	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
 		$status = !empty( $captures['status']) ? $captures['status'] : '';
-        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && $payment_intent === 'authorize' && $status === 'COMPLETED' ) {
+        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && ( $payment_intent === 'authorize' || $payment_intent== 'capture' ) && $status === 'COMPLETED' ) {
             $status = __('Paid', 'usb-swiper');
         }
 	} elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
 		$status = !empty( $authorizations['status']) ? $authorizations['status'] : '';
-        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && $payment_intent === 'authorize' ) {
+        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && ( $payment_intent === 'authorize' || $payment_intent== 'capture' )  ) {
             $status = __('Authorized', 'usb-swiper');
         }
 	}
