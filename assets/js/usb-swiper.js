@@ -669,7 +669,7 @@ jQuery( document ).ready(function( $ ) {
     });
 
     if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
-        var inactivityTime = 15 * 60 * 1000;
+        var inactivityTime = 10 * 60 * 1000;
         var lastActivity = new Date().getTime();
 
         $(document).on('mousemove keydown', function() {
