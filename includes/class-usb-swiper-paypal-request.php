@@ -800,6 +800,7 @@ class Usb_Swiper_Paypal_request{
 			$this->handle_paypal_debug_id($response, $transaction_id);
             if( !empty( $response ) ) {
                 update_post_meta($transaction_id, '_payment_response', $response);
+                update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
             }
 			return $response;
 		}

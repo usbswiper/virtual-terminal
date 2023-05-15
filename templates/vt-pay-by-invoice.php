@@ -144,4 +144,5 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
             </div>
         </div>
     </form>
+    <?php usb_swiper_get_template('vt-payment-timeout-popup.php'); ?>
 </div>

@@ -331,46 +331,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		}
 
 		/**
-		 * Set Query for Transaction Order By
-		 *
-		 * @since 1.1.9
-		 *
-		 * @param array $columns Get list table columns.
-		 *
-		 * @return array $columns
-		 */
-        public function transaction_custom_order_by($query){
-	        if ( ! is_admin() )
-		        return;
-	        $orderby = $query->get( 'orderby');
-	        if ( 'company' == $orderby ) {
-		        $query->set( 'meta_key', 'company' );
-		        $query->set( 'orderby', 'meta_value' );
-	        }
-	        if ( 'author' == $orderby ) {
-		        $query->set( 'orderby', 'author' );
-	        }
-	        if ( 'transaction_id' == $orderby ) {
-		        $query->set( 'meta_key', '_payment_response' );
-		        $query->set( 'orderby', 'meta_value' );
-	        }
-
-	        if ( 'payment_status' == $orderby ) {
-		        $query->set( 'meta_key', '_payment_status' );
-		        $query->set( 'orderby', 'meta_value' );
-	        }
-            if ( 'transaction_type' == $orderby ) {
-                $query->set( 'meta_key', '_transaction_type' );
-                $query->set( 'orderby', 'meta_value' );
-            }
-	        if ( 'grand_total' == $orderby ) {
-		        $query->set( 'meta_key', 'GrandTotal' );
-		        $query->set( 'orderby', 'meta_value_num' );
-	        }
-            return $query;
-        }
-
-		/**
          * Sortable Columns in Transaction
          *
          * @since 1.1.17
@@ -381,9 +341,9 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
         public function transactions_sortable_columns($columns){
 	        $columns['transaction_id'] ='transaction_id';
 	        $columns['grand_total'] = 'grand_total';
-	        $columns['payment_status'] = 'payment_status';
+	        //$columns['payment_status'] = 'payment_status';
 	        $columns['company'] = 'company';
-            $columns['transaction_type'] = 'transaction_type';
+            //$columns['transaction_type'] = 'transaction_type';
 	        $columns['author'] = 'author';
             return $columns;
         }
@@ -547,7 +507,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          */
 		public function exclude_form_tab() {
 
-		    return apply_filters( 'usb_swiper_exclude_form_tab' , array('logs'));
+		    return apply_filters( 'usb_swiper_exclude_form_tab' , array('logs','advanced'));
 		}
 
 		/**
@@ -562,6 +522,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				array(
 					''              => __( 'General', 'usb-swiper' ),
 					'partner_fees'  => __( 'Partner Fees', 'usb-swiper' ),
+					'advanced'  => __( 'Advanced', 'usb-swiper' ),
 					'logs'  => __( 'Logs', 'usb-swiper' ),
 					'uninstall'     => __( 'Uninstall', 'usb-swiper' ),
 				)
@@ -1388,6 +1349,91 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 			return $fee_html;
 		}
 
+        /**
+         * Manage USBSwiper Transaction status synchronous.
+         *
+         * @since 2.0.2
+         *
+         * @return void
+         */
+        public function advanced_settings() { ?>
+            <div class="usb-swiper-sync-status">
+                <a href="javascript:void(0);" id="vt_sync_status" data-nonce="<?php echo wp_create_nonce('_vt_sync_transaction_status')?>" class="vt_sync_status button button-primary"><?php _e('Update Transaction status', 'usb-swiper'); ?></a>
+            </div>
+         <?php }
+
+        /**
+         * Manage USBSwiper callback Transaction status synchronous.
+         *
+         * @since 2.0.2
+         *
+         * @return void
+         */
+        public function sync_transaction_status(){
+
+            $status = false;
+            $message = __('Nonce not verified. Please try again.', 'usb-swiper' );
+            $html = '';
+
+            if( !empty( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field($_POST['nonce']), '_vt_sync_transaction_status') ) {
+                $status = true;
+                $transaction_ids = $this->update_transaction_status();
+                $count = 0;
+                $fail_count = 0;
+                if( !empty($transaction_ids) && is_array($transaction_ids) ){
+                    foreach($transaction_ids as $transaction_id){
+                        $transaction_status = usbswiper_get_transaction_status($transaction_id);
+                        if( !empty($transaction_status) ){
+                            $count++;
+                            update_post_meta($transaction_id,'_payment_status',$transaction_status);
+                        }else{
+                            $fail_count++;
+                        }
+                    }
+                }
+                $message = sprintf(__('%s Transactions status updated successfully', 'usb-swiper' ),$count);
+                if( !empty($fail_count) ){
+                    $message .= sprintf(__(' and %s Transactions status not updated.', 'usb-swiper' ),$fail_count);
+                }
+            }
+
+            $response = array(
+                'status' => $status,
+                'html' => $html,
+                'message' => $message,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Update transaction status.
+         *
+         * @since 2.0.2
+         *
+         * @param $paged
+         *
+         * @return array|int[]|WP_Post[]
+         */
+        public function update_transaction_status( $paged = 1 ){
+
+            $args = array(
+                'post_type' => 'transactions',
+                'posts_per_page' => 100,
+                'paged' => $paged,
+                'fields' => 'ids'
+            );
+
+            $transactions = new WP_Query( $args );
+
+            $transactions_ids = !empty( $transactions->posts ) ? $transactions->posts : [];
+
+            if( !empty( $transactions->max_num_pages ) && $paged < $transactions->max_num_pages ){
+                $transactions_ids = array_merge($this->update_transaction_status($paged+1),$transactions_ids);
+            }
+            return $transactions_ids;
+        }
+
 		/**
 		 * Manage USBSwiper Onboarding logs.
          *
@@ -1650,26 +1696,24 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
         public function transaction_search_query_replace(  $where, $query ){
 
             global $wpdb;
-
+            $table_prefix = $wpdb->prefix;
 	        $transaction_search = !empty( $query->query_vars['transaction_search'] ) ? $query->query_vars['transaction_search'] : '';
 
             if ( '1' == $transaction_search){
-
-                $table_prefix = $wpdb->prefix;
-
 	            $where = preg_replace('/\s+/', '', $where);
 	            $where = str_replace("AND(({$table_prefix}postmeta.meta_key='_payment_response'", "OR(({$table_prefix}postmeta.meta_key='_payment_response'", $where);
 	            $where = str_replace( 'AND', ' AND ', $where);
 	            $where = str_replace( 'OR', ' OR ', $where);
 	            $where = str_replace( 'LIKE', ' LIKE ', $where);
 	            $where = str_replace( '=', ' = ', $where);
+	            $where .= str_replace( '=', ' = ', $where);
             }
 
             return $where;
         }
 
         /**
-         * Trasaction Search in BackEnd
+         * Transaction Search in BackEnd
          *
          * @param $query
          * @return mixed|void
@@ -1677,52 +1721,152 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          *
          */
         public function transaction_search_query( $query ){
-	        if ( ! is_admin() ) {
-		        return $query;
-	        }
 
-            if ( 'transactions' == $query->get('post_type' ) && $query->is_search()){
+            if ( ! is_admin() ) {
+                return $query;
+            }
+
+            if ( 'transactions' == $query->get('post_type' ) && $query->is_main_query() ){
+
+                if ($query->is_search()) {
+
+                    $meta_query['relation'] = 'OR';
+                    $meta_query[] = array(
+                        'key' => '_payment_response',
+                        'value' => $query->get('s'),
+                        'compare' => 'LIKE',
+                    );
+                    $meta_query[] = array(
+                        'key' => 'company',
+                        'value' => $query->get('s'),
+                        'compare' => 'LIKE',
+                    );
+                    $meta_query[] = array(
+                        'key' => 'GrandTotal',
+                        'value' => $query->get('s'),
+                        'compare' => 'LIKE',
+                    );
+                } else {
+
+                    $transaction_type = !empty($_REQUEST['transaction_type']) ? sanitize_text_field($_REQUEST['transaction_type']) : "";
+                    $intent_type = !empty($_REQUEST['intent_type']) ? sanitize_text_field($_REQUEST['intent_type']) : "";
+                    $transaction_status = !empty($_REQUEST['transaction_status']) ? sanitize_text_field($_REQUEST['transaction_status']) : "";
+                    if( empty( $transaction_type ) && !empty( $transaction_status ) && in_array( $transaction_status, ['paid', 'authorized']) ) {
+                        $transaction_type = 'invoice';
+                    }
+
+                    if( !empty( $transaction_type ) || !empty( $intent_type ) || $transaction_status ) {
+                        $meta_query['relation'] = 'AND';
+                    }
+
+                    if (!empty($transaction_type)) {
+                        $meta_query[] = array(
+                            'key' => '_transaction_type',
+                            'value' => $transaction_type,
+                            'compare' => 'LIKE',
+                        );
+                    }
+
+                    if (!empty($intent_type)) {
+                        $meta_query[] = array(
+                            'key' => 'TransactionType',
+                            'value' => $intent_type,
+                            'compare' => 'LIKE',
+                        );
+                    }
+
+                    if (!empty($transaction_status)) {
+                        $meta_query[] = array(
+                            'key' => '_payment_status',
+                            'value' => $transaction_status,
+                            'compare' => 'LIKE',
+                        );
+                    }
+                }
 
                 $query->set('transaction_search', true);
-	            $query->set('meta_query', array(
-                    'relation' => 'OR',
-                    array(
-                        'key'     => '_payment_response',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                    array(
-                        'key'     => '_payment_status',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                    array(
-                        'key'     => 'TransactionType',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                    array(
-                        'key'     => '_environment',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                    array(
-                        'key'     => 'company',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                    array(
-                        'key'     => 'GrandTotal',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                    array(
-                        'key'     => '_transaction_type',
-                        'value'   => $query->get('s'),
-                        'compare' => 'LIKE',
-                    ),
-                ));
 
+                $orderby = $query->get( 'orderby');
+
+                if( !empty( $orderby ) ) {
+
+                    if ( 'author' == $orderby ) {
+                        $query->set( 'orderby', 'author' );
+                    }
+
+                    if ( 'company' == $orderby ) {
+                        $query->set( 'meta_key', 'company' );
+                        $query->set( 'orderby', 'meta_value' );
+                        $query->set( 'meta_type', 'CHAR');
+                    }
+
+                    if ( 'transaction_id' == $orderby ) {
+                        $query->set( 'meta_key', '_payment_response' );
+                        $query->set( 'orderby', 'meta_value' );
+                        $query->set( 'meta_type', 'CHAR');
+                    }
+
+                    if ( 'grand_total' == $orderby ) {
+                        $query->set( 'meta_key', 'GrandTotal' );
+                        $query->set( 'orderby', 'meta_value' );
+                        $query->set( 'meta_type', 'DECIMAL');
+                    }
+                } else {
+                    $query->set('meta_query', $meta_query);
+                }
+            }
+        }
+
+        /**
+         * Add transaction custom filters
+         *
+         * @since 2.0.2
+         *
+         * @return void
+         */
+        public function manage_transaction_filter() {
+
+            if( !empty( $_GET['post_type'] ) && sanitize_text_field($_GET['post_type']) === 'transactions' ){
+
+                $transaction_types = array(
+                        'transaction' => __('Transaction','usb-swiper'),
+                        'invoice' => __('Invoice','usb-swiper'),
+                );
+                $intent_types = array(
+                        'authorize' => __('Authorize','usb-swiper'),
+                        'capture' => __('Capture','usb-swiper'),
+                );
+                $current_transaction = (isset($_GET['transaction_type']) && !empty($_GET['transaction_type'])) ? sanitize_text_field($_GET['transaction_type']) : "";
+                $current_intent = (isset($_GET['intent_type']) && !empty($_GET['intent_type'])) ? sanitize_text_field($_GET['intent_type']) : "";
+                $transaction_status = (isset($_GET['transaction_status']) && !empty($_GET['transaction_status'])) ? sanitize_text_field($_GET['transaction_status']) : "";
+
+                $get_status_lists = usbswiper_get_transaction_status_lists();
+                ?>
+                <select name="transaction_type" id="transaction_type">
+                    <option value=""><?php _e('All Type', 'usb-swiper'); ?></option>
+                    <?php foreach ($transaction_types as $transaction_type => $transaction_label) { ?>
+                        <option value="<?php echo esc_attr( $transaction_type ); ?>" <?php !empty($current_transaction) ? selected($current_transaction, $transaction_type) : ''; ?>>
+                            <?php echo $transaction_label; ?>
+                        </option>
+                    <?php } ?>
+                </select>
+                <select name="intent_type" id="intent_type">
+                    <option value=""><?php _e('All Intent', 'usb-swiper'); ?></option>
+                    <?php foreach ($intent_types as $intent_type => $intent_label) { ?>
+                        <option value="<?php echo esc_attr( $intent_type ); ?>" <?php !empty($current_intent) ? selected($current_intent, $intent_type) : ''; ?>>
+                            <?php echo $intent_label; ?>
+                        </option>
+                    <?php } ?>
+                </select>
+                <select name="transaction_status" id="transaction_status">
+                    <option value=""><?php _e('All Transaction Status', 'usb-swiper'); ?></option>
+                    <?php foreach ($get_status_lists as $status_key => $status_value) { ?>
+                        <option value="<?php echo esc_attr( $status_key ); ?>" <?php !empty($transaction_status) ? selected($transaction_status, $status_key) : ''; ?>>
+                            <?php echo !empty( $status_value ) ? $status_value : ''; ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            <?php
             }
         }
 

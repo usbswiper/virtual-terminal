@@ -122,6 +122,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         public function update_wc_endpoints( $query_vars ){
 
             $query_vars['view-transaction'] = 'view-transaction';
+            $query_vars['transactions'] = 'transactions';
+            $query_vars['vt-products'] = 'vt-products';
 
             return $query_vars;
         }
@@ -205,7 +207,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			$allow_pages = apply_filters( 'usb_swiper_dequeue_script_allow_pages', $allow_pages );
 
-			if( ( !empty( $allow_pages ) && is_array( $allow_pages ) && in_array( get_the_ID(), $allow_pages ) ) || is_wc_endpoint_url('view-transaction') || is_wc_endpoint_url('transactions')  ) {
+			if( ( !empty( $allow_pages ) && is_array( $allow_pages ) && in_array( get_the_ID(), $allow_pages ) ) || is_wc_endpoint_url('view-transaction') || is_wc_endpoint_url('transactions') || is_wc_endpoint_url('vt-products') ) {
 				wp_dequeue_script('angelleye-paypal-checkout-sdk');
 				wp_dequeue_script('angelleye-paypal-checkout-sdk-async');
 			}
@@ -266,6 +268,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
                     'vt_page_url' => get_the_permalink($vt_page_id),
 					'email_validation_message' => __( 'Please enter a valid email address.', 'usb-swiper' ),
+                    'vt_page_id' => $vt_page_id,
+                    'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
+                    'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
+                    'current_page_id' => get_the_ID()
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -291,7 +297,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
 					'vt_page_url' => get_the_permalink($vt_page_id),
                     'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper')),
-                    'product_min_price' => apply_filters( 'usb_swiper_add_product_min_price_message',__('Value must be greater than or equal to $1.00','usb-swiper'))
+                    'product_min_price' => apply_filters( 'usb_swiper_add_product_min_price_message',__('Value must be greater than or equal to $1.00','usb-swiper')),
+                    'vt_page_id' => $vt_page_id,
+                    'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
+                    'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
+                    'current_page_id' => get_the_ID()
 				) );
             }
 
@@ -872,6 +882,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'message_type' => __("ERROR",'usb-swiper'),
                 ), 200 );
             }
+
+            $get_merchant_data = usbswiper_get_onboarding_merchant_response($current_user_id);
+            $merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
+            if( empty($merchant_id) ){
+                wp_send_json( array(
+                    'status' => 'error',
+                    'message' => __("Merchant Id is invalid, please reconnect the paypal.", "usb-swiper"),
+                    'message_type' => __("ERROR",'usb-swiper'),
+                ), 200 );
+            }
 			$tab_fields = usb_swiper_get_fields_for_transaction();
             $invoice_payment = isset( $_POST['PayByInvoiceDisabled'] ) && (bool)$_POST['PayByInvoiceDisabled'] === true;
             $transaction = array();
@@ -986,6 +1006,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                     $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
                                     if( !empty( $order_response ) ) {
                                         update_post_meta($transaction_id, '_payment_response', $order_response);
+                                        update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
                                     }
                                 }
                             }
@@ -1124,13 +1145,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
 
 			    $payment_status = !empty( $response['status'] ) ? $response['status'] : '';
-			    update_post_meta($transaction_id, '_payment_status', $payment_status);
+                update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
 
                 if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
                     $settings = usb_swiper_get_settings('general');
                     $paybyinvoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
                     $redirect_url = add_query_arg( array('invoice-session'=> base64_encode(json_encode(array('id' => "invoice_$transaction_id", 'status' => $payment_status)))), get_the_permalink( $paybyinvoice_id ) );
-                    $temp_payment_status = ( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ) ? 'PAID' : 'PENDING';
+                    $temp_payment_status = ( !empty( $payment_status ) && strtolower( $payment_status ) === 'completed' ) ? usbswiper_get_transaction_status($transaction_id) : 'PENDING';
                     update_post_meta($transaction_id, '_payment_status', $temp_payment_status);
                 }
 
@@ -1266,6 +1287,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
                             if( !empty( $order_response ) ) {
                                 update_post_meta($transaction_id, '_payment_response', $order_response);
+                                update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
                             }
                         }
                     }
@@ -1402,6 +1424,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             $Paypal_request->handle_paypal_debug_id($response, $post_id);
                             if (!empty($response)) {
                                 update_post_meta($post_id, '_payment_response', $response);
+                                update_post_meta($post_id, '_payment_status', usbswiper_get_transaction_status($post_id) );
                             }
                             $payment_status = !empty($response['status']) ? $response['status'] : '';
 
@@ -1458,7 +1481,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 ));
                             }
 
-					        update_post_meta($post_id, '_payment_status', $payment_status);
+					        //update_post_meta($post_id, '_payment_status', $payment_status);
+                            update_post_meta($post_id, '_payment_status', usbswiper_get_transaction_status($post_id) );
 				        }
 			        }
 		        }
@@ -2454,6 +2478,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
                         if( !empty( $order_response ) ) {
                             update_post_meta($transaction_id, '_payment_response', $order_response);
+                            update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
                         }
                     }
                 }
@@ -2487,6 +2512,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             update_post_meta($transaction_id, '_payment_status', $payment_status);
+            //update_post_meta($transaction_id, '_payment_Status', usbswiper_get_payment_status($transaction_id));
 
             $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
             $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);

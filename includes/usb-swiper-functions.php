@@ -2048,3 +2048,23 @@ if( !function_exists('usbswiper_send_email_receipt_html') ) {
         return $html;
     }
 }
+
+
+function usbswiper_get_transaction_status_lists() {
+
+    $status_lists = apply_filters(
+        'usbswiper_get_transaction_status_lists',
+        [
+                'created' =>  __('Created','usb-swiper'),
+                'pending' => __('Pending','usb-swiper'),
+                'completed' => __('Completed','usb-swiper'),
+                'paid' => __('Paid','usb-swiper'),
+                'authorized' => __('Authorized','usb-swiper'),
+                'partially_refunded' => __('Partially Refunded','usb-swiper'),
+                'refunded' => __('Refunded','usb-swiper'),
+                'failed' => __('Failed','usb-swiper'),
+        ]
+    );
+
+    return $status_lists;
+}

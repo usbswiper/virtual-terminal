@@ -667,6 +667,30 @@ jQuery( document ).ready(function( $ ) {
             $('.input-field-wrap.product .vt-search-result').remove();
         },300);
     });
+
+    if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
+        var inactivityTime = 15 * 60 * 1000;
+        var lastActivity = new Date().getTime();
+
+        $(document).on('mousemove keydown', function() {
+            lastActivity = new Date().getTime();
+        });
+
+        const timeout_interval = setInterval(function () {
+            var currentTime = new Date().getTime();
+            var elapsedTime = currentTime - lastActivity;
+
+            if (elapsedTime >= inactivityTime) {
+                $('.vt-payment-timeout-popup-wrapper').show();
+                clearInterval(timeout_interval);
+            }
+        }, 1000);
+    }
+
+    $(document).on('click','#vt_form_timeout', function (){
+        location.reload();
+    });
+
 });
 
 function removeInterval( LoaderInterval ) {

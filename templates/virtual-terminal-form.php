@@ -1,7 +1,9 @@
 <?php
 $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
 $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
-if( true === $profile_status) {
+$get_merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
+$merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
+if( true === $profile_status && !empty($merchant_id)) {
 ?>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
@@ -146,6 +148,15 @@ if( true === $profile_status) {
         </div>
     </form>
 </div>
+<?php usb_swiper_get_template('vt-payment-timeout-popup.php');
+} else {
+    if( empty($merchant_id) ){ ?>
+        <div class="vt-form-wrap woocommerce">
+            <div class="vt-form-notification">
+                <p class="notification error"><?php _e("You do not have access to this page due to insufficient permission. Please contact to USBSwiper team or check PayPal permissions or your merchant_id is invalid.","usb-swiper"); ?></p>
+            </div>
+        </div>
 <?php
+    }
 }
 ?>

@@ -225,27 +225,29 @@ class Usb_Swiper {
 		$this->loader->add_filter('request', $plugin_admin, 'request_query_filter');
 		$this->loader->add_action('usb_swiper_section_content_general', $plugin_admin, 'general_settings');
 		$this->loader->add_action('usb_swiper_section_content_partner_fees', $plugin_admin, 'partner_fees_settings');
+		$this->loader->add_action('usb_swiper_section_content_advanced', $plugin_admin, 'advanced_settings');
 		$this->loader->add_action('usb_swiper_section_content_logs', $plugin_admin, 'logs_settings');
 		$this->loader->add_action('usb_swiper_save_section_partner_fees', $plugin_admin, 'save_partner_fees');
 		$this->loader->add_action('usb_swiper_section_content_uninstall', $plugin_admin, 'uninstall_settings');
 		$this->loader->add_action('wp_ajax_insert_new_partner_fee', $plugin_admin, 'insert_new_partner_fee');
 		$this->loader->add_action('wp_ajax_remove_partner_fee', $plugin_admin, 'remove_partner_fee');
+		$this->loader->add_action('wp_ajax_sync_transaction_status', $plugin_admin, 'sync_transaction_status');
 		$this->loader->add_action( 'show_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
 		$this->loader->add_action( 'edit_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
 		$this->loader->add_action( 'personal_options_update', $plugin_admin, 'save_customer_meta_fields' );
 		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'save_customer_meta_fields' );
 
 		//Transaction Search in Backend
-		$this->loader->add_action( 'pre_get_posts', $plugin_admin, 'transaction_search_query' );
+		$this->loader->add_action( 'pre_get_posts', $plugin_admin, 'transaction_search_query', 99 );
 		$this->loader->add_action( 'posts_where', $plugin_admin, 'transaction_search_query_replace', 10, 2 );
 
 		//Filter for Transactions Sorting
 		$this->loader->add_filter('manage_edit-'.$this->post_type.'_sortable_columns', $plugin_admin,'transactions_sortable_columns');
-		$this->loader->add_action('pre_get_posts',$plugin_admin,'transaction_custom_order_by');
 		$this->loader->add_action('usb_swiper_after_form_content', $plugin_admin, 'display_partner_fees_exclude_user_list', 10, 2);
 
 		$this->loader->add_action('show_user_profile', $plugin_admin, 'register_settings_for_vt_verification');
 		$this->loader->add_action('edit_user_profile', $plugin_admin, 'register_settings_for_vt_verification');
+        $this->loader->add_action('restrict_manage_posts', $plugin_admin, 'manage_transaction_filter');
 	}
 
 	/**

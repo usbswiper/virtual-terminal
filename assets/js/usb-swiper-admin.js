@@ -37,6 +37,31 @@ jQuery( document ).ready(function( $ ) {
         });
     });
 
+    $(document).on('click','#vt_sync_status', function (){
+
+        var current_obj = $(this);
+
+        usb_swiper_add_loader(current_obj);
+        usb_swiper_remove_notification();
+        var nonce = current_obj.attr('data-nonce');
+
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: "action=sync_transaction_status&nonce="+nonce,
+        }).done(function ( response ) {
+
+            if ( response.status ) {
+                usb_swiper_add_notification(response.message, 'notice');
+            } else{
+                usb_swiper_add_notification(response.message, 'error');
+            }
+
+            usb_swiper_remove_loader(current_obj);
+        });
+    });
+
     $(document).on('click','.remove-partner-fee', function (){
         var current_obj = $(this);
 
