@@ -54,6 +54,9 @@ jQuery( document ).ready(function( $ ) {
 
             if ( response.status ) {
                 usb_swiper_add_notification(response.message, 'notice');
+                if( undefined !== response.failed_ids ){
+                    console.log(response.failed_ids);
+                }
             } else{
                 usb_swiper_add_notification(response.message, 'error');
             }

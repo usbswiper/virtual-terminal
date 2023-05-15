@@ -2049,7 +2049,13 @@ if( !function_exists('usbswiper_send_email_receipt_html') ) {
     }
 }
 
-
+/**
+ * Get all transactions status.
+ *
+ * @since 2.0.2
+ *
+ * @return mixed|null
+ */
 function usbswiper_get_transaction_status_lists() {
 
     $status_lists = apply_filters(

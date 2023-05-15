@@ -1374,12 +1374,13 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             $status = false;
             $message = __('Nonce not verified. Please try again.', 'usb-swiper' );
             $html = '';
-
+            $failed_ids = [];
             if( !empty( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field($_POST['nonce']), '_vt_sync_transaction_status') ) {
                 $status = true;
                 $transaction_ids = $this->update_transaction_status();
                 $count = 0;
                 $fail_count = 0;
+
                 if( !empty($transaction_ids) && is_array($transaction_ids) ){
                     foreach($transaction_ids as $transaction_id){
                         $transaction_status = usbswiper_get_transaction_status($transaction_id);
@@ -1387,6 +1388,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                             $count++;
                             update_post_meta($transaction_id,'_payment_status',$transaction_status);
                         }else{
+                            $failed_ids[] = $transaction_id;
                             $fail_count++;
                         }
                     }
@@ -1401,6 +1403,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 'status' => $status,
                 'html' => $html,
                 'message' => $message,
+                'failed_ids' => $failed_ids
             );
 
             wp_send_json( $response , 200 );
