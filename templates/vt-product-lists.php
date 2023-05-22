@@ -49,7 +49,7 @@ $add_product_form_fields = array(
         'name' => 'price',
         'placeholder' => __( 'Price:', 'usb-swiper'),
         'attributes' => array(
-                'min' => 1
+            "step" => usbswiper_get_price_step(),
         ),
         'description' => '',
         'readonly' => false,

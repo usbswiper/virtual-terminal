@@ -2074,3 +2074,20 @@ function usbswiper_get_transaction_status_lists() {
 
     return $status_lists;
 }
+
+/**
+ * Get price decimal step.
+ *
+ * This function manage to input type number step value.
+ * In this function manage step based on WooCommerce price decimals setting.
+ *
+ * @since 2.0.2
+ *
+ * @return string
+ */
+function usbswiper_get_price_step() {
+
+	$decimals = wc_get_price_decimals();
+
+	return sprintf("0.%0{$decimals}d", 1 );
+}

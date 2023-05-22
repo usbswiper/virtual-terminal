@@ -89,6 +89,10 @@ jQuery( document ).ready(function( $ ) {
         return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/i.test(value);
     }, usb_swiper_settings.email_validation_message);
 
+    $.validator.addMethod("greaterThanZero", function(value, element) {
+        return parseFloat(value) > 0;
+    }, usb_swiper_settings.product_min_price);
+
     const render_cc_form = () => {
 
         let orderId;
@@ -406,17 +410,16 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
     });
 
-
     jQuery("form#vt_add_product_form").validate({
         rules: {
             price: {
                 required: true,
-                min: 1
+                greaterThanZero: true
             }
         },
         messages: {
             price: {
-                min: usb_swiper_settings.product_min_price
+                greaterThanZero: usb_swiper_settings.product_min_price
             }
 
         },
@@ -682,12 +685,13 @@ jQuery( document ).ready(function( $ ) {
 
             if (elapsedTime >= inactivityTime) {
                 $('.vt-payment-timeout-popup-wrapper').show();
+                autoSessionLogOut();
                 clearInterval(timeout_interval);
             }
         }, 1000);
     }
 
-    $(document).on('click','#vt_form_timeout', function (){
+    $(document).on('click','#vt_form_timeout, .vt-payment-timeout-popup-inner .close-btn', function (){
         location.reload();
     });
 
@@ -716,4 +720,26 @@ function customInput (el) {
         const previewImage = URL.createObjectURL(file)
         label.innerHTML = '<img src="'+previewImage+'" alt="preview">';
     }
+}
+
+function autoSessionLogOut() {
+
+    var timer = 5 * 60;
+    var minutes, seconds;
+    var display = document.querySelector("#auto_session_time");
+
+    var intervalId = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(intervalId);
+            window.location.href = document.querySelector('.vt-session-logout-link').getAttribute('href');
+        }
+    }, 1000);
 }

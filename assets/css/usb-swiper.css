@@ -181,6 +181,11 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-repeater-field .vt-fields-wrap:nth-child(2) .vt-remove-fields-wrap {pointer-events: none;}
 .vt-capture-popup-wrapper,.vt-refund-popup-wrapper,.vt-payment-timeout-popup-wrapper {background: #0006;bottom: 0;display: none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
 .vt-capture-popup-inner, .vt-refund-popup-inner,.vt-payment-timeout-popup-inner {background: #FFFFFF;border-radius: 16px;max-width: 350px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width: calc( 100% - 20px );}
+.vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner {max-width: 40%;border-radius: 10px;padding: 40px;}
+.vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner .close-btn {position: absolute;right: 15px;top: 15px;color: #4078eb;}
+.vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner .input-field-wrap.button-wrap{margin-top: 20px;}
+.vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner .input-field-wrap h3 {text-align: center;margin-bottom: 20px;}
+.vt-button-link {background: transparent;color: #4483f0;border-width: 0;border-radius: 0;letter-spacing: 1px;font-size: 14px;font-weight: 600;text-transform: inherit;padding: 10px 30px;text-decoration: none;display: inline-block;margin-bottom: 0;cursor: pointer;}
 .vt-capture-popup-wrapper .vt-capture-popup-content,.vt-refund-popup-wrapper .vt-refund-popup-content{display: block;height: 10vh;overflow-y: scroll;}
 .vt-capture-popup-content::-webkit-scrollbar,.vt-refund-popup-content::-webkit-scrollbar {width: 3px;background-color: #FFF!important;}
 .vt-capture-popup-content::-webkit-scrollbar-track,.vt-refund-popup-content::-webkit-scrollbar-track {box-shadow: inset 0 0 6px #FFF!important;}
@@ -254,6 +259,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .vt-repeater-field .vt-fields-wrap {align-items:center;flex-wrap: wrap;}
     .vt-form-contents .paypal-payment {padding: 0;}
     .invoice-content-main-wrap .vt-row .vt-col-100 {width: 100%;}
+    .vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner{max-width: 60%}
 }
 
 @media only screen and (max-width: 820px) {
@@ -287,4 +293,5 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .vt-repeater-field .input-field-wrap:nth-child(2){width: calc(50% - 12px);}
     .vt-repeater-field .input-field-wrap:nth-child(3){width: calc(50% - 12px);}
     .vt-repeater-field .vt-fields-wrap:has(svg) .price{width: calc(42% - 12px);}
+    .vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner{max-width: 100%}
 }

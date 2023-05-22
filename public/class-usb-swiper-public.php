@@ -297,7 +297,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
 					'vt_page_url' => get_the_permalink($vt_page_id),
                     'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper')),
-                    'product_min_price' => apply_filters( 'usb_swiper_add_product_min_price_message',__('Value must be greater than or equal to $1.00','usb-swiper')),
+                    'product_min_price' => apply_filters( 'usb_swiper_add_product_min_price_message',__('price must be greater than 0','usb-swiper')),
                     'vt_page_id' => $vt_page_id,
                     'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
                     'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
