@@ -1712,7 +1712,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             $table_prefix = $wpdb->prefix;
 	        $transaction_search = !empty( $query->query_vars['transaction_search'] ) ? $query->query_vars['transaction_search'] : '';
 
-            if ( '1' == $transaction_search){
+            if ( '1' == $transaction_search) {
 	            $where = preg_replace('/\s+/', '', $where);
 	            $where = str_replace("AND(({$table_prefix}postmeta.meta_key='_payment_response'", "OR(({$table_prefix}postmeta.meta_key='_payment_response'", $where);
 	            $where = str_replace( 'AND', ' AND ', $where);
@@ -1739,11 +1739,14 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 return $query;
             }
 
-            if ( 'transactions' == $query->get('post_type' ) && $query->is_main_query() ){
+            if ( 'transactions' == $query->get('post_type' ) && $query->is_main_query() ) {
 
                 if ($query->is_search()) {
 
+					$query->set('transaction_search', true);
+
                     $meta_query['relation'] = 'OR';
+
                     $meta_query[] = array(
                         'key' => '_payment_response',
                         'value' => $query->get('s'),
@@ -1797,8 +1800,6 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     }
                 }
 
-                $query->set('transaction_search', true);
-
                 $orderby = $query->get( 'orderby');
 
                 if( !empty( $orderby ) ) {
@@ -1825,7 +1826,9 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                         $query->set( 'meta_type', 'DECIMAL');
                     }
                 } else {
-                    $query->set('meta_query', $meta_query);
+					if( !empty( $meta_query ) ) {
+						$query->set('meta_query', $meta_query);
+					}
                 }
             }
         }

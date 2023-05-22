@@ -153,7 +153,7 @@ if( true === $profile_status && !empty($merchant_id)) {
     if( empty($merchant_id) ){ ?>
         <div class="vt-form-wrap woocommerce">
             <div class="vt-form-notification">
-                <p class="notification error"><?php _e("You do not have access to this page due to insufficient permission. Please contact to USBSwiper team or check PayPal permissions or your merchant_id is invalid.","usb-swiper"); ?></p>
+                <p class="notification error"><?php _e("Your merchant ID is unavailable. Please log out and back in to refresh your session/merchant ID.","usb-swiper"); ?></p>
             </div>
         </div>
 <?php
