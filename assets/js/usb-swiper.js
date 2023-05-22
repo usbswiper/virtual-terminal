@@ -673,26 +673,32 @@ jQuery( document ).ready(function( $ ) {
     });
 
     if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
-        var inactivityTime = 10 * 60 * 1000;
-        var lastActivity = new Date().getTime();
+        const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
+        localStorage.removeItem('sessionExpireTimer');
+        localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
 
         $(document).on('mousemove keydown', function() {
-            lastActivity = new Date().getTime();
+            var InactiveTimerTime = localStorage.getItem('sessionExpireTimer');
+            if(InactiveTimerTime === null || InactiveTimerTime === '' || InactiveTimerTime === undefined ) {
+                const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
+                localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
+            }
         });
 
-        const timeout_interval = setInterval(function () {
+        const timeoutInterval = setInterval(function () {
             var currentTime = new Date().getTime();
-            var elapsedTime = currentTime - lastActivity;
-
-            if (elapsedTime >= inactivityTime) {
-                clearInterval(timeout_interval);
+            if ( currentTime >= localStorage.getItem('sessionInactiveTimer')) {
+                clearInterval(timeoutInterval);
                 $('.vt-payment-timeout-popup-wrapper').show();
+                localStorage.removeItem('sessionInactiveTimer');
                 autoSessionLogOut();
             }
         }, 1000);
     }
 
     $(document).on('click','#vt_form_timeout, .vt-payment-timeout-popup-inner .close-btn', function (){
+        localStorage.removeItem('sessionInactiveTimer');
+        localStorage.removeItem('sessionExpireTimer');
         location.reload();
     });
 
@@ -725,21 +731,27 @@ function customInput (el) {
 
 function autoSessionLogOut() {
 
-    var timer = 5 * 60;
-    var minutes, seconds;
-    var display = document.querySelector("#auto_session_time");
+    const sessionExpireTimer = new Date(new Date().getTime() + (5 * 60000)).getTime();
+    localStorage.setItem('sessionExpireTimer', sessionExpireTimer);
 
     var intervalId = setInterval(function () {
-        minutes = parseInt(timer / 60, 10);
-        seconds = parseInt(timer % 60, 10);
 
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
+        var currentTime = new Date().getTime();
+        var InactiveTimerTime = parseInt(localStorage.getItem('sessionExpireTimer'));
 
-        display.textContent = minutes + ":" + seconds;
+        const timeDifference = InactiveTimerTime - currentTime;
+        let remainingTime = Math.floor(timeDifference / 1000);
+        remainingTime %= 3600;
+        const remainingMinutes = Math.floor(remainingTime / 60);
+        const remainingSeconds = remainingTime % 60;
 
-        if (--timer <= 0) {
+        if( remainingMinutes >= 0 || remainingSeconds >= 0 ) {
+            document.querySelector("#auto_session_time").textContent = remainingMinutes + ":" + remainingSeconds;
+        }
+
+        if ( currentTime >= InactiveTimerTime ) {
             clearInterval(intervalId);
+            localStorage.removeItem('sessionExpireTimer');
             window.location.href = document.querySelector('.vt-session-logout-link').getAttribute('href');
         }
     }, 1000);
