@@ -9,7 +9,7 @@
             </div>
             <div class="input-field-wrap button-wrap">
                 <button type="button" class="vt-button vt-payment-form-timeout" id="vt_form_timeout" name="vt_form_timeout_btn"><?php _e('STAY LOGGED IN','usb-swiper'); ?></button>
-                <a href="<?php echo wc_logout_url(); ?>" class="vt-button-link vt-session-logout-link"><?php _e('Log out','usb-swiper'); ?></a>
+                <a href="<?php echo wc_logout_url(); ?>" class="vt-button vt-button-link vt-session-logout-link"><?php _e('Log out','usb-swiper'); ?></a>
             </div>
         </div>
     </div>

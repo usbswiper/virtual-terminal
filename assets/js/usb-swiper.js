@@ -685,9 +685,9 @@ jQuery( document ).ready(function( $ ) {
             var elapsedTime = currentTime - lastActivity;
 
             if (elapsedTime >= inactivityTime) {
+                clearInterval(timeout_interval);
                 $('.vt-payment-timeout-popup-wrapper').show();
                 autoSessionLogOut();
-                clearInterval(timeout_interval);
             }
         }, 1000);
     }
@@ -738,7 +738,7 @@ function autoSessionLogOut() {
 
         display.textContent = minutes + ":" + seconds;
 
-        if (--timer < 0) {
+        if (--timer <= 0) {
             clearInterval(intervalId);
             window.location.href = document.querySelector('.vt-session-logout-link').getAttribute('href');
         }
