@@ -106,7 +106,7 @@ $add_product_form_fields = array(
                     }
 
                     if( !empty( $form_field['id'] ) && 'price' === $form_field['id'] ) {
-                        $value = wc_price( $value );
+                        $value = wc_price( $value, ['currency' => usbswiper_get_default_currency()] );
                     }
                     ?>
                     <div class="view-product" id="view_<?php echo !empty( $form_field['id'] ) ? $form_field['id'] : ''; ?>">
@@ -169,7 +169,7 @@ $add_product_form_fields = array(
                 <tr class="product-item-<?php echo esc_attr($product->ID); ?>">
                     <td class="product-id text-center" data-title="<?php _e('ID','usb-swiper'); ?>"><?php echo $product->ID; ?></td>
                     <td class="product-title" data-title="<?php _e('Title','usb-swiper'); ?>"><?php echo $product->post_title;?></td>
-                    <td class="product-price text-center" data-title="<?php _e('Price','usb-swiper'); ?>"><?php echo wc_price($product_data->get_price());?></td>
+                    <td class="product-price text-center" data-title="<?php _e('Price','usb-swiper'); ?>"><?php echo wc_price($product_data->get_price(), ['currency' => usbswiper_get_default_currency()]);?></td>
                     <td class="product-image text-center" data-title="<?php _e('Product Image','usb-swiper'); ?>">
                         <?php if( ! empty( $product_data->get_image_id() ) ) { ?>
                             <img height="50px" width="50px" src="<?php echo wp_get_attachment_image_url( $product_data->get_image_id() );?>" alt="Product-image"/>

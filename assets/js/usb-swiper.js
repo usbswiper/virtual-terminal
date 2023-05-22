@@ -419,7 +419,8 @@ jQuery( document ).ready(function( $ ) {
         },
         messages: {
             price: {
-                greaterThanZero: usb_swiper_settings.product_min_price
+                greaterThanZero: usb_swiper_settings.product_min_price,
+                step: usb_swiper_settings.price_step_message
             }
 
         },
