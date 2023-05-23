@@ -1396,7 +1396,8 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     foreach($transaction_ids as $transaction_id) {
 
 						if( !get_post_meta($transaction_id,  '_transaction_type', true)) {
-							update_post_meta($transaction_id, '_transaction_type', 'TRANSACTION');
+							$transaction_type = usbswiper_get_invoice_transaction_type($transaction_id);
+							update_post_meta($transaction_id, '_transaction_type', $transaction_type);
 						}
 
                         $transaction_status = usbswiper_get_transaction_status($transaction_id);
