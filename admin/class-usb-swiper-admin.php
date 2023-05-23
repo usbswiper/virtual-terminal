@@ -1362,7 +1362,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 <table class="form-table">
                     <tr>
                         <th>
-                            <label for="brand_name" class="tooltip-label"><?php _e('Virtual Terminal Transaction Status Update','usb-swiper' ); ?>:<span class="vt-help-tip" data-tooltip="<?php _e('We are fetching the previous transaction status from PayPal Array, now we have created the function, so that Admin can use the filter in the Transaction. In order to do that, we need to update all the existing transaction status.','usb-swiper'); ?>"></span></label>
+                            <label for="vt_sync_status" class="tooltip-label"><?php _e('Virtual Terminal Transaction Status Update','usb-swiper' ); ?>:<span class="vt-help-tip" data-tooltip="<?php _e('We are fetching the previous transaction status from PayPal Array, now we have created the function, so that Admin can use the filter in the Transaction. In order to do that, we need to update all the existing transaction status.','usb-swiper'); ?>"></span></label>
                         </th>
                         <td>
                             <a href="javascript:void(0);" id="vt_sync_status" data-nonce="<?php echo wp_create_nonce('_vt_sync_transaction_status')?>" class="vt_sync_status button button-primary"><?php _e('Update Transaction status', 'usb-swiper'); ?></a>
@@ -1391,18 +1391,26 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 $count = 0;
                 $fail_count = 0;
 
-                if( !empty($transaction_ids) && is_array($transaction_ids) ){
-                    foreach($transaction_ids as $transaction_id){
+                if( !empty($transaction_ids) && is_array($transaction_ids) ) {
+
+                    foreach($transaction_ids as $transaction_id) {
+
+						if( !get_post_meta($transaction_id,  '_transaction_type', true)) {
+							update_post_meta($transaction_id, '_transaction_type', 'TRANSACTION');
+						}
+
                         $transaction_status = usbswiper_get_transaction_status($transaction_id);
-                        if( !empty($transaction_status) ){
+
+                        if( !empty($transaction_status) ) {
                             $count++;
                             update_post_meta($transaction_id,'_payment_status',$transaction_status);
-                        }else{
+                        } else {
                             $failed_ids[] = $transaction_id;
                             $fail_count++;
                         }
                     }
                 }
+
                 $message = sprintf(__('%s Transactions status updated successfully', 'usb-swiper' ),$count);
                 if( !empty($fail_count) ){
                     $message .= sprintf(__(' and %s Transactions status not updated.', 'usb-swiper' ),$fail_count);
