@@ -2069,6 +2069,7 @@ function usbswiper_get_transaction_status_lists() {
                 'partially_refunded' => __('Partially Refunded','usb-swiper'),
                 'refunded' => __('Refunded','usb-swiper'),
                 'failed' => __('Failed','usb-swiper'),
+                'declined' => __('Declined','usb-swiper'),
         ]
     );
 
