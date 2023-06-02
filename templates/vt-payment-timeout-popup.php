@@ -3,7 +3,7 @@
         <a href="javascript:void(0)" class="close-btn"><span class="dashicons dashicons-no"></span></a>
         <div class="vt-notification-content">
             <div class="input-field-wrap ">
-                <h3><strong><?php _e("Your Session is about to expire","usb-swiper"); ?></strong></h3>
+                <h3><strong><?php _e("Your Session Is About to Expire","usb-swiper"); ?></strong></h3>
                 <p><?php echo sprintf( __("You've been inactive for a while. For your security, we will automatically log you out after <strong class='auto-session-timer'>%s minutes</strong>.","usb-swiper"), "<span id='auto_session_time'></span>" ) ?></p>
                 <p><?php _e("Do you want to stay logged in?","usb-swiper"); ?></p>
             </div>
