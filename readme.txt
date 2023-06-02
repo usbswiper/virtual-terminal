@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.2
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,14 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 2.2.0 =
+* Feature - Session timeout message and automatic logout if no response is given.
+* Tweak - If Invoice mode is enabled, billing email is required.  If VT mode is enabled, billing email is optional.
+* Fix - Filters and search in admin -> Transactions.
+* Fix - Allows products to be less than 1.00 (but greater than 0.00)
+* Fix - Net value is read-only and calculated based on the line item details.
+* Fix - Net value calculates correctly when line items are removed.
 
 = 2.1.0 =
 * Fix - Fixes in the user session management
