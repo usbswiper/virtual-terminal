@@ -26,7 +26,7 @@ if ( ! defined( 'USBSWIPER_PLUGIN_NAME' ) ) {
 
 //Define plugin version.
 if ( ! defined( 'USBSWIPER_VERSION' ) ) {
-	define( 'USBSWIPER_VERSION', '2.1.0' );
+	define( 'USBSWIPER_VERSION', '2.2.0' );
 }
 
 // Define plugin dir.
