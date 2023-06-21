@@ -93,6 +93,19 @@ jQuery( document ).ready(function( $ ) {
         return parseFloat(value) > 0;
     }, usb_swiper_settings.product_min_price);
 
+    $.validator.addMethod("onlyDigits", function(value, element) {
+        return (value && /^\d+$/.test(value));
+    }, usb_swiper_settings.product_min_qty_message);
+
+
+    $(document).on('keyup', 'input[name="VTProductQuantity[]"]', function () {
+        let currentObj = $(this);
+        let val = currentObj.val();
+        if( /^\d+$/.test(val) === false) {
+            currentObj.val("");
+        }
+    });
+
     const render_cc_form = () => {
 
         let orderId;
@@ -170,8 +183,15 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 VtForm.validate({
+                    rules: {
+                        'VTProductQuantity[]': {
+                            required: true,
+                            onlyDigits: true
+                        }
+                    },
                     messages: {
                         'VTProductQuantity[]': {
+                            onlyDigits: usb_swiper_settings.product_min_qty_message,
                             min: usb_swiper_settings.product_min_qty_message
                         }
                     },
