@@ -2347,7 +2347,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $product = wc_get_product( $product_id );
 
                 $product_name = $product->get_name();
-                $product_price = $product->get_regular_price();
+                $product_price = $product->get_price();
             }
 
             $response = array(

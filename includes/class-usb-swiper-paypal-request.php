@@ -511,7 +511,8 @@ class Usb_Swiper_Paypal_request{
 				if( !empty( $product_id ) && $product_id > 0 ) {
 					$product = wc_get_product( $product_id );
 					$sku = !empty( $product->get_sku() ) ? $product->get_sku() : '';
-					$description = !empty( $product->get_description() ) ? $product->get_description() : '';
+					$description = !empty( $product->get_description() ) ? wp_strip_all_tags($product->get_description()) : '';
+					$description = !empty( $description ) ?substr(str_replace(PHP_EOL, '', $description), 0, 127) : '';
 				}
 
                 $purchase_units_items[] =  array(
