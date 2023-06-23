@@ -2577,7 +2577,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$author_id = get_post_field( 'post_author', $transaction_id );
 				$author_id = !empty($author_id) ? $author_id : 1;
 				$brand_name = get_user_meta( (int)$author_id,'brand_name', true );
-				$brand_name = !empty( $brand_name ) ? $brand_name : '';
+				$brand_name = !empty( $brand_name ) ? $brand_name : 'USBSwiper';
 				$string  = str_replace('{#merchant_brand_name#}', $brand_name, $string );
 				$string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
                 $string = str_replace('{#transaction_type#}',ucfirst(strtolower($transaction_type)), $string);
