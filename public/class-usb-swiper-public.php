@@ -1663,11 +1663,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 ?>
                 <div class="brand-logo-preview">
                 <?php
-                     echo usbswiper_get_brand_logo(get_current_user_id(), false); ?>
+                    $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
 
-                <a title="<?php _e('Delete product', 'usb-swiper'); ?>" class="delete_brand_logo" data-id="<?php echo get_current_user_id(); ?>">
+                    $attachment_id = $brand_logo['attachment_id'];
+                     echo $brand_logo['image_html'];
+                     if ($brand_logo['image_html']) {
+                ?>
+
+                <a title="<?php _e('Delete product', 'usb-swiper'); ?>" class="delete_brand_logo" data-attachment-id="<?php echo $attachment_id; ?>">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                 </a>
+                         <?php } ?>
                 </div>
             </p>
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
@@ -1814,9 +1820,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        function delete_brand_logo() {
-            $attachmentId = isset($_FILES['BrandLogo']) ? intval($_FILES['BrandLogo']) : 0;
+        function delete_brand_logo_cb() {
+            $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
 
+            $attachmentId = $brand_logo['attachment_id'];
             if ($attachmentId > 0) {
 
                     $result = wp_delete_attachment($attachmentId, true);
@@ -1825,12 +1832,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         // Image deletion successful
                         wp_send_json_success();
                     }
-
             }
-
             // Image deletion failed
             wp_send_json_error();
-
         }
 
 		/**

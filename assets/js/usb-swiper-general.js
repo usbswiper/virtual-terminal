@@ -102,10 +102,10 @@ jQuery( document ).ready(function( $ ) {
     });
 
 
-    $('.delete_brand_logo').on('click', function (e) {
+    $(document).on('click', '.delete_brand_logo', function (e) {
         e.preventDefault();
 
-        var attachmentId = $(this).data('id');
+        var attachmentId = $(this).data('attachment-id');
 
         // Send AJAX request to delete the image
         $.ajax({
@@ -113,7 +113,7 @@ jQuery( document ).ready(function( $ ) {
             method: 'POST',
             data: {
                 action: 'delete_brand_logo',
-                data_id: attachmentId,
+                attachment_id: attachmentId,
                 // Add additional data if needed
             },
             success: function (response) {

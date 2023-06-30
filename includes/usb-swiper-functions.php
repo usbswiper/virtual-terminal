@@ -1411,14 +1411,25 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true ) {
     $brand_logo_id = get_user_meta( $user_id,'brand_logo', true);
 
     if( empty( $brand_logo_id ) ) {
-        return false;
+        return array(
+                'attachment_id' => '',
+                'image_html' => ''
+        );
     }
+
+    $brand_logo = array(
+        'attachment_id' => $brand_logo_id,
+        'image_html' => ''
+    );
 
     if( $is_url ) {
-        return wp_get_attachment_image_url($brand_logo_id);
+        $brand_logo['image_html'] = wp_get_attachment_image_url($brand_logo_id);
+//        return wp_get_attachment_image_url($brand_logo_id);
+    } else {
+        $brand_logo['image_html'] = wp_get_attachment_image($brand_logo_id);
     }
 
-    return wp_get_attachment_image($brand_logo_id);
+    return $brand_logo;
 }
 
 /**
