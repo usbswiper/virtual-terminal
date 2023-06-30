@@ -240,7 +240,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $sdk_obj = $this->get_paypal_sdk_obj();
                 wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js?enable-funding=venmo' ), array(), null, false );
                 wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
-
 				wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
 				wp_enqueue_style( 'select2', USBSWIPER_URL . 'assets/css/select2.min.css' );
 				wp_enqueue_script( 'bootstrap-min', USBSWIPER_URL . 'assets/js/bootstrap.min.js', array( 'jquery' ), $this->version, true );
@@ -309,7 +308,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			wp_enqueue_script( 'usb-swiper-general', USBSWIPER_URL . 'assets/js/usb-swiper-general.js', array( 'jquery' ), $this->version, true );
             wp_enqueue_style( 'pay-by-invoice', USBSWIPER_URL . 'assets/css/pay-by-invoice.css', array(), $this->version, 'all' );
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
-		}
+
+        }
 
 		/**
          * Clean up paypal checkout sdk url.
@@ -1590,6 +1590,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
+
 		public function wc_edit_account_form_start() {
 		    ?>
             <h2 class="wc-account-title general-info"><?php _e('General Information','usb-swiper'); ?></h2>
@@ -1647,6 +1648,27 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'wrapper' => false
                 ));
                 ?>
+            </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'file',
+                    'id' => 'vt_product_image',
+                    'name' => 'BrandLogo',
+                    'label' => __( 'Upload Image', 'usb-swiper'),
+                    'required' => false,
+                    'class' => 'p-2 vt-image-upload',
+                    'wrapper_class' => 'vt-image-upload-wrap'
+                ));
+                ?>
+                <div class="brand-logo-preview">
+                <?php
+                     echo usbswiper_get_brand_logo(get_current_user_id(), false); ?>
+
+                <a title="<?php _e('Delete product', 'usb-swiper'); ?>" class="delete_brand_logo" data-id="<?php echo get_current_user_id(); ?>">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </a>
+                </div>
             </p>
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
                 <?php
@@ -1773,14 +1795,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if ( is_user_logged_in() ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
+                $brand_logo = !empty( $_FILES['BrandLogo'] ) ? $_FILES['BrandLogo'] : '';
+
+                $logo_id = !empty( $brand_logo ) ? $this->vt_upload_from_path( $brand_logo ) : 0;
+
                 $invoice_prefix = !empty( $_POST['InvoicePrefix'] ) ? sanitize_text_field($_POST['InvoicePrefix']) : '';
                 $ignore_transaction_email = !empty( $_POST['ignore-transaction-email'] ) ? $_POST['ignore-transaction-email'] : '';
                 update_user_meta( $user_id, "_primary_currency", $primary_currency );
                 update_user_meta( $user_id, "brand_name", $brand_name );
+                update_user_meta( $user_id, "brand_logo", $logo_id );
                 update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
                 update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
 			}
 		}
+
+        /**
+         * Delete brand logo.
+         *
+         * @return void
+         */
+        function delete_brand_logo() {
+            $attachmentId = isset($_FILES['BrandLogo']) ? intval($_FILES['BrandLogo']) : 0;
+
+            if ($attachmentId > 0) {
+
+                    $result = wp_delete_attachment($attachmentId, true);
+
+                    if ($result !== false) {
+                        // Image deletion successful
+                        wp_send_json_success();
+                    }
+
+            }
+
+            // Image deletion failed
+            wp_send_json_error();
+
+        }
 
 		/**
 		 * Create new refund request.
@@ -2711,7 +2762,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 if( empty( $brand_name ) ) {
                     update_user_meta($current_user_id ,'brand_name', $company_name);
                 }
-
                 $new_email = WC()->mailer()->emails['paypal_profile_verification_request'];
                 $new_email->trigger( array(
                     'user_id' => $current_user_id,
@@ -2896,5 +2946,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'is_shipping' => $is_shipping,
 			) , 200 );
         }
-	}
+
+        /**
+         * Add enctype for edit account form.
+         *
+         * @since 2.2.2
+         *
+         * @return void
+         */
+        public function add_enctype_in_edit_account_form() {
+
+            echo 'enctype="multipart/form-data"';
+        }
+    }
 }

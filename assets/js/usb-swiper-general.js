@@ -100,4 +100,38 @@ jQuery( document ).ready(function( $ ) {
             });
         }
     });
+
+
+    $('.delete_brand_logo').on('click', function (e) {
+        e.preventDefault();
+
+        var attachmentId = $(this).data('id');
+
+        // Send AJAX request to delete the image
+        $.ajax({
+            url: usb_swiper_settings.ajax_url,
+            method: 'POST',
+            data: {
+                action: 'delete_brand_logo',
+                data_id: attachmentId,
+                // Add additional data if needed
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Image deletion successful, update the UI or take any other necessary action
+                    $('.brand-logo-preview').html('');
+                    // Show success message, if required
+                } else {
+                    // Image deletion failed, handle the error
+                    // Show error message, if required
+                }
+            },
+            error: function (error) {
+                // Handle error response
+            }
+        });
+    });
+
+
+
 });

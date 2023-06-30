@@ -1395,6 +1395,31 @@ function usbswiper_get_brand_name() {
 	$company_name = get_user_meta( get_current_user_id(),'brand_name', true);
 	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
+/**
+ * Get the brand logo.
+ *
+ * @since 1.0.0
+ *
+ * @return mixed|string|null
+ */
+function usbswiper_get_brand_logo( $user_id, $is_url = true ) {
+
+    if( empty( $user_id ) ) {
+         return false;
+    }
+
+    $brand_logo_id = get_user_meta( $user_id,'brand_logo', true);
+
+    if( empty( $brand_logo_id ) ) {
+        return false;
+    }
+
+    if( $is_url ) {
+        return wp_get_attachment_image_url($brand_logo_id);
+    }
+
+    return wp_get_attachment_image($brand_logo_id);
+}
 
 /**
  * Get the current user invoice prefix value.
