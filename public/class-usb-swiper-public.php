@@ -296,6 +296,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'style_size' => apply_filters('usb_swiper_smart_button_style_size','responsive'),
 					'vt_page_url' => get_the_permalink($vt_page_id),
                     'confirm_message' => apply_filters( 'usb_swiper_product_delete_confirm_message', __('Are you sure you want to delete "{#product_title#}" product?','usb-swiper')),
+                    'logo_delete_confirm_message' => apply_filters( 'usb_swiper_logo_delete_confirm_message', __('Are you sure you want to delete brand logo?','usb-swiper')),
                     'product_min_price' => apply_filters( 'usb_swiper_add_product_min_price_message',sprintf(__('Price must be greater than %s','usb-swiper'), strip_tags(wc_price(0, ['currency' => usbswiper_get_default_currency()])))),
                     'price_step_message' => apply_filters( 'usb_swiper_price_step_message',sprintf(__('Please enter a valid value. Allow only %s format.','usb-swiper'), strip_tags(wc_price(0, ['currency' => usbswiper_get_default_currency()])))),
                     'vt_page_id' => $vt_page_id,
@@ -1602,7 +1603,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @since 1.0.0
 		 */
-		public function wc_edit_account_form() {
+		public function wc_edit_account_form($string) {
 			$merchant_data = usbswiper_get_onboarding_merchant_response();
 
            if( empty( $merchant_data)) {
@@ -1666,14 +1667,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
 
                     $attachment_id = $brand_logo['attachment_id'];
-                     echo $brand_logo['image_html'];
-                     if ($brand_logo['image_html']) {
+                    if ($brand_logo['image_html']) {
+                        echo $brand_logo['image_html'];
                 ?>
 
                 <a title="<?php _e('Delete product', 'usb-swiper'); ?>" class="delete_brand_logo" data-attachment-id="<?php echo $attachment_id; ?>">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                 </a>
-                         <?php } ?>
+                    <?php } ?>
                 </div>
             </p>
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
@@ -2630,9 +2631,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $author_id = !empty($author_id) ? $author_id : 1;
                     $brand_name = get_user_meta( (int)$author_id,'brand_name', true );
                     $brand_name = !empty( $brand_name ) ? $brand_name : 'USBSwiper';
+                    $brand_logo = get_user_meta(get_current_user_id(), 'brand_logo', true);
                     $string  = str_replace('{#transaction_id#}', '#'.$user_invoice_id, $string );
                     $string  = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
                     $string  = str_replace('{#merchant_brand_name#}', $brand_name, $string );
+                    $string  = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string );
                 } else {
                     $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
                 }

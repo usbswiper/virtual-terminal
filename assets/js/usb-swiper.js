@@ -719,9 +719,15 @@ function customInput (el) {
     const label = document.createElement('div');
     label.className = 'upload-image-preview';
     el.appendChild(label);
-
     fileInput.onchange = function () {
         if (!fileInput.value) return
+        let fileInputName = fileInput.getAttribute('name');
+        if( fileInputName === 'BrandLogo' ) {
+            let brandLogoPreviewEl = document.getElementsByClassName('brand-logo-preview');
+            if( brandLogoPreviewEl) {
+                brandLogoPreviewEl[0].style.display = "none";
+            }
+        }
         /*const imageLabel = fileInput.value.replace(/^.*[\\\/]/, '')*/
         const file = fileInput.files[0];
         const previewImage = URL.createObjectURL(file)
@@ -756,3 +762,4 @@ function autoSessionLogOut() {
         }
     }, 1000);
 }
+

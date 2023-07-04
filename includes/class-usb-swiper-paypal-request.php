@@ -353,7 +353,7 @@ class Usb_Swiper_Paypal_request{
 
 		$application_context = array(
 			'brand_name' => usbswiper_get_brand_name(),
-            'brand_logo' => usbswiper_get_brand_logo(),
+            'brand_logo' => usbswiper_get_brand_logo(get_current_user_id()),
 			'locale' => usbswiper_get_locale(),
 			'landing_page' => $this->landing_page,
 			'shipping_preference' => $this->shipping_preference(),

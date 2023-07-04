@@ -87,6 +87,7 @@ ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}
 .paypal-disconnect-button {margin-top: 20px;}
 h2.wc-account-title {width: 100%;display: block;margin: 20px 0;}
 h2.wc-account-title.general-info {margin-top: 0;}
+a.delete_brand_logo {color: #f44336;}
 .paypal-connect-button-wrap {text-align: center;margin-top: 20px;}
 p.signature-text{display: none;}
 .transaction-history-title{font-size: 1.5rem;padding: 10px 0;}
@@ -111,9 +112,9 @@ p.signature-text{display: none;}
 .vt-product-wrapper .close {cursor: pointer;position: absolute;height: 26px;right: 10px;top: 10px;margin: 0 auto;width: 26px;}
 .vt-product-wrapper .close a {display: block;color: #000;}
 .input-field-wrap.vt-image-upload-wrap {display: flex;flex-direction: column;}
-.upload-image-preview {width: 100%;margin: 1rem 0;display: block;}
+.upload-image-preview {width: 150px;height: 150px;margin: 1rem 0;display: block;}
 .upload-image-preview:empty {display: none;}
-.upload-image-preview img {max-width: 100px;}
+.upload-image-preview img {width: 100%;height: 100%;}
 .product-actions a {display: inline-block;margin-right: 5px;color:#4361ee;cursor: pointer;}
 .product-actions a.vt_delete_product {color: #f44336;}
 .product-actions a svg {color: inherit;}

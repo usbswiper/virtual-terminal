@@ -1402,7 +1402,7 @@ function usbswiper_get_brand_name() {
  *
  * @return mixed|string|null
  */
-function usbswiper_get_brand_logo( $user_id, $is_url = true ) {
+function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150] ) {
 
     if( empty( $user_id ) ) {
          return false;
@@ -1419,19 +1419,25 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true ) {
 
     $brand_logo = array(
         'attachment_id' => $brand_logo_id,
-        'image_html' => ''
+        'image_html' => wp_get_attachment_image($brand_logo_id, $size)
     );
 
     if( $is_url ) {
-        $brand_logo['image_html'] = wp_get_attachment_image_url($brand_logo_id);
-//        return wp_get_attachment_image_url($brand_logo_id);
-    } else {
-        $brand_logo['image_html'] = wp_get_attachment_image($brand_logo_id);
+        $brand_logo['image_html'] = wp_get_attachment_image_url($brand_logo_id, $size);
     }
 
     return $brand_logo;
 }
 
+//function usb_swiper_brand_logo( $string ) {
+//
+//    if( !empty( $string ) ) {
+//        $brand_logo = get_user_meta(get_current_user_id(), 'brand_logo', true);
+//        $string = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string);
+//    }
+//
+//    return $string;
+//}
 /**
  * Get the current user invoice prefix value.
  *

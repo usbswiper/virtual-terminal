@@ -104,34 +104,32 @@ jQuery( document ).ready(function( $ ) {
 
     $(document).on('click', '.delete_brand_logo', function (e) {
         e.preventDefault();
-
         var attachmentId = $(this).data('attachment-id');
-
+        var message = usb_swiper_settings.logo_delete_confirm_message;
         // Send AJAX request to delete the image
-        $.ajax({
-            url: usb_swiper_settings.ajax_url,
-            method: 'POST',
-            data: {
-                action: 'delete_brand_logo',
-                attachment_id: attachmentId,
-                // Add additional data if needed
-            },
-            success: function (response) {
-                if (response.success) {
-                    // Image deletion successful, update the UI or take any other necessary action
-                    $('.brand-logo-preview').html('');
-                    // Show success message, if required
-                } else {
-                    // Image deletion failed, handle the error
-                    // Show error message, if required
+        if (confirm(message) === true) {
+            $.ajax({
+                url: usb_swiper_settings.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'delete_brand_logo',
+                    attachment_id: attachmentId,
+                    // Add additional data if needed
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Image deletion successful, update the UI or take any other necessary action
+                        $('.brand-logo-preview').html('');
+                        // Show success message, if required
+                    } else {
+                        // Image deletion failed, handle the error
+                        // Show error message, if required
+                    }
+                },
+                error: function (error) {
+                    // Handle error response
                 }
-            },
-            error: function (error) {
-                // Handle error response
-            }
-        });
+            });
+        }
     });
-
-
-
 });
