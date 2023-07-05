@@ -2631,11 +2631,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $author_id = !empty($author_id) ? $author_id : 1;
                     $brand_name = get_user_meta( (int)$author_id,'brand_name', true );
                     $brand_name = !empty( $brand_name ) ? $brand_name : 'USBSwiper';
-                    $brand_logo = get_user_meta(get_current_user_id(), 'brand_logo', true);
                     $string  = str_replace('{#transaction_id#}', '#'.$user_invoice_id, $string );
                     $string  = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
                     $string  = str_replace('{#merchant_brand_name#}', $brand_name, $string );
-                    $string  = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string );
                 } else {
                     $string  = str_replace('{#transaction_id#}', '#'.$transaction_id, $string );
                 }
@@ -2965,5 +2963,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             echo 'enctype="multipart/form-data"';
         }
+
+
+        public function add_brand_logo_for_email() {
+
+                $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
+                ?>
+                <div class="brand-logo">
+                    <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
+                </div>
+                <?php
+        }
+
     }
 }

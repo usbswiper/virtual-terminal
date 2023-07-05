@@ -12,6 +12,7 @@ $merchant_name = !empty( $merchantInfo->display_name ) ? $merchantInfo->display_
 $merchant_email = !empty( $merchantInfo->user_email ) ? $merchantInfo->user_email : '';
 $merchant_brand = get_user_meta( $merchant_id,'brand_name', true);
 $merchant_brand = !empty( $merchant_brand ) ? $merchant_brand : get_bloginfo('name');
+$merchant_brand_logo = usbswiper_get_brand_logo($merchant_id, false, [100,100]);
 
 $transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
 $payment_status = usbswiper_get_transaction_status($invoice_id);
@@ -46,8 +47,8 @@ $tax_amount = !empty( $tax_amount ) ? usb_swiper_price_formatter($tax_amount) : 
 $grand_total_amount = !empty( $grand_total_amount ) ? usb_swiper_price_formatter($grand_total_amount) : usb_swiper_price_formatter(0);
 $discount_amount = !empty( $discount_amount ) ? usb_swiper_price_formatter($discount_amount) : usb_swiper_price_formatter(0);
 $discount_percentage = !empty( $discount_percentage ) ? $discount_percentage : '0%';
-
 $site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
+$merchant_brand_logo = !empty($merchant_brand_logo) ? $merchant_brand_logo : $site_logo;
 
 $addresses = get_transaction_address_format($invoice_id, true);
 
@@ -64,9 +65,11 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
     <section class="invoice-branding invoice-general" style="display: block;padding: 20px;float: left;width: 100%;border-bottom: 1px solid #CCC;">
         <div class="branding" style="width: 50%;display: inline-block;vertical-align: top;float: left;">
             <div class="logo" style="width: 100%;float: left;">
-                <?php if( !empty( $site_logo ) ) { ?>
-                    <img style="width: 100%;float: left;max-width: 25%" src="<?php echo $site_logo; ?>" alt="logo">
-                <?php } ?>
+                <?php if( !empty( $merchant_brand_logo ) ) { 
+                    echo $merchant_brand_logo['image_html']; 
+                    } else { ?>
+                        <img style="width: 100%;float: left;max-width: 25%" src="<?php echo $site_logo; ?>" alt="logo">
+                    <?php } ?>
                 <h3 style="width: auto;float: left;clear: unset;margin-left: 10px;margin-top: 5px;"><?php echo !empty( $merchant_brand ) ? $merchant_brand : ""; ?></h3>
             </div>
             <div class="address" style="width: 100%;float: left;">

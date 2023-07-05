@@ -54,7 +54,6 @@ $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
 
-
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
     include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 }
@@ -62,15 +61,11 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
+
+
 ?>
 <div class="vt-form-notification"></div>
-<?php if( $is_email)  {
-    $brand_logo_arr =  usbswiper_get_brand_logo(get_current_user_id(), false);
-    echo !empty( $brand_logo_arr['image_html'] ) ? $brand_logo_arr['image_html']: '';
-//    $string = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string);
-    echo $this->usb_swiper_brand_logo('{#brand_logo#}');
-//    echo '{#brand_logo#}';
-} ?>
+
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
     <?php
     $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
