@@ -7,8 +7,8 @@ if( empty( $transaction_id)) {
 $transaction = get_post($transaction_id);
 $transaction_author = !empty( $transaction->post_author ) ? $transaction->post_author : '';
 
-//$Usb_Swiper_Public = new Usb_Swiper_Public();
-//$brand_logo = $Usb_Swiper_Public->add_brand_logo_for_email();
+$Usb_Swiper_Public = new Usb_Swiper_Public();
+$brand_logo = $Usb_Swiper_Public->add_brand_logo_for_email();
 
 
 
