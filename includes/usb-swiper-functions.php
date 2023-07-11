@@ -2092,3 +2092,38 @@ function usbswiper_get_price_step() {
 
 	return sprintf("0.%0{$decimals}d", 1 );
 }
+
+/**
+ * Get pagination links.
+ *
+ * @since 2.2.2
+ *
+ * @param array $args get pagination arguments.
+ * @return string|bool
+ */
+function usbswiper_get_pagination( $args ) {
+
+	if( empty( $args['max_num_pages'] ) ) {
+		return false;
+	}
+
+	$big = 999999999;
+
+	$main_pagenum = get_pagenum_link($big);
+
+	$format =  !empty( $args['format'] ) ? $args['format'] : '?paged=%#%';
+	$query_arg = !empty( $format ) ? explode('=', trim( $format, '?' )) : '';
+	$query_key = !empty( $query_arg[0] ) ? $query_arg[0] : '';
+	$get_link = !empty( $query_key ) ? remove_query_arg($query_key, $main_pagenum) : '';
+	$get_link = str_replace('/page/'.$big, $format, esc_url($get_link));
+
+	return paginate_links( array(
+		'base' => $get_link,
+		'format' => $format,
+		'current' => max( 1, $args['current_page'] ),
+		'total' => $args['max_num_pages'],
+		'type' => !empty( $args['type'] ) ? $args['type'] : 'list',
+		'prev_text'          => !empty( $args['prev_text'] ) ? $args['prev_text'] : '&laquo;',
+		'next_text'          => !empty( $args['next_text'] ) ? $args['next_text'] : '&raquo;',
+	) );
+}

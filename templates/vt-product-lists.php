@@ -200,4 +200,13 @@ $add_product_form_fields = array(
             ?>
         </tbody>
     </table>
+    <div class="vt-pagination">
+        <?php
+        echo usbswiper_get_pagination([
+            'format' => '?vt-page=%#%',
+            'max_num_pages' => !empty( $args['max_num_pages'] ) ? $args['max_num_pages'] : 0,
+            'current_page' => !empty( $args['current_page'] ) ? $args['current_page'] : 0,
+        ]);
+        ?>
+    </div>
 </div>
