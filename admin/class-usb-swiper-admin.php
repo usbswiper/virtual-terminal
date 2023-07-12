@@ -207,6 +207,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				'description'        => __( 'USBSwiper Transactions post type.', 'usb-swiper' ),
 				'public'             => true,
 				'publicly_queryable' => false,
+				'exclude_from_search' => true,
 				'show_ui'            => true,
 				'show_in_menu'       => true,
 				'query_var'          => true,
