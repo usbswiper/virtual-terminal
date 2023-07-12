@@ -21,6 +21,10 @@ if( ! empty( $card_last_digits )) {
 }
 $company_name = get_post_meta($transaction_id,'company',true);
 $user_invoice_id = get_post_meta( $transaction_id, '_user_invoice_id', true);
+$OrderAmount = get_post_meta($transaction_id, 'OrderAmount', true);
+$OrderAmount = usb_swiper_price_formatter($OrderAmount);
+$DiscountAmount = get_post_meta($transaction_id, 'DiscountAmount', true);
+$DiscountAmount = usb_swiper_price_formatter($DiscountAmount);
 $NetAmount = get_post_meta( $transaction_id, 'NetAmount', true);
 $NetAmount = usb_swiper_price_formatter($NetAmount);
 $ShippingAmount = get_post_meta( $transaction_id, 'ShippingAmount', true);

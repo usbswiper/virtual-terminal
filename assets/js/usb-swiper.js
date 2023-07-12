@@ -3,6 +3,9 @@ jQuery( document ).ready(function( $ ) {
     var BillingFirstName = localStorage.getItem('BillingFirstName');
     var BillingLastName = localStorage.getItem('BillingLastName');
     var BillingEmail = localStorage.getItem('BillingEmail');
+    var OrderAmount = localStorage.getItem('OrderAmount');
+    var Discount = localStorage.getItem('Discount');
+    var DiscountAmount = localStorage.getItem('DiscountAmount');
     var NetAmount = localStorage.getItem('NetAmount');
     var ShippingAmount = localStorage.getItem('ShippingAmount');
     var HandlingAmount = localStorage.getItem('HandlingAmount');
@@ -13,6 +16,9 @@ jQuery( document ).ready(function( $ ) {
     if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
     if (BillingLastName !== null) $('#BillingLastName').val(BillingLastName);
     if (BillingEmail !== null) $('#BillingEmail').val(BillingEmail);
+    if (OrderAmount !== null) $('#OrderAmount').val(OrderAmount);
+    if (Discount !== null) $('#Discount').val(Discount);
+    if (DiscountAmount !== null) $('#DiscountAmount').val(DiscountAmount);
     if (NetAmount !== null) $('#NetAmount').val(NetAmount);
     if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
     if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
@@ -204,6 +210,9 @@ jQuery( document ).ready(function( $ ) {
                                             localStorage.removeItem('BillingFirstName');
                                             localStorage.removeItem('BillingLastName');
                                             localStorage.removeItem('BillingEmail');
+                                            localStorage.removeItem('OrderAmount');
+                                            localStorage.removeItem('Discount');
+                                            localStorage.removeItem('DiscountAmount');
                                             localStorage.removeItem('NetAmount');
                                             localStorage.removeItem('ShippingAmount');
                                             localStorage.removeItem('HandlingAmount');
@@ -292,6 +301,9 @@ jQuery( document ).ready(function( $ ) {
                                     localStorage.removeItem('BillingFirstName');
                                     localStorage.removeItem('BillingLastName');
                                     localStorage.removeItem('BillingEmail');
+                                    localStorage.removeItem('OrderAmount');
+                                    localStorage.removeItem('Discount');
+                                    localStorage.removeItem('DiscountAmount');
                                     localStorage.removeItem('NetAmount');
                                     localStorage.removeItem('ShippingAmount');
                                     localStorage.removeItem('HandlingAmount');
@@ -325,6 +337,9 @@ jQuery( document ).ready(function( $ ) {
         var BillingLastName = $('#BillingLastName').val();
         var BillingFirstName = $('#BillingFirstName').val();
         var BillingEmail = $('#BillingEmail').val();
+        var OrderAmount = $('#OrderAmount').val();
+        var Discount = $('#Discount').val();
+        var DiscountAmount = $('#DiscountAmount').val();
         var NetAmount = $('#NetAmount').val();
         var ShippingAmount = $('#ShippingAmount').val();
         var HandlingAmount = $('#HandlingAmount').val();
@@ -336,6 +351,9 @@ jQuery( document ).ready(function( $ ) {
         localStorage.setItem('BillingFirstName', BillingFirstName);
         localStorage.setItem('BillingLastName', BillingLastName);
         localStorage.setItem('BillingEmail', BillingEmail);
+        localStorage.setItem('OrderAmount', OrderAmount);
+        localStorage.setItem('Discount', Discount);
+        localStorage.setItem('DiscountAmount', DiscountAmount);
         localStorage.setItem('NetAmount', NetAmount);
         localStorage.setItem('ShippingAmount', ShippingAmount);
         localStorage.setItem('HandlingAmount', HandlingAmount);
@@ -497,6 +515,10 @@ jQuery( document ).ready(function( $ ) {
             net_price += Number(quantity) * Number(price);
         });
 
+        $('#OrderAmount').val(net_price.toFixed(2));
+        updateSalesTax();
+        updateGrandTotal();
+
         $('#NetAmount').val(net_price.toFixed(2));
         updateSalesTax();
         updateGrandTotal();
@@ -608,10 +630,13 @@ jQuery( document ).ready(function( $ ) {
                     net_price_array[index] = Number(quantity) * Number(price);
                 });
 
-
                 for (let i = 0; i < net_price_array.length; i++) {
                     net_price = Number(net_price_array[i]) + Number(net_price);
                 }
+
+                $('#OrderAmount').val(net_price.toFixed(2));
+                updateSalesTax();
+                updateGrandTotal();
 
                 $('#NetAmount').val(net_price.toFixed(2));
                 updateSalesTax();
@@ -621,7 +646,12 @@ jQuery( document ).ready(function( $ ) {
             }
         });
     });
-
+    $(document).on('input', '#DiscountAmount', function() {
+        var orderAmount = $('#OrderAmount').val();
+        var discountAmount = $(this).val();
+        var netAmount = orderAmount - discountAmount;
+        $('#NetAmount').val(netAmount.toFixed(2));
+    });
     $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
 
         let net_price_array = [];
@@ -638,6 +668,10 @@ jQuery( document ).ready(function( $ ) {
         for (let i = 0; i < net_price_array.length; i++) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
+
+        $('#OrderAmount').val(net_price.toFixed(2));
+        updateSalesTax();
+        updateGrandTotal();
 
         $('#NetAmount').val(net_price.toFixed(2));
         updateSalesTax();

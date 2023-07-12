@@ -337,6 +337,56 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'disabled' => false,
 				'class' => '',
 			),
+            array(
+                'type' => 'text',
+                'id' => 'OrderAmount',
+                'name' => 'OrderAmount',
+                'label' => __( 'Order Amount', 'usb-swiper'),
+                'required' => true,
+                'readonly' => true,
+                'is_currency' => true,
+                'attributes' => array(
+                    'pattern' => '([0-9]|\$|,|.)+'
+                ),
+                'description' => '',
+                'class' => '',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign'
+            ),
+//            array(
+//                'type' => 'text',
+//                'id' => 'Discount',
+//                'name' => 'Discount',
+//                'label' => __( 'Discount', 'usb-swiper'),
+//                'required' => false,
+//                'is_percentage' => true,
+//                'attributes' => array(
+//                    'maxlength' => '4'
+//                ),
+//                'description' => '',
+//                'class' => '',
+//                'is_symbol' => true,
+//                'symbol' => '%',
+//                'symbol_wrap_class' => 'currency-sign after'
+//            ),
+            array(
+                'type' => 'text',
+                'id' => 'DiscountAmount',
+                'name' => 'DiscountAmount',
+                'label' => __( 'Discount Amount', 'usb-swiper'),
+                'required' => true,
+                'readonly' => false,
+                'is_currency' => true,
+                'attributes' => array(
+                    'pattern' => '([0-9]|\$|,|.)+'
+                ),
+                'description' => '',
+                'class' => '',
+                'is_symbol' => true,
+                'symbol' => usbswiper_get_currency_symbol(),
+                'symbol_wrap_class' => 'currency-sign'
+            ),
 			array(
 				'type' => 'text',
 				'id' => 'NetAmount',
