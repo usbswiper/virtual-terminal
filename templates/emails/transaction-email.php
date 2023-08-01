@@ -7,10 +7,14 @@ if( empty( $transaction_id)) {
 $transaction = get_post($transaction_id);
 $transaction_author = !empty( $transaction->post_author ) ? $transaction->post_author : '';
 
-$Usb_Swiper_Public = new Usb_Swiper_Public();
-$brand_logo = $Usb_Swiper_Public->add_brand_logo_for_email();
-
-
+//$usb_swiper_public = new Usb_Swiper_Public();
+//$brand_logo = $usb_swiper_public->add_brand_logo_for_email();
+$brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
+?>
+<div class="brand-logo">
+    <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
+</div>
+<?php
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
 

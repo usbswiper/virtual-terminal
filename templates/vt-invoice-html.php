@@ -70,7 +70,7 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                     } else { ?>
                         <img style="width: 100%;float: left;max-width: 25%" src="<?php echo $site_logo; ?>" alt="logo">
                     <?php } ?>
-                <h3 style="width: auto;float: left;clear: unset;margin-left: 10px;margin-top: 5px;"><?php echo !empty( $merchant_brand ) ? $merchant_brand : ""; ?></h3>
+                <h3 style="width: auto;float: left;clear: unset;margin-top: 5px;"><?php echo !empty( $merchant_brand ) ? $merchant_brand : ""; ?></h3>
             </div>
             <div class="address" style="width: 100%;float: left;">
                 <p style="margin: 0" class="invoice-display-name"><?php echo !empty( $merchant_name ) ? $merchant_name : ""; ?></p>

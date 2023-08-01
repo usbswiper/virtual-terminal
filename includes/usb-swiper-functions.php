@@ -1429,15 +1429,15 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150] 
     return $brand_logo;
 }
 
-//function usb_swiper_brand_logo( $string ) {
-//
-//    if( !empty( $string ) ) {
-//        $brand_logo = get_user_meta(get_current_user_id(), 'brand_logo', true);
-//        $string = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string);
-//    }
-//
-//    return $string;
-//}
+function usb_swiper_brand_logo( $string ) {
+
+    if( !empty( $string ) ) {
+        $brand_logo = get_user_meta(get_current_user_id(), 'brand_logo', true);
+        $string = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string);
+    }
+
+    return $string;
+}
 /**
  * Get the current user invoice prefix value.
  *

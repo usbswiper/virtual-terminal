@@ -2964,16 +2964,5 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             echo 'enctype="multipart/form-data"';
         }
 
-
-        public function add_brand_logo_for_email() {
-
-                $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
-                ?>
-                <div class="brand-logo">
-                    <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
-                </div>
-                <?php
-        }
-
     }
 }
