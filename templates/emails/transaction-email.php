@@ -7,14 +7,14 @@ if( empty( $transaction_id)) {
 $transaction = get_post($transaction_id);
 $transaction_author = !empty( $transaction->post_author ) ? $transaction->post_author : '';
 
-//$usb_swiper_public = new Usb_Swiper_Public();
-//$brand_logo = $usb_swiper_public->add_brand_logo_for_email();
-$brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
-?>
-<div class="brand-logo">
-    <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
-</div>
-<?php
+if( !class_exists('Usb_Swiper_Public') ) {
+    include_once USBSWIPER_PATH.'/includes/class-usb-swiper.php';
+}
+
+$usb_swiper_public = new Usb_Swiper_Public($plugin_name, $version);
+$brand_logo = $usb_swiper_public->add_brand_logo_for_email();
+
+
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
 

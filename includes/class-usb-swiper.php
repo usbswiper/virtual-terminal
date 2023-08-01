@@ -146,7 +146,7 @@ class Usb_Swiper {
 	}
 
 	/**
-	 * Register all of the hooks related to the admin and public area functionality of the plugin.
+	 * Register all the hooks related to the admin and public area functionality of the plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   private
@@ -209,7 +209,7 @@ class Usb_Swiper {
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
 		$this->loader->add_filter( 'woocommerce_edit_account_form_tag',$plugin_public, 'add_enctype_in_edit_account_form' );
         $this->loader->add_action('wp_ajax_delete_brand_logo', $plugin_public,'delete_brand_logo_cb');
-//        $this->loader->add_action( 'woocommerce_email_header', $plugin_public, 'add_brand_logo_for_email');
+        $this->loader->add_action( 'woocommerce_email_header', $plugin_public, 'add_brand_logo_for_email');
 		if (!is_admin()) {
 			return;
 		}
@@ -253,7 +253,7 @@ class Usb_Swiper {
 	}
 
 	/**
-	 * Run the loader to execute all of the hooks with WordPress.
+	 * Run the loader to execute all the hooks with WordPress.
 	 *
 	 * @since    1.0.0
 	 */
