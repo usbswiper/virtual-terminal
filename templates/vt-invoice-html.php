@@ -17,6 +17,8 @@ $transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
 $payment_status = usbswiper_get_transaction_status($invoice_id);
 $billing_email = get_post_meta($invoice_id, 'BillingEmail', true);
 $billing_phone_number = get_post_meta($invoice_id, 'BillingPhoneNumber', true);
+$discount = get_post_meta($invoice_id, 'Discount', true);
+$discount_amount = get_post_meta($invoice_id, 'DiscountAmount', true);
 $net_amount = get_post_meta($invoice_id, 'NetAmount', true);
 $shipping_amount = get_post_meta($invoice_id, 'ShippingAmount', true);
 $handling_amount = get_post_meta($invoice_id, 'HandlingAmount', true);
@@ -38,6 +40,8 @@ if( $shippingDisabled !== 'true') {
     }
 }
 
+$discount = !empty( $discount ) ? usb_swiper_price_formatter($discount) : usb_swiper_price_formatter(0);
+$discount_amount = !empty( $discount_amount ) ? usb_swiper_price_formatter($discount_amount) : usb_swiper_price_formatter(0);
 $net_amount = !empty( $net_amount ) ? usb_swiper_price_formatter($net_amount) : usb_swiper_price_formatter(0);
 $shipping_amount = !empty( $shipping_amount ) ? usb_swiper_price_formatter($shipping_amount) : usb_swiper_price_formatter(0);
 $handling_amount = !empty( $handling_amount ) ? usb_swiper_price_formatter($handling_amount) : usb_swiper_price_formatter(0);
@@ -144,6 +148,11 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                 ?>
             </tbody>
             <tfoot>
+                <tr>
+                    <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
+                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Discount:', 'usb-swiper'); ?></td>
+                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Discount:','usb-swiper'); ?>"><?php echo wc_price($discount_amount, array('currency' => $transaction_currency)); ?></td>
+                </tr>
                 <tr>
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
                     <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Sub Total:','usb-swiper'); ?></td>

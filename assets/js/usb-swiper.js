@@ -380,7 +380,7 @@ jQuery( document ).ready(function( $ ) {
         var discountType = $('#DiscountType').val();
 
         var discountAmount;
-        if (discountType === 'percent') {
+        if (discountType === '%') {
             discountAmount = (orderAmount * discountInput) / 100;
         } else {
             discountAmount = discountInput;
