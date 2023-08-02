@@ -445,8 +445,6 @@ class Usb_Swiper_Paypal_request{
         }
 
         $OrderAmount = get_post_meta( $transaction_id,'OrderAmount', true);
-        $DiscountAmount = get_post_meta( $transaction_id,'DiscountAmount', true);
-        $NetAmount = get_post_meta( $transaction_id,'NetAmount', true);
 
         if (isset($OrderAmount) && $OrderAmount > 0) {
             $body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
@@ -454,19 +452,15 @@ class Usb_Swiper_Paypal_request{
                 'value' => usb_swiper_price_formatter($OrderAmount),
             );
         }
+
+        $DiscountAmount = get_post_meta( $transaction_id,'DiscountAmount', true);
+
         if (isset($DiscountAmount) && $DiscountAmount > 0) {
-            $body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
+            $body_request['purchase_units'][0]['amount']['breakdown']['discount'] = array(
                 'currency_code' => $this->get_transaction_currency($transaction_id),
                 'value' => usb_swiper_price_formatter($DiscountAmount),
             );
         }
-        if (isset($NetAmount) && $NetAmount > 0) {
-            $body_request['purchase_units'][0]['amount']['breakdown']['item_total'] = array(
-                'currency_code' => $this->get_transaction_currency($transaction_id),
-                'value' => usb_swiper_price_formatter($NetAmount),
-            );
-        }
-
 
         $ShippingAmount = get_post_meta( $transaction_id,'ShippingAmount', true);
 

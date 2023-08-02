@@ -354,33 +354,47 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'symbol' => usbswiper_get_currency_symbol(),
                 'symbol_wrap_class' => 'currency-sign'
             ),
-//            array(
-//                'type' => 'text',
-//                'id' => 'Discount',
-//                'name' => 'Discount',
-//                'label' => __( 'Discount', 'usb-swiper'),
-//                'required' => false,
-//                'is_percentage' => true,
-//                'attributes' => array(
-//                    'maxlength' => '4'
-//                ),
-//                'description' => '',
-//                'class' => '',
-//                'is_symbol' => true,
-//                'symbol' => '%',
-//                'symbol_wrap_class' => 'currency-sign after'
-//            ),
+            array(
+                'type' => 'text',
+                'id' => 'Discount',
+                'name' => 'Discount',
+                'label' => __( 'Discount', 'usb-swiper'),
+                'required' => false,
+                'is_percentage' => true,
+                'attributes' => array(
+                    'maxlength' => '4'
+                ),
+                'description' => '',
+                'class' => '',
+                'is_symbol' => true,
+                'symbol' => '$',
+                'symbol_wrap_class' => 'currency-sign after'
+            ),
+            array(
+                'type' => 'select',
+                'id' => 'DiscountType',
+                'name' => 'DiscountType',
+                'label' => __( 'Discount Type', 'usb-swiper'),
+                'required' => true,
+                'options' => array(
+                    'percent' => __( '%', 'usb-swiper' ),
+                    'flat' => __( '$', 'usb-swiper' ),
+                ),
+                'default' => '$',
+                'attributes' => '',
+                'description' => '',
+                'readonly' => false,
+                'disabled' => false,
+                'class' => '',
+            ),
             array(
                 'type' => 'text',
                 'id' => 'DiscountAmount',
                 'name' => 'DiscountAmount',
                 'label' => __( 'Discount Amount', 'usb-swiper'),
-                'required' => true,
+                'required' => false,
                 'readonly' => false,
                 'is_currency' => true,
-                'attributes' => array(
-                    'pattern' => '([0-9]|\$|,|.)+'
-                ),
                 'description' => '',
                 'class' => '',
                 'is_symbol' => true,

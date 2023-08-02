@@ -114,7 +114,6 @@ jQuery(function( $ ) {
             updateSalesTax();
             updateGrandTotal();
         });
-
         /* Swipe field */
         jQuery('#swiper').change(function(){
             ParseStripeData();
@@ -322,6 +321,7 @@ function updateSalesTax()
 function updateGrandTotal()
 {
     var currencySign = jQuery('#ae-paypal-pos-form').attr('data-currency-sign');
+    // var orderAmount = ( jQuery('#OrderAmount').val());
     var netAmount = ( jQuery('#NetAmount').val().replace(/,/g, '') * 1 );
     var shippingAmount = ( jQuery('#ShippingAmount').val().replace(/,/g, '') * 1 );
     var handlingAmount = ( jQuery('#HandlingAmount').val().replace(/,/g, '') * 1 );

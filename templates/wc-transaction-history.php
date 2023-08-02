@@ -304,6 +304,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
+                <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Order Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($OrderAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Discount Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($DiscountAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Net Amount','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($NetAmount, array('currency' => $transaction_currency)); ?></td>
             </tr>
