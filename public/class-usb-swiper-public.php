@@ -2972,5 +2972,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             </div>
             <?php
         }
+
+        public function add_footer() {
+            ?>
+            <div class="footer-info">
+                <?php echo __('Hello', 'usb-swiper'); ?>
+            </div>
+<?php
+        }
     }
 }
