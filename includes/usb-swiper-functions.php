@@ -366,15 +366,15 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 ),
                 'description' => '',
                 'class' => '',
-                'is_symbol' => true,
-                'symbol' => '$',
-                'symbol_wrap_class' => 'currency-sign after'
+//                'is_symbol' => true,
+//                'symbol' => '$',
+//                'symbol_wrap_class' => 'currency-sign after'
             ),
             array(
                 'type' => 'select',
                 'id' => 'DiscountType',
                 'name' => 'DiscountType',
-                'label' => __( 'Discount Type', 'usb-swiper'),
+//                'label' => __( 'Discount Type', 'usb-swiper'),
                 'required' => true,
                 'options' => array(
                     '%' => __( '%', 'usb-swiper' ),
@@ -385,7 +385,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'description' => '',
                 'readonly' => false,
                 'disabled' => false,
-                'class' => '',
+                'class' => 'discount-type',
             ),
             array(
                 'type' => 'text',
@@ -393,8 +393,11 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'name' => 'DiscountAmount',
                 'label' => __( 'Discount Amount', 'usb-swiper'),
                 'required' => false,
-                'readonly' => false,
+                'readonly' => true,
                 'is_currency' => true,
+                'attributes' => array(
+                    'pattern' => '([0-9]|\$|,|.)+'
+                ),
                 'description' => '',
                 'class' => '',
                 'is_symbol' => true,

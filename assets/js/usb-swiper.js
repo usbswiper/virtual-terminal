@@ -385,8 +385,12 @@ jQuery( document ).ready(function( $ ) {
         } else {
             discountAmount = discountInput;
         }
-
+        if (discountAmount > orderAmount) {
+            alert('Discount Amount is greater than Order Amount so please add valid discount amount');
+            discountAmount.prop('disabled', true);
+        }
         $('#DiscountAmount').val(discountAmount.toFixed(2));
+
         var netAmount = orderAmount - discountAmount;
         $('#NetAmount').val(netAmount.toFixed(2));
         updateSalesTax();
