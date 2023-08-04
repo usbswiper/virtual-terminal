@@ -27,7 +27,7 @@ $grand_total_amount = get_post_meta($invoice_id, 'GrandTotal', true);
 $vt_products = get_post_meta($invoice_id, 'vt_products', true);
 $item_names = get_post_meta($invoice_id, 'ItemName', true);
 $invoice_notes = get_post_meta($invoice_id, 'Notes', true);
-$billing_phone_number = !empty( $billing_phone_number ) ? mobile_number_format($billing_phone_number) : '-';
+$billing_phone_number = !empty( $billing_phone_number ) ? mobile_number_format($billing_phone_number) : '';
 
 $shippingDisabled = get_post_meta( $invoice_id,'shippingDisabled', true);
 

@@ -2959,26 +2959,25 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function add_enctype_in_edit_account_form() {
-
+        public function add_enctype_in_edit_account_form()
+        {
             echo 'enctype="multipart/form-data"';
         }
+
         public function add_brand_logo_for_email() {
 
             $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
             ?>
             <div class="brand-logo">
                 <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
+
             </div>
             <?php
         }
-
         public function add_footer() {
-            ?>
-            <div class="footer-info">
-                <?php echo __('Hello', 'usb-swiper'); ?>
-            </div>
-<?php
+                 echo usbswiper_get_brand_name();
+                $user_email = usbswiper_get_onboarding_user();
+                echo $user_email['user_email'];
         }
     }
 }

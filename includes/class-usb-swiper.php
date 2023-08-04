@@ -209,7 +209,7 @@ class Usb_Swiper {
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
 		$this->loader->add_filter( 'woocommerce_edit_account_form_tag',$plugin_public, 'add_enctype_in_edit_account_form' );
         $this->loader->add_action('wp_ajax_delete_brand_logo', $plugin_public,'delete_brand_logo_cb');
-        $this->loader->add_action( 'woocommerce_email_header', $plugin_public, 'add_brand_logo_for_email');
+        $this->loader->add_action( 'woocommerce_email_header', $plugin_public, 'add_brand_logo_for_email', 5);
         $this->loader->add_action( 'woocommerce_email_footer', $plugin_public, 'add_footer');
 		if (!is_admin()) {
 			return;
