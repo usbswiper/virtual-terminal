@@ -2959,18 +2959,23 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function add_enctype_in_edit_account_form()
-        {
+        public function add_enctype_edit_account_form() {
             echo 'enctype="multipart/form-data"';
         }
 
+        /**
+         * Add brand logo in email transaction.
+         *
+         * @since 2.2.2
+         *
+         * @return void
+         */
         public function add_brand_logo_for_email() {
 
             $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
             ?>
             <div class="brand-logo">
                 <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
-
             </div>
             <?php
         }
@@ -2978,6 +2983,22 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                  echo usbswiper_get_brand_name();
                 $user_email = usbswiper_get_onboarding_user();
                 echo $user_email['user_email'];
+        }
+
+        /**
+         * Manage email header template.
+         *
+         * @since 2.2.2
+         *
+         * @return void
+         */
+        public function manage_wc_email_header_template( $template, $template_name ) {
+
+            if( !empty( $template_name) && $template_name === 'emails/email-header.php' ) {
+                $template = USBSWIPER_PATH . 'templates/emails/email-header.php';
+            }
+
+            return $template;
         }
     }
 }
