@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <?php
                                 $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
                                 ?>
-                                <div class="brand-logo">
+                                <div class="brand-logo" style="padding-bottom: 20px;">
                                     <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
                                 </div>
                             </div>

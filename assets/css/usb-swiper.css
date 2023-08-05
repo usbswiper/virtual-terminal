@@ -88,6 +88,7 @@ ul.oauth-third-party-scopes li {margin: 0 0 15px 0;list-style: inherit;}
 h2.wc-account-title {width: 100%;display: block;margin: 20px 0;}
 h2.wc-account-title.general-info {margin-top: 0;}
 a.delete_brand_logo {color: #f44336;}
+div.brand-logo {padding-bottom: 20px;}
 .paypal-connect-button-wrap {text-align: center;margin-top: 20px;}
 p.signature-text{display: none;}
 .transaction-history-title{font-size: 1.5rem;padding: 10px 0;}
