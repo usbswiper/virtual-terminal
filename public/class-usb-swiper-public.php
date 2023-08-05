@@ -124,7 +124,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $query_vars['view-transaction'] = 'view-transaction';
             $query_vars['transactions'] = 'transactions';
             $query_vars['vt-products'] = 'vt-products';
-
+            $query_vars['vt-tax-rules'] = 'vt-tax-rules';
             return $query_vars;
         }
 
@@ -368,6 +368,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				$menu_links['transactions']    = __( 'Transactions', 'usb-swiper' );
 				    $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
+				    $menu_links['vt-tax-rules']    = __( 'Tax Rules', 'usb-swiper' );
 				$menu_links['customer-logout'] = $logout;
 			}
 
@@ -384,6 +385,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
+            add_rewrite_endpoint( 'vt-tax-rules', EP_ROOT | EP_PAGES );
 		}
 
 		/**
@@ -536,6 +538,29 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 extract($args);
 
                 usb_swiper_get_template('vt-product-lists.php', $args);
+            }
+        }
+
+        /**
+         * VT-Products endpoint callback method.
+         *
+         * @since 1.0.0
+         *
+         * @return void
+         */
+        public function vt_tax_rules_endpoint_cb() {
+
+            if (usb_swiper_allow_user_by_role('administrator') || usb_swiper_allow_user_by_role('customer')) {
+
+                $current_page = !empty($_GET['vt-page']) ? $_GET['vt-page'] : 1;
+
+
+
+
+
+
+
+                usb_swiper_get_template('vt-tax-rules.php');
             }
         }
 
@@ -2896,5 +2921,23 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'is_shipping' => $is_shipping,
 			) , 200 );
         }
-	}
+
+        function custom_plugin_template_include( $template ) {
+            // Check if it's your custom endpoint, e.g., 'vt-tax-rules'
+            if ( get_query_var( 'vt-tax-rules' ) ) {
+                // Locate your custom template file in the plugin directory
+                $custom_template = plugin_dir_path( __FILE__ ) . 'templates/vt-tax-rules.php';
+
+                // Check if the custom template file exists
+                if ( file_exists( $custom_template ) ) {
+                    return $custom_template;
+                }
+            }
+
+            // If it's not your custom endpoint or the custom template doesn't exist, return the original template
+            return $template;
+        }
+
+
+    }
 }

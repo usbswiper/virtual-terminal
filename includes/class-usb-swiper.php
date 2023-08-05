@@ -165,6 +165,7 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_account_view-transaction_endpoint', $plugin_public, 'view_transactions_endpoint_cb');
         $this->loader->add_filter( 'woocommerce_get_query_vars', $plugin_public, 'update_wc_endpoints' );
         $this->loader->add_action('woocommerce_account_vt-products_endpoint', $plugin_public, 'vt_products_endpoint_cb');
+        $this->loader->add_action('woocommerce_account_vt-tax-rules_endpoint', $plugin_public, 'vt_tax_rules_endpoint_cb');
 
 		add_shortcode( 'usb_swiper_paypal_connect', array( $plugin_public, 'usb_swiper_paypal_connect') );
 		add_shortcode( 'usb_swiper_vt_verification_form', array( $plugin_public, 'usb_swiper_vt_verification_form') );
@@ -207,6 +208,7 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_account_content', $plugin_public, 'add_notification_for_verify_profile', 9);
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email',$plugin_public, 'send_transaction_email' );
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
+//        $this->loader->add_filter( 'template_include', $plugin_public, 'custom_plugin_template_include' );
 
 		if (!is_admin()) {
 			return;
