@@ -54,8 +54,8 @@ defined( 'ABSPATH' ) || exit;
                                 $country = get_user_meta($user_id, 'billing_country', true);
 
                                 ?>
-                                <div class="footer-info" style="text-align: left;">
-                                    <h2 style="margin: 0px;"><?php echo $company_name; ?></h2>
+                                <div class="footer-info" style="text-align: center;">
+                                    <h2 style="margin: 0px;text-align: center;"><?php echo $company_name; ?></h2>
                                     <p style="margin: 0px;"><?php echo $user_email; ?></p>
                                     <p style="margin: 0px;"><?php echo $phone; ?></p>
                                     <p style="margin: 0px;"><?php echo $user_address1; ?></p>

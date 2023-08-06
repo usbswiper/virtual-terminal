@@ -13,6 +13,14 @@ $merchant_email = !empty( $merchantInfo->user_email ) ? $merchantInfo->user_emai
 $merchant_brand = get_user_meta( $merchant_id,'brand_name', true);
 $merchant_brand = !empty( $merchant_brand ) ? $merchant_brand : get_bloginfo('name');
 $merchant_brand_logo = usbswiper_get_brand_logo($merchant_id, false, [100,100]);
+$user_id = get_current_user_id();
+$phone = get_user_meta($user_id, 'billing_phone', true);
+$user_address1 = get_user_meta($user_id, 'billing_address_1', true);
+$user_address2 = get_user_meta($user_id, 'billing_address_2', true);
+$city = get_user_meta($user_id, 'billing_city', true);
+$state = get_user_meta($user_id, 'billing_state', true);
+$postcode = get_user_meta($user_id, 'billing_postcode', true);
+$country = get_user_meta($user_id, 'billing_country', true);
 
 $transaction_type = get_post_meta($invoice_id,'_transaction_type', true);
 $payment_status = usbswiper_get_transaction_status($invoice_id);
@@ -71,11 +79,16 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                         <img style="width: 100%;float: left;max-width: 25%" src="<?php echo $site_logo; ?>" alt="logo">
                     <?php } ?>
                 <h3 style="width: auto;float: left;clear: unset;margin-top: 5px;"><?php echo !empty( $merchant_brand ) ? $merchant_brand : ""; ?></h3>
+                <p style="margin: 0px" class="invoice-email-address"><?php echo !empty( $merchant_email ) ? $merchant_email : ""; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $user_address1 ) ? $user_address1 : ''; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $user_address2 ) ? $user_address2 : ''; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $city ) ? $city : ''; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $state ) ? $state : ''; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $postcode ) ? $postcode : ''; ?></p>
+                <p style="margin: 0px;"><?php echo !empty( $country ) ? $country : ''; ?></p>
             </div>
-            <div class="address" style="width: 100%;float: left;">
-                <p style="margin: 0" class="invoice-display-name"><?php echo !empty( $merchant_name ) ? $merchant_name : ""; ?></p>
-                <p style="margin: 0" class="invoice-email-address"><?php echo !empty( $merchant_email ) ? $merchant_email : ""; ?></p>
-            </div>
+            
         </div>
         <div class="invoice-date" style="width: 50%;display: inline-block;vertical-align: top;float: left;text-align: right;">
             <p class="invoice-number">
