@@ -208,6 +208,7 @@ class Usb_Swiper {
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email',$plugin_public, 'send_transaction_email' );
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
         $this->loader->add_action( 'init', $plugin_public, 'handle_tax_form_submission' );
+		$this->loader->add_action( 'wp_ajax_delete_tax_data', $plugin_public, 'vt_delete_tax_data');
 
 		if (!is_admin()) {
 			return;

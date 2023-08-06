@@ -2921,7 +2921,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $user_id = get_current_user_id();
                 $tax_label = sanitize_text_field($_POST['tax_label']);
                 $tax_rate = floatval($_POST['tax_rate']);
-                $include_shipping = isset($_POST['shipping']) ? 1 : 0;
+                $include_shipping = isset($_POST['shipping']) ? true : false;
 
                 $tax_data = get_user_meta($user_id, 'user_tax_data', true);
                 $new_tax_item = array(
@@ -2935,15 +2935,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 } else {
                     $tax_data = array($new_tax_item);
                 }
-                // Save data in usermeta
+                
                 update_user_meta($user_id, 'user_tax_data', $tax_data);
-                // update_user_meta($user_id, 'tax_label', $tax_label);
-                // update_user_meta($user_id, 'tax_rate', $tax_rate);
-                // update_user_meta($user_id, 'shipping', $include_shipping);
-
-                // Redirect back to the original page to avoid form resubmission
+                
                 wp_safe_redirect($_SERVER['REQUEST_URI']);
                 exit;
+            }
+        }
+
+        public function vt_delete_tax_data() {
+            if (isset($_POST['tax_index'])) {
+                $index = intval($_POST['tax_index']);
+                if ($index >= 0) {
+                    $user_id = get_current_user_id();
+                    $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+                    if (is_array($tax_data) && isset($tax_data[$index])) {
+                        // Remove the tax item at the specified index
+                        array_splice($tax_data, $index, 1);
+                        // Save the updated tax data in usermeta
+                        update_user_meta($user_id, 'user_tax_data', $tax_data);
+                        echo 'success'; // Return a success message to the AJAX request
+                    } else {
+                        echo 'error'; // Return an error message to the AJAX request
+                    }
+                }
             }
         }
     }
