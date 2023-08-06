@@ -2917,14 +2917,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         public function handle_tax_form_submission() {
-            if (isset($_POST['tax_label']) && isset($_POST['tax_rate']) && isset($_POST['tax_index'])) {
+            if (isset($_POST['tax_label']) && isset($_POST['tax_rate'])) {
                 $user_id = get_current_user_id();
                 $tax_label = sanitize_text_field($_POST['tax_label']);
                 $tax_rate = floatval($_POST['tax_rate']);
                 $include_shipping = isset($_POST['shipping']) ? 1 : 0;
 
                 $tax_data = get_user_meta($user_id, 'user_tax_data', true);
-                $tax_index = intval($_POST['tax_index']);
                 $new_tax_item = array(
                     'tax_label' => $tax_label,
                     'tax_rate' => $tax_rate,
@@ -2936,17 +2935,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 } else {
                     $tax_data = array($new_tax_item);
                 }
-                if ($tax_index >= 0 && is_array($tax_data) && isset($tax_data[$tax_index])) {
-                    // Update the existing tax data with new values
-                    $tax_data[$tax_index]['tax_label'] = $tax_label;
-                    $tax_data[$tax_index]['tax_rate'] = $tax_rate;
-                    $tax_data[$tax_index]['shipping'] = $include_shipping;
-        
-                    // Save the updated tax data in usermeta
-                    update_user_meta($user_id, 'user_tax_data', $tax_data);
-                }
                 // Save data in usermeta
-                // update_user_meta($user_id, 'user_tax_data', $tax_data);
+                update_user_meta($user_id, 'user_tax_data', $tax_data);
                 // update_user_meta($user_id, 'tax_label', $tax_label);
                 // update_user_meta($user_id, 'tax_rate', $tax_rate);
                 // update_user_meta($user_id, 'shipping', $include_shipping);
