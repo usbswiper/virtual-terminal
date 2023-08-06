@@ -173,7 +173,6 @@ class Usb_Swiper {
 		add_shortcode( 'usb_swiper_pay_by_invoice', array( $plugin_public, 'usb_swiper_pay_by_invoice') );
 
 		$this->loader->add_action('template_redirect', $plugin_public, 'template_redirect');
-		//$this->loader->add_action('usb_swiper_before_transactions', $plugin_public, 'paypal_disconnect_button');
 		$this->loader->add_action('woocommerce_api_usb_swiper_transaction', $plugin_public, 'handle_usb_swiper_transaction');
 		$this->loader->add_action('wp_logout', $plugin_public, 'wp_logout');
 		$this->loader->add_action('woocommerce_edit_account_form_start', $plugin_public, 'wc_edit_account_form_start');
@@ -208,7 +207,7 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_account_content', $plugin_public, 'add_notification_for_verify_profile', 9);
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email',$plugin_public, 'send_transaction_email' );
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
-//        $this->loader->add_filter( 'template_include', $plugin_public, 'custom_plugin_template_include' );
+        $this->loader->add_action( 'init', $plugin_public, 'handle_tax_form_submission' );
 
 		if (!is_admin()) {
 			return;

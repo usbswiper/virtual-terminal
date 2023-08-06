@@ -220,6 +220,16 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-pagination ul {list-style: none;padding: 0;display: flex;align-items: center;justify-content: center;}
 .vt-pagination ul li a, .vt-pagination ul li span {padding: 1rem;display: block;font-size: 1rem;line-height: 1;color: #4078eb;}
 .vt-pagination ul li .current {background: #3e78ea;color: #FFF;border-radius: 0.2rem;}
+.vt-taxrule-wrapper {background: #0006;bottom: 0;display: none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
+.vt-taxrule-inner {background: #fff;border-radius: 16px;max-width: 600px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width: calc(100% - 20px);}
+.vt-taxrule-wrapper .close {cursor: pointer;position: absolute;height: 26px;right: 10px;top: 10px;margin: 0 auto;width: 26px;}
+.vt-taxrule-wrapper .close a {display: block;color: #000;}
+.vt-taxrule-wrapper .vt-taxrule-content {display: block;height: 60vh;overflow-y: scroll;}
+.vt-taxrule-content .input-field-wrap {display: flex;flex-direction: column;padding: 10px 0;text-align: left;}
+.vt-taxrule-wrapper .input-field-wrap input {padding: 10px;}
+.vt-taxrule-wrapper .button-wrap {display: block;}
+#vt_add_taxrule_form .button-wrap .vt-button {margin-right: 8px;}
+.tax-actions a.vt_delete_taxrule {color: #f44336;}
 
 @media print {
     body{line-height: 1.2 !important;}

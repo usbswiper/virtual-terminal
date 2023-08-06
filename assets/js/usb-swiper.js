@@ -701,7 +701,6 @@ jQuery( document ).ready(function( $ ) {
         localStorage.removeItem('sessionExpireTimer');
         location.reload();
     });
-
 });
 
 function removeInterval( LoaderInterval ) {

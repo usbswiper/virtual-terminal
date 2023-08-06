@@ -367,8 +367,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				unset( $menu_links['customer-logout'] );
 
 				$menu_links['transactions']    = __( 'Transactions', 'usb-swiper' );
-				    $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
-				    $menu_links['vt-tax-rules']    = __( 'Tax Rules', 'usb-swiper' );
+                $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
+                $menu_links['vt-tax-rules']    = __( 'Tax Rules', 'usb-swiper' );
 				$menu_links['customer-logout'] = $logout;
 			}
 
@@ -542,7 +542,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
-         * VT-Products endpoint callback method.
+         * VT-Tax-Rules endpoint callback method.
          *
          * @since 1.0.0
          *
@@ -553,12 +553,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if (usb_swiper_allow_user_by_role('administrator') || usb_swiper_allow_user_by_role('customer')) {
 
                 $current_page = !empty($_GET['vt-page']) ? $_GET['vt-page'] : 1;
-
-
-
-
-
-
 
                 usb_swiper_get_template('vt-tax-rules.php');
             }
@@ -2922,22 +2916,45 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			) , 200 );
         }
 
-        function custom_plugin_template_include( $template ) {
-            // Check if it's your custom endpoint, e.g., 'vt-tax-rules'
-            if ( get_query_var( 'vt-tax-rules' ) ) {
-                // Locate your custom template file in the plugin directory
-                $custom_template = plugin_dir_path( __FILE__ ) . 'templates/vt-tax-rules.php';
+        public function handle_tax_form_submission() {
+            if (isset($_POST['tax_label']) && isset($_POST['tax_rate']) && isset($_POST['tax_index'])) {
+                $user_id = get_current_user_id();
+                $tax_label = sanitize_text_field($_POST['tax_label']);
+                $tax_rate = floatval($_POST['tax_rate']);
+                $include_shipping = isset($_POST['shipping']) ? 1 : 0;
 
-                // Check if the custom template file exists
-                if ( file_exists( $custom_template ) ) {
-                    return $custom_template;
+                $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+                $tax_index = intval($_POST['tax_index']);
+                $new_tax_item = array(
+                    'tax_label' => $tax_label,
+                    'tax_rate' => $tax_rate,
+                    'shipping' => $include_shipping
+                );
+
+                if (is_array($tax_data)) {
+                    $tax_data[] = $new_tax_item;
+                } else {
+                    $tax_data = array($new_tax_item);
                 }
+                if ($tax_index >= 0 && is_array($tax_data) && isset($tax_data[$tax_index])) {
+                    // Update the existing tax data with new values
+                    $tax_data[$tax_index]['tax_label'] = $tax_label;
+                    $tax_data[$tax_index]['tax_rate'] = $tax_rate;
+                    $tax_data[$tax_index]['shipping'] = $include_shipping;
+        
+                    // Save the updated tax data in usermeta
+                    update_user_meta($user_id, 'user_tax_data', $tax_data);
+                }
+                // Save data in usermeta
+                // update_user_meta($user_id, 'user_tax_data', $tax_data);
+                // update_user_meta($user_id, 'tax_label', $tax_label);
+                // update_user_meta($user_id, 'tax_rate', $tax_rate);
+                // update_user_meta($user_id, 'shipping', $include_shipping);
+
+                // Redirect back to the original page to avoid form resubmission
+                wp_safe_redirect($_SERVER['REQUEST_URI']);
+                exit;
             }
-
-            // If it's not your custom endpoint or the custom template doesn't exist, return the original template
-            return $template;
         }
-
-
     }
 }

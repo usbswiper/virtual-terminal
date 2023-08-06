@@ -30,6 +30,24 @@ jQuery( document ).ready(function( $ ) {
         $(".vt-product-wrapper").hide();
     });
 
+    $("#vt_add_taxrule").click(function () {
+        $(".vt-taxrule-wrapper").toggle();
+    });
+    let tPageURL = window.location.search.substring(1),
+        tURLVariables = tPageURL.split('&');
+    if(tURLVariables[0] === 'action=edit'){
+        $(".vt-taxrule-wrapper").toggle();
+    }
+    // $(document).on("click", ".vt_update_taxrule", function (e) {
+    //     e.preventDefault();
+    //     alert('click');
+    //     $(".vt-taxrule-wrapper").toggle();
+    // });
+
+    $(".vt-taxrule-inner .close svg, #vt_add_taxrule_cancel").click(function () {
+        $(".vt-taxrule-wrapper").hide();
+    });
+
     const usb_swiper_add_loader = ( current_obj) => {
         current_obj.append('<span class="vt-loader"></span>');
     };
