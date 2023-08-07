@@ -2341,6 +2341,55 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
+         * Append tax list in search fields
+         *
+         * @since 1.1.9
+         *
+         * @return void
+         */
+        public function vt_search_tax() {
+            $status = false;
+            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+
+            if( ! empty( $_POST['vt-add-tax-nonce'] ) && wp_verify_nonce( $_POST['vt-add-tax-nonce'],'vt_add_tax_nonce') ) {
+                $status = true;
+                $message_type = __('SUCCESS', 'usb-swiper');
+                $tax_key = ! empty( $_POST['tax-key'] ) ? $_POST['tax-key'] : '';
+                $data = '';
+
+                $tax_data = get_user_meta(get_current_user_id(), 'user_tax_data', true);
+                $count = 0;
+                if (!empty($tax_data)) {
+                    foreach ( $tax_data as $tax_option_key => $tax ) {
+                        $count ++;
+                        $tax_rate = !empty( $tax['tax_rate'] ) ? $tax['tax_rate'] : '';
+                        $tax_label = !empty( $tax['tax_label'] ) ? $tax['tax_label'] : '';
+                        if( empty( $tax_key ) || strlen($tax_key) < 3 ){
+                            $data .= "<span class='tax-item' data-id='$tax_rate'>$tax_label</span>";
+                            if($count === 3) {
+                                break;
+                            }
+                        }else{
+                            if( str_contains($tax_label, $tax_key)  ){
+                                $data .= "<span class='tax-item' data-id='$tax_rate'>$tax_label</span>";
+                            }
+                        }
+                    }
+                }
+            }
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+                'product_select' => $data,
+            );
+
+            wp_send_json( $response , 200 );
+        }
+
+        /**
          * Append product price in input fields.
 		 *
          * @since   1.1.9
@@ -2921,31 +2970,76 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function handle_tax_form_submission() {
-            if (isset($_POST['tax_label']) && isset($_POST['tax_rate'])) {
-                $user_id = get_current_user_id();
-                $tax_label = sanitize_text_field($_POST['tax_label']);
-                $tax_rate = floatval($_POST['tax_rate']);
-                $include_shipping = isset($_POST['shipping']) ? true : false;
+        public function vt_create_update_product_tax() {
 
-                $tax_data = get_user_meta($user_id, 'user_tax_data', true);
-                $new_tax_item = array(
-                    'tax_label' => $tax_label,
-                    'tax_rate' => $tax_rate,
-                    'shipping' => $include_shipping
-                );
 
-                if (is_array($tax_data)) {
-                    $tax_data[] = $new_tax_item;
-                } else {
-                    $tax_data = array($new_tax_item);
+            $status = false;
+            $message = __('Something went wrong. Please try again.','usb-swiper');
+            $message_type = __('ERROR','usb-swiper');
+
+            parse_str($_POST['fields'], $fields);
+
+            if( ! empty( $fields['vt-add-taxrule-form-nonce'] ) && wp_verify_nonce( $fields['vt-add-taxrule-form-nonce'],'vt-add-taxrule-form') ) {
+
+                $vt_action = ! empty( $fields['vt-taxrule-action'] ) ?  sanitize_text_field( $fields['vt-taxrule-action']) : '';
+
+                $tax_label = ! empty( $fields['tax_label'] ) ? sanitize_text_field( $fields['tax_label'] ) : '';
+                $tax_rate  = ! empty( $fields['tax_rate'] ) ? sanitize_text_field( $fields['tax_rate'] ) : '';
+
+                $tax_id = !empty( $fields['vt_taxrule_id'] ) ? $fields['vt_taxrule_id'] : '';
+                $tax_id = !empty( $tax_id ) ? $tax_id : strtolower($tax_label) . '_' . $tax_rate;
+
+                $include_shipping  = isset($fields['tax_on_shipping']) ? true : false;
+
+                try {
+                    $user_id = get_current_user_id();
+
+                    $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+
+                    $label_exists = array_key_exists($tax_id, $tax_data);
+
+                    if( ( empty( $tax_id ) || empty( $vt_action ) || 'edit' !== $vt_action ) && $label_exists ){
+                        $message = __('Tax label exists.','usb-swiper');
+                    }else{
+                        $new_tax_item = array(
+                            'tax_label' => $tax_label,
+                            'tax_rate' => $tax_rate,
+                            'tax_on_shipping' => $include_shipping
+                        );
+                        $message = __('Tax created successfully.','usb-swiper');
+
+                        if (is_array($tax_data)) {
+                            if( !empty( $tax_id ) && !empty( $vt_action ) && 'edit' === $vt_action ){
+                                $tax_data[$tax_id] = $new_tax_item;
+                                $message = __('Tax updated successfully.','usb-swiper');
+                            } elseif ( !empty( $vt_action ) && 'add' === $vt_action ){
+                                $tax_data[$tax_id] = $new_tax_item;
+                            }
+                        } else {
+                            $tax_data[$tax_id] = array($new_tax_item);
+                        }
+
+                        update_user_meta($user_id, 'user_tax_data', $tax_data);
+
+                        $status = true;
+                        $message_type = __('SUCCESS','usb-swiper');
+                    }
+                } catch(Exception $e) {
+                    $message = $e->getMessage();
                 }
-                
-                update_user_meta($user_id, 'user_tax_data', $tax_data);
-                
-                wp_safe_redirect($_SERVER['REQUEST_URI']);
-                exit;
+            } else {
+                $status  = false;
+                $message = __('Nonce not verified. Please try again.','usb-swiper');
             }
+
+            wp_send_json(
+                array(
+                    'status' => $status,
+                    'redirect_url' => wc_get_endpoint_url( 'vt-tax-rules', '', wc_get_page_permalink( 'myaccount' )),
+                    'message' => $message,
+                    'message_type' => $message_type,
+                )
+            );
         }
 
         /**
@@ -2954,22 +3048,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @return void
          */
         public function vt_delete_tax_data() {
-            if (isset($_POST['tax_index'])) {
-                $index = intval($_POST['tax_index']);
-                if ($index >= 0) {
-                    $user_id = get_current_user_id();
-                    $tax_data = get_user_meta($user_id, 'user_tax_data', true);
-                    if (is_array($tax_data) && isset($tax_data[$index])) {
-                        // Remove the tax item at the specified index
-                        array_splice($tax_data, $index, 1);
-                        // Save the updated tax data in usermeta
-                        update_user_meta($user_id, 'user_tax_data', $tax_data);
-                        echo 'success'; // Return a success message to the AJAX request
-                    } else {
-                        echo 'error'; // Return an error message to the AJAX request
-                    }
+            if (isset($_POST['tax_id']) && !empty($_POST['tax_id']) ) {
+                $tax_id = sanitize_text_field($_POST['tax_id']);
+                $user_id = get_current_user_id();
+                $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+                if (is_array($tax_data) && isset($tax_data[$tax_id])) {
+                    unset($tax_data[$tax_id]);
+                    update_user_meta($user_id, 'user_tax_data', $tax_data);
+                    echo 'success'; // Return a success message to the AJAX request
+                } else {
+                    echo 'error'; // Return an error message to the AJAX request
                 }
             }
         }
+
+        public function handle_default_tax(){
+            if(isset($_POST['default_tax_nonce']) && wp_verify_nonce($_POST['default_tax_nonce'],'vt-default-tax-form')) {
+                $default_tax = !empty($_POST['default-tax']) ? sanitize_text_field($_POST['default-tax']) : "";
+                $user_id = get_current_user_id();
+                if(empty($default_tax) || empty( $user_id ) ){
+                    return ;
+                }
+                update_user_meta($user_id,'default_tax',$default_tax);
+            }
+        }
+
     }
 }

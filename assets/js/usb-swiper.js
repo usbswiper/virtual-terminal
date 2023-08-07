@@ -449,6 +449,48 @@ jQuery( document ).ready(function( $ ) {
         }
     });
 
+    jQuery("form#vt_add_taxrule_form").validate({
+        rules: {
+            tax_label: {
+                required: true
+            },
+            tax_rate: {
+                required: true,
+                greaterThanZero: true
+            }
+        },
+        messages: {
+            tax_rate: {
+                greaterThanZero: usb_swiper_settings.product_min_price,
+                step: usb_swiper_settings.price_step_message
+            }
+
+        },
+        submitHandler: function (form, event) {
+            $('.vt-form-notification').empty()
+            event.preventDefault();
+
+            var fd = new FormData();
+            fd.append('action', 'create_update_product_tax');
+            fd.append('fields', $('#vt_add_taxrule_form').serialize());
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+            }).done(function (response) {
+                if (response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            });
+        }
+    });
+
+
     $("#vt_verification_form").validate({
         rules: {
             email_address: {
@@ -518,6 +560,34 @@ jQuery( document ).ready(function( $ ) {
                 $('#vt_repeater_field').append( response.html );
                 usb_swiper_remove_loader(loader);
                 loader.removeAttr('disabled');
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
+    $(document).on('keyup','.vt-tax-input',function(){
+        let search_val = $(this).val();
+        let vt_product_input = $(this);
+        let nonce = $('#vt_add_tax_nonce').val();
+        let data = {
+            'action': 'vt_search_tax',
+            'tax-key': search_val,
+            'vt-add-tax-nonce': nonce
+        };
+
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                if(response.product_select) {
+                    if (vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children().hasClass('vt-search-result')) {
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                    } else {
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                    }
+                } else {
+                    vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                }
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -622,6 +692,13 @@ jQuery( document ).ready(function( $ ) {
         });
     });
 
+    $(document).on('click','.tax_rate_wrapper .tax-item', function () {
+        let tax_input = $(this).parents('.tax_rate_wrapper').find('.vt-tax-input');
+        tax_input.val($(this).attr('data-id'));
+        updateSalesTax();
+        updateGrandTotal();
+    });
+
     $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
 
         let net_price_array = [];
@@ -669,6 +746,12 @@ jQuery( document ).ready(function( $ ) {
     $(document).on("focusout",".input-field-wrap.product .vt-product-input", function (){
         setTimeout(function() {
             $('.input-field-wrap.product .vt-search-result').remove();
+        },300);
+    });
+
+    $(document).on("focusout",".input-field-wrap.tax_rate_wrapper .vt-tax-input", function (){
+        setTimeout(function() {
+            $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
         },300);
     });
 

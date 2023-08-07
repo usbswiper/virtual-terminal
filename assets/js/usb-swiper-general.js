@@ -54,7 +54,7 @@ jQuery( document ).ready(function( $ ) {
           type: 'POST',
           data: {
             action: 'delete_tax_data',
-            tax_index: index
+            tax_id: index
           },
           success: function (response) {
             // Reload the page to reflect the updated tax data

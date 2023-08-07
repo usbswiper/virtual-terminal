@@ -200,6 +200,7 @@ class Usb_Swiper {
         $this->loader->add_action('woocommerce_product_query', $plugin_public,'extend_product_query');
 		$this->loader->add_filter( 'wp_ajax_add_vt_product_wrapper', $plugin_public, 'add_vt_product_wrapper');
 		$this->loader->add_filter( 'wp_ajax_vt_search_product', $plugin_public, 'vt_search_product');
+		$this->loader->add_filter( 'wp_ajax_vt_search_tax', $plugin_public, 'vt_search_tax');
 		$this->loader->add_filter( 'wp_ajax_vt_add_product_value_in_inputs', $plugin_public, 'vt_add_product_value_in_inputs');
 		$this->loader->add_action('wp_ajax_vt_verification_form', $plugin_public, 'vt_verification_form_cb');
 		$this->loader->add_action('woocommerce_email_headers', $plugin_public, 'vt_email_headers', 10, 4);
@@ -207,7 +208,8 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_account_content', $plugin_public, 'add_notification_for_verify_profile', 9);
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email',$plugin_public, 'send_transaction_email' );
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
-        $this->loader->add_action( 'init', $plugin_public, 'handle_tax_form_submission' );
+		$this->loader->add_action( 'wp_ajax_create_update_product_tax',$plugin_public, 'vt_create_update_product_tax');
+        $this->loader->add_action( 'init', $plugin_public, 'handle_default_tax' );
 		$this->loader->add_action( 'wp_ajax_delete_tax_data', $plugin_public, 'vt_delete_tax_data');
 
 		if (!is_admin()) {
