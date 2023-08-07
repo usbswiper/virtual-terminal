@@ -2916,6 +2916,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			) , 200 );
         }
 
+        /**
+         * Add tax rules on the my account page.
+         *
+         * @return void
+         */
         public function handle_tax_form_submission() {
             if (isset($_POST['tax_label']) && isset($_POST['tax_rate'])) {
                 $user_id = get_current_user_id();
@@ -2943,6 +2948,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
         }
 
+        /**
+         * Delete tax rules on the my account page.
+         *
+         * @return void
+         */
         public function vt_delete_tax_data() {
             if (isset($_POST['tax_index'])) {
                 $index = intval($_POST['tax_index']);
