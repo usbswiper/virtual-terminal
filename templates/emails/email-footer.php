@@ -60,19 +60,27 @@ defined( 'ABSPATH' ) || exit;
                                     <p style="margin: 0px;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
                                     <p style="margin: 0px;">
                                         <?php
-                                        if (!empty($user_address1)) {
-                                            echo $user_address1;
-                                        }
-                                        if (!empty($user_address2)) {
-                                            echo ' , ' . $user_address2;
-                                        }
+                                            if (!empty($user_address1)) {
+                                                echo $user_address1;
+                                            }
+                                            if (!empty($user_address2)) {
+                                                echo ', ' . $user_address2;
+                                            }
                                         ?>
-                                     <?php //echo !empty( $user_address1 ) ? $user_address1 : ''; ?>
                                    </p>
-                                    <p style="margin: 0px;"><?php echo !empty( $user_address2 ) ? $user_address2 : ''; ?></p>
-                                    <p style="margin: 0px;"><?php echo !empty( $city ) ? $city : ''; ?></p>
-                                    <p style="margin: 0px;"><?php echo !empty( $state ) ? $state : ''; ?></p>
-                                    <p style="margin: 0px;"><?php echo !empty( $postcode ) ? $postcode : '';?></p>
+                                    <p style="margin: 0px;">
+                                        <?php
+                                            if (!empty($city)) {
+                                                echo $city;
+                                            }
+                                            if (!empty($state)) {
+                                                echo ', ' . $state;
+                                            }
+                                            if (!empty($postcode)) {
+                                                echo '-' . $postcode;
+                                            }
+                                        ?>
+                                    </p>
                                     <p style="margin: 0px;"><?php echo !empty( $country ) ? $country : ''; ?></p>
                                 </div>
                             </td>
