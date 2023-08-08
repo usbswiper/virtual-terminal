@@ -1800,7 +1800,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			if ( is_user_logged_in() ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
-				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
+				$brand_name = !empty( $_POST['BrandName'] ) ? sanitize_text_field( $_POST['BrandName'] ) : '';
                 $brand_logo = !empty( $_FILES['BrandLogo'] ) ? $_FILES['BrandLogo'] : '';
 
                 $logo_id = !empty( $brand_logo ) ? $this->vt_upload_from_path( $brand_logo ) : 0;

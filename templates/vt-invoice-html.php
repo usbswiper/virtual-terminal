@@ -127,7 +127,7 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                 <?php echo ! empty( $company_name ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;padding:0;">'.$company_name.'</p>' : '' ?>
                 <?php echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : $addresses['shipping_address']; ?>
                 <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
-                <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
+                <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '-' ?>
             </div>
             <?php if( !empty( $addresses['shipping_address'] ) && !empty( $addresses['billing_address'] ) ){ ?>
                 <div class="address" style="width: 50%;display: inline-block;vertical-align: top;float: left;">
