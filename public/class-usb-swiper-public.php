@@ -484,7 +484,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @param int $transaction_id Get transaction id.
          */
-        public function view_invoice_endpoint_cb( $transaction_id ){
+        public function view_invoice_endpoint_cb( $transaction_id ) {
 
             if( empty( $transaction_id ) ) {
                 return;
@@ -614,7 +614,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function add_notification_for_verify_profile(){
+        public function add_notification_for_verify_profile() {
 
             $profile_status = get_user_meta( get_current_user_id(),'vt_user_verification_status', true );
 
@@ -641,7 +641,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
 		 * @return false|string $form
 		 */
-        public function usb_swiper_vt_verification_form(){
+        public function usb_swiper_vt_verification_form() {
 
 	        ob_start();
 
@@ -806,7 +806,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @param int $user_id get the user id
 		 * @return void
 		 */
-        public function disconnect_email($user_id){
+        public function disconnect_email($user_id) {
 	        $mailer = WC()->mailer()->get_emails();
 	        $mailer['UsbSwiperPaypalDisconnectedEmail']->template_html_path = USBSWIPER_PATH . 'templates/emails/paypaldisconnected.php';
 	        $mailer['UsbSwiperPaypalDisconnectedEmail']->trigger( $user_id );
@@ -2425,8 +2425,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function manage_pay_with_paypal_transaction()
-        {
+        public function manage_pay_with_paypal_transaction() {
 
             if (!class_exists('Usb_Swiper_Paypal_request')) {
                 include_once USBSWIPER_PATH . '/includes/class-usb-swiper-paypal-request.php';

@@ -366,15 +366,11 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 ),
                 'description' => '',
                 'class' => '',
-//                'is_symbol' => true,
-//                'symbol' => '$',
-//                'symbol_wrap_class' => 'currency-sign after'
             ),
             array(
                 'type' => 'select',
                 'id' => 'DiscountType',
                 'name' => 'DiscountType',
-//                'label' => __( 'Discount Type', 'usb-swiper'),
                 'required' => true,
                 'options' => array(
                     '%' => __( '%', 'usb-swiper' ),
