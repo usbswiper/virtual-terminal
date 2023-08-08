@@ -428,11 +428,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
                 if ( !empty( $start_date ) && !empty( $end_date ) ) {
                     $transaction_args['date_query'] = array(
-                            array(
-                                    'after' => $start_date,
-                                    'before' => $end_date,
-                                    'inclusive' => true
-                            ),
+                        array(
+                            'after' => $start_date,
+                            'before' => $end_date,
+                            'inclusive' => true
+                        ),
                     );
                 }
                 if( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'invoice' || strtolower($transaction_type) === 'transaction' ) ){
