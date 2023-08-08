@@ -405,7 +405,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $start_date = isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : '';
                 $end_date = isset( $_GET['end-date'] ) ? sanitize_text_field( $_GET['end-date'] ) : '';
 
-                $order = isset( $_GET['date_toggle'] ) && $_GET['date_toggle'] === 'asc' ? 'ASC' : 'DESC';
+                $order = isset( $_GET['date_toggle'] ) && sanitize_text_field( $_GET['date_toggle'] ) === 'asc' ? 'ASC' : 'DESC';
 
                 $transaction_args = array(
                     'post_type' => 'transactions',
