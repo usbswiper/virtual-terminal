@@ -2460,8 +2460,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function manage_pay_with_paypal_transaction()
-        {
+        public function manage_pay_with_paypal_transaction() {
 
             if (!class_exists('Usb_Swiper_Paypal_request')) {
                 include_once USBSWIPER_PATH . '/includes/class-usb-swiper-paypal-request.php';
@@ -2773,7 +2772,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return mixed|string
          */
-        public function vt_woocommerce_email_headers( $header, $email_id ){
+        public function vt_woocommerce_email_headers( $header, $email_id ) {
 
             if ( !empty( $email_id ) && $email_id === 'transaction_email_admin' ) {
                 $admin_email_id = get_option('admin_email');
