@@ -7,12 +7,6 @@ if( empty( $transaction_id)) {
 $transaction = get_post($transaction_id);
 $transaction_author = !empty( $transaction->post_author ) ? $transaction->post_author : '';
 
-//$usb_swiper_public = new Usb_Swiper_Public($transaction, $transaction_author);
-//$brand_logo = $usb_swiper_public->add_brand_logo_for_email();
-
-?>
-
-<?php
 do_action( 'woocommerce_email_header', $email_heading, $email);
 
 $author_name = !empty( $profile_args['email_args']['display_name'] ) ? $profile_args['email_args']['display_name'] : '';

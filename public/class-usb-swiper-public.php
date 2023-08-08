@@ -594,7 +594,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     }
                 }
 
-
 			} else {
 
 				$Usb_Swiper_PPCP = new Usb_Swiper_PPCP();
@@ -1821,7 +1820,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        function delete_brand_logo_cb() {
+        public function delete_brand_logo_cb() {
             $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
 
             $attachmentId = $brand_logo['attachment_id'];
@@ -2481,8 +2480,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @return void
          */
-        public function manage_pay_with_paypal_transaction()
-        {
+        public function manage_pay_with_paypal_transaction() {
 
             if (!class_exists('Usb_Swiper_Paypal_request')) {
                 include_once USBSWIPER_PATH . '/includes/class-usb-swiper-paypal-request.php';

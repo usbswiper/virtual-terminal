@@ -55,15 +55,25 @@ defined( 'ABSPATH' ) || exit;
 
                                 ?>
                                 <div class="footer-info" style="text-align: center;">
-                                    <h2 style="margin: 0px;text-align: center;"><?php echo $company_name; ?></h2>
-                                    <p style="margin: 0px;"><?php echo $user_email; ?></p>
-                                    <p style="margin: 0px;"><?php echo $phone; ?></p>
-                                    <p style="margin: 0px;"><?php echo $user_address1; ?></p>
-                                    <p style="margin: 0px;"><?php echo $user_address2; ?></p>
-                                    <p style="margin: 0px;"><?php echo $city; ?></p>
-                                    <p style="margin: 0px;"><?php echo $state; ?></p>
-                                    <p style="margin: 0px;"><?php echo $postcode;?></p>
-                                    <p style="margin: 0px;"><?php echo $country; ?></p>
+                                    <h2 style="margin: 0px;text-align: center;"><?php echo !empty( $company_name ) ? $company_name : ''; ?></h2>
+                                    <p style="margin: 0px;"><?php echo !empty( $user_email ) ? $user_email : ''; ?></p>
+                                    <p style="margin: 0px;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
+                                    <p style="margin: 0px;">
+                                        <?php
+                                        if (!empty($user_address1)) {
+                                            echo $user_address1;
+                                        }
+                                        if (!empty($user_address2)) {
+                                            echo ' , ' . $user_address2;
+                                        }
+                                        ?>
+                                     <?php //echo !empty( $user_address1 ) ? $user_address1 : ''; ?>
+                                   </p>
+                                    <p style="margin: 0px;"><?php echo !empty( $user_address2 ) ? $user_address2 : ''; ?></p>
+                                    <p style="margin: 0px;"><?php echo !empty( $city ) ? $city : ''; ?></p>
+                                    <p style="margin: 0px;"><?php echo !empty( $state ) ? $state : ''; ?></p>
+                                    <p style="margin: 0px;"><?php echo !empty( $postcode ) ? $postcode : '';?></p>
+                                    <p style="margin: 0px;"><?php echo !empty( $country ) ? $country : ''; ?></p>
                                 </div>
                             </td>
                         </tr>
