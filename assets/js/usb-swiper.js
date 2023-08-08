@@ -386,15 +386,16 @@ jQuery( document ).ready(function( $ ) {
             discountAmount = discountInput;
         }
         if (discountAmount > orderAmount) {
-            set_notification('Discount Amount is greater than Order Amount so please add valid discount amount');
+            set_notification('Discount Amount is greater than Order Amount so please add valid discount amount', 'error');
             // set_notification(response.message, 'Discount Amount is greater than Order Amount so please add valid discount amount', response.message_type );
             // discountAmount.prop('disabled', true);
             $('#pos-submit-btn').prop('disabled', true);
             $('#PayByInvoice').prop('disabled', true);
         } else {
-            // set_notification('').hide(); // Clear the error message
+            // set_notification();
             $('#pos-submit-btn').prop('disabled', false);
             $('#PayByInvoice').prop('disabled', false); // Enable the submit button
+            // set_notification().clear(); // Clear the error message
         }
         //     $('#ae-paypal-pos-form').on('submit', function(event) {
         //         event.preventDefault();
