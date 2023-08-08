@@ -387,30 +387,19 @@ jQuery( document ).ready(function( $ ) {
         }
         if (discountAmount > orderAmount) {
             set_notification('Discount Amount is greater than Order Amount so please add valid discount amount', 'error');
-            // set_notification(response.message, 'Discount Amount is greater than Order Amount so please add valid discount amount', response.message_type );
-            // discountAmount.prop('disabled', true);
             $('#pos-submit-btn').prop('disabled', true);
             $('#PayByInvoice').prop('disabled', true);
         } else {
-            // set_notification();
             $('#pos-submit-btn').prop('disabled', false);
-            $('#PayByInvoice').prop('disabled', false); // Enable the submit button
-            // set_notification().clear(); // Clear the error message
+            $('#PayByInvoice').prop('disabled', false);
         }
-        //     $('#ae-paypal-pos-form').on('submit', function(event) {
-        //         event.preventDefault();
-        //     });
-        // } else {
-        //     $('#ae-paypal-pos-form').off('submit');
-        // }
         $('#DiscountAmount').val(discountAmount.toFixed(2));
 
         var netAmount = orderAmount - discountAmount;
         $('#NetAmount').val(netAmount.toFixed(2));
         updateSalesTax();
         updateGrandTotal();
-        //$('#GrandTotal').val(netAmount.toFixed(2));
-    })
+    });
 
     $(document).on('click','.cancel-refund', function (event) {
         event.preventDefault();
