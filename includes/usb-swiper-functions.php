@@ -373,8 +373,8 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'name' => 'DiscountType',
                 'required' => true,
                 'options' => array(
-                    '%' => __( '%', 'usb-swiper' ),
-                    '$' => __( '$', 'usb-swiper' ),
+                    'percent' => __( '%', 'usb-swiper' ),
+                    'flat' => __( usbswiper_get_currency_symbol(), 'usb-swiper' ),
                 ),
                 'default' => '$',
                 'attributes' => '',

@@ -380,13 +380,13 @@ jQuery( document ).ready(function( $ ) {
         var discountType = $('#DiscountType').val();
 
         var discountAmount;
-        if (discountType === '%') {
+        if (discountType === 'percent') {
             discountAmount = (orderAmount * discountInput) / 100;
         } else {
             discountAmount = discountInput;
         }
         if (discountAmount > orderAmount) {
-            alert('Discount Amount is greater than Order Amount so please add valid discount amount');
+            set_notification('Discount Amount is greater than Order Amount so please add valid discount amount' );
             discountAmount.prop('disabled', true);
         }
         $('#DiscountAmount').val(discountAmount.toFixed(2));
