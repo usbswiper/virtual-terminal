@@ -109,7 +109,6 @@ jQuery( document ).ready(function( $ ) {
         toggleIcon.toggleClass('desc', toggleValue === 'desc');
         toggleIcon.html(toggleValue === 'asc' ? '&#x25B2;' : '&#x25BC;');
 
-
         var currentUrl = new URL(window.location.href);
         currentUrl.searchParams.set('date_toggle', toggleValue);
         window.location.href = currentUrl.href;
@@ -120,13 +119,18 @@ jQuery( document ).ready(function( $ ) {
         $('#end-date').attr('min', fromDate);
     });
 
-    // $('#vt_search').on('change', function() {
-    //     var searchDate = $(this).val();
-    //     var regex = /^\d{2}\/\d{2}\/\d{4}$/; // Regular expression for dd/mm/yyyy format
-    //
-    //     if (!regex.test(searchDate)) {
-    //         alert('Please enter the date in dd/mm/yyyy format.');
-    //         return false; // Prevent form submission
-    //     }
-    // });
+    // Initialize the datepicker for start date field
+    $('#start-date').datepicker({
+        dateFormat: 'yy-mm-dd', // The format to submit the date in
+        changeMonth: true,
+        changeYear: true,
+    });
+
+    // Initialize the datepicker for end date field
+    $('#end-date').datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true
+    });
+
 });

@@ -227,7 +227,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$vt_verification_page_id = !empty( $settings['vt_verification_page'] ) ? (int)$settings['vt_verification_page'] : '';
 			$myaccount_page_id = (int)get_option( 'woocommerce_myaccount_page_id' );
             $vt_pay_by_invoice_id = !empty( $settings['vt_paybyinvoice_page'] ) ? (int)$settings['vt_paybyinvoice_page'] : '';
-
+            wp_enqueue_script( 'jquery-ui-datepicker' );
+            wp_enqueue_style( 'jquery-ui', USBSWIPER_URL . 'assets/css/jquery-ui.css' );
 			/**
 			 * Dequeue script before VT script enqueue.
 			 *
@@ -240,6 +241,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $sdk_obj = $this->get_paypal_sdk_obj();
                 wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js?enable-funding=venmo' ), array(), null, false );
                 wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
+
 
 				wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
 				wp_enqueue_style( 'select2', USBSWIPER_URL . 'assets/css/select2.min.css' );
@@ -399,8 +401,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $transaction_type   = !empty( $_GET['vt-type'] ) ? sanitize_text_field( $_GET['vt-type'] ) : "";
 
                 $transaction_search   = !empty( $_GET['vt-search'] ) ? sanitize_text_field( $_GET['vt-search'] ) : "";
-//                $search_date = DateTime::createFromFormat('d/m/Y', $transaction_search);
-//                $search_date = $search_date ? $search_date->format('Y-m-d') : '';
 
                 $start_date = isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : '';
                 $end_date = isset( $_GET['end-date'] ) ? sanitize_text_field( $_GET['end-date'] ) : '';
@@ -415,21 +415,33 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'author' => get_current_user_id(),
                     'order' => $order,
                     'orderby' => 'date',
-                    's' => $transaction_search
                 );
                 if (!empty($transaction_search)) {
                     $transaction_args['meta_query'][] = array(
                         'relation' => 'OR',
                         array(
-                            'key' => '_payment_action',
-                            'value' => 'CAPTURE'
+                            'key' => '_payment_response',
+                            'value' => $transaction_search,
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_payment_response',
+                            'value' => $transaction_search,
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => 'TransactionType',
+                            'value' => $transaction_search,
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => 'GrandTotal',
+                            'value' => $transaction_search,
+                            'compare' => 'LIKE'
                         ),
                     );
                 }
-//                if( !empty( $transaction_search ) ) {
-//                    $transaction_args['s'] = $transaction_search;
-//                }
-//
+
                 if ( !empty( $start_date ) && !empty( $end_date ) ) {
                     $transaction_args['date_query'] = array(
                         array(
@@ -439,6 +451,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         ),
                     );
                 }
+
                 if( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'invoice' || strtolower($transaction_type) === 'transaction' ) ){
                     $transaction_args['meta_query'] = array(
                         array(
@@ -468,8 +481,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? sanitize_text_field( $_GET['vt-search'] ) : ''; ?>" placeholder="<?php echo __('Search...'); ?>">
                             </div>
                             <div class="input-field-wrap date-field-wrap form-row">
-                                <span class="date-range-label"><?php _e( 'From:' , 'usb-swiper' ); ?></span><input type="date" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>">
-                                <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="date" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>">
+                                <span class="date-range-label"><?php _e( 'From:' , 'usb-swiper' ); ?></span><input type="text" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
+                                <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="text" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
                             </div>
                             <div class="input-field-wrap form-row">
                                 <select name="vt-type" id="vt_type" class="transaction-input-field">
