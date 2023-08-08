@@ -551,9 +551,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         public function vt_tax_rules_endpoint_cb() {
 
             if (usb_swiper_allow_user_by_role('administrator') || usb_swiper_allow_user_by_role('customer')) {
-
-                $current_page = !empty($_GET['vt-page']) ? $_GET['vt-page'] : 1;
-
                 usb_swiper_get_template('vt-tax-rules.php');
             }
         }
@@ -3055,9 +3052,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 if (is_array($tax_data) && isset($tax_data[$tax_id])) {
                     unset($tax_data[$tax_id]);
                     update_user_meta($user_id, 'user_tax_data', $tax_data);
-                    echo 'success'; // Return a success message to the AJAX request
+                    echo 'success';
                 } else {
-                    echo 'error'; // Return an error message to the AJAX request
+                    echo 'error';
                 }
             }
         }

@@ -33,6 +33,7 @@ jQuery( document ).ready(function( $ ) {
     $("#vt_add_taxrule").click(function () {
         $(".vt-taxrule-wrapper").toggle();
     });
+
     let tPageURL = window.location.search.substring(1),
         tURLVariables = tPageURL.split('&');
     if(tURLVariables[0] === 'action=edit'){

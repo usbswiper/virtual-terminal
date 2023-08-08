@@ -200,7 +200,7 @@ class Usb_Swiper {
         $this->loader->add_action('woocommerce_product_query', $plugin_public,'extend_product_query');
 		$this->loader->add_filter( 'wp_ajax_add_vt_product_wrapper', $plugin_public, 'add_vt_product_wrapper');
 		$this->loader->add_filter( 'wp_ajax_vt_search_product', $plugin_public, 'vt_search_product');
-		$this->loader->add_filter( 'wp_ajax_vt_search_tax', $plugin_public, 'vt_search_tax');
+		$this->loader->add_action( 'wp_ajax_vt_search_tax', $plugin_public, 'vt_search_tax');
 		$this->loader->add_filter( 'wp_ajax_vt_add_product_value_in_inputs', $plugin_public, 'vt_add_product_value_in_inputs');
 		$this->loader->add_action('wp_ajax_vt_verification_form', $plugin_public, 'vt_verification_form_cb');
 		$this->loader->add_action('woocommerce_email_headers', $plugin_public, 'vt_email_headers', 10, 4);
