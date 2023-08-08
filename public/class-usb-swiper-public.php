@@ -398,21 +398,49 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$current_page   = !empty( $_GET['vt-page'] ) ? $_GET['vt-page'] : 1;
                 $transaction_type   = !empty( $_GET['vt-type'] ) ? sanitize_text_field($_GET['vt-type']) : "";
 
+                $transaction_search   = !empty( $_GET['vt-search'] ) ? sanitize_text_field($_GET['vt-search']) : "";
+                $search_date = DateTime::createFromFormat('d/m/Y', $transaction_search);
+                $search_date = $search_date ? $search_date->format('Y-m-d') : '';
+
+                $start_date = isset($_GET['start-date']) ? sanitize_text_field($_GET['start-date']) : '';
+                $end_date = isset($_GET['end-date']) ? sanitize_text_field($_GET['end-date']) : '';
+
+                $order = isset($_GET['date_toggle']) && $_GET['date_toggle'] === 'asc' ? 'ASC' : 'DESC';
+
                 $transaction_args = array(
                     'post_type' => 'transactions',
                     'post_status' => 'publish',
                     'posts_per_page' => !empty( get_option( 'posts_per_page' ) ) ? get_option( 'posts_per_page' ) : 10,
                     'paged' => $current_page,
                     'author' => get_current_user_id(),
-                    'order' => 'DESC',
+                    'order' => $order,
                     'orderby' => 'date',
                 );
 
+                if( !empty( $transaction_search )) {
+                    $transaction_args['date_query'] = array(
+                        array(
+                            'after'     => $search_date . ' 00:00:00',
+                            'before'    => $search_date . ' 23:59:59',
+                            'inclusive' => true,
+                        ),
+                    );
+                }
+                if ( !empty( $start_date ) && !empty( $end_date ) ) {
+                    $transaction_args['date_query'] = array(
+                            array(
+                                    'after' => $start_date,
+                                    'before' => $end_date,
+                                    'inclusive' => true
+                            ),
+                    );
+                }
                 if( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'invoice' || strtolower($transaction_type) === 'transaction' ) ){
                     $transaction_args['meta_query'] = array(
                         array(
                             'key' => '_transaction_type',
                             'value' => $transaction_type,
+                            'compare' => '='
                         )
                     );
                 }
@@ -432,21 +460,28 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     ?>
                     <form class="transaction-filter-form" id="transaction_filter_form">
                         <div class="transaction-filter-wrap">
-                            <div class="transaction-field-wrap form-row form-row-first">
-                                <select name="vt-type" id="vt_type" class="transaction-select">
+                            <div class="input-field-wrap form-row">
+                                <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? $_GET['vt-search'] : ''; ?>" placeholder="<?php echo __('dd/mm/yyyy'); ?>">
+                            </div>
+                            <div class="input-field-wrap date-field-wrap form-row">
+                                <label for="date-range" class="date-range-label">Date:</label>
+                                <span class="date-range-label">From</span><input type="date" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset($_GET['start-date']) ? $_GET['start-date'] : ''; ?>">
+                                <span class="date-range-label">to</span><input type="date" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? $_GET['end-date'] : ''; ?>">
+                            </div>
+                            <div class="input-field-wrap form-row">
+                                <select name="vt-type" id="vt_type" class="transaction-input-field">
                                     <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
                                     <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
                                     <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Virtual Terminal ','usb-swiper'); ?></option>
                                 </select>
                             </div>
-                            <div class="transaction-field-wrap form-row form-row-last">
+                            <div class="input-field-wrap form-row">
                                 <button type="submit" class="vt-button"><?php _e('FILTER','usb-swiper'); ?></button>
                             </div>
                         </div>
                     </form>
                     <?php
                 }
-
 				usb_swiper_get_template('wc-transactions-lists.php', $args);
 			}
 		}

@@ -140,4 +140,6 @@ jQuery( document ).ready(function( $ ) {
         $(this).wrap('<div class="tooltip"></div>');
         $(this).after('<span class="tooltiptext">' + tooltip + '</span>');
     });
+
+
 });

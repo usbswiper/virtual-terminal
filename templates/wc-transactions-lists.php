@@ -17,7 +17,7 @@ if( $has_transactions ) : ?>
                 <th class="woocommerce-orders-table__header woocommerce-orders-table__header-intent"><?php _e('Intent','usb-swiper'); ?></th>
                 <th class="woocommerce-orders-table__header woocommerce-orders-table__header-type"><?php _e('Type','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-total"><?php _e('Total','usb-swiper'); ?></th>
-				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-date"><?php _e('Date','usb-swiper'); ?></th>
+				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-date"><?php _e('Date','usb-swiper'); ?><span id="date-toggle" class="toggle-icon <?php echo isset($_GET['date_toggle']) && $_GET['date_toggle'] === 'asc' ? 'asc' : 'desc'; ?>"><?php echo isset($_GET['date_toggle']) && $_GET['date_toggle'] === 'asc' ? '&#x25B2;' : '&#x25BC;'; ?></span></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-actions"><?php _e('Actions','usb-swiper'); ?></th>
 			</tr>
 		</thead>
@@ -88,6 +88,15 @@ if( $has_transactions ) : ?>
             if( !empty( $_GET['vt-type'] ) ){
                 $next_args['vt-type'] = sanitize_text_field( $_GET['vt-type'] );
             }
+            if (!empty($_GET['vt-search'])) {
+                $next_args['vt-search'] = sanitize_text_field($_GET['vt-search']);
+            }
+            if (!empty($_GET['start-date'])) {
+                $previous_args['start-date'] = sanitize_text_field($_GET['start-date']);
+            }
+            if (!empty($_GET['end-date'])) {
+                $previous_args['end-date'] = sanitize_text_field($_GET['end-date']);
+            }
 		    $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'transactions' ,'') );
             ?>
 			<a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url($next_page_url); ?>"><?php esc_html_e( 'Previous', 'woocommerce' ); ?></a>
@@ -101,7 +110,15 @@ if( $has_transactions ) : ?>
             if( !empty( $_GET['vt-type'] ) ){
                 $previous_args['vt-type'] = sanitize_text_field( $_GET['vt-type'] );
             }
-
+            if (!empty($_GET['vt-search'])) {
+                $previous_args['vt-search'] = sanitize_text_field($_GET['vt-search']);
+            }
+            if (!empty($_GET['start-date'])) {
+                $previous_args['start-date'] = sanitize_text_field($_GET['start-date']);
+            }
+            if (!empty($_GET['end-date'])) {
+                $previous_args['end-date'] = sanitize_text_field($_GET['end-date']);
+            }
 			$previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'transactions' ,'') );
             ?>
 			<a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button" href="<?php echo esc_url( $previous_page_url ); ?>"><?php esc_html_e( 'Next', 'woocommerce' ); ?></a>

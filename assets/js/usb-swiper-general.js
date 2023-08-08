@@ -100,4 +100,33 @@ jQuery( document ).ready(function( $ ) {
             });
         }
     });
+
+    $('#date-toggle').on('click', function() {
+        var toggleIcon = $(this);
+        var toggleValue = toggleIcon.hasClass('asc') ? 'desc' : 'asc';
+
+        toggleIcon.toggleClass('asc', toggleValue === 'asc');
+        toggleIcon.toggleClass('desc', toggleValue === 'desc');
+        toggleIcon.html(toggleValue === 'asc' ? '&#x25B2;' : '&#x25BC;');
+
+
+        var currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('date_toggle', toggleValue);
+        window.location.href = currentUrl.href;
+    });
+
+    $('#start-date').on('change', function() {
+        var fromDate = $(this).val();
+        $('#end-date').attr('min', fromDate);
+    });
+
+    $('#vt_search').on('change', function() {
+        var searchDate = $(this).val();
+        var regex = /^\d{2}\/\d{2}\/\d{4}$/; // Regular expression for dd/mm/yyyy format
+
+        if (!regex.test(searchDate)) {
+            alert('Please enter the date in dd/mm/yyyy format.');
+            return false; // Prevent form submission
+        }
+    });
 });
