@@ -399,8 +399,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $transaction_type   = !empty( $_GET['vt-type'] ) ? sanitize_text_field( $_GET['vt-type'] ) : "";
 
                 $transaction_search   = !empty( $_GET['vt-search'] ) ? sanitize_text_field( $_GET['vt-search'] ) : "";
-                $search_date = DateTime::createFromFormat('d/m/Y', $transaction_search);
-                $search_date = $search_date ? $search_date->format('Y-m-d') : '';
+//                $search_date = DateTime::createFromFormat('d/m/Y', $transaction_search);
+//                $search_date = $search_date ? $search_date->format('Y-m-d') : '';
 
                 $start_date = isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : '';
                 $end_date = isset( $_GET['end-date'] ) ? sanitize_text_field( $_GET['end-date'] ) : '';
@@ -415,11 +415,21 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'author' => get_current_user_id(),
                     'order' => $order,
                     'orderby' => 'date',
+                    's' => $transaction_search
                 );
-
-                if( !empty( $transaction_search ) ) {
-                    $transaction_args['s'] = $transaction_search;
+                if (!empty($transaction_search)) {
+                    $transaction_args['meta_query'][] = array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => '_payment_action',
+                            'value' => 'CAPTURE'
+                        ),
+                    );
                 }
+//                if( !empty( $transaction_search ) ) {
+//                    $transaction_args['s'] = $transaction_search;
+//                }
+//
                 if ( !empty( $start_date ) && !empty( $end_date ) ) {
                     $transaction_args['date_query'] = array(
                         array(
