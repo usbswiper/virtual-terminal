@@ -100,7 +100,7 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                             echo !empty($city) ? ' , ' . $state : $state;
                         }
                         if (!empty($postcode)) {
-                            echo (!empty($city) || !empty($state)) ? '-' . $postcode;
+                            echo (!empty($city) || !empty($state)) ? '-' . $postcode : $postcode;
                         }
                     ?>
                 </p>
