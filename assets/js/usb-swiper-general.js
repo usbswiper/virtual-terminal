@@ -120,13 +120,13 @@ jQuery( document ).ready(function( $ ) {
         $('#end-date').attr('min', fromDate);
     });
 
-    $('#vt_search').on('change', function() {
-        var searchDate = $(this).val();
-        var regex = /^\d{2}\/\d{2}\/\d{4}$/; // Regular expression for dd/mm/yyyy format
-
-        if (!regex.test(searchDate)) {
-            alert('Please enter the date in dd/mm/yyyy format.');
-            return false; // Prevent form submission
-        }
-    });
+    // $('#vt_search').on('change', function() {
+    //     var searchDate = $(this).val();
+    //     var regex = /^\d{2}\/\d{2}\/\d{4}$/; // Regular expression for dd/mm/yyyy format
+    //
+    //     if (!regex.test(searchDate)) {
+    //         alert('Please enter the date in dd/mm/yyyy format.');
+    //         return false; // Prevent form submission
+    //     }
+    // });
 });

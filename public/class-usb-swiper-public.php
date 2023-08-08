@@ -418,13 +418,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 );
 
                 if( !empty( $transaction_search ) ) {
-                    $transaction_args['date_query'] = array(
-                        array(
-                            'after'     => $search_date . ' 00:00:00',
-                            'before'    => $search_date . ' 23:59:59',
-                            'inclusive' => true,
-                        ),
-                    );
+                    $transaction_args['s'] = $transaction_search;
                 }
                 if ( !empty( $start_date ) && !empty( $end_date ) ) {
                     $transaction_args['date_query'] = array(
@@ -461,12 +455,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     <form class="transaction-filter-form" id="transaction_filter_form">
                         <div class="transaction-filter-wrap">
                             <div class="input-field-wrap form-row">
-                                <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? sanitize_text_field( $_GET['vt-search'] ) : ''; ?>" placeholder="<?php echo __('dd/mm/yyyy'); ?>">
+                                <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? sanitize_text_field( $_GET['vt-search'] ) : ''; ?>" placeholder="<?php echo __('Search...'); ?>">
                             </div>
                             <div class="input-field-wrap date-field-wrap form-row">
-                                <label for="date-range" class="date-range-label"><?php _e( 'Date:', 'usb-swiper' ); ?></label>
-                                <span class="date-range-label"><?php _e( 'From' , 'usb-swiper' ); ?></span><input type="date" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>">
-                                <span class="date-range-label"><?php _e( 'to', 'usb-swiper' ); ?></span><input type="date" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>">
+                                <span class="date-range-label"><?php _e( 'From:' , 'usb-swiper' ); ?></span><input type="date" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>">
+                                <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="date" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>">
                             </div>
                             <div class="input-field-wrap form-row">
                                 <select name="vt-type" id="vt_type" class="transaction-input-field">
