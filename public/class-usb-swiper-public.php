@@ -464,9 +464,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? sanitize_text_field( $_GET['vt-search'] ) : ''; ?>" placeholder="<?php echo __('dd/mm/yyyy'); ?>">
                             </div>
                             <div class="input-field-wrap date-field-wrap form-row">
-                                <label for="date-range" class="date-range-label"><?php echo _e( 'Date:' ); ?></label>
-                                <span class="date-range-label">From</span><input type="date" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>">
-                                <span class="date-range-label">to</span><input type="date" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>">
+                                <label for="date-range" class="date-range-label"><?php _e( 'Date:', 'usb-swiper' ); ?></label>
+                                <span class="date-range-label"><?php _e( 'From' , 'usb-swiper' ); ?></span><input type="date" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>">
+                                <span class="date-range-label"><?php _e( 'to', 'usb-swiper' ); ?></span><input type="date" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>">
                             </div>
                             <div class="input-field-wrap form-row">
                                 <select name="vt-type" id="vt_type" class="transaction-input-field">
