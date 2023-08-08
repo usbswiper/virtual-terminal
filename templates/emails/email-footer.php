@@ -55,16 +55,22 @@ defined( 'ABSPATH' ) || exit;
 
                                 ?>
                                 <div class="footer-info" style="text-align: center;">
-                                    <h2 style="margin: 0px;text-align: center;"><?php echo !empty( $company_name ) ? $company_name : ''; ?></h2>
-                                    <p style="margin: 0px;"><?php echo !empty( $user_email ) ? $user_email : ''; ?></p>
-                                    <p style="margin: 0px;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
+                                    <?php if( !empty( $company_name ) ){ ?>
+                                        <h2 style="margin: 0px;text-align: center;"><?php echo $company_name; ?></h2>
+                                    <?php }
+                                    if (!empty($user_email)){ ?>
+                                    <p style="margin: 0px;"><?php echo $user_email; ?></p>
+                                    <?php }
+                                    if (!empty($phone)){ ?>
+                                    <p style="margin: 0px;"><?php echo $phone; ?></p>
+                                    <?php } ?>
                                     <p style="margin: 0px;">
                                         <?php
                                             if (!empty($user_address1)) {
                                                 echo $user_address1;
                                             }
                                             if (!empty($user_address2)) {
-                                                echo ', ' . $user_address2;
+                                                echo !empty($user_address1) ? ', ' . $user_address2 : $user_address2;
                                             }
                                         ?>
                                    </p>
@@ -74,14 +80,16 @@ defined( 'ABSPATH' ) || exit;
                                                 echo $city;
                                             }
                                             if (!empty($state)) {
-                                                echo ', ' . $state;
+                                                echo !empty($city) ? ', ' . $state : $state;
                                             }
                                             if (!empty($postcode)) {
-                                                echo '-' . $postcode;
+                                                echo (!empty($city) || !empty($state)) ? '-' . $postcode : $postcode;
                                             }
                                         ?>
                                     </p>
-                                    <p style="margin: 0px;"><?php echo !empty( $country ) ? $country : ''; ?></p>
+                                    <?php if( !empty( $country ) ){ ?>
+                                        <p style="margin: 0px;"><?php echo $country; ?></p>
+                                    <?php } ?>
                                 </div>
                             </td>
                         </tr>
@@ -95,7 +103,7 @@ defined( 'ABSPATH' ) || exit;
 </table>
 </div>
 </td>
-<td><!-- Deliberately empty to support consistent sizing and layout across multiple email clients. --></td>
+<td></td>
 </tr>
 </table>
 </body>

@@ -87,7 +87,7 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                             echo $user_address1;
                         }
                         if (!empty($user_address2)) {
-                            echo ' , ' . $user_address2;
+                            echo !empty($user_address1) ? ' , ' . $user_address2 : $user_address2;
                         }
                     ?>
                 </p>
@@ -97,10 +97,10 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                             echo $city;
                         }
                         if (!empty($state)) {
-                            echo ' , ' . $state;
+                            echo !empty($city) ? ' , ' . $state : $state;
                         }
                         if (!empty($postcode)) {
-                            echo '-' . $postcode;
+                            echo (!empty($city) || !empty($state)) ? '-' . $postcode;
                         }
                     ?>
                 </p>

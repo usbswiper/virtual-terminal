@@ -26,6 +26,5 @@ usb_swiper_get_template( 'wc-transaction-history.php', $args );
 if ( $additional_content ) {
     echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
 }
-//echo __('Hello', 'usb-swiper');
-//$footer_info = $usb_swiper_public->add_footer();
+
 do_action( 'woocommerce_email_footer', $email );
