@@ -35,6 +35,7 @@
             'id' => 'tax_on_shipping',
             'name' => 'tax_on_shipping',
             'label' => __( 'Include Shipping:', 'usb-swiper' ),
+            'wrapper_class' => 'inline-checkbox',
             'attributes' => '',
             'description' => '',
             'readonly' => false,

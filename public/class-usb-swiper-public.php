@@ -2355,10 +2355,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $tax_key = ! empty( $_POST['tax-key'] ) ? $_POST['tax-key'] : '';
                 $data = '';
 
-                $tax_data = get_user_meta(get_current_user_id(), 'user_tax_data', true);
+                $tax_options = get_user_meta(get_current_user_id(), 'user_tax_data', true);
                 $count = 0;
-                if (!empty($tax_data)) {
-                    foreach ( $tax_data as $tax_option_key => $tax ) {
+                if (!empty($tax_options) && is_array($tax_options)) {
+                    foreach ( array_reverse($tax_options) as $tax_option_key => $tax ) {
                         $count ++;
                         $tax_rate = !empty( $tax['tax_rate'] ) ? $tax['tax_rate'] : '';
                         $tax_label = !empty( $tax['tax_label'] ) ? $tax['tax_label'] : '';
@@ -2971,7 +2971,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 
             $status = false;
-            $message = __('Something went wrong. Please try again.','usb-swiper');
+            $message = __('Nonce not verified. Please try again.','usb-swiper');
             $message_type = __('ERROR','usb-swiper');
 
             parse_str($_POST['fields'], $fields);
@@ -2983,8 +2983,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $tax_label = ! empty( $fields['tax_label'] ) ? sanitize_text_field( $fields['tax_label'] ) : '';
                 $tax_rate  = ! empty( $fields['tax_rate'] ) ? sanitize_text_field( $fields['tax_rate'] ) : '';
 
-                $tax_id = !empty( $fields['vt_taxrule_id'] ) ? $fields['vt_taxrule_id'] : '';
-                $tax_id = !empty( $tax_id ) ? $tax_id : strtolower($tax_label) . '_' . $tax_rate;
+                $tax_id = strtolower(str_replace([' ','+','%','!','@','#','$','^','&','*','(',')','-','=','/','>','<',','],'_',$tax_label)) . '_' . $tax_rate;
 
                 $include_shipping  = isset($fields['tax_on_shipping']) ? true : false;
 
@@ -2993,7 +2992,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                     $tax_data = get_user_meta($user_id, 'user_tax_data', true);
 
-                    $label_exists = array_key_exists($tax_id, $tax_data);
+                    $labels = array_column($tax_data, 'tax_label');
+                    $label_exists = in_array($tax_label,$labels);
 
                     if( ( empty( $tax_id ) || empty( $vt_action ) || 'edit' !== $vt_action ) && $label_exists ){
                         $message = __('Tax label exists.','usb-swiper');
@@ -3007,6 +3007,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                         if (is_array($tax_data)) {
                             if( !empty( $tax_id ) && !empty( $vt_action ) && 'edit' === $vt_action ){
+                                if( !empty( $fields['vt_taxrule_id'] ) && isset( $tax_data[$fields['vt_taxrule_id']] ) ){
+                                    unset($tax_data[$fields['vt_taxrule_id']]);
+                                }
                                 $tax_data[$tax_id] = $new_tax_item;
                                 $message = __('Tax updated successfully.','usb-swiper');
                             } elseif ( !empty( $vt_action ) && 'add' === $vt_action ){
@@ -3024,9 +3027,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 } catch(Exception $e) {
                     $message = $e->getMessage();
                 }
-            } else {
-                $status  = false;
-                $message = __('Nonce not verified. Please try again.','usb-swiper');
             }
 
             wp_send_json(
