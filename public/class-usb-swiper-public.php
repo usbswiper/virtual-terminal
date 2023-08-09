@@ -418,17 +418,34 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'author' => get_current_user_id(),
                     'order' => $order,
                     'orderby' => 'date',
+                    'transaction_search' => 1
                 );
 
-                $transaction_args['date_query'] = array(
-                    array(
-                        'after' => $search_date, // Assuming the date is stored as 'YYYY-MM-DD'
-                        'inclusive' => true
-                    ),
-                );
-                $transaction_args['s'] = $transaction_search;
+                if( !empty( $search_date ) ){
+                    $transaction_args['date_query'] = array(
+                        array(
+                            'after' => $search_date,
+                            'inclusive' => true
+                        ),
+                    );
+                }
+
+                if( !empty($transaction_search) ){
+                    $transaction_args['search_prod_title'] = $transaction_search;
+                }
+
                 if (!empty($transaction_search)) {
+                    $transaction_status = !empty($_REQUEST['transaction_status']) ? sanitize_text_field($_REQUEST['transaction_status']) : "";
+                    if( empty( $transaction_type ) && !empty( $transaction_search ) && in_array( $transaction_search, ['paid', 'authorized']) ) {
+                        $transaction_type = 'invoice';
+                    }
                     $meta_query = array('relation' => 'OR');
+
+                    $meta_query[] = array(
+                        'key'     => '_payment_status',
+                        'value'   => $transaction_search,
+                        'compare' => 'LIKE'
+                    );
 
                     $meta_query[] = array(
                         'key' => '_payment_response',
@@ -477,7 +494,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     );
                 }
 
+                add_filter( 'posts_where',array($this, 'vt_title_filter'), 10, 2 );
                 $transactions = new WP_Query( $transaction_args );
+                remove_filter( 'posts_where',array($this,'vt_title_filter'), 10, 2 );
 				$args = array(
 					'transactions' => !empty( $transactions->posts ) ? $transactions->posts : '',
 					'current_page'    => absint( $current_page ),
@@ -488,43 +507,52 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				extract( $args );
 
-                if( !empty( $args['has_transactions'] ) ) {
-                    ?>
-                    <form class="transaction-filter-form" id="transaction_filter_form">
-                        <div class="transaction-filter-wrap">
-                            <div class="input-field-wrap form-row">
-                                <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? sanitize_text_field( $_GET['vt-search'] ) : ''; ?>" placeholder="<?php echo __('Search...'); ?>">
-                            </div>
-                            <div class="input-field-wrap date-field-wrap form-row">
-                                <span class="date-range-label"><?php _e( 'From:' , 'usb-swiper' ); ?></span><input type="text" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
-                                <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="text" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
-                            </div>
-                            <div class="input-field-wrap form-row">
-                                <select name="vt-type" id="vt_type" class="transaction-input-field">
-                                    <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
-                                    <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
-                                    <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Virtual Terminal ','usb-swiper'); ?></option>
-                                </select>
-                            </div>
-                            <div class="input-field-wrap form-row">
-                                <button type="submit" class="vt-button"><?php _e('FILTER','usb-swiper'); ?></button>
-                            </div>
+                ?>
+                <form class="transaction-filter-form" id="transaction_filter_form">
+                    <div class="transaction-filter-wrap">
+                        <div class="input-field-wrap form-row">
+                            <input type="text" name="vt-search" id="vt_search" class="transaction-input-field" value="<?php echo isset($_GET['vt-search']) ? sanitize_text_field( $_GET['vt-search'] ) : ''; ?>" placeholder="<?php echo __('Search...'); ?>">
                         </div>
-                    </form>
-                    <?php
-                }
+                        <div class="input-field-wrap date-field-wrap form-row">
+                            <span class="date-range-label"><?php _e( 'From:' , 'usb-swiper' ); ?></span><input type="text" id="start-date" class="start-date vt-date-field transaction-input-field" name="start-date" value="<?php echo isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
+                            <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="text" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
+                        </div>
+                        <div class="input-field-wrap form-row">
+                            <select name="vt-type" id="vt_type" class="transaction-input-field">
+                                <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
+                                <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
+                                <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Virtual Terminal ','usb-swiper'); ?></option>
+                            </select>
+                        </div>
+                        <div class="input-field-wrap form-row">
+                            <button type="submit" class="vt-button"><?php _e('FILTER','usb-swiper'); ?></button>
+                        </div>
+                    </div>
+                </form>
+                <?php
 				usb_swiper_get_template('wc-transactions-lists.php', $args);
 			}
 		}
 
-//        function vt_posts_where( $where, &$wp_query )
-//        {
-//            global $wpdb;
-//            if ( $title = $wp_query->get( 'search_title' ) ) {
-//                $where .= " AND " . $wpdb->posts . ".post_title LIKE '" . esc_sql( $wpdb->esc_like( $title ) ) . "%'";
-//            }
-//            return $where;
-//        }
+
+        /**
+         * WP_Query title filter callback function.
+         *
+         * @param $where
+         * @param $wp_query
+         * @return mixed|string
+         */
+        public function vt_title_filter($where, $wp_query){
+            global $wpdb;
+            $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
+            $search_term = !empty( $wp_query->get( 'search_prod_title' ) ) ? $wp_query->get( 'search_prod_title' ) : '';
+            if ( '1' == $transaction_search && !empty( $search_term ) ) {
+                $where .= ' OR ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\'';
+            }
+            return $where;
+        }
+
+
         /**
          * Transaction Detail page endpoint callback method.
          *
