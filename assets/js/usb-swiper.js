@@ -380,11 +380,21 @@ jQuery( document ).ready(function( $ ) {
         var discountType = $('#DiscountType').val();
 
         var discountAmount;
-        if (discountType === 'percent') {
-            discountAmount = (orderAmount * discountInput) / 100;
+        if (discountInput === '') {
+            discountAmount = 0; // Set discount amount to 0 if input is empty
         } else {
-            discountAmount = discountInput;
+            discountInput = parseFloat(discountInput); // Convert to float
+            if (isNaN(discountInput)) {
+                discountAmount = 0; // Set discount amount to 0 if invalid input
+            } else {
+                if (discountType === 'percent') {
+                    discountAmount = (orderAmount * discountInput) / 100;
+                } else {
+                    discountAmount = discountInput;
+                }
+            }
         }
+
         if (discountAmount > orderAmount) {
             set_notification('Discount Amount is greater than Order Amount so please add valid discount amount', 'error');
             $('#pos-submit-btn').prop('disabled', true);
@@ -393,6 +403,7 @@ jQuery( document ).ready(function( $ ) {
             $('#pos-submit-btn').prop('disabled', false);
             $('#PayByInvoice').prop('disabled', false);
         }
+
         $('#DiscountAmount').val(discountAmount.toFixed(2));
 
         var netAmount = orderAmount - discountAmount;
