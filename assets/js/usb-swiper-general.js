@@ -45,27 +45,30 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $(document).on('click', '.vt_delete_taxrule', function(){
-        var index = $(this).data('tax-index');
-        deleteTaxData(index);
-    });
-    function deleteTaxData(index) {
-        // Perform the AJAX request
+        var TaxId = $(this).data('tax-index');
+        var TaxNonce = $(this).data('nonce');
+
         jQuery.ajax({
-          url: usb_swiper_settings.ajax_url,
-          type: 'POST',
-          data: {
-            action: 'delete_tax_data',
-            tax_id: index
-          },
-          success: function (response) {
-            // Reload the page to reflect the updated tax data
-            location.reload();
-          },
-          error: function (errorThrown) {
-            console.log('Error:', errorThrown);
-          }
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'delete_tax_data',
+                tax_nonce: TaxNonce,
+                tax_id: TaxId
+            },
+            success: function (response) {
+                if (response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            },
+            error: function (errorThrown) {
+                console.log('Error:', errorThrown);
+            }
         });
-    }
+
+    });
 
     const usb_swiper_add_loader = ( current_obj) => {
         current_obj.append('<span class="vt-loader"></span>');

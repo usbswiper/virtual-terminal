@@ -16,7 +16,7 @@ jQuery( document ).ready(function( $ ) {
     if (NetAmount !== null) $('#NetAmount').val(NetAmount);
     if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
     if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
-    if (TaxRate !== null){
+    if( !isNaN(TaxRate) && TaxRate !== null){
         TaxRate = parseInt(TaxRate);
         $('#TaxRate').val(TaxRate);
     }

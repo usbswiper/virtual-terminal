@@ -2346,7 +2346,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          */
         public function vt_search_tax() {
             $status = false;
-            $message = __( 'Something went Wrong', 'usb-swiper');
+            $message = __( 'Something went Wrong, please try after some time.', 'usb-swiper');
             $message_type = __('ERROR','usb-swiper');
 
             if( ! empty( $_POST['vt-add-tax-nonce'] ) && wp_verify_nonce( $_POST['vt-add-tax-nonce'],'vt_add_tax_nonce') ) {
@@ -2354,10 +2354,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $message_type = __('SUCCESS', 'usb-swiper');
                 $tax_key = ! empty( $_POST['tax-key'] ) ? $_POST['tax-key'] : '';
                 $data = '';
-
+                $message = __( 'No any tax found.', 'usb-swiper');
                 $tax_options = get_user_meta(get_current_user_id(), 'user_tax_data', true);
                 $count = 0;
                 if (!empty($tax_options) && is_array($tax_options)) {
+                    $message = __( 'Tax options found successfully.', 'usb-swiper');
                     foreach ( array_reverse($tax_options) as $tax_option_key => $tax ) {
                         $count ++;
                         $tax_rate = !empty( $tax['tax_rate'] ) ? $tax['tax_rate'] : '';
@@ -3045,18 +3046,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @return void
          */
         public function vt_delete_tax_data() {
-            if (isset($_POST['tax_id']) && !empty($_POST['tax_id']) ) {
+            $status = false;
+            $message_type = "error";
+            $message = __('Nonce not verified, please try after some time.', 'usb-swiper');
+            if ( !empty( $_POST['tax_nonce'] ) && wp_verify_nonce($_POST['tax_nonce'],'vt-remove-tax') && isset($_POST['tax_id']) && !empty($_POST['tax_id']) ) {
+                $message = __('Something went wrong, please try after some time', 'usb-swiper');
                 $tax_id = sanitize_text_field($_POST['tax_id']);
                 $user_id = get_current_user_id();
                 $tax_data = get_user_meta($user_id, 'user_tax_data', true);
                 if (is_array($tax_data) && isset($tax_data[$tax_id])) {
+                    $status = true;
+                    $message_type = "success";
+                    $message = __('Tax removed successfully.', 'usb-swiper');
                     unset($tax_data[$tax_id]);
                     update_user_meta($user_id, 'user_tax_data', $tax_data);
-                    echo 'success';
-                } else {
-                    echo 'error';
                 }
             }
+            wp_send_json(
+                array(
+                    'status' => $status,
+                    'redirect_url' => wc_get_endpoint_url( 'vt-tax-rules', '', wc_get_page_permalink( 'myaccount' )),
+                    'message' => $message,
+                    'message_type' => $message_type,
+                )
+            );
         }
 
         public function handle_default_tax(){
