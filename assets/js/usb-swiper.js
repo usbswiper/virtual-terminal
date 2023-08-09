@@ -20,7 +20,7 @@ jQuery( document ).ready(function( $ ) {
     if (NetAmount !== null) $('#NetAmount').val(NetAmount);
     if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
     if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
-    if (TaxRate !== null){
+    if ( isNaN(TaxRate) && TaxRate !== null){
         TaxRate = parseInt(TaxRate);
         $('#TaxRate').val(TaxRate);
     }
@@ -379,19 +379,15 @@ jQuery( document ).ready(function( $ ) {
         var discountInput = parseFloat($('#Discount').val());
         var discountType = $('#DiscountType').val();
 
-        var discountAmount;
-        if (discountInput === '') {
-            discountAmount = 0; // Set discount amount to 0 if input is empty
-        } else {
+        var discountAmount = 0;
+        var netAmount = 0;
+
+        if ( !isNaN(orderAmount) && !isNaN(discountInput) && discountInput !== '') {
             discountInput = parseFloat(discountInput); // Convert to float
-            if (isNaN(discountInput)) {
-                discountAmount = 0; // Set discount amount to 0 if invalid input
+            if (discountType === 'percent') {
+                discountAmount = (orderAmount * discountInput) / 100;
             } else {
-                if (discountType === 'percent') {
-                    discountAmount = (orderAmount * discountInput) / 100;
-                } else {
-                    discountAmount = discountInput;
-                }
+                discountAmount = discountInput;
             }
         }
 
@@ -406,7 +402,9 @@ jQuery( document ).ready(function( $ ) {
 
         $('#DiscountAmount').val(discountAmount.toFixed(2));
 
-        var netAmount = orderAmount - discountAmount;
+        if ( !isNaN(orderAmount) && !isNaN(discountAmount) ) {
+            netAmount = orderAmount - discountAmount;
+        }
         $('#NetAmount').val(netAmount.toFixed(2));
         updateSalesTax();
         updateGrandTotal();
@@ -549,6 +547,7 @@ jQuery( document ).ready(function( $ ) {
 
         $('#NetAmount').val(net_price.toFixed(2));
         $('#OrderAmount').val(net_price.toFixed(2));
+        jQuery('#Discount').trigger('change');
         updateSalesTax();
         updateGrandTotal();
     });
@@ -665,6 +664,7 @@ jQuery( document ).ready(function( $ ) {
 
                 $('#OrderAmount').val(net_price.toFixed(2));
                 $('#NetAmount').val(net_price.toFixed(2));
+                jQuery('#Discount').trigger('change');
                 updateSalesTax();
                 updateGrandTotal();
             } else {
@@ -692,6 +692,7 @@ jQuery( document ).ready(function( $ ) {
 
         $('#OrderAmount').val(net_price.toFixed(2));
         $('#NetAmount').val(net_price.toFixed(2));
+        jQuery('#Discount').trigger('change');
         updateSalesTax();
         updateGrandTotal();
     });
