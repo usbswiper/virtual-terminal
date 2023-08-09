@@ -114,16 +114,14 @@ jQuery( document ).ready(function( $ ) {
         window.location.href = currentUrl.href;
     });
 
-    $('#start-date').on('change', function() {
-        var fromDate = $(this).val();
-        $('#end-date').attr('min', fromDate);
-    });
-
     // Initialize the datepicker for start date field
     $('#start-date').datepicker({
         dateFormat: 'yy-mm-dd', // The format to submit the date in
         changeMonth: true,
         changeYear: true,
+        onSelect: function(selectedDate) {
+            $('#end-date').datepicker('option', 'minDate', selectedDate);
+        }
     });
 
     // Initialize the datepicker for end date field
