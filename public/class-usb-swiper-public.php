@@ -402,6 +402,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $transaction_search   = !empty( $_GET['vt-search'] ) ? sanitize_text_field( $_GET['vt-search'] ) : "";
 
+                $search_date = DateTime::createFromFormat('d/m/Y', $transaction_search);
+                $search_date = $search_date ? $search_date->format('Y-m-d') : '';
+
                 $start_date = isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : '';
                 $end_date = isset( $_GET['end-date'] ) ? sanitize_text_field( $_GET['end-date'] ) : '';
 
@@ -417,8 +420,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'orderby' => 'date',
                 );
 
+                $transaction_args['date_query'] = array(
+                    array(
+                        'after' => $search_date, // Assuming the date is stored as 'YYYY-MM-DD'
+                        'inclusive' => true
+                    ),
+                );
+                $transaction_args['s'] = $transaction_search;
                 if (!empty($transaction_search)) {
-                    $transaction_args['s'] = $transaction_search;
                     $meta_query = array('relation' => 'OR');
 
                     $meta_query[] = array(
