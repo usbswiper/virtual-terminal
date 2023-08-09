@@ -273,14 +273,11 @@ form.transaction-filter-form {width: 810px;}
 
 @media only screen and (max-width: 820px) {
     .vt-form-contents .vt-row .vt-col.vt-col-payments.fixed {width: 30%;}
-<<<<<<< HEAD
     .vt-pagination ul li a, .vt-pagination ul li span {font-size: 0.8rem;}
-=======
     form.transaction-filter-form {width: 100%;}
     .transaction-filter-form .transaction-filter-wrap {display: block;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap {display: flex;align-items: center;justify-content: flex-start;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .vt-date-field {width: 300px;}
->>>>>>> 5af4b9d (Add date filter functionality to Transactions data)
 }
 
 @media (max-width: 760px) {
@@ -311,12 +308,10 @@ form.transaction-filter-form {width: 810px;}
     .vt-repeater-field .input-field-wrap:nth-child(3){width: calc(50% - 12px);}
     .vt-repeater-field .vt-fields-wrap:has(svg) .price{width: calc(42% - 12px);}
     .vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner{max-width: 100%}
-<<<<<<< HEAD
     .vt-pagination ul li a, .vt-pagination ul li span {padding: 0.5rem;}
-=======
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap {display: block;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .date-range-label {margin-right: 0;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .vt-date-field {width: 100%;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .start-date {margin-right: 0;}
->>>>>>> 5af4b9d (Add date filter functionality to Transactions data)
+
 }

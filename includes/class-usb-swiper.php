@@ -207,6 +207,7 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_account_content', $plugin_public, 'add_notification_for_verify_profile', 9);
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email',$plugin_public, 'send_transaction_email' );
 		$this->loader->add_filter( 'wp_ajax_send_transaction_email_html',$plugin_public, 'send_transaction_email_html' );
+//        $this->loader->add_filter( 'posts_where', 'vt_posts_where', 10, 2 );
 
 		if (!is_admin()) {
 			return;

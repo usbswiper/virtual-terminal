@@ -416,30 +416,36 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'order' => $order,
                     'orderby' => 'date',
                 );
+
                 if (!empty($transaction_search)) {
-                    $transaction_args['meta_query'][] = array(
-                        'relation' => 'OR',
-                        array(
-                            'key' => '_payment_response',
-                            'value' => $transaction_search,
-                            'compare' => 'LIKE'
-                        ),
-                        array(
-                            'key' => '_payment_response',
-                            'value' => $transaction_search,
-                            'compare' => 'LIKE'
-                        ),
-                        array(
-                            'key' => 'TransactionType',
-                            'value' => $transaction_search,
-                            'compare' => 'LIKE'
-                        ),
-                        array(
-                            'key' => 'GrandTotal',
-                            'value' => $transaction_search,
-                            'compare' => 'LIKE'
-                        ),
+                    $transaction_args['s'] = $transaction_search;
+                    $meta_query = array('relation' => 'OR');
+
+                    $meta_query[] = array(
+                        'key' => '_payment_response',
+                        'value' => $transaction_search,
+                        'compare' => 'LIKE'
                     );
+
+                    $meta_query[] = array(
+                        'key' => 'TransactionType',
+                        'value' => $transaction_search,
+                        'compare' => 'LIKE'
+                    );
+
+                    $meta_query[] = array(
+                        'key' => 'GrandTotal',
+                        'value' => $transaction_search,
+                        'compare' => '='
+                    );
+
+                    $meta_query[] = array(
+                        'key' => '_user_invoice_id',
+                        'value' => $transaction_search,
+                        'compare' => '='
+                    );
+
+                    $transaction_args['meta_query'] = $meta_query;
                 }
 
                 if ( !empty( $start_date ) && !empty( $end_date ) ) {
@@ -453,7 +459,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
 
                 if( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'invoice' || strtolower($transaction_type) === 'transaction' ) ){
-                    $transaction_args['meta_query'] = array(
+                    $transaction_args['meta_query'][] = array(
                         array(
                             'key' => '_transaction_type',
                             'value' => $transaction_type,
@@ -502,6 +508,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			}
 		}
 
+//        function vt_posts_where( $where, &$wp_query )
+//        {
+//            global $wpdb;
+//            if ( $title = $wp_query->get( 'search_title' ) ) {
+//                $where .= " AND " . $wpdb->posts . ".post_title LIKE '" . esc_sql( $wpdb->esc_like( $title ) ) . "%'";
+//            }
+//            return $where;
+//        }
         /**
          * Transaction Detail page endpoint callback method.
          *
