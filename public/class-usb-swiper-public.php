@@ -2984,49 +2984,56 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $tax_label = ! empty( $fields['tax_label'] ) ? sanitize_text_field( $fields['tax_label'] ) : '';
                 $tax_rate  = ! empty( $fields['tax_rate'] ) ? sanitize_text_field( $fields['tax_rate'] ) : '';
 
-                $tax_id = strtolower(str_replace([' ','+','%','!','@','#','$','^','&','*','(',')','-','=','/','>','<',','],'_',$tax_label)) . '_' . $tax_rate;
+                if( empty($tax_label) || empty($tax_rate) ) {
+                    $message = __('Tax label and Tax rate both fields is required','usb-swiper');
+                } else {
+                    $tax_id = strtolower(str_replace([' ', '+', '%', '!', '@', '#', '$', '^', '&', '*', '(', ')', '-', '=', '/', '>', '<', ','], '_', $tax_label)) . '_' . $tax_rate;
 
-                $include_shipping  = isset($fields['tax_on_shipping']) ? true : false;
+                    $include_shipping = isset($fields['tax_on_shipping']) ? true : false;
 
-                try {
-                    $user_id = get_current_user_id();
+                    try {
+                        $user_id = get_current_user_id();
 
-                    $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+                        $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+                        $tax_data = !empty($tax_data) ? $tax_data : array();
 
-                    $labels = array_column($tax_data, 'tax_label');
-                    $label_exists = in_array($tax_label,$labels);
-
-                    if( ( empty( $tax_id ) || empty( $vt_action ) || 'edit' !== $vt_action ) && $label_exists ){
-                        $message = __('Tax label exists.','usb-swiper');
-                    }else{
-                        $new_tax_item = array(
-                            'tax_label' => $tax_label,
-                            'tax_rate' => $tax_rate,
-                            'tax_on_shipping' => $include_shipping
-                        );
-                        $message = __('Tax created successfully.','usb-swiper');
-
-                        if (is_array($tax_data)) {
-                            if( !empty( $tax_id ) && !empty( $vt_action ) && 'edit' === $vt_action ){
-                                if( !empty( $fields['vt_taxrule_id'] ) && isset( $tax_data[$fields['vt_taxrule_id']] ) ){
-                                    unset($tax_data[$fields['vt_taxrule_id']]);
-                                }
-                                $tax_data[$tax_id] = $new_tax_item;
-                                $message = __('Tax updated successfully.','usb-swiper');
-                            } elseif ( !empty( $vt_action ) && 'add' === $vt_action ){
-                                $tax_data[$tax_id] = $new_tax_item;
-                            }
-                        } else {
-                            $tax_data[$tax_id] = array($new_tax_item);
+                        if (!empty($tax_data) && is_array($tax_data)) {
+                            $labels = array_column($tax_data, 'tax_label');
+                            $label_exists = in_array($tax_label, $labels);
                         }
 
-                        update_user_meta($user_id, 'user_tax_data', $tax_data);
+                        if ((empty($tax_id) || empty($vt_action) || 'edit' !== $vt_action) && $label_exists) {
+                            $message = __('Tax label exists.', 'usb-swiper');
+                        } else {
+                            $new_tax_item = array(
+                                'tax_label' => $tax_label,
+                                'tax_rate' => $tax_rate,
+                                'tax_on_shipping' => $include_shipping
+                            );
+                            $message = __('Tax created successfully.', 'usb-swiper');
 
-                        $status = true;
-                        $message_type = __('SUCCESS','usb-swiper');
+                            if (!empty($tax_data) && is_array($tax_data)) {
+                                if (!empty($tax_id) && !empty($vt_action) && 'edit' === $vt_action) {
+                                    if (!empty($fields['vt_taxrule_id']) && isset($tax_data[$fields['vt_taxrule_id']])) {
+                                        unset($tax_data[$fields['vt_taxrule_id']]);
+                                    }
+                                    $tax_data[$tax_id] = $new_tax_item;
+                                    $message = __('Tax updated successfully.', 'usb-swiper');
+                                } elseif (!empty($vt_action) && 'add' === $vt_action) {
+                                    $tax_data[$tax_id] = $new_tax_item;
+                                }
+                            } else {
+                                $tax_data[$tax_id] = $new_tax_item;
+                            }
+
+                            update_user_meta($user_id, 'user_tax_data', $tax_data);
+
+                            $status = true;
+                            $message_type = __('SUCCESS', 'usb-swiper');
+                        }
+                    } catch (Exception $e) {
+                        $message = $e->getMessage();
                     }
-                } catch(Exception $e) {
-                    $message = $e->getMessage();
                 }
             }
 
