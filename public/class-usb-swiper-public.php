@@ -2970,7 +2970,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          */
         public function vt_create_update_product_tax() {
 
-
             $status = false;
             $message = __('Nonce not verified. Please try again.','usb-swiper');
             $message_type = __('ERROR','usb-swiper');
