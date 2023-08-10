@@ -60,7 +60,7 @@
             <input type="submit" class="vt-button" name="submit">
         </form>
     <?php } ?>
-    <div class="vt-taxrule" style="width: 100%;">
+    <div class="vt-taxrule">
         <button id="vt_add_taxrule" class="vt-button"><?php _e('Add Tax Rule','usb-swiper'); ?></button>
     </div>
 </div>
