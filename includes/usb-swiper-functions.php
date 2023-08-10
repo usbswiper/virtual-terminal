@@ -201,7 +201,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 	$get_states = usb_swiper_get_states($country_code);
     $tax_data = get_user_meta($user_id, 'user_tax_data', true);
     $default_tax = get_user_meta($user_id,'default_tax',true);
-    $default_tax = !empty( $default_tax ) ? $tax_data[$default_tax] : '';
+    $default_tax = ( !empty( $default_tax ) && isset($tax_data[$default_tax]) ) ? $tax_data[$default_tax] : '';
     $tax_rate = !empty( $default_tax['tax_rate'] ) ? $default_tax['tax_rate'] : '';
     $tax_on_shipping = !empty( $default_tax['tax_on_shipping'] ) ? $default_tax['tax_on_shipping'] : false;
 

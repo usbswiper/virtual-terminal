@@ -381,7 +381,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function endpoint_init() {
-
 			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
@@ -2974,7 +2973,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $message = __('Nonce not verified. Please try again.','usb-swiper');
             $message_type = __('ERROR','usb-swiper');
 
-            parse_str($_POST['fields'], $fields);
+            if( !empty($_POST['fields']) ){
+                parse_str($_POST['fields'], $fields);
+            }
 
             if( ! empty( $fields['vt-add-taxrule-form-nonce'] ) && wp_verify_nonce( $fields['vt-add-taxrule-form-nonce'],'vt-add-taxrule-form') ) {
 

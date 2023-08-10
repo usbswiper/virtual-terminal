@@ -233,10 +233,14 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 #vt_add_taxrule_form .button-wrap .vt-button {margin-right: 8px;}
 .tax-actions a.vt_delete_taxrule {color: #f44336;}
 .input-field-wrap.d-none{display: none;}
-form#default_tax_form,form#default_tax_form .default-tax{padding: 15px 5px; margin-right:30px;}
+form#default_tax_form,form#default_tax_form .default-tax,.vt-tax-filter-wrapper > .vt-taxrule{padding: 15px 5px; margin-right:30px;}
 .vt-taxrule-content .input-field-wrap.inline-checkbox{flex-direction:row;}
 .vt-taxrule-content .input-field-wrap.inline-checkbox .checkmark-container{display:flex;}
-.vt-taxrule-content .input-field-wrap.inline-checkbox .checkmark-container input{margin: 2px 0 0 5px;}
+.vt-taxrule-content .input-field-wrap.inline-checkbox .checkmark-container input{width:20px;}
+.vt-taxrule-content .input-field-wrap.inline-checkbox .checkbox-label{order:2;}
+.vt-tax-filter-wrapper{display:flex;flex-flow:row;}
+.vt-tax-filter-wrapper #default_tax_form{display: flex;align-content:center;}
+.vt-tax-filter-wrapper .vt-button{margin:0;}
 
 @media print {
     body{line-height: 1.2 !important;}
@@ -289,6 +293,7 @@ form#default_tax_form,form#default_tax_form .default-tax{padding: 15px 5px; marg
 
 @media (max-width: 760px) {
     .tool::after {font-size: .75em;margin-left: -5em;width: 10em;}
+    .vt-tax-filter-wrapper{flex-flow:column;}
 }
 
 @media only screen and (max-width: 600px) {

@@ -34,7 +34,7 @@
             'type' => 'checkbox',
             'id' => 'tax_on_shipping',
             'name' => 'tax_on_shipping',
-            'label' => __( 'Include Shipping:', 'usb-swiper' ),
+            'label' => __( 'Include Shipping', 'usb-swiper' ),
             'wrapper_class' => 'inline-checkbox',
             'attributes' => '',
             'description' => '',
@@ -45,25 +45,25 @@
     );
 ?>
 <div class="vt-form-notification"></div>
-<div class="vt-taxrule" style="width: 100%;">
-    <button id="vt_add_taxrule" class="vt-button"><?php _e('Add Tax Rule','usb-swiper'); ?></button>
+<div class="vt-tax-filter-wrapper">
+    <?php if( !empty($tax_data) && is_array($tax_data)){ ?>
+        <form name="default-tax-form" id="default_tax_form" method="post">
+            <label class="default-tax-label">
+                <select name="default-tax" id="default_tax" class="default-tax">
+                    <option <?php echo selected($default_tax,'');?> value=""><?php _e('Default Tax','usb-swiper'); ?></option>
+                    <?php foreach($tax_data as $tax_option_key => $tax_option){ ?>
+                        <option value="<?php echo $tax_option_key; ?>" <?php echo selected($default_tax,$tax_option_key);?>><?php echo wp_kses_post($tax_option['tax_label']);?></option>
+                    <?php } ?>
+                </select>
+            </label>
+            <input type="hidden" name="default_tax_nonce" value="<?php echo wp_create_nonce('vt-default-tax-form'); ?>">
+            <input type="submit" class="vt-button" name="submit">
+        </form>
+    <?php } ?>
+    <div class="vt-taxrule" style="width: 100%;">
+        <button id="vt_add_taxrule" class="vt-button"><?php _e('Add Tax Rule','usb-swiper'); ?></button>
+    </div>
 </div>
-<form name="default-tax-form" id="default_tax_form" method="post">
-    <label class="default-tax-label">
-        <select name="default-tax" id="default_tax" class="default-tax">
-            <option <?php echo selected($default_tax,'');?> value=""><?php _e('Default Tax','usb-swiper'); ?></option>
-            <?php
-            if( !empty($tax_data) && is_array($tax_data)){
-                foreach($tax_data as $tax_option_key => $tax_option){ ?>
-                    <option value="<?php echo $tax_option_key; ?>" <?php echo selected($default_tax,$tax_option_key);?>><?php echo wp_kses_post($tax_option['tax_label']);?></option>
-                <?php }
-            }
-            ?>
-        </select>
-    </label>
-    <input type="hidden" name="default_tax_nonce" value="<?php echo wp_create_nonce('vt-default-tax-form'); ?>">
-    <input type="submit" class="vt-button" name="submit">
-</form>
 <div class="vt-taxrule-wrapper">
     <div class="vt-taxrule-inner">
         <div class="close">
