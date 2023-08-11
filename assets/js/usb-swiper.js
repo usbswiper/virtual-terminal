@@ -722,17 +722,40 @@ function customInput (el) {
     fileInput.onchange = function () {
         if (!fileInput.value) return
         let fileInputName = fileInput.getAttribute('name');
-        if( fileInputName === 'BrandLogo' ) {
-            let brandLogoPreviewEl = document.getElementsByClassName('brand-logo-preview');
-            if( brandLogoPreviewEl) {
-                brandLogoPreviewEl[0].style.display = "none";
-            }
+        let bigImage = false;
+        var _URL = window.URL || window.webkitURL;
+        var LogoFile, img;
+        if ((LogoFile = fileInput.files[0])) {
+            img = new Image();
+            var objectUrl = _URL.createObjectURL(LogoFile);
+            img.onload = function () {
+                if( this.width > 250 ){
+                    bigImage = true;
+                    vt_set_notification(usb_swiper_settings.vt_max_image_size, 'error');
+                    fileInput.value = '';
+                } else {
+                        if (fileInputName === 'BrandLogo') {
+                            let brandLogoPreviewEl = document.getElementsByClassName('brand-logo-preview');
+                            if (brandLogoPreviewEl) {
+                                brandLogoPreviewEl[0].style.display = "none";
+                            }
+                        }
+                        const file = fileInput.files[0];
+                        const previewImage = URL.createObjectURL(file)
+                        label.innerHTML = '<img src="' + previewImage + '" alt="preview">';
+                }
+                _URL.revokeObjectURL(objectUrl);
+            };
+            img.src = objectUrl;
         }
-        /*const imageLabel = fileInput.value.replace(/^.*[\\\/]/, '')*/
-        const file = fileInput.files[0];
-        const previewImage = URL.createObjectURL(file)
-        label.innerHTML = '<img src="'+previewImage+'" alt="preview">';
     }
+}
+
+function vt_set_notification( message, type ='success', message_type='' ) {
+    var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
+    jQuery('.vt-form-notification').empty().append(notification);
+
+    jQuery([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
 }
 
 function autoSessionLogOut() {

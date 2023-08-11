@@ -269,6 +269,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'email_validation_message' => __( 'Please enter a valid email address.', 'usb-swiper' ),
                     'vt_page_id' => $vt_page_id,
                     'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
+                    'vt_max_image_size' => __('Failed to upload an Brand logo. The Brand logo image maximum dimension is 250.','usb-swiper'),
                     'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
                     'current_page_id' => get_the_ID()
 				) );
@@ -302,6 +303,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'vt_page_id' => $vt_page_id,
                     'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
                     'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
+                    'vt_max_image_size' => __('Failed to upload an Brand logo. The Brand logo image maximum dimension is 250.','usb-swiper'),
                     'current_page_id' => get_the_ID()
 				) );
             }
@@ -1808,9 +1810,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $ignore_transaction_email = !empty( $_POST['ignore-transaction-email'] ) ? $_POST['ignore-transaction-email'] : '';
                 update_user_meta( $user_id, "_primary_currency", $primary_currency );
                 update_user_meta( $user_id, "brand_name", $brand_name );
-                update_user_meta( $user_id, "brand_logo", $logo_id );
                 update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
                 update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
+
+                if( !empty( $logo_id ) && $logo_id > 0 ){
+                    update_user_meta( $user_id, "brand_logo", $logo_id );
+                }
 			}
 		}
 
@@ -1826,18 +1831,18 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $brand_logo_id = !empty( $_POST['attachment_id'] ) ? sanitize_text_field($_POST['attachment_id']) : 0;
             $status = false;
             $message_type = __('ERROR','usb-swiper');
-            $message = __('Brand logo id not verified, please try after some time.', 'usb-swiper');
+            $message = __('Nonce not verified, please try after some time.', 'usb-swiper');
 
-            if( !empty($brand_logo_id) && $brand_logo_id > 0 ){
-                $message = __('Nonce not verified, please try after some time.', 'usb-swiper');
-                if( !empty( $_POST['attachment_nonce'] ) && wp_verify_nonce($_POST['attachment_nonce'],'vt-remove-brand-logo') ) {
+            if( !empty( $_POST['attachment_nonce'] ) && wp_verify_nonce($_POST['attachment_nonce'],'vt-remove-brand-logo') ) {
+                $message = __('Brand logo id not verified, please try after some time.', 'usb-swiper');
+                if( !empty($brand_logo_id) && $brand_logo_id > 0 ){
                     $message = __('Something went wrong, please try after some time.', 'usb-swiper');
-                        $result = wp_delete_attachment($brand_logo_id, true);
-                        if ($result !== false) {
-                            $status = true;
-                            $message_type = __('SUCCESS','usb-swiper');
-                            $message = __('Brand logo successfully deleted.','usb-swiper');
-                        }
+                    $result = wp_delete_attachment($brand_logo_id, true);
+                    if ($result !== false) {
+                        $status = true;
+                        $message_type = __('SUCCESS','usb-swiper');
+                        $message = __('Brand logo successfully deleted.','usb-swiper');
+                    }
                 }
             }
 

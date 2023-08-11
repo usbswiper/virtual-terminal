@@ -1421,7 +1421,7 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150],
         $brand_logo_url = !empty( $brand_logo_id ) ? wp_get_attachment_url($brand_logo_id) : '';
 
         if( !empty($brand_logo_url) ){
-            $brand_logo['image_html'] = "<img width='100' height='100' src='".esc_url($brand_logo_url)."' alt='' loading='lazy' style='height:auto;vertical-align: middle;max-width: 100%;'>";
+            $brand_logo['image_html'] = "<img width='250' src='".esc_url($brand_logo_url)."' alt='' loading='lazy' style='height:auto;vertical-align: middle;max-width: 100%;'>";
         }
     } else {
         $brand_logo = array(
