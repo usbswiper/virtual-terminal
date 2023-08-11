@@ -30,8 +30,8 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 
             if( empty( $settings ) ) {
 
-                $vt_page = get_page_by_title('Virtual Terminal');
-                $vt_page_id = !empty( $vt_page->ID ) ? $vt_page->ID : 0;
+                $vt_page = post_exists('Virtual Terminal');
+                $vt_page_id = ( !empty( $vt_page ) && (int)$vt_page  > 0 ) ? $vt_page : 0;
                 if( empty( $vt_page ) ) {
                     $vt_page_id = wp_insert_post(array(
                         'post_title' => __('Virtual Terminal', 'usb-swiper'),
@@ -42,8 +42,8 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
                     ));
                 }
 
-                $vt_verification_page = get_page_by_title('Virtual Terminal Verification');
-                $vt_verification_page_id = !empty( $vt_verification_page->ID ) ? $vt_verification_page->ID : 0;
+                $vt_verification_page = post_exists('Virtual Terminal Verification');
+                $vt_verification_page_id = ( !empty( $vt_verification_page ) && (int)$vt_verification_page  > 0 ) ? $vt_verification_page : 0;
                 if( empty( $vt_verification_page ) ) {
                     $vt_verification_page_id = wp_insert_post(array(
                         'post_title' => __('Virtual Terminal Verification', 'usb-swiper'),
@@ -54,8 +54,8 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
                     ));
                 }
 
-                $vt_paybyinvoice_page = get_page_by_title( 'Pay By Invoice' );
-                $vt_paybyinvoice_page_id = !empty( $vt_paybyinvoice_page->ID ) ? $vt_paybyinvoice_page->ID : 0;
+                $vt_paybyinvoice_page = post_exists( 'Pay By Invoice' );
+                $vt_paybyinvoice_page_id = ( !empty( $vt_paybyinvoice_page ) && (int)$vt_paybyinvoice_page  > 0 ) ? $vt_paybyinvoice_page : 0;
                 if( empty( $vt_paybyinvoice_page ) ){
                     $vt_paybyinvoice_page_id = wp_insert_post( array(
                         'post_title'    => __('Pay By Invoice', 'usb-swiper'),

@@ -38,11 +38,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <td align="center" valign="top">
                             <div id="template_header_image" class="vt-brand-logo">
                                 <?php
-                                $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100]);
-                                ?>
-                                <div class="brand-logo" style="padding-bottom: 20px;">
-                                    <?php echo !empty( $brand_logo['image_html'] ) ? $brand_logo['image_html'] : ''; ?>
-                                </div>
+                                $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100],true);
+                                if( isset($brand_logo) && isset($brand_logo['image_html']) && !empty( $brand_logo['image_html'] ) ){ ?>
+                                    <div class="brand-logo" style="padding-bottom: 20px;">
+                                        <?php echo $brand_logo['image_html']; ?>
+                                    </div>
+                                <?php } ?>
                             </div>
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="template_container">
                                 <tr>

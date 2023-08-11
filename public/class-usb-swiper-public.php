@@ -1636,51 +1636,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 echo  usb_swiper_get_html_field( array(
                     'type' => 'text',
-                    'value' => usbswiper_get_brand_name(),
-                    'id' => 'BrandName',
-                    'name' => 'BrandName',
-                    'label' => __( 'Brand Name', 'usb-swiper'),
-                    'attributes' => '',
-                    'description' => '',
-                    'readonly' => false,
-                    'disabled' => false,
-                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
-                    'wrapper' => false
-                ));
-                ?>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-                <?php
-                echo  usb_swiper_get_html_field( array(
-                    'type' => 'file',
-                    'id' => 'vt_product_image',
-                    'name' => 'BrandLogo',
-                    'label' => __( 'Upload Image', 'usb-swiper'),
-                    'required' => false,
-                    'class' => 'p-2 vt-image-upload',
-                    'wrapper_class' => 'vt-image-upload-wrap'
-                ));
-                ?>
-                <div class="brand-logo-preview">
-                <?php
-                    $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
-
-                    $attachment_id = $brand_logo['attachment_id'];
-                    if ($brand_logo['image_html']) {
-                        echo $brand_logo['image_html'];
-                ?>
-
-                <a title="<?php _e('Delete product', 'usb-swiper'); ?>" class="delete_brand_logo" data-attachment-id="<?php echo $attachment_id; ?>">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                </a>
-                    <?php } ?>
-                </div>
-            </p>
-            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-                <?php
-
-                echo  usb_swiper_get_html_field( array(
-                    'type' => 'text',
                     'value' => usbswiper_get_invoice_prefix(),
                     'id' => 'InvoicePrefix',
                     'name' => 'InvoicePrefix',
@@ -1694,6 +1649,50 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 ));
                 ?>
             </p>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <?php
+
+                echo  usb_swiper_get_html_field( array(
+                    'type' => 'text',
+                    'value' => usbswiper_get_brand_name(),
+                    'id' => 'BrandName',
+                    'name' => 'BrandName',
+                    'label' => __( 'Brand Name', 'usb-swiper'),
+                    'attributes' => '',
+                    'description' => '',
+                    'readonly' => false,
+                    'disabled' => false,
+                    'class' => 'woocommerce-Input woocommerce-Input--text input-text',
+                    'wrapper' => false
+                ));
+                ?>
+            </p>
+            <div class="vt-upload-brand-logo-wrapper">
+
+                <?php echo  usb_swiper_get_html_field( array(
+                    'type' => 'file',
+                    'id' => 'vt_product_image',
+                    'name' => 'BrandLogo',
+                    'label' => __( 'Upload Brand Logo', 'usb-swiper'),
+                    'required' => false,
+                    'class' => 'p-2 vt-image-upload',
+                    'wrapper_class' => 'vt-image-upload-wrap',
+                    'attributes' => array('accept'=>'.png, .jpg, .jpeg')
+                )); ?>
+
+                <div class="brand-logo-preview">
+                    <?php $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
+
+                    $attachment_id = $brand_logo['attachment_id'];
+                    if ($brand_logo['image_html']) {
+                        echo $brand_logo['image_html'];
+                        ?>
+                        <a title="<?php _e('Delete product', 'usb-swiper'); ?>" class="delete_brand_logo" data-delete-nonce="<?php echo wp_create_nonce('vt-remove-brand-logo'); ?>" data-attachment-id="<?php echo $attachment_id; ?>">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </a>
+                    <?php } ?>
+                </div>
+            </div>
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 				<?php
 				echo  usb_swiper_get_html_field( array(
@@ -1816,25 +1815,39 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		}
 
         /**
-         * Delete brand logo.
+         * Delete user brand logo.
+         *
+         * @since 2.2.4
          *
          * @return void
          */
         public function delete_brand_logo_cb() {
-            $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
 
-            $attachmentId = $brand_logo['attachment_id'];
-            if ($attachmentId > 0) {
+            $brand_logo_id = !empty( $_POST['attachment_id'] ) ? sanitize_text_field($_POST['attachment_id']) : 0;
+            $status = false;
+            $message_type = __('ERROR','usb-swiper');
+            $message = __('Brand logo id not verified, please try after some time.', 'usb-swiper');
 
-                    $result = wp_delete_attachment($attachmentId, true);
-
-                    if ($result !== false) {
-                        // Image deletion successful
-                        wp_send_json_success();
-                    }
+            if( !empty($brand_logo_id) && $brand_logo_id > 0 ){
+                $message = __('Nonce not verified, please try after some time.', 'usb-swiper');
+                if( !empty( $_POST['attachment_nonce'] ) && wp_verify_nonce($_POST['attachment_nonce'],'vt-remove-brand-logo') ) {
+                    $message = __('Something went wrong, please try after some time.', 'usb-swiper');
+                        $result = wp_delete_attachment($brand_logo_id, true);
+                        if ($result !== false) {
+                            $status = true;
+                            $message_type = __('SUCCESS','usb-swiper');
+                            $message = __('Brand logo successfully deleted.','usb-swiper');
+                        }
+                }
             }
-            // Image deletion failed
-            wp_send_json_error();
+
+            $response = array(
+                'status' => $status,
+                'message' => $message,
+                'message_type' => $message_type,
+            );
+
+            wp_send_json( $response , 200 );
         }
 
 		/**

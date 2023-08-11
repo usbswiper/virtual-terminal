@@ -52,7 +52,21 @@ defined( 'ABSPATH' ) || exit;
                                 $state = get_user_meta($user_id, 'billing_state', true);
                                 $postcode = get_user_meta($user_id, 'billing_postcode', true);
                                 $country = get_user_meta($user_id, 'billing_country', true);
+                                $addresses_line1 = [];
+                                if( !empty( $user_address1 ) ) {
+                                    $addresses_line1[] = $user_address1;
+                                }
+                                if( !empty( $user_address2 ) ) {
+                                    $addresses_line1[] = $user_address2;
+                                }
 
+                                $addresses_line2 = [];
+                                if (!empty($city)) {
+                                    $addresses_line2[] = $city;
+                                }
+                                if (!empty($state)) {
+                                    $addresses_line2[] = $state;
+                                }
                                 ?>
                                 <div class="footer-info" style="text-align: center;">
                                     <?php if( !empty( $company_name ) ){ ?>
@@ -63,31 +77,19 @@ defined( 'ABSPATH' ) || exit;
                                     <?php }
                                     if (!empty($phone)){ ?>
                                     <p style="margin: 0px;"><?php echo $phone; ?></p>
-                                    <?php } ?>
-                                    <p style="margin: 0px;">
-                                        <?php
-                                            if (!empty($user_address1)) {
-                                                echo $user_address1;
-                                            }
-                                            if (!empty($user_address2)) {
-                                                echo !empty($user_address1) ? ', ' . $user_address2 : $user_address2;
-                                            }
-                                        ?>
-                                   </p>
-                                    <p style="margin: 0px;">
-                                        <?php
-                                            if (!empty($city)) {
-                                                echo $city;
-                                            }
-                                            if (!empty($state)) {
-                                                echo !empty($city) ? ', ' . $state : $state;
-                                            }
+                                    <?php }
+                                    if( !empty( $addresses_line1 ) ){?>
+                                        <p style="margin: 0px;"><?php echo implode(', ', $addresses_line1); ?></p>
+                                    <?php }
+                                    if( !empty( $addresses_line2 ) || !empty($postcode) ){ ?>
+                                        <p style="margin: 0px;">
+                                            <?php echo implode(', ', $addresses_line2);
                                             if (!empty($postcode)) {
-                                                echo (!empty($city) || !empty($state)) ? '-' . $postcode : $postcode;
-                                            }
-                                        ?>
-                                    </p>
-                                    <?php if( !empty( $country ) ){ ?>
+                                                echo !empty($addresses_line2) ? '-' . $postcode : $postcode;
+                                            }  ?>
+                                        </p>
+                                    <?php }
+                                    if( !empty( $country ) ){ ?>
                                         <p style="margin: 0px;"><?php echo $country; ?></p>
                                     <?php } ?>
                                 </div>

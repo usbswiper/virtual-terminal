@@ -39,6 +39,22 @@ $billing_phone_number = !empty( $billing_phone_number ) ? mobile_number_format($
 
 $shippingDisabled = get_post_meta( $invoice_id,'shippingDisabled', true);
 
+$addresses_line1 = [];
+if( !empty( $user_address1 ) ) {
+    $addresses_line1[] = $user_address1;
+}
+if( !empty( $user_address2 ) ) {
+    $addresses_line1[] = $user_address2;
+}
+
+$addresses_line2 = [];
+if (!empty($city)) {
+    $addresses_line2[] = $city;
+}
+if (!empty($state)) {
+    $addresses_line2[] = $state;
+}
+
 if( $shippingDisabled !== 'true') {
     $shippingSameAsBilling = get_post_meta($invoice_id, 'shippingSameAsBilling', true);
     if( $shippingSameAsBilling !== true ) {
@@ -55,8 +71,9 @@ $tax_amount = !empty( $tax_amount ) ? usb_swiper_price_formatter($tax_amount) : 
 $grand_total_amount = !empty( $grand_total_amount ) ? usb_swiper_price_formatter($grand_total_amount) : usb_swiper_price_formatter(0);
 $discount_amount = !empty( $discount_amount ) ? usb_swiper_price_formatter($discount_amount) : usb_swiper_price_formatter(0);
 $discount_percentage = !empty( $discount_percentage ) ? $discount_percentage : '0%';
-$site_logo = esc_url( wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) );
-$merchant_brand_logo = !empty($merchant_brand_logo) ? $merchant_brand_logo : $site_logo;
+$custom_logo = get_theme_mod( 'custom_logo' );
+$site_logo = !empty( $custom_logo ) ? wp_get_attachment_url( $custom_logo ) : '';
+$merchant_brand_logo = !empty($merchant_brand_logo) ? $merchant_brand_logo : '';
 
 $addresses = get_transaction_address_format($invoice_id, true);
 
@@ -75,35 +92,23 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
             <div class="logo" style="width: 100%;float: left;">
                 <?php if( !empty( $merchant_brand_logo ) ) { 
                     echo $merchant_brand_logo['image_html']; 
-                    } else { ?>
-                        <img style="width: 100%;float: left;max-width: 25%" src="<?php echo $site_logo; ?>" alt="logo">
+                    } else if( !empty( $site_logo ) ) { ?>
+                        <img style="width: 100%;float: left;max-width: 25%" src="<?php echo esc_url($site_logo); ?>" alt="logo">
                     <?php } ?>
                 <h3 style="width: auto;float: left;clear: unset;margin-top: 5px;"><?php echo !empty( $merchant_brand ) ? $merchant_brand : ""; ?></h3>
                 <p style="margin: 0px" class="invoice-email-address"><?php echo !empty( $merchant_email ) ? $merchant_email : ""; ?></p>
                 <p style="margin: 0px;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
-                <p style="margin: 0px;">
-                    <?php
-                        if (!empty($user_address1)) {
-                            echo $user_address1;
-                        }
-                        if (!empty($user_address2)) {
-                            echo !empty($user_address1) ? ' , ' . $user_address2 : $user_address2;
-                        }
-                    ?>
-                </p>
-                <p style="margin: 0px;">
-                    <?php
-                        if (!empty($city)) {
-                            echo $city;
-                        }
-                        if (!empty($state)) {
-                            echo !empty($city) ? ' , ' . $state : $state;
-                        }
+                <?php if( !empty( $addresses_line1 ) ) { ?>
+                    <p style="margin: 0px;"><?php echo implode(', ', $addresses_line1); ?></p>
+                <?php }
+                if( !empty( $addresses_line2 ) || !empty($postcode) ) {?>
+                    <p style="margin: 0px;">
+                        <?php echo implode(', ', $addresses_line2);
                         if (!empty($postcode)) {
-                            echo (!empty($city) || !empty($state)) ? '-' . $postcode : $postcode;
-                        }
-                    ?>
-                </p>
+                            echo !empty($addresses_line2) ? '-' . $postcode : $postcode;
+                        }  ?>
+                    </p>
+                <?php } ?>
                 <p style="margin: 0px;"><?php echo !empty( $country ) ? $country : ''; ?></p>
             </div>
             
