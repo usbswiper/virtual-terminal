@@ -695,7 +695,7 @@ jQuery( document ).ready(function( $ ) {
     $(document).on('click','.tax_rate_wrapper .tax-item', function () {
         let tax_input = $(this).parents('.tax_rate_wrapper').find('.vt-tax-input');
         tax_input.val($(this).attr('data-id'));
-        if( undefined !== $(this).attr('include-tax') && '' !== $(this).attr('include-tax') ){
+        if( undefined !== $(this).attr('data-include-tax') && '' !== $(this).attr('data-include-tax') ){
             $("#TaxOnShipping").prop('checked', true);
         }else {
             $("#TaxOnShipping").prop('checked', false);
