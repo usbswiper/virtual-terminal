@@ -402,8 +402,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $transaction_search   = !empty( $_GET['vt-search'] ) ? sanitize_text_field( $_GET['vt-search'] ) : "";
 
-                $search_date = DateTime::createFromFormat('d/m/Y', $transaction_search);
-                $search_date = $search_date ? $search_date->format('Y-m-d') : '';
+                $search_date = '';
+                if( !empty($transaction_search) && preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$transaction_search) ){
+                    $search_date = $transaction_search;
+                }
 
                 $start_date = isset( $_GET['start-date'] ) ? sanitize_text_field( $_GET['start-date'] ) : '';
                 $end_date = isset( $_GET['end-date'] ) ? sanitize_text_field( $_GET['end-date'] ) : '';
@@ -433,13 +435,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 if( !empty($transaction_search) ){
                     $transaction_args['search_prod_title'] = $transaction_search;
                 }
+                $meta_query = array('relation' => 'AND');
+                if (!empty($transaction_search) && empty($search_date) ) {
 
-                if (!empty($transaction_search)) {
-                    $transaction_status = !empty($_REQUEST['transaction_status']) ? sanitize_text_field($_REQUEST['transaction_status']) : "";
-                    if( empty( $transaction_type ) && !empty( $transaction_search ) && in_array( $transaction_search, ['paid', 'authorized']) ) {
-                        $transaction_type = 'invoice';
-                    }
-                    $meta_query = array('relation' => 'OR');
+                    $meta_query['relation'] = 'OR';
 
                     $meta_query[] = array(
                         'key'     => '_payment_status',
@@ -547,7 +546,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
             $search_term = !empty( $wp_query->get( 'search_prod_title' ) ) ? $wp_query->get( 'search_prod_title' ) : '';
             if ( '1' == $transaction_search && !empty( $search_term ) ) {
-                $where .= ' OR ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\'';
+                $where .= ' OR (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\' AND '.$wpdb->posts.'.post_type=\'transactions\')';
             }
             return $where;
         }
