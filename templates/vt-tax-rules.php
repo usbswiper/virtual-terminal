@@ -49,7 +49,7 @@
     <?php if( !empty($tax_data) && is_array($tax_data)){ ?>
         <form name="default-tax-form" id="default_tax_form" method="post">
             <label class="default-tax-label">
-                <select name="default-tax" id="default_tax" class="default-tax">
+                <select name="default-tax" id="default_tax" class="woocommerce-Select default-tax">
                     <option <?php echo selected($default_tax,'');?> value=""><?php _e('Default Tax','usb-swiper'); ?></option>
                     <?php foreach($tax_data as $tax_option_key => $tax_option){ ?>
                         <option value="<?php echo $tax_option_key; ?>" <?php echo selected($default_tax,$tax_option_key);?>><?php echo wp_kses_post($tax_option['tax_label']);?></option>

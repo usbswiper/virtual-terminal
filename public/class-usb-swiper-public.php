@@ -2362,14 +2362,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         $count ++;
                         $tax_rate = !empty( $tax['tax_rate'] ) ? $tax['tax_rate'] : '';
                         $tax_label = !empty( $tax['tax_label'] ) ? $tax['tax_label'] : '';
+                        $tax_on_shipping = !empty( $tax['tax_on_shipping'] ) ? $tax['tax_on_shipping'] : false;
+
                         if( empty( $tax_key ) || strlen($tax_key) < 3 ){
-                            $data .= "<span class='tax-item' data-id='$tax_rate'>$tax_label</span>";
+                            $data .= "<span class='tax-item' data-include-tax='$tax_on_shipping' data-id='$tax_rate'>$tax_label</span>";
                             if($count === 3) {
                                 break;
                             }
                         }else{
                             if( str_contains($tax_label, $tax_key)  ){
-                                $data .= "<span class='tax-item' data-id='$tax_rate'>$tax_label</span>";
+                                $data .= "<span class='tax-item' data-include-tax='$tax_on_shipping' data-id='$tax_rate'>$tax_label</span>";
                             }
                         }
                     }
@@ -3083,7 +3085,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if(isset($_POST['default_tax_nonce']) && wp_verify_nonce($_POST['default_tax_nonce'],'vt-default-tax-form')) {
                 $default_tax = !empty($_POST['default-tax']) ? sanitize_text_field($_POST['default-tax']) : "";
                 $user_id = get_current_user_id();
-                if(empty($default_tax) || empty( $user_id ) ){
+                if( empty( $user_id ) ){
                     return ;
                 }
                 update_user_meta($user_id,'default_tax',$default_tax);
