@@ -399,9 +399,6 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'required' => false,
 				'is_percentage' => true,
                 'placeholder' => __( 'Search Tax', 'usb-swiper'),
-				'attributes' => array(
-					'maxlength' => '4'
-				),
 				'description' => '',
 				'class' => 'tax-rate-sign vt-tax-input',
                 'wrapper_class' => 'tax_rate_wrapper',

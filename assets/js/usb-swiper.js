@@ -700,6 +700,7 @@ jQuery( document ).ready(function( $ ) {
         }else {
             $("#TaxOnShipping").prop('checked', false);
         }
+        $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
         updateSalesTax();
         updateGrandTotal();
     });
