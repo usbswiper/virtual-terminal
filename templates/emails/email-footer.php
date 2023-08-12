@@ -41,10 +41,14 @@ defined( 'ABSPATH' ) || exit;
                         <tr>
                             <td colspan="2" valign="middle" id="credit">
                                 <?php
-
+                                $invoice_id = !empty( $_GET['pbi_transaction_id'] ) ? sanitize_text_field($_GET['pbi_transaction_id']) : 0;
+                                $merchant_id = get_post_meta( $invoice_id, '_transaction_user_id', true);
+                                $merchant_id = !empty( $merchant_id ) ? $merchant_id : 0;
                                 $user_id = get_current_user_id();
+                                $user_id = !empty( $user_id ) ? $user_id : $merchant_id;
+                                $user = get_userdata($user_id);
                                 $company_name = get_user_meta($user_id,'brand_name', true);
-                                $user_email = get_userdata($user_id)->user_email;
+                                $user_email = !empty($user->user_email) ? $user->user_email : '';
                                 $phone = get_user_meta($user_id, 'billing_phone', true);
                                 $user_address1 = get_user_meta($user_id, 'billing_address_1', true);
                                 $user_address2 = get_user_meta($user_id, 'billing_address_2', true);
@@ -70,7 +74,7 @@ defined( 'ABSPATH' ) || exit;
                                 ?>
                                 <div class="footer-info" style="text-align: center;">
                                     <?php if( !empty( $company_name ) ){ ?>
-                                        <h2 style="margin: 0px;text-align: center;"><?php echo $company_name; ?></h2>
+                                        <h4 style="margin: 0px;text-align: center;"><?php echo $company_name; ?></h4>
                                     <?php }
                                     if (!empty($user_email)){ ?>
                                     <p style="margin: 0px;"><?php echo $user_email; ?></p>

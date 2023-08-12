@@ -1426,11 +1426,11 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150],
     } else {
         $brand_logo = array(
             'attachment_id' => $brand_logo_id,
-            'image_html' => wp_get_attachment_image($brand_logo_id, $size)
+            'image_html' => wp_get_attachment_image($brand_logo_id, 'full')
         );
 
         if( $is_url ) {
-            $brand_logo['image_html'] = wp_get_attachment_image_url($brand_logo_id, $size);
+            $brand_logo['image_html'] = wp_get_attachment_image_url($brand_logo_id,'full');
         }
     }
 

@@ -1670,18 +1670,19 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 ?>
             </p>
             <div class="vt-upload-brand-logo-wrapper">
-
-                <?php echo  usb_swiper_get_html_field( array(
-                    'type' => 'file',
-                    'id' => 'vt_product_image',
-                    'name' => 'BrandLogo',
-                    'label' => __( 'Upload Brand Logo', 'usb-swiper'),
-                    'required' => false,
-                    'class' => 'p-2 vt-image-upload',
-                    'wrapper_class' => 'vt-image-upload-wrap',
-                    'attributes' => array('accept'=>'.png, .jpg, .jpeg')
-                )); ?>
-
+                <div class="vt-image-upload-button-wrap">
+                    <?php echo  usb_swiper_get_html_field( array(
+                        'type' => 'file',
+                        'id' => 'vt_product_image',
+                        'name' => 'BrandLogo',
+                        'label' => __( 'Upload Brand Logo', 'usb-swiper'),
+                        'required' => false,
+                        'class' => 'p-2 vt-image-upload',
+                        'wrapper_class' => 'vt-image-upload-wrap',
+                        'attributes' => array('accept'=>'.png, .jpg, .jpeg')
+                    )); ?>
+                    <span><?php _e('Upload Image with max-width 250px','usb-swiper'); ?></span>
+                </div>
                 <div class="brand-logo-preview">
                     <?php $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false);
 

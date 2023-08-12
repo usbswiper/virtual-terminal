@@ -38,7 +38,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <td align="center" valign="top">
                             <div id="template_header_image" class="vt-brand-logo">
                                 <?php
-                                $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false, [100,100],true);
+                                $invoice_id = !empty( $_GET['pbi_transaction_id'] ) ? sanitize_text_field($_GET['pbi_transaction_id']) : 0;
+                                $merchant_id = get_post_meta( $invoice_id, '_transaction_user_id', true);
+                                $merchant_id = !empty( $merchant_id ) ? $merchant_id : 0;
+                                $user_id = get_current_user_id();
+                                $user_id = !empty( $user_id ) ? $user_id : $merchant_id;
+                                $brand_logo = usbswiper_get_brand_logo($user_id, false, [100,100],true);
                                 if( isset($brand_logo) && isset($brand_logo['image_html']) && !empty( $brand_logo['image_html'] ) ){ ?>
                                     <div class="brand-logo" style="padding-bottom: 20px;">
                                         <?php echo $brand_logo['image_html']; ?>

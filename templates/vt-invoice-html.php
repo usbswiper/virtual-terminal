@@ -14,6 +14,7 @@ $merchant_brand = get_user_meta( $merchant_id,'brand_name', true);
 $merchant_brand = !empty( $merchant_brand ) ? $merchant_brand : get_bloginfo('name');
 $merchant_brand_logo = usbswiper_get_brand_logo($merchant_id, false, [100,100]);
 $user_id = get_current_user_id();
+$user_id = !empty( $user_id ) ? $user_id : $merchant_id;
 $phone = get_user_meta($user_id, 'billing_phone', true);
 $user_address1 = get_user_meta($user_id, 'billing_address_1', true);
 $user_address2 = get_user_meta($user_id, 'billing_address_2', true);
@@ -163,11 +164,13 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
             </thead>
             <tbody>
                 <?php
+                $order_amount = 0;
                 if( !empty( $vt_products ) && is_array($vt_products) ){
                     foreach ($vt_products as $key => $product ){
                         $quantity = !empty($product['product_quantity']) ? (int)$product['product_quantity'] : 0;
                         $price = !empty($product['product_price']) ? (float)$product['product_price'] : 0;
                         $total_price = $quantity * $price;
+                        $order_amount += $total_price;
                         $price = !empty( $price ) ? usb_swiper_price_formatter($price) : usb_swiper_price_formatter(0);
                         $total_price = !empty( $total_price ) ? usb_swiper_price_formatter($total_price) : usb_swiper_price_formatter(0); ?>
                         <tr>
@@ -185,13 +188,13 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
             <tfoot>
                 <tr>
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
-                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Sub Total:','usb-swiper'); ?></td>
-                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Sub Total:','usb-swiper'); ?>"><?php echo wc_price($net_amount, array('currency' => $transaction_currency)); ?></td>
+                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Order Amount:','usb-swiper'); ?></td>
+                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Order Amount:','usb-swiper'); ?>"><?php echo wc_price($order_amount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr>
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
-                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Tax Amount:','usb-swiper'); ?></td>
-                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Tax Amount:','usb-swiper'); ?>"><?php echo wc_price($tax_amount, array('currency' => $transaction_currency)); ?></td>
+                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Sub Total:','usb-swiper'); ?></td>
+                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Sub Total:','usb-swiper'); ?>"><?php echo wc_price($net_amount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr>
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
@@ -202,6 +205,11 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
                     <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Handling Amount:','usb-swiper'); ?></td>
                     <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Handling Amount: ','usb-swiper'); ?>"><?php echo wc_price($shipping_amount, array('currency' => $transaction_currency)); ?></td>
+                </tr>
+                <tr>
+                    <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
+                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Tax Amount:','usb-swiper'); ?></td>
+                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Tax Amount:','usb-swiper'); ?>"><?php echo wc_price($tax_amount, array('currency' => $transaction_currency)); ?></td>
                 </tr>
                 <tr class="grand-total">
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
