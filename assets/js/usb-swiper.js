@@ -375,8 +375,8 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $(document).on('change', '#DiscountType, #Discount', function(){
-        var orderAmount = parseFloat($('#OrderAmount').val());
-        var discountInput = parseFloat($('#Discount').val());
+        var orderAmount = ( $('#OrderAmount').val().replace(/,/g, '') * 1 );
+        var discountInput = ( $('#Discount').val().replace(/,/g, '') * 1 );
         var discountType = $('#DiscountType').val();
 
         var discountAmount = 0;
@@ -403,7 +403,7 @@ jQuery( document ).ready(function( $ ) {
         $('#DiscountAmount').val(discountAmount.toFixed(2));
 
         if ( !isNaN(orderAmount) && !isNaN(discountAmount) ) {
-            netAmount = orderAmount - discountAmount;
+            netAmount = orderAmount.toFixed(2) - discountAmount.toFixed(2);
         }
         $('#NetAmount').val(netAmount.toFixed(2));
         updateSalesTax();
