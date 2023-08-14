@@ -229,6 +229,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-pagination ul li .current {background: #3e78ea;color: #FFF;border-radius: 0.2rem;}
 .vt-upload-brand-logo-wrapper {display: flex;flex-direction: row;flex-wrap: wrap;max-width: 100%;align-items: center;gap: 15px;justify-content: space-between;padding: 15px 3px;margin: 0 0 6px;}
 .vt-image-upload-button-wrap,#ae-paypal-pos-form > .vt-form-contents .branding >.logo{display: grid;width: 100%;}
+.vt-upload-brand-logo-wrapper:has(.vt-image-upload-button-wrap .upload-image-preview:empty) .vt-image-upload-button-wrap{width: auto;}
 
 @media print {
     body{line-height: 1.2 !important;}
