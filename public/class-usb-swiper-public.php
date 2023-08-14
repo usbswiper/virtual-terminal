@@ -536,7 +536,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             if( !empty( $meta_value ) ){
-                $where .= $wpdb->prepare(
+                $transaction_type_query = $wpdb->prepare(
                     " AND {$wpdb->posts}.ID IN (
                         SELECT post_id
                         FROM {$wpdb->postmeta}
@@ -545,12 +545,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $meta_key,
                     $meta_value
                 );
+
+                $where .= $transaction_type_query;
             }
 
             $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
             $search_term = !empty( $wp_query->get( 'search_prod_title' ) ) ? $wp_query->get( 'search_prod_title' ) : '';
             if ( '1' == $transaction_search && !empty( $search_term ) ) {
-                $where .= ' OR (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\' AND '.$wpdb->posts.'.post_type=\'transactions\')';
+                $where .= ' OR  ( (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\' AND '.$wpdb->posts.'.post_type=\'transactions\')' . $transaction_type_query . ' )' ;
             }
             return $where;
         }
