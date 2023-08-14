@@ -123,6 +123,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $query_vars['view-transaction'] = 'view-transaction';
             $query_vars['transactions'] = 'transactions';
+            $query_vars['invoices'] = 'invoices';
             $query_vars['vt-products'] = 'vt-products';
 
             return $query_vars;
@@ -207,7 +208,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			$allow_pages = apply_filters( 'usb_swiper_dequeue_script_allow_pages', $allow_pages );
 
-			if( ( !empty( $allow_pages ) && is_array( $allow_pages ) && in_array( get_the_ID(), $allow_pages ) ) || is_wc_endpoint_url('view-transaction') || is_wc_endpoint_url('transactions') || is_wc_endpoint_url('vt-products') ) {
+			if( ( !empty( $allow_pages ) && is_array( $allow_pages ) && in_array( get_the_ID(), $allow_pages ) ) || is_wc_endpoint_url('view-transaction') || is_wc_endpoint_url('transactions') || is_wc_endpoint_url('vt-products') || is_wc_endpoint_url('invoices') ) {
 				wp_dequeue_script('angelleye-paypal-checkout-sdk');
 				wp_dequeue_script('angelleye-paypal-checkout-sdk-async');
 			}
@@ -369,7 +370,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				unset( $menu_links['customer-logout'] );
 
 				$menu_links['transactions']    = __( 'Transactions', 'usb-swiper' );
-				    $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
+                $menu_links['invoices']    = __( 'Invoices', 'usb-swiper' );
+                $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
 				$menu_links['customer-logout'] = $logout;
 			}
 
@@ -385,6 +387,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
+			add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
 		}
 
@@ -423,13 +426,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'transaction_search' => 1
                 );
 
-                if( !empty( $search_date ) ){
-                    $transaction_args['date_query'] = array(
-                        array(
-                            'after' => $search_date,
-                            'inclusive' => true
-                        ),
-                    );
+                if( empty( $start_date ) && empty( $end_date ) && !empty( $search_date ) ){
+                    $start_date = $search_date;
+                    $end_date = $search_date;
                 }
 
                 if( !empty($transaction_search) ){
@@ -483,16 +482,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     );
                 }
 
-                if( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'invoice' || strtolower($transaction_type) === 'transaction' ) ){
-                    $transaction_args['meta_query'][] = array(
-                        array(
-                            'key' => '_transaction_type',
-                            'value' => $transaction_type,
-                            'compare' => '='
-                        )
-                    );
-                }
-
                 add_filter( 'posts_where',array($this, 'vt_title_filter'), 10, 2 );
                 $transactions = new WP_Query( $transaction_args );
                 remove_filter( 'posts_where',array($this,'vt_title_filter'), 10, 2 );
@@ -517,13 +506,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="text" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
                         </div>
                         <div class="input-field-wrap form-row">
-                            <select name="vt-type" id="vt_type" class="transaction-input-field">
-                                <option value="" <?php echo selected('',$transaction_type); ?>><?php _e('All','usb-swiper'); ?></option>
-                                <option value="invoice" <?php echo selected('invoice',$transaction_type); ?>><?php _e('Invoice','usb-swiper'); ?></option>
-                                <option value="transaction" <?php echo selected('transaction',$transaction_type); ?>><?php _e('Virtual Terminal ','usb-swiper'); ?></option>
-                            </select>
-                        </div>
-                        <div class="input-field-wrap form-row">
                             <button type="submit" class="vt-button"><?php _e('FILTER','usb-swiper'); ?></button>
                         </div>
                     </div>
@@ -542,7 +524,29 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @return mixed|string
          */
         public function vt_title_filter($where, $wp_query){
+
             global $wpdb;
+
+            $meta_key = '_transaction_type';
+            $meta_value = '';
+            if( is_wc_endpoint_url('transactions') ){
+                $meta_value = 'transaction';
+            }elseif ( is_wc_endpoint_url('invoices') ){
+                $meta_value = 'invoice';
+            }
+
+            if( !empty( $meta_value ) ){
+                $where .= $wpdb->prepare(
+                    " AND {$wpdb->posts}.ID IN (
+                        SELECT post_id
+                        FROM {$wpdb->postmeta}
+                        WHERE meta_key = %s AND meta_value = %s
+                    )",
+                    $meta_key,
+                    $meta_value
+                );
+            }
+
             $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
             $search_term = !empty( $wp_query->get( 'search_prod_title' ) ) ? $wp_query->get( 'search_prod_title' ) : '';
             if ( '1' == $transaction_search && !empty( $search_term ) ) {

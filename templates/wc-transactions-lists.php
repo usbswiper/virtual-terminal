@@ -97,7 +97,12 @@ if( $has_transactions ) : ?>
             if (!empty($_GET['end-date'])) {
                 $previous_args['end-date'] = sanitize_text_field($_GET['end-date']);
             }
-		    $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'transactions' ,'') );
+            if( is_wc_endpoint_url('transactions') ){
+                $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'transactions' ,'') );
+            } elseif ( is_wc_endpoint_url('invoices') ) {
+                $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'invoices' ,'') );
+            }
+
             ?>
 			<a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url($next_page_url); ?>"><?php esc_html_e( 'Previous', 'woocommerce' ); ?></a>
 		<?php endif; ?>
@@ -119,7 +124,12 @@ if( $has_transactions ) : ?>
             if (!empty($_GET['end-date'])) {
                 $previous_args['end-date'] = sanitize_text_field($_GET['end-date']);
             }
-			$previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'transactions' ,'') );
+
+            if( is_wc_endpoint_url('transactions') ){
+                $previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'transactions' ,'') );
+            } elseif ( is_wc_endpoint_url('invoices') ) {
+                $previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'invoices' ,'') );
+            }
             ?>
 			<a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button" href="<?php echo esc_url( $previous_page_url ); ?>"><?php esc_html_e( 'Next', 'woocommerce' ); ?></a>
 		<?php endif; ?>
