@@ -97,20 +97,20 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                         <img style="width: 100%;float: left;max-width: 25%" src="<?php echo esc_url($site_logo); ?>" alt="logo">
                     <?php } ?>
                 <h3 style="width: auto;float: left;clear: unset;margin-top: 5px;"><?php echo !empty( $merchant_brand ) ? $merchant_brand : ""; ?></h3>
-                <p style="margin: 0px" class="invoice-email-address"><?php echo !empty( $merchant_email ) ? $merchant_email : ""; ?></p>
-                <p style="margin: 0px;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
+                <p style="margin: 0;padding-bottom: 0;" class="invoice-email-address"><?php echo !empty( $merchant_email ) ? $merchant_email : ""; ?></p>
+                <p style="margin: 0;padding-bottom: 0;"><?php echo !empty( $phone ) ? $phone : ''; ?></p>
                 <?php if( !empty( $addresses_line1 ) ) { ?>
-                    <p style="margin: 0px;"><?php echo implode(', ', $addresses_line1); ?></p>
+                    <p style="margin: 0;padding-bottom: 0;padding-bottom: 0;"><?php echo implode(', ', $addresses_line1); ?></p>
                 <?php }
                 if( !empty( $addresses_line2 ) || !empty($postcode) ) {?>
-                    <p style="margin: 0px;">
+                    <p style="margin: 0;padding-bottom: 0;">
                         <?php echo implode(', ', $addresses_line2);
                         if (!empty($postcode)) {
                             echo !empty($addresses_line2) ? '-' . $postcode : $postcode;
                         }  ?>
                     </p>
                 <?php } ?>
-                <p style="margin: 0px;"><?php echo !empty( $country ) ? $country : ''; ?></p>
+                <p style="margin: 0;padding-bottom: 0;"><?php echo !empty( $country ) ? $country : ''; ?></p>
             </div>
             
         </div>
@@ -133,7 +133,7 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                 <?php echo ! empty( $company_name ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;padding:0;">'.$company_name.'</p>' : '' ?>
                 <?php echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : $addresses['shipping_address']; ?>
                 <?php echo ! empty( $billing_email ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_email.'</p>' : '' ?>
-                <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '-' ?>
+                <?php echo ! empty( $billing_phone_number ) ? '<p style="margin: 0;font-size: 12px;font-weight: 600;">'.$billing_phone_number.'</p>' : '' ?>
             </div>
             <?php if( !empty( $addresses['shipping_address'] ) && !empty( $addresses['billing_address'] ) ){ ?>
                 <div class="address" style="width: 50%;display: inline-block;vertical-align: top;float: left;">

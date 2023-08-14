@@ -76,12 +76,6 @@ defined( 'ABSPATH' ) || exit;
                                     <?php if( !empty( $company_name ) ){ ?>
                                         <h4 style="margin: 0px;text-align: center;"><?php echo $company_name; ?></h4>
                                     <?php }
-                                    if (!empty($user_email)){ ?>
-                                    <p style="margin: 0px;"><?php echo $user_email; ?></p>
-                                    <?php }
-                                    if (!empty($phone)){ ?>
-                                    <p style="margin: 0px;"><?php echo $phone; ?></p>
-                                    <?php }
                                     if( !empty( $addresses_line1 ) ){?>
                                         <p style="margin: 0px;"><?php echo implode(', ', $addresses_line1); ?></p>
                                     <?php }
@@ -95,6 +89,11 @@ defined( 'ABSPATH' ) || exit;
                                     <?php }
                                     if( !empty( $country ) ){ ?>
                                         <p style="margin: 0px;"><?php echo $country; ?></p>
+                                    <?php }if (!empty($user_email)){ ?>
+                                        <p style="margin: 0px;"><?php echo $user_email; ?></p>
+                                    <?php }
+                                    if (!empty($phone)){ ?>
+                                        <p style="margin: 0px;"><?php echo $phone; ?></p>
                                     <?php } ?>
                                 </div>
                             </td>
