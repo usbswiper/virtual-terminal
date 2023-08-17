@@ -1408,6 +1408,8 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150],
          return false;
     }
 
+    $brand_logo = array();
+
     $brand_logo_id = get_user_meta( $user_id,'brand_logo', true);
 
     if( empty( $brand_logo_id ) && (int)$brand_logo_id ) {
@@ -1422,6 +1424,9 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150],
 
         if( !empty($brand_logo_url) ){
             $brand_logo['image_html'] = "<img width='250' src='".esc_url($brand_logo_url)."' alt='' loading='lazy' style='height:auto;vertical-align: middle;max-width: 100%;'>";
+        } else {
+            $brand_name = get_user_meta( $user_id,'brand_name', true);
+            $brand_logo['image_html'] = !empty( $brand_name ) ? "<h1 style='vertical-align:middle;text-align:center;font-size:32px;margin:0;font-weight:bold;'>".esc_html($brand_name)."</h1>" : '';
         }
     } else {
         $brand_logo = array(
