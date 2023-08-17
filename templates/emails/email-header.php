@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 $merchant_id = !empty( $merchant_id ) ? $merchant_id : 0;
                                 $user_id = get_current_user_id();
                                 $user_id = !empty( $user_id ) ? $user_id : $merchant_id;
-                                $brand_logo = usbswiper_get_brand_logo($user_id, false, [100,100],true);
+                                $brand_logo = usbswiper_get_brand_logo($user_id, false, 'full',true);
                                 if( isset($brand_logo) && isset($brand_logo['image_html']) && !empty( $brand_logo['image_html'] ) ){ ?>
                                     <div class="brand-logo" style="padding-bottom: 20px;">
                                         <?php echo $brand_logo['image_html']; ?>

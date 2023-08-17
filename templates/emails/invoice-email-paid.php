@@ -25,7 +25,7 @@ $args = array(
 if( !empty($transaction_author) && $transaction_author > 0 ) {
 ?>
 <div class="brand-logo" style="text-align:center;">
-    <?php echo usbswiper_get_brand_logo($transaction_author, false, [100,100]); ?>
+    <?php echo usbswiper_get_brand_logo($transaction_author, false); ?>
 </div>
 <?php
 }

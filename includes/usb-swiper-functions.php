@@ -1402,26 +1402,26 @@ function usbswiper_get_brand_name() {
  *
  * @return mixed|string|null
  */
-function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150], $is_email = false ) {
+function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = 'full', $is_email = false ) {
 
     if( empty( $user_id ) ) {
          return false;
     }
 
-    $brand_logo = array();
+    $brand_logo = array(
+        'attachment_id' => '',
+        'image_html' => ''
+    );
 
     $brand_logo_id = get_user_meta( $user_id,'brand_logo', true);
 
-    if( empty( $brand_logo_id ) && (int)$brand_logo_id ) {
-        return array(
-            'attachment_id' => '',
-            'image_html' => ''
-        );
+    if( empty( $brand_logo_id ) ) {
+        return $brand_logo;
     }
 
-    if( $is_email ){
-        $brand_logo_url = !empty( $brand_logo_id ) ? wp_get_attachment_url($brand_logo_id) : '';
+    $brand_logo_url = !empty( $brand_logo_id ) ? wp_get_attachment_image_url($brand_logo_id,$size) : '';
 
+    if( $is_email ){
         if( !empty($brand_logo_url) ){
             $brand_logo['image_html'] = "<img width='250' src='".esc_url($brand_logo_url)."' alt='' loading='lazy' style='height:auto;vertical-align: middle;max-width: 100%;'>";
         } else {
@@ -1431,11 +1431,11 @@ function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = [150, 150],
     } else {
         $brand_logo = array(
             'attachment_id' => $brand_logo_id,
-            'image_html' => wp_get_attachment_image($brand_logo_id, 'full')
+            'image_html' => wp_get_attachment_image($brand_logo_id, $size)
         );
 
         if( $is_url ) {
-            $brand_logo['image_html'] = wp_get_attachment_image_url($brand_logo_id,'full');
+            $brand_logo['image_html'] = !empty($brand_logo_url) ? esc_url($brand_logo_url) : '';
         }
     }
 
