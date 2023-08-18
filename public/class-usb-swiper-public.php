@@ -271,7 +271,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'vt_page_id' => $vt_page_id,
                     'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
                     'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
-                    'current_page_id' => get_the_ID()
+                    'current_page_id' => get_the_ID(),
+					'product_min_qty_message' => __("Only positive numbers are allowed for QTY.", 'usb-swiper')
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -960,6 +961,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $vt_product = get_post_meta( $transaction_id,'VTProduct', true);
                 $vt_product_quantity = get_post_meta( $transaction_id,'VTProductQuantity', true);
                 $vt_product_price = get_post_meta( $transaction_id,'VTProductPrice', true);
+				$vt_product_ids = get_post_meta( $transaction_id,'VTProductID', true);
                 $vt_products = array();
 
                 if( !empty( $vt_product ) && is_array( $vt_product ) ) {
@@ -967,13 +969,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     for ($i = 0; $i < count($vt_product); $i++) {
 
                         $product = !empty($vt_product[$i]) ? $vt_product[$i] : '';
-                        $quantity = !empty($vt_product_quantity[$i]) ? $vt_product_quantity[$i] : 1;
+                        $quantity = !empty($vt_product_quantity[$i]) ? ltrim($vt_product_quantity[$i], '0') : 1;
                         $price = !empty($vt_product_price[$i]) ? $vt_product_price[$i] : '';
+						$product_id = !empty($vt_product_ids[$i]) ? $vt_product_ids[$i] : '';
 
                         $vt_products[] = array(
                             'product_name' => $product,
                             'product_quantity' => $quantity,
-                            'product_price' => $price
+                            'product_price' => $price,
+							'product_id' => $product_id
                         );
                     }
                 }
@@ -2334,6 +2338,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $product_name = '';
             $product_price = '';
 
+			$product_id = 0;
             if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
                 $status = true;
                 $message_type = __('SUCCESS', 'usb-swiper');
@@ -2342,7 +2347,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $product = wc_get_product( $product_id );
 
                 $product_name = $product->get_name();
-                $product_price = $product->get_regular_price();
+                $product_price = $product->get_price();
             }
 
             $response = array(
@@ -2351,6 +2356,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'message_type' => $message_type,
                 'product_name' => $product_name,
                 'product_price' => $product_price,
+                'product_id' => $product_id,
             );
 
             wp_send_json( $response , 200 );

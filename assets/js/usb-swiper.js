@@ -93,6 +93,19 @@ jQuery( document ).ready(function( $ ) {
         return parseFloat(value) > 0;
     }, usb_swiper_settings.product_min_price);
 
+    $.validator.addMethod("onlyDigits", function(value, element) {
+        return (value && /^\d+$/.test(value));
+    }, usb_swiper_settings.product_min_qty_message);
+
+
+    $(document).on('keyup', 'input[name="VTProductQuantity[]"]', function () {
+        let currentObj = $(this);
+        let val = currentObj.val();
+        if( /^\d+$/.test(val) === false) {
+            currentObj.val("");
+        }
+    });
+
     const render_cc_form = () => {
 
         let orderId;
@@ -170,7 +183,18 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 VtForm.validate({
-                    messages: {},
+                    rules: {
+                        'VTProductQuantity[]': {
+                            required: true,
+                            onlyDigits: true
+                        }
+                    },
+                    messages: {
+                        'VTProductQuantity[]': {
+                            onlyDigits: usb_swiper_settings.product_min_qty_message,
+                            min: usb_swiper_settings.product_min_qty_message
+                        }
+                    },
                     submitHandler: function(form, event) {
 
                         event.preventDefault();
@@ -584,7 +608,8 @@ jQuery( document ).ready(function( $ ) {
         let nonce = $('#vt_add_product_nonce').val();
         let repeater = $('.vt-repeater-field');
         let product_item = $(this);
-        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id')
+        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id');
+        let wrap_id = product_item.parents('.vt-fields-wrap').attr('data-id');
         let data = {
             'action': 'vt_add_product_value_in_inputs',
             'product-id': product_id,
@@ -596,6 +621,7 @@ jQuery( document ).ready(function( $ ) {
                 $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
                 $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
                 $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
+                $('#'+wrapper_id).children('#VTProductID_'+wrap_id).val(response.product_id);
                 repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
                 let net_price_array = [];
