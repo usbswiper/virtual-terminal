@@ -194,11 +194,16 @@ function usb_swiper_get_states( $country = 'US' ) {
  * @return array $form_fields
  */
 function usb_swiper_get_vt_form_fields( $tab = '' ) {
-
-    $merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
+    $user_id = get_current_user_id();
+    $merchant_data = usbswiper_get_onboarding_merchant_response($user_id);
     $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
 	$get_countries = usb_swiper_get_countries();
 	$get_states = usb_swiper_get_states($country_code);
+    $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+    $default_tax = get_user_meta($user_id,'default_tax',true);
+    $default_tax = ( !empty( $default_tax ) && isset($tax_data[$default_tax]) ) ? $tax_data[$default_tax] : '';
+    $tax_rate = !empty( $default_tax['tax_rate'] ) ? $default_tax['tax_rate'] : '';
+    $tax_on_shipping = !empty( $default_tax['tax_on_shipping'] ) ? $default_tax['tax_on_shipping'] : false;
 
     $form_fields = array(
         'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
@@ -404,15 +409,28 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'label' => __( 'Tax Rate', 'usb-swiper'),
 				'required' => false,
 				'is_percentage' => true,
-				'attributes' => array(
-					'maxlength' => '4'
-				),
+                'placeholder' => __( 'Search Tax', 'usb-swiper'),
 				'description' => '',
-				'class' => 'tax-rate-sign',
+				'class' => 'tax-rate-sign vt-tax-input',
+                'wrapper_class' => 'tax_rate_wrapper',
 				'is_symbol' => true,
 				'symbol' => '%',
-				'symbol_wrap_class' => 'currency-sign after'
+				'symbol_wrap_class' => 'currency-sign after',
+                'value' => $tax_rate
 			),
+            array(
+                'type' => 'checkbox',
+                'id' => 'TaxOnShipping',
+                'name' => 'TaxOnShipping',
+                'label' => __( 'Tax on Shipping', 'usb-swiper'),
+                'required' => false,
+                'description' => '',
+                'class' => 'hidden d-none',
+                'wrapper_class' => 'hidden d-none',
+                'symbol_wrap_class' => 'currency-sign after',
+                'value' => true,
+                'checked' => $tax_on_shipping
+            ),
 			array(
 				'type' => 'text',
 				'id' => 'TaxAmount',
