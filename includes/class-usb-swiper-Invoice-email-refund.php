@@ -25,8 +25,8 @@ class UsbSwiperInvoiceEmailRefunded extends WC_Email {
         $this->description = __('Email Sent when a Payment is Refunded.', 'usb-swiper');
 
         // these are the default heading and subject lines that can be overridden using the settings
-        $this->heading = __( '{#transaction_type#} {#transaction_id#} refunded', 'usb-swiper' );
-        $this->subject = __( 'Your {#transaction_type#} {#transaction_id#} has been refunded', 'usb-swiper');
+        $this->heading = __( '{#transaction_type#} {#invoice_number#} refunded', 'usb-swiper' );
+        $this->subject = __( 'Your {#transaction_type#} {#invoice_number#} has been refunded', 'usb-swiper');
 
         // these define the locations of the templates that this email should use
         $this->template_base  = USBSWIPER_PATH . 'templates/';
@@ -143,13 +143,13 @@ class UsbSwiperInvoiceEmailRefunded extends WC_Email {
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'Your {#transaction_type#} {#transaction_id#} has been refunded', 'usb-swiper'),
+                'placeholder' => __( 'Your {#transaction_type#} {#invoice_number#} has been refunded', 'usb-swiper'),
                 'default'     => '',
             ),
             'heading'            => array(
                 'title'       => __( 'Email Heading', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( '{#transaction_type#} {#transaction_id#} refunded', 'usb-swiper' ),
+                'placeholder' => __( '{#transaction_type#} {#invoice_number#} refunded', 'usb-swiper' ),
                 'default'     => '',
             ),
             'additional_content' => array(

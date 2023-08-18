@@ -25,8 +25,8 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
         $this->description = __('Email Sent when a user Paid Invoice.', 'usb-swiper');
 
         // these are the default heading and subject lines that can be overridden using the settings
-        $this->heading = __( 'Invoice {#transaction_id#}', 'usb-swiper' );
-        $this->subject = __( 'USBSwiper - Invoice Paid {#transaction_id#}', 'usb-swiper');
+        $this->heading = __( 'Invoice {#invoice_number#}', 'usb-swiper' );
+        $this->subject = __( 'USBSwiper - Invoice Paid {#invoice_number#}', 'usb-swiper');
 
         // these define the locations of the templates that this email should use
         $this->template_base  = USBSWIPER_PATH . 'templates/';
@@ -136,13 +136,13 @@ class UsbSwiperInvoiceEmailPaidAdmin extends WC_Email {
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'USBSwiper - Invoice Paid {#transaction_id#}', 'usb-swiper'),
+                'placeholder' => __( 'USBSwiper - Invoice Paid {#invoice_number#}', 'usb-swiper'),
                 'default'     => '',
             ),
             'heading'            => array(
                 'title'       => __( 'Email Heading', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'Invoice {#transaction_id#}', 'usb-swiper' ),
+                'placeholder' => __( 'Invoice {#invoice_number#}', 'usb-swiper' ),
                 'default'     => '',
             ),
             'additional_content' => array(
