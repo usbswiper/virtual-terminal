@@ -207,11 +207,6 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
                 </tr>
                 <tr>
                     <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
-                    <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Sub Total:','usb-swiper'); ?></td>
-                    <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Sub Total:','usb-swiper'); ?>"><?php echo wc_price($net_amount, array('currency' => $transaction_currency)); ?></td>
-                </tr>
-                <tr>
-                    <td style="padding:10px;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" colspan="3"></td>
                     <td style="padding:10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="title"><?php _e('Shipping Amount:','usb-swiper'); ?></td>
                     <td style="padding:10px 20px 10px 10px;text-align: right;border-left: 0;border-right: 0;border-top: 0; border-bottom: 0;" class="amount" data-title="<?php _e('Shipping Amount: ','usb-swiper'); ?>"><?php echo wc_price($shipping_amount, array('currency' => $transaction_currency)); ?></td>
                 </tr>

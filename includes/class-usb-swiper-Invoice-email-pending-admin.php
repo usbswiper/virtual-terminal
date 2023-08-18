@@ -25,8 +25,8 @@ class UsbSwiperInvoiceEmailPendingAdmin extends WC_Email {
         $this->description = __('Email Sent when a Invoice is Pending.', 'usb-swiper');
 
         // these are the default heading and subject lines that can be overridden using the settings
-        $this->heading = __( 'New Invoice {#transaction_id#}', 'usb-swiper' );
-        $this->subject = __( 'New Invoice {#transaction_id#} Created', 'usb-swiper');
+        $this->heading = __( 'New Invoice {#invoice_number#}', 'usb-swiper' );
+        $this->subject = __( 'New Invoice {#invoice_number#} Created', 'usb-swiper');
 
         // these define the locations of the templates that this email should use
         $this->template_base  = USBSWIPER_PATH . 'templates/';
@@ -138,13 +138,13 @@ class UsbSwiperInvoiceEmailPendingAdmin extends WC_Email {
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'New Invoice {#transaction_id#} Created', 'usb-swiper'),
+                'placeholder' => __( 'New Invoice {#invoice_number#} Created', 'usb-swiper'),
                 'default'     => '',
             ),
             'heading'            => array(
                 'title'       => __( 'Email Heading', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'New Invoice {#transaction_id#}', 'usb-swiper' ),
+                'placeholder' => __( 'New Invoice {#invoice_number#}', 'usb-swiper' ),
                 'default'     => '',
             ),
             'additional_content' => array(
