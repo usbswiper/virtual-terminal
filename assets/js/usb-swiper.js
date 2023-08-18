@@ -16,7 +16,7 @@ jQuery( document ).ready(function( $ ) {
     if (NetAmount !== null) $('#NetAmount').val(NetAmount);
     if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
     if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
-    if (TaxRate !== null){
+    if( !isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null){
         TaxRate = parseInt(TaxRate);
         $('#TaxRate').val(TaxRate);
     }
@@ -92,6 +92,19 @@ jQuery( document ).ready(function( $ ) {
     $.validator.addMethod("greaterThanZero", function(value, element) {
         return parseFloat(value) > 0;
     }, usb_swiper_settings.product_min_price);
+
+    $.validator.addMethod("onlyDigits", function(value, element) {
+        return (value && /^\d+$/.test(value));
+    }, usb_swiper_settings.product_min_qty_message);
+
+
+    $(document).on('keyup', 'input[name="VTProductQuantity[]"]', function () {
+        let currentObj = $(this);
+        let val = currentObj.val();
+        if( /^\d+$/.test(val) === false) {
+            currentObj.val("");
+        }
+    });
 
     const render_cc_form = () => {
 
@@ -170,7 +183,18 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 VtForm.validate({
-                    messages: {},
+                    rules: {
+                        'VTProductQuantity[]': {
+                            required: true,
+                            onlyDigits: true
+                        }
+                    },
+                    messages: {
+                        'VTProductQuantity[]': {
+                            onlyDigits: usb_swiper_settings.product_min_qty_message,
+                            min: usb_swiper_settings.product_min_qty_message
+                        }
+                    },
                     submitHandler: function(form, event) {
 
                         event.preventDefault();
@@ -449,6 +473,48 @@ jQuery( document ).ready(function( $ ) {
         }
     });
 
+    jQuery("form#vt_add_taxrule_form").validate({
+        rules: {
+            tax_label: {
+                required: true
+            },
+            tax_rate: {
+                required: true,
+                greaterThanZero: true
+            }
+        },
+        messages: {
+            tax_rate: {
+                greaterThanZero: usb_swiper_settings.product_min_price,
+                step: usb_swiper_settings.price_step_message
+            }
+
+        },
+        submitHandler: function (form, event) {
+            $('.vt-form-notification').empty()
+            event.preventDefault();
+
+            var fd = new FormData();
+            fd.append('action', 'create_update_product_tax');
+            fd.append('fields', $('#vt_add_taxrule_form').serialize());
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+            }).done(function (response) {
+                if (response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            });
+        }
+    });
+
+
     $("#vt_verification_form").validate({
         rules: {
             email_address: {
@@ -524,6 +590,34 @@ jQuery( document ).ready(function( $ ) {
         });
     });
 
+    $(document).on('keyup','.vt-tax-input',function(){
+        let search_val = $(this).val();
+        let vt_product_input = $(this);
+        let nonce = $('#vt_add_tax_nonce').val();
+        let data = {
+            'action': 'vt_search_tax',
+            'tax-key': search_val,
+            'vt-add-tax-nonce': nonce
+        };
+
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                if(response.product_select) {
+                    if (vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children().hasClass('vt-search-result')) {
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                    } else {
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                    }
+                } else {
+                    vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                }
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
     $(document).on('keyup','.vt-product-input', function () {
         let search_val = $(this).val();
         let vt_product_input = $(this);
@@ -584,7 +678,8 @@ jQuery( document ).ready(function( $ ) {
         let nonce = $('#vt_add_product_nonce').val();
         let repeater = $('.vt-repeater-field');
         let product_item = $(this);
-        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id')
+        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id');
+        let wrap_id = product_item.parents('.vt-fields-wrap').attr('data-id');
         let data = {
             'action': 'vt_add_product_value_in_inputs',
             'product-id': product_id,
@@ -596,6 +691,7 @@ jQuery( document ).ready(function( $ ) {
                 $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
                 $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
                 $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
+                $('#'+wrapper_id).children('#VTProductID_'+wrap_id).val(response.product_id);
                 repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
                 let net_price_array = [];
@@ -620,6 +716,19 @@ jQuery( document ).ready(function( $ ) {
                 set_notification(response.message, 'error', response.message_type);
             }
         });
+    });
+
+    $(document).on('click','.tax_rate_wrapper .tax-item', function () {
+        let tax_input = $(this).parents('.tax_rate_wrapper').find('.vt-tax-input');
+        tax_input.val($(this).attr('data-id'));
+        if( undefined !== $(this).attr('data-include-tax') && '' !== $(this).attr('data-include-tax') ){
+            $("#TaxOnShipping").prop('checked', true);
+        }else {
+            $("#TaxOnShipping").prop('checked', false);
+        }
+        $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
+        updateSalesTax();
+        updateGrandTotal();
     });
 
     $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
@@ -672,6 +781,12 @@ jQuery( document ).ready(function( $ ) {
         },300);
     });
 
+    $(document).on("focusout",".input-field-wrap.tax_rate_wrapper .vt-tax-input", function (){
+        setTimeout(function() {
+            $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
+        },300);
+    });
+
     if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
         const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
         localStorage.removeItem('sessionExpireTimer');
@@ -701,7 +816,6 @@ jQuery( document ).ready(function( $ ) {
         localStorage.removeItem('sessionExpireTimer');
         location.reload();
     });
-
 });
 
 function removeInterval( LoaderInterval ) {

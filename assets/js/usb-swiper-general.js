@@ -30,6 +30,46 @@ jQuery( document ).ready(function( $ ) {
         $(".vt-product-wrapper").hide();
     });
 
+    $("#vt_add_taxrule").click(function () {
+        $(".vt-taxrule-wrapper").toggle();
+    });
+
+    let tPageURL = window.location.search.substring(1),
+        tURLVariables = tPageURL.split('&');
+    if(tURLVariables[0] === 'action=edit'){
+        $(".vt-taxrule-wrapper").toggle();
+    }
+
+    $(".vt-taxrule-inner .close svg, #vt_add_taxrule_cancel").click(function () {
+        $(".vt-taxrule-wrapper").hide();
+    });
+
+    $(document).on('click', '.vt_delete_taxrule', function(){
+        var TaxId = $(this).data('tax-index');
+        var TaxNonce = $(this).data('nonce');
+
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'delete_tax_data',
+                tax_nonce: TaxNonce,
+                tax_id: TaxId
+            },
+            success: function (response) {
+                if (response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            },
+            error: function (errorThrown) {
+                console.log('Error:', errorThrown);
+            }
+        });
+
+    });
+
     const usb_swiper_add_loader = ( current_obj) => {
         current_obj.append('<span class="vt-loader"></span>');
     };

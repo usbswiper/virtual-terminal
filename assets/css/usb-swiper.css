@@ -65,7 +65,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .input-field-wrap .sign.after .sign-symbol {border-right: 1px solid #CCC;border-radius: 0 4px 4px 0;border-left: 0;}
 .input-field-wrap .sign.after  input {border-radius: 4px 0 0 4px;}
 .vt-fields-wrap .input-field-wrap input:read-only, .refund-form-wrap .refund-field input:read-only{background: #f5f5f5 !important;}
-.input-field-wrap .sign.after {flex-direction: row-reverse;}
+.input-field-wrap .sign.after {flex-direction: row-reverse;justify-content: flex-end;}
 .refund-form-wrap {width: 50%;display: inline-block;padding: 0 20px;border: 1px solid #CCC;float: right;margin-bottom: 20px;text-align: left;}
 .refund-form-wrap .refund-field {width: 100%;display: block;margin: 10px 0;}
 .refund-form-wrap .refund-field label {width: 100%;display: block;}
@@ -99,9 +99,9 @@ p.signature-text{display: none;}
 .vt-product-wrapper {background: #0006;bottom: 0;display:none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
 .vt-product-inner {background: #FFFFFF;border-radius: 16px;max-width: 600px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width:calc( 100% - 20px );}
 .vt-product-wrapper .vt-product-content {display: block;height: 60vh;overflow-y: scroll;}
-.vt-product-content::-webkit-scrollbar {width: 3px;background-color: #FFF!important;}
-.vt-product-content::-webkit-scrollbar-track {box-shadow: inset 0 0 6px #FFF!important;}
-.vt-product-content::-webkit-scrollbar-thumb {background: #FFF!important;}
+.vt-product-content::-webkit-scrollbar,.vt-taxrule-content::-webkit-scrollbar {width: 3px;background-color: #FFF!important;}
+.vt-product-content::-webkit-scrollbar-track,.vt-taxrule-content::-webkit-scrollbar-track {box-shadow: inset 0 0 6px #FFF!important;}
+.vt-product-content::-webkit-scrollbar-thumb,.vt-taxrule-content::-webkit-scrollbar-thumb {background: #FFF!important;}
 .vt-product-lists {margin: 1.5rem 0;}
 .vt-product-wrapper .input-field-wrap {text-align: left;display: flex;}
 .vt-product-wrapper .input-field-wrap input {padding: 10px;}
@@ -167,7 +167,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-repeater-field .input-field-wrap:nth-child(1) {width: calc(60% - 18px);}
 .vt-repeater-field .input-field-wrap:nth-child(2) {width: calc(20% - 12px);}
 .vt-repeater-field .input-field-wrap:nth-child(3) {margin: 0 6px;width: calc(20% - 22px);}
-.vt-repeater-field .input-field-wrap  .select2-container {width: 100% !important;}
+.vt-repeater-field .input-field-wrap .select2-container {width: 100% !important;}
 .vt-repeater-field svg {cursor: pointer;padding-top: 10px;}
 .transaction-filter-form .transaction-select{padding: 15px 5px;}
 .transaction-filter-form .submit{margin-top: 0 !important;}
@@ -183,7 +183,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .tool:hover::after, .tool:focus::after  {transition: all .65s cubic-bezier(.84,-0.18,.31,1.26);}
 .vt-col-pay-by-invoice fieldset {padding: 0;border: 0;box-shadow: unset;margin: 0;}
 .woocommerce-MyAccount-content .vt-form-notification {float: left;margin: 0;}
-.vt-repeater-field .vt-fields-wrap:nth-child(2) .vt-remove-fields-wrap {pointer-events: none;}
 .vt-capture-popup-wrapper,.vt-refund-popup-wrapper,.vt-payment-timeout-popup-wrapper {background: #0006;bottom: 0;display: none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
 .vt-capture-popup-inner, .vt-refund-popup-inner,.vt-payment-timeout-popup-inner {background: #FFFFFF;border-radius: 16px;max-width: 350px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width: calc( 100% - 20px );}
 .vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner {max-width: 40%;border-radius: 10px;padding: 40px;}
@@ -200,7 +199,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-capture-popup-wrapper .button-wrap .vt-button, .vt-refund-popup-wrapper .button-wrap .vt-button {margin-right: 0.5rem;}
 .poupup-loader span.vt-loader {top: 50%;left: 50%;position: absolute; width: 20px;height: 20px;}
 .poupup-loader {width: 100%;height: 100%;position: absolute;left: 0;top:0;border-radius: 15px 15px;background: #00000042;z-index:1}
-.vt-search-result {background: transparent;border-radius: 6px;display: flex;flex-direction: column;padding: 0;max-height: 55vh;overflow-y: scroll;}
+.vt-search-result {background: transparent;border-radius: 6px;display: flex;flex-direction: column;padding: 0;max-height: 20vh;overflow-y: scroll;border: 1px solid #CCC; }
 .vt-search-result span {background: #eee;cursor: pointer;border-bottom: 0;padding: 10px;}
 .vt-search-result .product-item:nth-child(odd) {background: #E1DEDE;}
 .vt-form-contents .vt-col-form-fields {padding: 0;box-shadow: unset;border: 0;}
@@ -223,6 +222,15 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-payment-wrapper .paypal-buttons-context-iframe.disabled {pointer-events: none;}
 .vt-payment-timeout-popup-wrapper .button-wrap {text-align: center;}
 .vt-row .vt-payment-wrapper .vt-col {margin-left: 10px;}
+.vt-repeater-field {display: flex;flex-wrap: wrap;gap: 15px;margin: 10px 0;}
+.vt-repeater-field .vt-fields-wrap {background: #f5f5f5;display: flex;position: relative;flex-wrap: wrap;padding: 15px;gap: 10px;border-radius: 5px;justify-content: space-between;}
+.vt-repeater-field .vt-fields-wrap .input-field-wrap {margin: 0;width: calc(50% - 5px);}
+.vt-repeater-field .vt-fields-wrap .input-field-wrap .vt-input-field {width: 100%;}
+.vt-repeater-field .vt-fields-wrap .input-field-wrap.product {width: 100%;}
+.vt-repeater-field .vt-fields-wrap .vt-remove-fields-wrap {position: absolute;right: -10px;top: -10px;line-height: 0;background: #FFF;border-radius: 100%;cursor: pointer;}
+.vt-repeater-field ::-webkit-scrollbar {width: 2px;}
+.vt-repeater-field ::-webkit-scrollbar-thumb {background-color: #3f77ea;}
+.vt-repeater-field ::-webkit-scrollbar-thumb:hover {background-color: #3f77ea;}
 .vt-pagination {width: 100%;display: block;}
 .vt-pagination ul {list-style: none;padding: 0;display: flex;align-items: center;justify-content: center;}
 .vt-pagination ul li a, .vt-pagination ul li span {padding: 1rem;display: block;font-size: 1rem;line-height: 1;color: #4078eb;}
@@ -230,6 +238,31 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-upload-brand-logo-wrapper {display: flex;flex-direction: row;flex-wrap: wrap;max-width: 100%;align-items: center;gap: 15px;justify-content: space-between;padding: 15px 3px;margin: 0 0 6px;}
 .vt-image-upload-button-wrap,#ae-paypal-pos-form > .vt-form-contents .branding >.logo{display: grid;width: 100%;}
 .vt-upload-brand-logo-wrapper:has(.vt-image-upload-button-wrap .upload-image-preview:empty) .vt-image-upload-button-wrap{width: auto;}
+.vt-taxrule-wrapper {background: #0006;bottom: 0;display: none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
+.vt-taxrule-inner {background: #fff;border-radius: 16px;max-width: 600px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width: calc(100% - 20px);z-index: 9999999;}
+.vt-taxrule-wrapper .close {cursor: pointer;position: absolute;height: 26px;right: 10px;top: 10px;margin: 0 auto;width: 26px;}
+.vt-taxrule-wrapper .close a {display: block;color: #000;}
+.vt-taxrule-wrapper .vt-taxrule-content{display:block;height:40vh;overflow-y:scroll;}
+.vt-taxrule-content .input-field-wrap {display: flex;flex-direction: column;padding: 10px 0;text-align: left;}
+.vt-taxrule-content form#vt_add_taxrule_form{clear:both;}
+.vt-taxrule-wrapper .input-field-wrap input {padding: 10px;}
+.vt-taxrule-wrapper .button-wrap {display: block;}
+.input-field-wrap.tax_rate_wrapper .vt-search-result{width:100%;}
+#vt_add_taxrule_form .button-wrap .vt-button {margin-right: 8px;}
+.tax-actions a.vt_delete_taxrule {color: #f44336;}
+.input-field-wrap.d-none{display: none;}
+form#default_tax_form,.vt-tax-filter-wrapper > .vt-taxrule{padding: 13px 0;}
+form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: pointer;-webkit-appearance: none;-moz-appearance: none;background: transparent;z-index: 99;display: block;position: relative;}
+.vt-tax-filter-wrapper #default_tax_form .default-tax-label,.vt-tax-filter-wrapper #default_tax_form{margin-right:15px;}
+.vt-taxrule-content .input-field-wrap.inline-checkbox{flex-direction:row;}
+.vt-taxrule-content .input-field-wrap.inline-checkbox .checkmark-container{display:flex;}
+.vt-taxrule-content .input-field-wrap.inline-checkbox .checkmark-container input{width:20px;}
+.vt-taxrule-content .input-field-wrap.inline-checkbox .checkbox-label{order:2;}
+.vt-tax-filter-wrapper{clear:both;display:flex;flex-direction:row;max-width:100%;flex-flow:wrap;justify-content:space-between;}
+.vt-tax-filter-wrapper #default_tax_form{display: flex;align-content:center;}
+.vt-tax-filter-wrapper .vt-button{margin:0;}
+.default-tax-label {position:relative;background: #eee;cursor: pointer;}
+.default-tax-label:after{position:absolute;font-family: dashicons;display: inline-block;line-height: 1;font-weight: 400;font-style: normal;font-size: 18px;content:'\f347';top: calc(50% - 9px);right: 5px;cursor: pointer;}
 
 @media print {
     body{line-height: 1.2 !important;}
@@ -269,7 +302,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .invoice-content-main-wrap .vt-payment-wrapper.fixed, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper.fixed {position: unset;width: 100%; margin: 20px 0 0 0;}
     .vt-fields-wrap .input-field-wrap .vt-input-field {margin: 0;width: 100%;}
     .vt-row fieldset {width: 100%;}
-    .vt-repeater-field .vt-fields-wrap {align-items:center;flex-wrap: wrap;}
     .vt-form-contents .paypal-payment {padding: 0;}
     .invoice-content-main-wrap .vt-row .vt-col-100 {width: 100%;}
     .vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner{max-width: 60%}
@@ -282,6 +314,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 
 @media (max-width: 760px) {
     .tool::after {font-size: .75em;margin-left: -5em;width: 10em;}
+    .vt-tax-filter-wrapper{flex-flow:column;}
 }
 
 @media only screen and (max-width: 600px) {
@@ -302,11 +335,6 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
     .my-account-products-listings-table tbody tr td.text-center {text-align: left !important;}
     .my-account-products-listings-table tbody tr td:before {content: attr(data-title) ": ";font-weight: 600;padding-top: 1px;vertical-align: top;}
     .my-account-products-listings-table tbody tr:nth-child(even){background: #f6f7f7;}
-    .vt-repeater-field .vt-fields-wrap {align-items:center;flex-wrap: wrap;}
-    .vt-repeater-field .input-field-wrap:nth-child(1){width: calc(100% - 12px);margin-bottom: 10px;}
-    .vt-repeater-field .input-field-wrap:nth-child(2){width: calc(50% - 12px);}
-    .vt-repeater-field .input-field-wrap:nth-child(3){width: calc(50% - 12px);}
-    .vt-repeater-field .vt-fields-wrap:has(svg) .price{width: calc(42% - 12px);}
     .vt-payment-timeout-popup-wrapper .vt-payment-timeout-popup-inner{max-width: 100%}
     .vt-pagination ul li a, .vt-pagination ul li span {padding: 0.5rem;}
 }
