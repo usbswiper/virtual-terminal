@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.2
-Stable tag: 2.2.4
+Stable tag: 2.3.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,20 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 2.3.0 =
+* Feature - Added a setting for upload brand login in MyAccount >> Account details page.
+* Feature - Branding details Added in email notifications and invoice
+* Feature - Added sorting and search filter for transactions and invoices
+* Feature - Added Discount Feature in VT form. In VT form Discount will apply using percentage or flat rate
+* Feature - Added setting for Tax Rules. So, merchant will easily add multiple tax rates/rules in the their account
+* Feature - Added setting for default tax rule
+* Feature - Added new tax rule option to include shipping
+* Feature - Search tax rule in VT form and apply correct rule
+* Enhancement - VT Form fields design changes
+* Enhancement - VT Form Product field design
+* Fix - Correct merchant brand name in email notifications for invoice and transactions
+* Fix - Only positive numbers are allowed for QTY and QTY Input sanitization
 
 = 2.2.4 =
 * Fix - Transactions post not show up front-end public search. ([VT-69](https://github.com/usbswiper/virtual-terminal/pull/40))
