@@ -21,6 +21,10 @@ if( ! empty( $card_last_digits )) {
 }
 $company_name = get_post_meta($transaction_id,'company',true);
 $user_invoice_id = get_post_meta( $transaction_id, '_user_invoice_id', true);
+$OrderAmount = get_post_meta($transaction_id, 'OrderAmount', true);
+$OrderAmount = usb_swiper_price_formatter($OrderAmount);
+$DiscountAmount = get_post_meta($transaction_id, 'DiscountAmount', true);
+$DiscountAmount = usb_swiper_price_formatter($DiscountAmount);
 $NetAmount = get_post_meta( $transaction_id, 'NetAmount', true);
 $NetAmount = usb_swiper_price_formatter($NetAmount);
 $ShippingAmount = get_post_meta( $transaction_id, 'ShippingAmount', true);
@@ -61,8 +65,10 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
+
 ?>
 <div class="vt-form-notification"></div>
+
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
     <?php
     $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');
@@ -299,6 +305,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Order Totals','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
+            <tr>
+                <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Order Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($OrderAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
+            <tr>
+                <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Discount Amount','usb-swiper'); ?></th>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($DiscountAmount, array('currency' => $transaction_currency)); ?></td>
+            </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Net Amount','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($NetAmount, array('currency' => $transaction_currency)); ?></td>

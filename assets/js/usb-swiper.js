@@ -3,6 +3,8 @@ jQuery( document ).ready(function( $ ) {
     var BillingFirstName = localStorage.getItem('BillingFirstName');
     var BillingLastName = localStorage.getItem('BillingLastName');
     var BillingEmail = localStorage.getItem('BillingEmail');
+    var OrderAmount = localStorage.getItem('OrderAmount');
+    var Discount = localStorage.getItem('Discount');
     var NetAmount = localStorage.getItem('NetAmount');
     var ShippingAmount = localStorage.getItem('ShippingAmount');
     var HandlingAmount = localStorage.getItem('HandlingAmount');
@@ -13,10 +15,12 @@ jQuery( document ).ready(function( $ ) {
     if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
     if (BillingLastName !== null) $('#BillingLastName').val(BillingLastName);
     if (BillingEmail !== null) $('#BillingEmail').val(BillingEmail);
+    if (OrderAmount !== null) $('#OrderAmount').val(OrderAmount);
+    if (Discount !== null) $('#Discount').val(Discount);
     if (NetAmount !== null) $('#NetAmount').val(NetAmount);
     if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
     if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
-    if (TaxRate !== null){
+    if( !isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null){
         TaxRate = parseInt(TaxRate);
         $('#TaxRate').val(TaxRate);
     }
@@ -92,6 +96,19 @@ jQuery( document ).ready(function( $ ) {
     $.validator.addMethod("greaterThanZero", function(value, element) {
         return parseFloat(value) > 0;
     }, usb_swiper_settings.product_min_price);
+
+    $.validator.addMethod("onlyDigits", function(value, element) {
+        return (value && /^\d+$/.test(value));
+    }, usb_swiper_settings.product_min_qty_message);
+
+
+    $(document).on('keyup', 'input[name="VTProductQuantity[]"]', function () {
+        let currentObj = $(this);
+        let val = currentObj.val();
+        if( /^\d+$/.test(val) === false) {
+            currentObj.val("");
+        }
+    });
 
     const render_cc_form = () => {
 
@@ -170,7 +187,18 @@ jQuery( document ).ready(function( $ ) {
                 });
 
                 VtForm.validate({
-                    messages: {},
+                    rules: {
+                        'VTProductQuantity[]': {
+                            required: true,
+                            onlyDigits: true
+                        }
+                    },
+                    messages: {
+                        'VTProductQuantity[]': {
+                            onlyDigits: usb_swiper_settings.product_min_qty_message,
+                            min: usb_swiper_settings.product_min_qty_message
+                        }
+                    },
                     submitHandler: function(form, event) {
 
                         event.preventDefault();
@@ -204,6 +232,8 @@ jQuery( document ).ready(function( $ ) {
                                             localStorage.removeItem('BillingFirstName');
                                             localStorage.removeItem('BillingLastName');
                                             localStorage.removeItem('BillingEmail');
+                                            localStorage.removeItem('OrderAmount');
+                                            localStorage.removeItem('Discount');
                                             localStorage.removeItem('NetAmount');
                                             localStorage.removeItem('ShippingAmount');
                                             localStorage.removeItem('HandlingAmount');
@@ -292,6 +322,8 @@ jQuery( document ).ready(function( $ ) {
                                     localStorage.removeItem('BillingFirstName');
                                     localStorage.removeItem('BillingLastName');
                                     localStorage.removeItem('BillingEmail');
+                                    localStorage.removeItem('OrderAmount');
+                                    localStorage.removeItem('Discount');
                                     localStorage.removeItem('NetAmount');
                                     localStorage.removeItem('ShippingAmount');
                                     localStorage.removeItem('HandlingAmount');
@@ -325,6 +357,8 @@ jQuery( document ).ready(function( $ ) {
         var BillingLastName = $('#BillingLastName').val();
         var BillingFirstName = $('#BillingFirstName').val();
         var BillingEmail = $('#BillingEmail').val();
+        var OrderAmount = $('#OrderAmount').val();
+        var Discount = $('#Discount').val();
         var NetAmount = $('#NetAmount').val();
         var ShippingAmount = $('#ShippingAmount').val();
         var HandlingAmount = $('#HandlingAmount').val();
@@ -336,6 +370,8 @@ jQuery( document ).ready(function( $ ) {
         localStorage.setItem('BillingFirstName', BillingFirstName);
         localStorage.setItem('BillingLastName', BillingLastName);
         localStorage.setItem('BillingEmail', BillingEmail);
+        localStorage.setItem('OrderAmount', OrderAmount);
+        localStorage.setItem('Discount', Discount);
         localStorage.setItem('NetAmount', NetAmount);
         localStorage.setItem('ShippingAmount', ShippingAmount);
         localStorage.setItem('HandlingAmount', HandlingAmount);
@@ -360,6 +396,42 @@ jQuery( document ).ready(function( $ ) {
         event.preventDefault();
         $(this).hide();
         $('.refund-form-wrap').show();
+    });
+
+    $(document).on('change', '#DiscountType, #Discount', function(){
+        var orderAmount = ( $('#OrderAmount').val().replace(/,/g, '') * 1 );
+        var discountInput = ( $('#Discount').val().replace(/,/g, '') * 1 );
+        var discountType = $('#DiscountType').val();
+
+        var discountAmount = 0;
+        var netAmount = 0;
+
+        if ( !isNaN(orderAmount) && !isNaN(discountInput) && discountInput !== '') {
+            discountInput = parseFloat(discountInput); // Convert to float
+            if (discountType === 'percent') {
+                discountAmount = (orderAmount * discountInput) / 100;
+            } else {
+                discountAmount = discountInput;
+            }
+        }
+
+        if (discountAmount > orderAmount) {
+            set_notification('Discount Amount is greater than Order Amount so please add valid discount amount', 'error');
+            $('#pos-submit-btn').prop('disabled', true);
+            $('#PayByInvoice').prop('disabled', true);
+        } else {
+            $('#pos-submit-btn').prop('disabled', false);
+            $('#PayByInvoice').prop('disabled', false);
+        }
+
+        $('#DiscountAmount').val(discountAmount.toFixed(2));
+
+        if ( !isNaN(orderAmount) && !isNaN(discountAmount) ) {
+            netAmount = orderAmount.toFixed(2) - discountAmount.toFixed(2);
+        }
+        $('#NetAmount').val(netAmount.toFixed(2));
+        updateSalesTax();
+        updateGrandTotal();
     });
 
     $(document).on('click','.cancel-refund', function (event) {
@@ -449,6 +521,48 @@ jQuery( document ).ready(function( $ ) {
         }
     });
 
+    jQuery("form#vt_add_taxrule_form").validate({
+        rules: {
+            tax_label: {
+                required: true
+            },
+            tax_rate: {
+                required: true,
+                greaterThanZero: true
+            }
+        },
+        messages: {
+            tax_rate: {
+                greaterThanZero: usb_swiper_settings.product_min_price,
+                step: usb_swiper_settings.price_step_message
+            }
+
+        },
+        submitHandler: function (form, event) {
+            $('.vt-form-notification').empty()
+            event.preventDefault();
+
+            var fd = new FormData();
+            fd.append('action', 'create_update_product_tax');
+            fd.append('fields', $('#vt_add_taxrule_form').serialize());
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+            }).done(function (response) {
+                if (response.status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    set_notification(response.message, 'error');
+                }
+            });
+        }
+    });
+
+
     $("#vt_verification_form").validate({
         rules: {
             email_address: {
@@ -498,6 +612,8 @@ jQuery( document ).ready(function( $ ) {
         });
 
         $('#NetAmount').val(net_price.toFixed(2));
+        $('#OrderAmount').val(net_price.toFixed(2));
+        jQuery('#Discount').trigger('change');
         updateSalesTax();
         updateGrandTotal();
     });
@@ -518,6 +634,34 @@ jQuery( document ).ready(function( $ ) {
                 $('#vt_repeater_field').append( response.html );
                 usb_swiper_remove_loader(loader);
                 loader.removeAttr('disabled');
+            } else {
+                set_notification(response.message, 'error', response.message_type);
+            }
+        });
+    });
+
+    $(document).on('keyup','.vt-tax-input',function(){
+        let search_val = $(this).val();
+        let vt_product_input = $(this);
+        let nonce = $('#vt_add_tax_nonce').val();
+        let data = {
+            'action': 'vt_search_tax',
+            'tax-key': search_val,
+            'vt-add-tax-nonce': nonce
+        };
+
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            if (response.status) {
+                if(response.product_select) {
+                    if (vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children().hasClass('vt-search-result')) {
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                    } else {
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                    }
+                } else {
+                    vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                }
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -584,7 +728,8 @@ jQuery( document ).ready(function( $ ) {
         let nonce = $('#vt_add_product_nonce').val();
         let repeater = $('.vt-repeater-field');
         let product_item = $(this);
-        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id')
+        let wrapper_id = product_item.parents('.vt-fields-wrap').attr('id');
+        let wrap_id = product_item.parents('.vt-fields-wrap').attr('data-id');
         let data = {
             'action': 'vt_add_product_value_in_inputs',
             'product-id': product_id,
@@ -596,6 +741,7 @@ jQuery( document ).ready(function( $ ) {
                 $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
                 $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
                 $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
+                $('#'+wrapper_id).children('#VTProductID_'+wrap_id).val(response.product_id);
                 repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
                 let net_price_array = [];
@@ -608,18 +754,32 @@ jQuery( document ).ready(function( $ ) {
                     net_price_array[index] = Number(quantity) * Number(price);
                 });
 
-
                 for (let i = 0; i < net_price_array.length; i++) {
                     net_price = Number(net_price_array[i]) + Number(net_price);
                 }
 
+                $('#OrderAmount').val(net_price.toFixed(2));
                 $('#NetAmount').val(net_price.toFixed(2));
+                jQuery('#Discount').trigger('change');
                 updateSalesTax();
                 updateGrandTotal();
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
         });
+    });
+
+    $(document).on('click','.tax_rate_wrapper .tax-item', function () {
+        let tax_input = $(this).parents('.tax_rate_wrapper').find('.vt-tax-input');
+        tax_input.val($(this).attr('data-id'));
+        if( undefined !== $(this).attr('data-include-tax') && '' !== $(this).attr('data-include-tax') ){
+            $("#TaxOnShipping").prop('checked', true);
+        }else {
+            $("#TaxOnShipping").prop('checked', false);
+        }
+        $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
+        updateSalesTax();
+        updateGrandTotal();
     });
 
     $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
@@ -639,7 +799,9 @@ jQuery( document ).ready(function( $ ) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
 
+        $('#OrderAmount').val(net_price.toFixed(2));
         $('#NetAmount').val(net_price.toFixed(2));
+        jQuery('#Discount').trigger('change');
         updateSalesTax();
         updateGrandTotal();
     });
@@ -672,6 +834,12 @@ jQuery( document ).ready(function( $ ) {
         },300);
     });
 
+    $(document).on("focusout",".input-field-wrap.tax_rate_wrapper .vt-tax-input", function (){
+        setTimeout(function() {
+            $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
+        },300);
+    });
+
     if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
         const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
         localStorage.removeItem('sessionExpireTimer');
@@ -701,7 +869,6 @@ jQuery( document ).ready(function( $ ) {
         localStorage.removeItem('sessionExpireTimer');
         location.reload();
     });
-
 });
 
 function removeInterval( LoaderInterval ) {
@@ -719,14 +886,43 @@ function customInput (el) {
     const label = document.createElement('div');
     label.className = 'upload-image-preview';
     el.appendChild(label);
-
     fileInput.onchange = function () {
         if (!fileInput.value) return
-        /*const imageLabel = fileInput.value.replace(/^.*[\\\/]/, '')*/
-        const file = fileInput.files[0];
-        const previewImage = URL.createObjectURL(file)
-        label.innerHTML = '<img src="'+previewImage+'" alt="preview">';
+        let fileInputName = fileInput.getAttribute('name');
+        let bigImage = false;
+        var _URL = window.URL || window.webkitURL;
+        var LogoFile, img;
+        if ((LogoFile = fileInput.files[0])) {
+            img = new Image();
+            var objectUrl = _URL.createObjectURL(LogoFile);
+            img.onload = function () {
+                if( this.width > 250 ){
+                    bigImage = true;
+                    vt_set_notification(usb_swiper_settings.vt_max_image_size, 'error');
+                    fileInput.value = '';
+                } else {
+                        if (fileInputName === 'BrandLogo') {
+                            let brandLogoPreviewEl = document.getElementsByClassName('brand-logo-preview');
+                            if (brandLogoPreviewEl) {
+                                brandLogoPreviewEl[0].style.display = "none";
+                            }
+                        }
+                        const file = fileInput.files[0];
+                        const previewImage = URL.createObjectURL(file)
+                        label.innerHTML = '<img src="' + previewImage + '" alt="preview">';
+                }
+                _URL.revokeObjectURL(objectUrl);
+            };
+            img.src = objectUrl;
+        }
     }
+}
+
+function vt_set_notification( message, type ='success', message_type='' ) {
+    var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
+    jQuery('.vt-form-notification').empty().append(notification);
+
+    jQuery([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
 }
 
 function autoSessionLogOut() {
@@ -756,3 +952,4 @@ function autoSessionLogOut() {
         }
     }, 1000);
 }
+

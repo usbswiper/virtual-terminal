@@ -114,7 +114,6 @@ jQuery(function( $ ) {
             updateSalesTax();
             updateGrandTotal();
         });
-
         /* Swipe field */
         jQuery('#swiper').change(function(){
             ParseStripeData();
@@ -307,7 +306,14 @@ function ToggleIssueNumber()
 function updateSalesTax()
 {
     var currencySign = jQuery('#ae-paypal-pos-form').attr('data-currency-sign');
-    var taxAmount = ( jQuery('#TaxRate').val().replace(/,/g, '') / 100 ) * jQuery('#NetAmount').val().replace(/,/g, '');
+    var taxableAmount = jQuery('#NetAmount').val().replace(/,/g, '');
+    var ShippingAmount = jQuery('#ShippingAmount').val().replace(/,/g, '');
+    var TaxOnShipping = jQuery('#TaxOnShipping').is(":checked");
+    var TotalTaxableAmount = Number(taxableAmount);
+    if( TaxOnShipping && undefined !== ShippingAmount && Number(ShippingAmount) > 0){
+       TotalTaxableAmount = Number(taxableAmount) + Number(ShippingAmount);
+    }
+    var taxAmount = ( jQuery('#TaxRate').val().replace(/,/g, '') / 100 ) * Number(TotalTaxableAmount);
     if(!taxAmount) taxAmount = 0;
     jQuery('#TaxAmountDisplay').html('<i>(' + currencySign + ' ' + roundNumber(taxAmount, 2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ')</i>');
     var taxAmountRounded = roundNumber(taxAmount,2);
@@ -322,6 +328,7 @@ function updateSalesTax()
 function updateGrandTotal()
 {
     var currencySign = jQuery('#ae-paypal-pos-form').attr('data-currency-sign');
+    // var orderAmount = ( jQuery('#OrderAmount').val());
     var netAmount = ( jQuery('#NetAmount').val().replace(/,/g, '') * 1 );
     var shippingAmount = ( jQuery('#ShippingAmount').val().replace(/,/g, '') * 1 );
     var handlingAmount = ( jQuery('#HandlingAmount').val().replace(/,/g, '') * 1 );
