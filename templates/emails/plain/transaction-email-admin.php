@@ -15,6 +15,7 @@ if( !empty( $transaction_author ) && $transaction_author > 0 ) {
     $user_info = get_user_by( 'id', $transaction_author );
     $author_name = !empty( $user_info->display_name ) ? $user_info->display_name : '';
 }
+
 $args = array(
     'transaction_id' => $transaction_id,
     'display_name' => $author_name,

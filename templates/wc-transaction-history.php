@@ -65,8 +65,10 @@ if( !class_exists('Usb_Swiper_Paypal_request') ) {
 $Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 $transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
+
 ?>
 <div class="vt-form-notification"></div>
+
 <div class="vt-transaction-history woocommerce-page" style="width: 100%;">
     <?php
     $myaccount_page_id = (int)get_option('woocommerce_myaccount_page_id');

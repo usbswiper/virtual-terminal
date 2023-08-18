@@ -194,11 +194,16 @@ function usb_swiper_get_states( $country = 'US' ) {
  * @return array $form_fields
  */
 function usb_swiper_get_vt_form_fields( $tab = '' ) {
-
-    $merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
+    $user_id = get_current_user_id();
+    $merchant_data = usbswiper_get_onboarding_merchant_response($user_id);
     $country_code = !empty( $merchant_data['country'] ) ? $merchant_data['country'] : 'US';
 	$get_countries = usb_swiper_get_countries();
 	$get_states = usb_swiper_get_states($country_code);
+    $tax_data = get_user_meta($user_id, 'user_tax_data', true);
+    $default_tax = get_user_meta($user_id,'default_tax',true);
+    $default_tax = ( !empty( $default_tax ) && isset($tax_data[$default_tax]) ) ? $tax_data[$default_tax] : '';
+    $tax_rate = !empty( $default_tax['tax_rate'] ) ? $default_tax['tax_rate'] : '';
+    $tax_on_shipping = !empty( $default_tax['tax_on_shipping'] ) ? $default_tax['tax_on_shipping'] : false;
 
     $form_fields = array(
         'swiper' => apply_filters( 'usb_swiper_swipe_card_fields', array(
@@ -249,7 +254,10 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'name' => 'VTProductQuantity[]',
                 'placeholder' => __( 'Quantity', 'usb-swiper'),
                 'required' => true,
-                'attributes' => '',
+				'attributes' => array(
+					"step" => 1,
+					"min" => 1,
+				),
                 'description' => '',
                 'readonly' => false,
                 'disabled' => false,
@@ -268,7 +276,15 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'disabled' => false,
                 'class' => 'vt-input-field vt-product-price',
                 'wrapper_class' => 'price'
-            )
+            ),
+			array(
+				'type' => 'hidden',
+				'id' => 'VTProductID',
+				'name' => 'VTProductID[]',
+				'attributes' => '',
+				'description' => '',
+				'class' => 'vt-input-field vt-product-id',
+			)
         )),
         'personal_info' => apply_filters( 'usb_swiper_personal_info_fields', array(
             array(
@@ -456,15 +472,28 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'label' => __( 'Tax Rate', 'usb-swiper'),
 				'required' => false,
 				'is_percentage' => true,
-				'attributes' => array(
-					'maxlength' => '4'
-				),
+                'placeholder' => __( 'Search Tax', 'usb-swiper'),
 				'description' => '',
-				'class' => 'tax-rate-sign',
+				'class' => 'tax-rate-sign vt-tax-input',
+                'wrapper_class' => 'tax_rate_wrapper',
 				'is_symbol' => true,
 				'symbol' => '%',
-				'symbol_wrap_class' => 'currency-sign after'
+				'symbol_wrap_class' => 'currency-sign after',
+                'value' => $tax_rate
 			),
+            array(
+                'type' => 'checkbox',
+                'id' => 'TaxOnShipping',
+                'name' => 'TaxOnShipping',
+                'label' => __( 'Tax on Shipping', 'usb-swiper'),
+                'required' => false,
+                'description' => '',
+                'class' => 'hidden d-none',
+                'wrapper_class' => 'hidden d-none',
+                'symbol_wrap_class' => 'currency-sign after',
+                'value' => true,
+                'checked' => $tax_on_shipping
+            ),
 			array(
 				'type' => 'text',
 				'id' => 'TaxAmount',
@@ -1458,7 +1487,62 @@ function usbswiper_get_brand_name() {
 	$company_name = get_user_meta( get_current_user_id(),'brand_name', true);
 	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
+/**
+ * Get the brand logo.
+ *
+ * @since 1.0.0
+ *
+ * @return mixed|string|null
+ */
+function usbswiper_get_brand_logo( $user_id, $is_url = true, $size = 'full', $is_email = false ) {
 
+    if( empty( $user_id ) ) {
+         return false;
+    }
+
+    $brand_logo = array(
+        'attachment_id' => '',
+        'image_html' => ''
+    );
+
+    $brand_logo_id = get_user_meta( $user_id,'brand_logo', true);
+
+    if( empty( $brand_logo_id ) ) {
+        return $brand_logo;
+    }
+
+    $brand_logo_url = !empty( $brand_logo_id ) ? wp_get_attachment_image_url($brand_logo_id,$size) : '';
+
+    if( $is_email ){
+        if( !empty($brand_logo_url) ){
+            $brand_logo['image_html'] = "<img width='250' src='".esc_url($brand_logo_url)."' alt='' loading='lazy' style='height:auto;vertical-align: middle;max-width: 100%;'>";
+        } else {
+            $brand_name = get_user_meta( $user_id,'brand_name', true);
+            $brand_logo['image_html'] = !empty( $brand_name ) ? "<h1 style='vertical-align:middle;text-align:center;font-size:32px;margin:0;font-weight:bold;'>".esc_html($brand_name)."</h1>" : '';
+        }
+    } else {
+        $brand_logo = array(
+            'attachment_id' => $brand_logo_id,
+            'image_html' => wp_get_attachment_image($brand_logo_id, $size)
+        );
+
+        if( $is_url ) {
+            $brand_logo['image_html'] = !empty($brand_logo_url) ? esc_url($brand_logo_url) : '';
+        }
+    }
+
+    return $brand_logo;
+}
+
+function usb_swiper_brand_logo( $string ) {
+
+    if( !empty( $string ) ) {
+        $brand_logo = get_user_meta(get_current_user_id(), 'brand_logo', true);
+        $string = str_replace('{#brand_logo#}', $brand_logo['image_html'], $string);
+    }
+
+    return $string;
+}
 /**
  * Get the current user invoice prefix value.
  *
@@ -1661,7 +1745,7 @@ function get_product_html( $id = 0 ) {
 
     $product_info_fields = usb_swiper_get_vt_form_fields('product_info');
 
-    $html = '<div id="vt_fields_wrap_' . $id . '" class="vt-fields-wrap">';
+    $html = '<div id="vt_fields_wrap_' . $id . '" class="vt-fields-wrap" data-id="'.$id.'">';
 
     if (!empty($product_info_fields) && is_array($product_info_fields)) {
 
@@ -1682,7 +1766,7 @@ function get_product_html( $id = 0 ) {
 
     $html .= '</span>';
 
-    $html .= '</div>';
+	$html .= '</div>';
 
     return $html;
 }

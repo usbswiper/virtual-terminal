@@ -353,6 +353,7 @@ class Usb_Swiper_Paypal_request{
 
 		$application_context = array(
 			'brand_name' => usbswiper_get_brand_name(),
+            'brand_logo' => usbswiper_get_brand_logo(get_current_user_id()),
 			'locale' => usbswiper_get_locale(),
 			'landing_page' => $this->landing_page,
 			'shipping_preference' => $this->shipping_preference(),
@@ -512,12 +513,24 @@ class Usb_Swiper_Paypal_request{
             $purchase_units_items = array();
 
             foreach ( $vt_products as $products ) {
+
+				$product_id = !empty( $products['product_id'] ) ? $products['product_id'] : '';
+
+				$sku = '';
+				$description = '';
+				if( !empty( $product_id ) && $product_id > 0 ) {
+					$product = wc_get_product( $product_id );
+					$sku = !empty( $product->get_sku() ) ? $product->get_sku() : '';
+					$description = !empty( $product->get_description() ) ? wp_strip_all_tags($product->get_description()) : '';
+					$description = !empty( $description ) ?substr(str_replace(PHP_EOL, '', $description), 0, 127) : '';
+				}
+
                 $purchase_units_items[] =  array(
                     'name'        => $products['product_name'],
-                    'description' => '',
-                    'sku'         => '',
+                    'description' => $description,
+                    'sku'         => $sku,
                     'category'    => '',
-                    'quantity'    => $products['product_quantity'],
+                    'quantity'    => ltrim($products['product_quantity'], 0),
                     'unit_amount' => array(
                         'currency_code' => $this->get_transaction_currency( $transaction_id ),
                         'value'         => usb_swiper_price_formatter ( $products['product_price'] ),
