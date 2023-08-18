@@ -79,6 +79,17 @@ if( true === $profile_status && !empty($merchant_id)) {
                                 </div>
                             </fieldset>
 							<?php
+                            echo usb_swiper_get_html_field(array(
+                                'type' => 'hidden',
+                                'id' => 'vt_add_tax_nonce',
+                                'name' => 'vt_add_tax_nonce',
+                                'required' => false,
+                                'attributes' => '',
+                                'description' => '',
+                                'readonly' => false,
+                                'disabled' => false,
+                                'value' => wp_create_nonce('vt_add_tax_nonce')
+                            ));
 						}
 					}
 					?>
