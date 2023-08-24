@@ -886,11 +886,11 @@ function usbswiper_get_onboarding_user( $user_id = 0 ) {
  */
 function usbswiper_get_platform_fees( $cart_total, $type = 'transaction', $transaction_id = 0 ) {
 
-	if( !is_user_logged_in() || empty( $cart_total ) ) {
+	if( empty( $cart_total ) ) {
 		return 0;
 	}
 
-    $user_id = get_current_user_id();
+    $user_id = ( is_user_logged_in() ) ? get_current_user_id() : 0;
     if( $type === 'invoice' && $transaction_id > 0 ){
         $user_id = get_post_meta($transaction_id, '_transaction_user_id', true);
     }
@@ -899,6 +899,7 @@ function usbswiper_get_platform_fees( $cart_total, $type = 'transaction', $trans
 	if( !empty( $exclude_partner_users ) && is_array( $exclude_partner_users ) && in_array( $user_id, $exclude_partner_users) ) {
 		return 0;
 	}
+
 	$billing_country = get_user_meta( $user_id, 'billing_country', true);
 
     $transaction_user = $transaction_id ? get_post_field( 'post_author', $transaction_id ) : 0;
