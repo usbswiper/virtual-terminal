@@ -2555,7 +2555,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 break;
                             }
                         }else{
-                            if( str_contains($tax_label, $tax_key)  ){
+                            if( str_contains(strtolower($tax_label), strtolower($tax_key))  ){
                                 $data .= "<span class='tax-item' data-include-tax='$tax_on_shipping' data-id='$tax_rate'>$tax_label</span>";
                             }
                         }
