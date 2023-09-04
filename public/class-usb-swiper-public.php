@@ -2540,25 +2540,19 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $data = '';
                 $message = __( 'No any tax found.', 'usb-swiper');
                 $tax_options = get_user_meta(get_current_user_id(), 'user_tax_data', true);
-                $count = 0;
                 if (!empty($tax_options) && is_array($tax_options)) {
                     $message = __( 'Tax options found successfully.', 'usb-swiper');
                     foreach ( array_reverse($tax_options) as $tax_option_key => $tax ) {
-                        $count ++;
                         $tax_rate = !empty( $tax['tax_rate'] ) ? $tax['tax_rate'] : '';
                         $tax_label = !empty( $tax['tax_label'] ) ? $tax['tax_label'] : '';
                         $tax_on_shipping = !empty( $tax['tax_on_shipping'] ) ? $tax['tax_on_shipping'] : false;
 
-                        if( empty( $tax_key ) || strlen($tax_key) < 3 ){
+                        if( !empty($tax_label) && !empty($tax_key) && str_contains(strtolower($tax_label), strtolower($tax_key)) ){
                             $data .= "<span class='tax-item' data-include-tax='$tax_on_shipping' data-id='$tax_rate'>$tax_label</span>";
-                            if($count === 3) {
-                                break;
-                            }
-                        }else{
-                            if( str_contains(strtolower($tax_label), strtolower($tax_key))  ){
-                                $data .= "<span class='tax-item' data-include-tax='$tax_on_shipping' data-id='$tax_rate'>$tax_label</span>";
-                            }
+                        }else if(!empty($tax_label) && empty($tax_key)) {
+                            $data .= "<span class='tax-item' data-include-tax='$tax_on_shipping' data-id='$tax_rate'>$tax_label</span>";
                         }
+
                     }
                 }
             }
