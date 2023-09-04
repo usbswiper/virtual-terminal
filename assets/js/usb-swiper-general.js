@@ -18,8 +18,10 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $("#vt_add_product").click(function () {
+        $('.vt-form-notification').empty();
         $(".vt-product-wrapper").toggle();
     });
+
     let sPageURL = window.location.search.substring(1),
         sURLVariables = sPageURL.split('&');
     if(sURLVariables[0] === 'action=edit' || sURLVariables[0] === 'action=view'){
