@@ -269,6 +269,9 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 .vt-tax-filter-wrapper .vt-button{margin:0;}
 .default-tax-label {position:relative;background: #eee;cursor: pointer;}
 .default-tax-label:after{position:absolute;font-family: dashicons;display: inline-block;line-height: 1;font-weight: 400;font-style: normal;font-size: 18px;content:'\f347';top: calc(50% - 9px);right: 5px;cursor: pointer;}
+.vt-fields-wrap .input-field-wrap.profile-verify-tc label.checkbox-label, .vt-fields-wrap .input-field-wrap.profile-verify-tc .checkmark-container {width: 100%;position: relative;}
+.vt-fields-wrap .input-field-wrap.profile-verify-tc .checkmark-container{padding-left: 30px;}
+.vt-fields-wrap .input-field-wrap.profile-verify-tc input[type="checkbox"] {margin-right: 10px;position: absolute;left: 0;top: 5px;height: 20px;width: 20px;}
 
 @media print {
     body{line-height: 1.2 !important;}
