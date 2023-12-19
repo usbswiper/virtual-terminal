@@ -422,7 +422,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $transaction_args = array(
                     'post_type' => 'transactions',
-                    'post_status' => 'publish',
+                    'post_status' => ['publish','future'],
                     'posts_per_page' => !empty( get_option( 'posts_per_page' ) ) ? get_option( 'posts_per_page' ) : 10,
                     'paged' => $current_page,
                     'author' => get_current_user_id(),
@@ -1055,7 +1055,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'post_author'  => $current_user_id,
                 'post_type'   => 'transactions',
                 'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
-                'post_date_gmt' => current_time( 'mysql' ),
+                'post_date_gmt' => usbswiper_get_user_date_i18n( $current_user_id ),
             );
 
 			$transaction_id = wp_insert_post($post_args);
