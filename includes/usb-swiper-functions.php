@@ -1562,43 +1562,6 @@ function usbswiper_get_invoice_prefix( $transaction_id = '' ) {
 }
 
 /**
- * Get the current user timezone.
- *
- * @sience 1.1.17
- *
- * @return false|mixed|null
- */
-function usbswiper_get_user_timezone() {
-
-    $current_user_id = get_current_user_id();
-
-    $current_offset = get_option( 'gmt_offset' );
-    $tzstring       = get_option( 'timezone_string' );
-
-    $check_zone_info = true;
-
-    if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
-        $tzstring = '';
-    }
-
-    if ( empty( $tzstring ) ) { // Create a UTC+- zone if no timezone string exists.
-        $check_zone_info = false;
-        if ( 0 == $current_offset ) {
-            $tzstring = 'UTC+0';
-        } elseif ( $current_offset < 0 ) {
-            $tzstring = 'UTC' . $current_offset;
-        } else {
-            $tzstring = 'UTC+' . $current_offset;
-        }
-    }
-
-    $user_timezone = get_user_meta($current_user_id,'user_timezone', true);
-
-    return !empty( $user_timezone ) ? $user_timezone : $tzstring;
-
-}
-
-/**
  * Create the invoice id with the prefix.
  *
  * @since 1.1.17
@@ -2311,4 +2274,85 @@ function usbswiper_get_pagination( $args ) {
 		'prev_text'          => !empty( $args['prev_text'] ) ? $args['prev_text'] : '&laquo;',
 		'next_text'          => !empty( $args['next_text'] ) ? $args['next_text'] : '&raquo;',
 	) );
+}
+
+/**
+ * Get the current user timezone.
+ *
+ * @sience 1.1.17
+ *
+ * @return false|mixed|null
+ */
+function usbswiper_get_user_timezone( $user_id = 0 ) {
+
+    if( empty( $user_id ) ) {
+        $user_id = get_current_user_id();
+    }
+
+    $current_offset = get_option( 'gmt_offset' );
+    $tzstring       = get_option( 'timezone_string' );
+
+    if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
+        $tzstring = '';
+    }
+
+    if ( empty( $tzstring ) ) {
+        if ( 0 == $current_offset ) {
+            $tzstring = 'UTC+0';
+        } elseif ( $current_offset < 0 ) {
+            $tzstring = 'UTC' . $current_offset;
+        } else {
+            $tzstring = 'UTC+' . $current_offset;
+        }
+    }
+
+    $user_timezone = get_user_meta( $user_id,'vt_user_timezone', true);
+
+    return !empty( $user_timezone ) ? $user_timezone : $tzstring;
+
+}
+
+/**
+ * Get date from current timezone user wise.
+ *
+ * @since 2.3.3
+ *
+ * @param int $user_id Get user id
+ * @param bool $is_timezone Check is timezone.
+ * @return false|mixed|string|null
+ * @throws Exception
+ */
+function usbswiper_get_user_date_i18n( $user_id = 0, $is_timezone = false ) {
+
+    if( empty( $user_id ) ) {
+        $user_id = get_current_user_id();
+    }
+
+    $timezone = usbswiper_get_user_timezone( $user_id );
+
+    if( !empty( $timezone ) && str_contains( $timezone, 'UTC') !== false ) {
+
+        if( $timezone !== 'UTC' ) {
+            $gmt_offset = str_replace('UTC', '', $timezone);
+            $offset  = (float) $gmt_offset;
+            $hours   = (int) $offset;
+            $minutes = ( $offset - $hours );
+
+            $sign      = ( $offset < 0 ) ? '-' : '+';
+            $abs_hour  = abs( $hours );
+            $abs_mins  = abs( $minutes * 60 );
+            $timezone = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
+        }
+    }
+
+
+    if( $is_timezone ) {
+        return $timezone;
+    }
+
+    $timezone   = new DateTimeZone( $timezone );
+    $custom_datetime = new DateTime('now', $timezone);
+    $date = $custom_datetime->format('Y-m-d H:i:s');
+
+    return !empty( $date ) ? $date : '';
 }

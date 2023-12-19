@@ -1048,26 +1048,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $invoice_status = 'PENDING';
             }
 
-            //$timestamp = time();
-            //$tz = usbswiper_get_user_timezone();
-            //$tz = !empty($tz) ? str_replace('.5',':30',$tz) : '';
-
-            //$now = new \DateTime( 'now', new \DateTimeZone( $tz ) );
-
-            //$date_format = get_option( 'date_format' );
-
             $post_args = array(
                 'post_title'   => wp_strip_all_tags($display_name),
                 'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
                 'post_status'  => 'publish',
                 'post_author'  => $current_user_id,
                 'post_type'   => 'transactions',
-                'post_date'     => date('')
+                'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
+                'post_date_gmt' => current_time( 'mysql' ),
             );
-
-            /*if( !empty( $date_format ) && !empty( $now ) ){
-                $post_args['post_date'] = $now->format($date_format);
-            }*/
 
 			$transaction_id = wp_insert_post($post_args);
 
@@ -1837,17 +1826,20 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     <?php } ?>
                 </div>
             </div>
-
-            <?php
-            $selected_timezone = usbswiper_get_user_timezone();
-            ?>
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-                <label for="UserTimezone"><?php _e( 'Timezone' ); ?></label>
-                <select id="UserTimezone" name="UserTimezone" aria-describedby="timezone-description" class="woocommerce-Select">
-                    <?php echo wp_timezone_choice( $selected_timezone, get_user_locale() ); ?>
+                <label for="vt_user_timezone"><?php _e( 'Timezone', 'usb-swiper' ); ?></label>
+                <select id="vt_user_timezone" name="vt_user_timezone" aria-describedby="timezone-description" class="woocommerce-Select">
+                    <?php echo wp_timezone_choice( usbswiper_get_user_timezone(), get_user_locale() ); ?>
                 </select>
             </p>
-
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide timezone-info">
+                <span id="utc-time" class="timezone-time">
+                    <?php echo sprintf(__( 'Universal time is %s' ), '<code>' .date_i18n( 'Y-m-d H:i:s', false, true ) . '</code>'); ?>
+                </span>
+                <span id="local-time" class="timezone-time">
+                    <?php echo sprintf(__( 'Local time is %s' ), '<code>' . usbswiper_get_user_date_i18n() . '</code>'); ?>
+                </span>
+            </p>
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 				<?php
 				echo  usb_swiper_get_html_field( array(
@@ -1953,10 +1945,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		public function wc_save_account_details( $user_id ) {
 
 			if ( is_user_logged_in() ) {
+
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
                 $brand_logo = !empty( $_FILES['BrandLogo'] ) ? $_FILES['BrandLogo'] : '';
-                $user_timezone = !empty( $_POST['UserTimezone'] ) ? $_POST['UserTimezone'] : usbswiper_get_user_timezone();
+                $user_timezone = !empty( $_POST['vt_user_timezone'] ) ? $_POST['vt_user_timezone'] : '';
 
                 $logo_id = !empty( $brand_logo ) ? $this->vt_upload_from_path( $brand_logo ) : 0;
 
@@ -1966,9 +1959,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta( $user_id, "brand_name", $brand_name );
                 update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
                 update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
-                update_user_meta( $user_id, "user_timezone", $user_timezone );
+                update_user_meta( $user_id, "vt_user_timezone", $user_timezone );
 
-                if( !empty( $logo_id ) && $logo_id > 0 ){
+                if( !empty( $logo_id ) && $logo_id > 0 ) {
                     update_user_meta( $user_id, "brand_logo", $logo_id );
                 }
 			}
@@ -3329,6 +3322,5 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta($user_id,'default_tax',$default_tax);
             }
         }
-
     }
 }
