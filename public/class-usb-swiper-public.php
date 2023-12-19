@@ -1048,13 +1048,28 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $invoice_status = 'PENDING';
             }
 
-			$transaction_id = wp_insert_post(array(
-				'post_title'   => wp_strip_all_tags($display_name),
-				'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
-				'post_status'  => 'publish',
-				'post_author'  => $current_user_id,
-				'post_type'   => 'transactions',
-            ));
+            //$timestamp = time();
+            //$tz = usbswiper_get_user_timezone();
+            //$tz = !empty($tz) ? str_replace('.5',':30',$tz) : '';
+
+            //$now = new \DateTime( 'now', new \DateTimeZone( $tz ) );
+
+            //$date_format = get_option( 'date_format' );
+
+            $post_args = array(
+                'post_title'   => wp_strip_all_tags($display_name),
+                'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
+                'post_status'  => 'publish',
+                'post_author'  => $current_user_id,
+                'post_type'   => 'transactions',
+                'post_date'     => date('')
+            );
+
+            /*if( !empty( $date_format ) && !empty( $now ) ){
+                $post_args['post_date'] = $now->format($date_format);
+            }*/
+
+			$transaction_id = wp_insert_post($post_args);
 
 			if( !is_wp_error( $transaction_id ) ) {
 
@@ -1822,6 +1837,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     <?php } ?>
                 </div>
             </div>
+
+            <?php
+            $selected_timezone = usbswiper_get_user_timezone();
+            ?>
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <label for="UserTimezone"><?php _e( 'Timezone' ); ?></label>
+                <select id="UserTimezone" name="UserTimezone" aria-describedby="timezone-description" class="woocommerce-Select">
+                    <?php echo wp_timezone_choice( $selected_timezone, get_user_locale() ); ?>
+                </select>
+            </p>
+
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 				<?php
 				echo  usb_swiper_get_html_field( array(
@@ -1930,6 +1956,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$primary_currency = !empty( $_POST['TransactionCurrency'] ) ? $_POST['TransactionCurrency'] : 'USD';
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
                 $brand_logo = !empty( $_FILES['BrandLogo'] ) ? $_FILES['BrandLogo'] : '';
+                $user_timezone = !empty( $_POST['UserTimezone'] ) ? $_POST['UserTimezone'] : usbswiper_get_user_timezone();
 
                 $logo_id = !empty( $brand_logo ) ? $this->vt_upload_from_path( $brand_logo ) : 0;
 
@@ -1939,6 +1966,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta( $user_id, "brand_name", $brand_name );
                 update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
                 update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
+                update_user_meta( $user_id, "user_timezone", $user_timezone );
 
                 if( !empty( $logo_id ) && $logo_id > 0 ){
                     update_user_meta( $user_id, "brand_logo", $logo_id );

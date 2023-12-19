@@ -1685,7 +1685,9 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             if( ! empty( $_POST['user-verify-vt-nonce'] ) && wp_verify_nonce( $_POST['user-verify-vt-nonce'],'user-verify-vt-nonce') ) {
 
                 $user_verify_for_vt = ! empty( $_POST['user-verify-for-vt'] );
+                $user_timezone = !empty($_POST['user_timezone_string']) ? $_POST['user_timezone_string'] : usbswiper_get_user_timezone();
 
+                update_user_meta( $user_id, 'user_timezone', $user_timezone);
                 update_user_meta( $user_id, 'vt_user_verification_status', $user_verify_for_vt );
 
                 if( ! empty( $user_verify_for_vt ) ) {
@@ -1934,6 +1936,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 	        $user_id = ! empty( $user->ID ) ? $user->ID : 0;
             $verification_status = get_user_meta( $user_id, 'vt_user_verification_status', true );
+            $tzstring = usbswiper_get_user_timezone();
             ?>
             <h3 id="verify_data"><?php _e('Verification Form Data','usb-swiper'); ?></h3>
             <table class="form-table">
@@ -1941,6 +1944,15 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     <th><label><?php _e('Verify User for VT','usb-swiper'); ?></label></th>
                     <td><input type="checkbox" name="user-verify-for-vt" <?php echo checked(true, $verification_status); ?> value="user-verify-for-vt"></td>
                     <td><input type="hidden" name="user-verify-vt-nonce" value="<?php echo wp_create_nonce('user-verify-vt-nonce'); ?>">
+                </tr>
+                <tr>
+                    <th scope="row"><label for="user_timezone_string"><?php _e( 'Timezone' ); ?></label></th>
+                    <td>
+
+                        <select id="user_timezone_string" name="user_timezone_string" aria-describedby="timezone-description">
+                            <?php echo wp_timezone_choice( $tzstring, get_user_locale() ); ?>
+                        </select>
+                    </td>
                 </tr>
             </table>
             <?php
