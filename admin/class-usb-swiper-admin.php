@@ -1951,7 +1951,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     <th scope="row"><label for="vt_user_timezone"><?php _e( 'Timezone', 'usb-swiper' ); ?></label></th>
                     <td>
                         <select id="vt_user_timezone" name="vt_user_timezone" aria-describedby="timezone-description">
-                            <?php echo wp_timezone_choice( usbswiper_get_user_timezone(), get_user_locale() ); ?>
+                            <?php echo wp_timezone_choice( usbswiper_get_user_timezone($user_id), get_user_locale() ); ?>
                         </select>
                     </td>
                 </tr>
