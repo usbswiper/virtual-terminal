@@ -142,6 +142,16 @@ $form_fields = array(
         'default' => $default_country,
         'class' => 'vt-billing-address-field vt-select-field vt-billing-country',
     ),
+    array(
+        'type' => 'checkbox',
+        'id' => 'TermsAndCondition',
+        'name' => 'TermsAndCondition',
+        'label' => __( 'Important Message for Manually Processed Transactions', 'usb-swiper'),
+        'required' => true,
+        'description' => __("Credit Card Fraud happens every day. It is important for everyone to understand this and be vigilant to ensure everyone’s credit card data is not used for nefarious purposes. When processing manual payments, there may be people who will try to purchase your products or services using stolen credit cards, especially for large dollar amount transactions from customers you have no track record with. Always know who your customers are and if needed we recommend you seek some type of verification or identification to ensure the people you are dealing with are legitimate customers. Understand that you, as a merchant, are liable for fraudulent transactions and there can be costs and fees associated with those such as “chargeback fees” which can be expensive. Excessive fraudulent transactions or other suspicious activity can also result in the merchant account or use of our platform being suspended.",'usb-swiper'),
+        'wrapper_class' => 'profile-verify-tc',
+        'value' => true,
+    ),
 	array(
 		'type' => 'hidden',
 		'id' => 'vt-verification-nonce',

@@ -272,6 +272,10 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 .timezone-info {display: block;}
 .timezone-info .timezone-time {display: block;}
 .timezone-info .timezone-time code {font-weight: bold;border-bottom: 1px solid #CCC;}
+.vt-fields-wrap .input-field-wrap.profile-verify-tc label.checkbox-label, .vt-fields-wrap .input-field-wrap.profile-verify-tc .checkmark-container {width: 100%;position: relative;}
+.vt-fields-wrap .input-field-wrap.profile-verify-tc .checkmark-container{padding-left: 30px;}
+.vt-fields-wrap .input-field-wrap.profile-verify-tc input[type="checkbox"] {margin-right: 10px;position: absolute;left: 0;top: 5px;height: 20px;width: 20px;}
+
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}
