@@ -1,8 +1,8 @@
 === USBSwiper Hosted Virtual Terminal ===
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
-Tested up to: 6.2
-Stable tag: 2.3.3
+Tested up to: 6.4.2
+Stable tag: 2.3.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,11 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 2.3.4 =
+* Feature - Added option for merchant to set time zone in the profile / dashboard.
+* Feature - Merchant orders and logs reflect based on set time zone accordingly.
+* Feature - Added a Terms and Conditions checkbox to the verification page.
 
 = 2.3.3 =
 * Fix - Brand name missing in soft_descriptor field.
