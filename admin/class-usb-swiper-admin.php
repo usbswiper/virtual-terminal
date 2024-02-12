@@ -525,6 +525,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					'partner_fees'  => __( 'Partner Fees', 'usb-swiper' ),
 					'advanced'  => __( 'Advanced', 'usb-swiper' ),
 					'logs'  => __( 'Logs', 'usb-swiper' ),
+					'zettle'  => __( 'Zettle POS', 'usb-swiper' ),
 					'uninstall'     => __( 'Uninstall', 'usb-swiper' ),
 				)
 			);
@@ -1957,6 +1958,51 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 </tr>
             </table>
             <?php
+        }
+		
+		/**
+         * Zettle settings callback method.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
+        public function zettle_settings() {
+	        
+	        $settings = usb_swiper_get_settings('zettle');
+	        $get_fields = UsbSwiperZettle::get_setting_fields('admin');
+	        ?>
+            <table class="form-table">
+                <tbody>
+		        <?php
+			        if( !empty( $get_fields ) && is_array( $get_fields ) ) {
+				        foreach ( $get_fields as $key => $get_field ) {
+					        $type = !empty( $get_field['type'] ) ? $get_field['type'] : '';
+					        $field_id = !empty( $get_field['id'] ) ? $get_field['id'] : '';
+					        $label = !empty( $get_field['label'] ) ? $get_field['label'] : '';
+					        unset($get_field['label']);
+					        $value = !empty( $settings[$field_id] ) ? esc_attr( $settings[$field_id] ) : '';
+					        if( 'checkbox' == $type ) {
+						        if( $value == $get_field['value'] ) {
+							        $get_field['checked'] = true;
+						        }
+					        } else {
+						        $get_field['value'] = $value;
+					        }
+					        ?>
+                            <tr>
+                                <th for="<?php echo $field_id; ?>"><?php echo $label; ?></th>
+                                <td>
+							        <?php echo usb_swiper_get_html_field($get_field); ?>
+                                </td>
+                            </tr>
+					        <?php
+				        }
+			        }
+		        ?>
+                </tbody>
+            </table>
+	        <?php
         }
 	}
 }

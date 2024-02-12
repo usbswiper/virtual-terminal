@@ -120,6 +120,11 @@ class Usb_Swiper {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once USBSWIPER_PATH.'/includes/usb-swiper-ppcp.php';
+		
+		/**
+		 * This class responsible for defining all actions that occur related to zettle.
+		 */
+		require_once USBSWIPER_PATH.'/includes/class-usb-swiper-zettle.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing side of the site.
@@ -167,6 +172,7 @@ class Usb_Swiper {
         $this->loader->add_filter( 'woocommerce_get_query_vars', $plugin_public, 'update_wc_endpoints' );
         $this->loader->add_action('woocommerce_account_vt-products_endpoint', $plugin_public, 'vt_products_endpoint_cb');
         $this->loader->add_action('woocommerce_account_vt-tax-rules_endpoint', $plugin_public, 'vt_tax_rules_endpoint_cb');
+        $this->loader->add_action('woocommerce_account_vt-zettle_endpoint', $plugin_public, 'vt_zettle_endpoint_cb');
 
 		add_shortcode( 'usb_swiper_paypal_connect', array( $plugin_public, 'usb_swiper_paypal_connect') );
 		add_shortcode( 'usb_swiper_vt_verification_form', array( $plugin_public, 'usb_swiper_vt_verification_form') );
@@ -235,6 +241,7 @@ class Usb_Swiper {
 		$this->loader->add_action('usb_swiper_section_content_partner_fees', $plugin_admin, 'partner_fees_settings');
 		$this->loader->add_action('usb_swiper_section_content_advanced', $plugin_admin, 'advanced_settings');
 		$this->loader->add_action('usb_swiper_section_content_logs', $plugin_admin, 'logs_settings');
+		$this->loader->add_action('usb_swiper_section_content_zettle', $plugin_admin, 'zettle_settings');
 		$this->loader->add_action('usb_swiper_save_section_partner_fees', $plugin_admin, 'save_partner_fees');
 		$this->loader->add_action('usb_swiper_section_content_uninstall', $plugin_admin, 'uninstall_settings');
 		$this->loader->add_action('wp_ajax_insert_new_partner_fee', $plugin_admin, 'insert_new_partner_fee');

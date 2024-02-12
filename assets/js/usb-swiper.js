@@ -869,6 +869,23 @@ jQuery( document ).ready(function( $ ) {
         localStorage.removeItem('sessionExpireTimer');
         location.reload();
     });
+
+    jQuery("form#vt_zettle_form").validate({
+        rules: {
+            zettle_api_key: {
+                required: true,
+            },
+            zettle_client_id: {
+                required: true,
+            },
+            zettle_client_secret: {
+                required: true,
+            },
+        },
+        submitHandler: function (form, event) {
+            return true;
+        }
+    });
 });
 
 function removeInterval( LoaderInterval ) {

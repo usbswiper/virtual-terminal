@@ -126,6 +126,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $query_vars['invoices'] = 'invoices';
             $query_vars['vt-products'] = 'vt-products';
             $query_vars['vt-tax-rules'] = 'vt-tax-rules';
+            $query_vars['vt-zettle'] = 'vt-zettle';
             return $query_vars;
         }
 
@@ -377,6 +378,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $menu_links['invoices']    = __( 'Invoices', 'usb-swiper' );
                 $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
                 $menu_links['vt-tax-rules']    = __( 'Tax Rules', 'usb-swiper' );
+                $menu_links['vt-zettle']    = __( 'Zettle POS', 'usb-swiper' );
 				$menu_links['customer-logout'] = $logout;
 			}
 
@@ -394,6 +396,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-tax-rules', EP_ROOT | EP_PAGES );
+            add_rewrite_endpoint( 'vt-zettle', EP_ROOT | EP_PAGES );
 		}
 
 		/**
@@ -921,6 +924,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					}
 				}
 			}
+            
+            $this->manage_zettle_settings();
 		}
 
 		/**
@@ -3281,7 +3286,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
-         * Delete tax rules on the my account page.
+         * Delete tax rules on the my-account page.
          *
          * @return void
          */
@@ -3311,7 +3316,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 )
             );
         }
-
+		
+		/**
+         * Handle default tax.
+         *
+		 * @return void
+		 */
         public function handle_default_tax(){
             if(isset($_POST['default_tax_nonce']) && wp_verify_nonce($_POST['default_tax_nonce'],'vt-default-tax-form')) {
                 $default_tax = !empty($_POST['default-tax']) ? sanitize_text_field($_POST['default-tax']) : "";
@@ -3321,6 +3331,91 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
                 update_user_meta($user_id,'default_tax',$default_tax);
             }
+        }
+		
+		/**
+         * Manage zettle my-account endpoint template.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
+        public function vt_zettle_endpoint_cb() {
+         
+	        usb_swiper_get_template('vt-zettle.php', [
+                'get_zettle_fields' => UsbSwiperZettle::get_setting_fields(),
+                'zettle_settings' => UsbSwiperZettle::get_settings('', 'both'),
+                'zettle_token' => UsbSwiperZettle::get_token_data(),
+            ]);
+        }
+		
+		/**
+         * Manage zettle settings.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
+        public function manage_zettle_settings() {
+	        
+	        if( is_wc_endpoint_url('vt-zettle') ) {
+                
+                if( !empty( $_POST['action'] && 'vt-zettle-form' === $_POST['action'] ) && !empty( $_POST['_nonce'] ) && wp_verify_nonce( $_POST['_nonce'], 'vt-zettle-form-nonce') ) {
+	                
+	                $get_setting_fields = UsbSwiperZettle::get_setting_fields();
+	                
+	                $settings = [];
+                    if( !empty( $get_setting_fields ) && is_array( $get_setting_fields  ) ) {
+                    
+                        foreach ( $get_setting_fields as $key => $get_setting_field ) {
+                            $field_id = !empty( $get_setting_field['id']) ? $get_setting_field['id'] : '';
+	                        $settings[$field_id] = !empty($_POST[$field_id]) ? sanitize_text_field($_POST[$field_id]) : '';
+	                    }
+                    }
+                    
+	                update_user_meta(get_current_user_id(), 'usb_swiper_zettle_settings', $settings);
+                }
+	        }
+	        
+	        $this->manage_zettle_outh_code();
+	        
+	        $this->disconnect_zettle_app();
+        }
+		
+		/**
+         * Manage zettle outh code after successfully get the access.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
+        public function manage_zettle_outh_code() {
+	        
+	        if( is_wc_endpoint_url('vt-zettle') && !empty( $_GET['code'] ) ) {
+		        $token_response = UsbSwiperZettle::generate_token( esc_attr( $_GET['code'] ) );
+		        if( !empty( $token_response ) && (int) $token_response['status'] == 200 ) {
+			        update_user_meta( get_current_user_id(), 'usb_swiper_zettle_token', $token_response  );
+		        }
+		        
+		        wp_safe_redirect(UsbSwiperZettle::get_redirection_uri());
+		        exit();
+	        }
+        }
+		
+		/**
+         * Disconnect zettle application.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
+        public function disconnect_zettle_app() {
+	        
+	        if( is_wc_endpoint_url('vt-zettle') && !empty( $_GET['disconnect_app'] ) ) {
+		        UsbSwiperZettle::disconnect_app();
+		        wp_safe_redirect(UsbSwiperZettle::get_redirection_uri());
+		        exit();
+	        }
         }
     }
 }
