@@ -886,6 +886,37 @@ jQuery( document ).ready(function( $ ) {
             return true;
         }
     });
+
+    jQuery("form#zettle_pair_reader_form").validate({
+        rules: {
+            zettle_pair_reader_code: {
+                required: true,
+            },
+            zettle_pair_reader_device_name: {
+                required: true,
+            }
+        },
+        submitHandler: function (form, event) {
+
+            const form_id = form.id;
+            const submitButton = jQuery('#vt_zettle_pair_reader_settings');
+            usb_swiper_remove_loader(submitButton);
+            usb_swiper_add_loader(submitButton);
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: jQuery('#'+form_id).serialize()+"&action=vt_zettle_pair_reader",
+            }).done(function ( response ) {
+                if(response.status) {
+                    location.reload();
+                } else {
+                    set_notification(response.message, 'error', response.message_type);
+                }
+                usb_swiper_remove_loader(submitButton);
+            });
+        }
+    });
 });
 
 function removeInterval( LoaderInterval ) {

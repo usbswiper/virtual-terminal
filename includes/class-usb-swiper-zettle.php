@@ -15,40 +15,49 @@ class UsbSwiperZettle {
 	 * @var array|string[]
 	 */
 	public static array $scopes = [
-		'READ:FINANCE',
-		'READ:PURCHASE',
 		'READ:USERINFO',
+		'WRITE:USERINFO',
 		'READ:PRODUCT',
 		'WRITE:PRODUCT',
+		'READ:PAYMENT',
+		'WRITE:PAYMENT',
+		'READ:PURCHASE',
 	];
 	
 	/**
-	 * Define zettle apps api key url.
+	 * Define zettle apps api key URL.
  	 *
 	 * @var string
 	 */
 	public static string $api_key_url = 'https://my.zettle.com/apps/api-keys';
 	
 	/**
-	 * Define zettle oauth authorize url.
+	 * Define zettle oauth authorize URL.
 	 *
 	 * @var string
 	 */
 	public static string $authorize_url = 'https://oauth.zettle.com/authorize';
 	
 	/**
-	 * Define zettle oauth token url.
+	 * Define zettle oauth token URL.
 	 *
 	 * @var string
 	 */
 	public static string $token_url = 'https://oauth.zettle.com/token';
 	
 	/**
-	 * Define zettle oauth application connections url.
+	 * Define zettle oauth application connections URL.
 	 *
 	 * @var string
 	 */
 	public static string $disconnect_app_url = 'https://oauth.zettle.com/application-connections/self';
+	
+	/**
+	 * Define reader integration URL.
+	 *
+	 * @var string
+	 */
+	public static string $reader_connect_url = 'https://reader-connect.zettle.com/v1/integrator';
 	
 	/**
 	 * Define random number prefix.
@@ -191,6 +200,17 @@ class UsbSwiperZettle {
 		return $settings;
 	}
 	
+	public static function get_zettle_reader_data( $user_id = 0 ) {
+		
+		if( empty( $user_id ) ) {
+			$user_id = get_current_user_id();
+		}
+		
+		$reader_data = get_user_meta( $user_id, 'usb_swiper_zettle_reader_data', true);
+		
+		return !empty( $reader_data ) ? $reader_data : '';
+	}
+	
 	/**
 	 * Get zettle token data.
 	 *
@@ -206,11 +226,29 @@ class UsbSwiperZettle {
 		
 		$settings = get_user_meta( $user_id, 'usb_swiper_zettle_token', true);
 		
-		if( !empty(  $key ) ) {
+		if( !empty( $key ) ) {
 			return !empty( $settings[$key] ) ? $settings[$key] : '';
 		}
 		
 		return $settings;
+	}
+	
+	public static function get_access_token() {
+		
+		$access_token = self::get_token_data('access_token');
+		$refresh_token = self::get_token_data('refresh_token');
+		$time = self::get_token_data('time');
+		$date1 = new DateTime($time);
+		$date2 = new DateTime(date('Y-m-d h:i:s'));
+		$interval = $date1->diff($date2);
+		$difference = $interval->s + ($interval->i * 60) + ($interval->h * 3600) + ($interval->d * 86400);
+		
+		if( $difference >= 7200 ){
+			$response = self::generate_refresh_token($refresh_token);
+			$access_token = !empty( $response['access_token'] ) ? $response['access_token'] : '';
+		}
+		
+		return $access_token;
 	}
 	
 	/**
@@ -316,8 +354,7 @@ class UsbSwiperZettle {
 		
 		if( empty( $refresh_token ) ) {
 			
-			$zettle_token  = UsbSwiperZettle::get_token_data();
-			$refresh_token = !empty( $zettle_token['refresh_token'] ) ? $zettle_token['refresh_token'] : '';
+			$refresh_token  = UsbSwiperZettle::get_token_data('refresh_token');
 		}
 		
 		$status_code = 404;
@@ -373,7 +410,7 @@ class UsbSwiperZettle {
 	 */
 	public static function disconnect_app() {
 		
-		$access_token = self::get_token_data('access_token');
+		$access_token = self::get_access_token();
 		$client_id = self::get_settings('zettle_client_id', 'admin' );
 		$client_secret = self::get_settings('zettle_client_secret', 'admin' );
 		
@@ -408,6 +445,53 @@ class UsbSwiperZettle {
 		
 		return [
 			'status' => $status_code,
+		];
+	}
+	
+	public static function pair_reader( $args = [] ) {
+		
+		if( empty( $args ) || !is_array( $args  ) ){
+			return [
+				'status' => 404,
+				'message' => __( 'Pair rreader', 'usb-swiper' ),
+			];
+		}
+		
+		$access_token = self::get_access_token();
+		
+		$response = wp_remote_post( self::$reader_connect_url.'/link-offers/claim', [
+			'headers' => [
+				'Content-Type'  => 'application/json',
+				'Authorization' => "Bearer {$access_token}",
+			],
+			'body' =>  json_encode( [
+				'code' => !empty( $args['code'] ) ? $args['code'] : '',
+				'tags' => [
+					'device_name' => !empty( $args['device_name'] ) ? $args['device_name'] : '',
+				],
+			]),
+			'method'      => 'POST',
+			'data_format' => 'body',
+		]);
+		
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		
+		if ( is_wp_error( $response ) ) {
+			
+			return [
+				'status' => $status_code,
+				'message' => $response->get_error_message(),
+			];
+			
+		}
+		
+		$body = wp_remote_retrieve_body( $response );
+		
+		$body_data = json_decode( $body, true );
+		
+		return [
+			'status' => $status_code,
+			'data' => $body_data
 		];
 	}
 }

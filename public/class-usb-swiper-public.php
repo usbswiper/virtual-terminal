@@ -3417,5 +3417,47 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        exit();
 	        }
         }
+        
+        public function vt_zettle_pair_reader() {
+         
+	        $status = false;
+	        $message = __('Nonce not verified, please try after some time.', 'usb-swiper');
+	        $message_type = __("ERROR",'usb-swiper');
+            
+            if( !empty( $_POST['_nonce'] ) &&  wp_verify_nonce( $_POST['_nonce'],'vt-zettle-pair-reader') ) {
+                
+                $reader_code = !empty( $_POST['zettle_pair_reader_code'] ) ? $_POST['zettle_pair_reader_code'] : '';
+                $reader_device_name = !empty( $_POST['zettle_pair_reader_device_name'] ) ? $_POST['zettle_pair_reader_device_name'] : __( 'UsbSwiper Terminal', 'usb-swiper' );
+                
+                if( !empty( $reader_code ) ) {
+                 
+	                $response = UsbSwiperZettle::pair_reader([
+                       'code' => $reader_code,
+                       'device_name' => $reader_device_name,
+                    ]);
+                    
+                    if( !empty( $response['status'] ) && 200 === (int) $response['status'] ) {
+	                    $status = true;
+                        $data = !empty( $response['data'] ) ? $response['data'] : '';
+	                    $data['zettle_pair_reader_code'] = $reader_code;
+	                    $data['zettle_pair_reader_device_name'] = $reader_device_name;
+                        update_user_meta( get_current_user_id(),  'usb_swiper_zettle_reader_data', $data );
+	                    $message = __("<strong>$reader_code</strong> Reader paired successfully.", 'usb-swiper');
+                    } else {
+	                    $message = !empty( $response['data']['developerMessage'] ) ? $response['data']['developerMessage'] : '';
+                        $message_type = !empty( $response['data']['errorType'] ) ? $response['data']['errorType'] : '';
+                        delete_user_meta( get_current_user_id(), 'usb_swiper_zettle_reader_data');
+                    }
+                }
+            }
+            
+	        wp_send_json(
+		        array(
+			        'status' => $status,
+			        'message' => $message,
+			        'message_type' => $message_type,
+		        )
+	        );
+        }
     }
 }
