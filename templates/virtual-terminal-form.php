@@ -130,6 +130,40 @@ if( true === $profile_status && !empty($merchant_id)) {
                                 </div>
                             </fieldset>
                         </div>
+                        <div class="vt-col vt-col-pay-with-zettle">
+                            <fieldset>
+                                <label><?php _e('Zettle','usb-swiper'); ?><span class="tool" data-tip="<?php _e('Enable to make payment with zettle .','usb-swiper'); ?>" tabindex="1">?</span></label>
+                                <div class="vt-fields-wrap">
+				                    <?php
+					                    echo usb_swiper_get_html_field(array(
+						                    'type' => 'checkbox',
+						                    'id' => 'PayWithZettleDisabled',
+						                    'name' => 'PayWithZettleDisabled',
+						                    'label' => __( 'Enable Zettle', 'usb-swiper'),
+						                    'required' => false,
+						                    'value' => "true",
+						                    'checked' => true,
+						                    'attributes' => array(
+							                    'data-default-checked' => 'FALSE'
+						                    ),
+						                    'description' => '',
+						                    'class' => '',
+					                    ));
+					                    echo usb_swiper_get_html_field(array(
+						                    'type' => 'button',
+						                    'id' => 'PayWithZettle',
+						                    'name' => 'PayWithZettle',
+						                    'btn_type' => 'button',
+						                    'required' => false,
+						                    'value' => __( 'Pay With Zettle', 'usb-swiper'),
+						                    'description' => '',
+						                    'class' => 'vt-button',
+					                    ));
+				                    ?>
+                                </div>
+                            </fieldset>
+                            <div class="zettle-response"><ul></ul></div>
+                        </div>
                         <div class="vt-col vt-col-payments">
                             <div class="usb-swiper-advanced-cc-form">
                                 <div class="card-form">

@@ -66,9 +66,12 @@ class UsbSwiperZettle {
 	 */
 	public static string $number_prefix = 'usbswiper';
 	
-	public function __construct() {
-	
-	}
+	/**
+	 * Define default log file name.
+	 *
+	 * @var string
+	 */
+	public static $default_log_file ='Zettle';
 	
 	/**
 	 * Get zettle setting fields for frontend and backed.
@@ -140,7 +143,18 @@ class UsbSwiperZettle {
 				'value' => !empty( $zettle_settings['zettle_api_key'] ) ? $zettle_settings['zettle_api_key'] : '' ,
 				'description' => sprintf(__( 'Enter Zettle API Key. %s in PayPal Zettle to allow access.','usb-swiper' ), '<a target="_blank" href="'.esc_url( $api_create_link ).'">'.__('Create an API key','usb-swiper').'</a>'),
 			],
-			
+			[
+				'type' => 'checkbox',
+				'id' => 'enable_zettle_tipping',
+				'name' => 'enable_zettle_tipping',
+				'label' => __( 'Enable Tipping', 'usb-swiper'),
+				'required' => false,
+				'value' => true,
+				'checked' => !empty( $zettle_settings['enable_zettle_tipping'] ),
+				'description' => '',
+				'class' => '',
+				'wrapper_class' => 'vt-check-wrap',
+			],
 		];
 		
 		$get_fields = '';
@@ -200,6 +214,12 @@ class UsbSwiperZettle {
 		return $settings;
 	}
 	
+	/**
+	 * Get zettle reader data.
+	 *
+	 * @param int $user_id Get login user id.
+	 * @return mixed|string
+	 */
 	public static function get_zettle_reader_data( $user_id = 0 ) {
 		
 		if( empty( $user_id ) ) {
@@ -233,13 +253,19 @@ class UsbSwiperZettle {
 		return $settings;
 	}
 	
+	/**
+	 * Get access token.
+	 *
+	 * @return mixed|string $access_token
+	 * @throws Exception
+	 */
 	public static function get_access_token() {
 		
 		$access_token = self::get_token_data('access_token');
 		$refresh_token = self::get_token_data('refresh_token');
 		$time = self::get_token_data('time');
 		$date1 = new DateTime($time);
-		$date2 = new DateTime(date('Y-m-d h:i:s'));
+		$date2 = new DateTime(current_time('mysql'));
 		$interval = $date1->diff($date2);
 		$difference = $interval->s + ($interval->i * 60) + ($interval->h * 3600) + ($interval->d * 86400);
 		
@@ -311,18 +337,25 @@ class UsbSwiperZettle {
 		$redirect_uri = self::get_redirection_uri();
 		$authorization_code = $code;
 		
-		$response = wp_remote_post( self::$token_url, array(
-			'body' => array(
+		$request_url = self::$token_url;
+		
+		$request_args = [
+			'body' => [
 				'grant_type'    => 'authorization_code',
 				'code'          => $authorization_code,
 				'client_id'     => $client_id,
 				'client_secret' => $client_secret,
 				'redirect_uri'  => $redirect_uri,
-			),
-			'headers' => array(
+			],
+			'timeout' => 10,
+			'headers' => [
 				'Content-Type' => 'application/x-www-form-urlencoded',
-			),
-		));
+			],
+		];
+		
+		$response = wp_remote_post( $request_url, $request_args);
+		
+		self::add_log( $response, $request_url, $request_args,'generate_token' );
 		
 		$status_code = (int) wp_remote_retrieve_response_code( $response );
 		
@@ -364,17 +397,24 @@ class UsbSwiperZettle {
 			$client_id = self::get_settings( 'zettle_client_id', 'admin' );
 			$client_secret = self::get_settings('zettle_client_secret', 'admin' );
 			
-			$response = wp_remote_post( self::$token_url, array(
-				'body' => array(
+			$request_url = self::$token_url;
+			
+			$request_args  = [
+				'body' => [
 					'grant_type'    => 'refresh_token',
 					'refresh_token' => $refresh_token,
 					'client_id'     => $client_id,
 					'client_secret' => $client_secret,
-				),
-				'headers' => array(
+				],
+				'timeout' => 10,
+				'headers' => [
 					'Content-Type' => 'application/x-www-form-urlencoded',
-				),
-			));
+				]
+			];
+			
+			$response = wp_remote_post( $request_url, $request_args);
+			
+			self::add_log( $response, $request_url, $request_args,'generate_refresh_token' );
 			
 			$status_code = (int) wp_remote_retrieve_response_code( $response );
 			
@@ -407,6 +447,7 @@ class UsbSwiperZettle {
 	 * Disconnect zettle application request.
 	 *
 	 * @return array|int[]
+	 * @throws Exception
 	 */
 	public static function disconnect_app() {
 		
@@ -415,19 +456,28 @@ class UsbSwiperZettle {
 		$client_secret = self::get_settings('zettle_client_secret', 'admin' );
 		
 		$status_code = 404;
+		$message = __( 'Something went wrong', 'usb-swiper');
 		
 		if( !empty(  $access_token ) ) {
-			$response = wp_remote_request(self::$disconnect_app_url, array(
+			
+			$request_url = self::$disconnect_app_url;
+			
+			$request_args = [
 				'method' => 'DELETE',
-				'headers' => array(
+				'headers' => [
 					'Authorization' => "Bearer {$access_token}",
 					'Content-Type' => 'application/json',
-				),
-				'body' => array(
+				],
+				'timeout' => 10,
+				'body' => [
 					'client_id'     => $client_id,
 					'client_secret' => $client_secret,
-				),
-			));
+				],
+			];
+			
+			$response = wp_remote_request( $request_url, $request_args );
+			
+			self::add_log( $response, $request_url, $request_args,'disconnect_app' );
 			
 			$status_code = (int) wp_remote_retrieve_response_code( $response );
 			
@@ -437,6 +487,8 @@ class UsbSwiperZettle {
 					'message' => $response->get_error_message(),
 				];
 			}
+			
+			$message = wp_remote_retrieve_response_message($response);
 		}
 		
 		if( $status_code === 204 || $status_code === 200 ) {
@@ -445,34 +497,49 @@ class UsbSwiperZettle {
 		
 		return [
 			'status' => $status_code,
+			'message' => $message,
 		];
 	}
 	
+	/**
+	 * Pair reader request.
+	 *
+	 * @param array $args Get request arguments.
+	 * @return array
+	 * @throws Exception
+	 */
 	public static function pair_reader( $args = [] ) {
 		
 		if( empty( $args ) || !is_array( $args  ) ){
 			return [
 				'status' => 404,
-				'message' => __( 'Pair rreader', 'usb-swiper' ),
+				'message' => __( 'Pair reader', 'usb-swiper' ),
 			];
 		}
 		
 		$access_token = self::get_access_token();
 		
-		$response = wp_remote_post( self::$reader_connect_url.'/link-offers/claim', [
+		$request_url = self::$reader_connect_url.'/link-offers/claim';
+	
+		$request_args = [
 			'headers' => [
 				'Content-Type'  => 'application/json',
 				'Authorization' => "Bearer {$access_token}",
 			],
+			'timeout' => 10,
 			'body' =>  json_encode( [
 				'code' => !empty( $args['code'] ) ? $args['code'] : '',
 				'tags' => [
 					'device_name' => !empty( $args['device_name'] ) ? $args['device_name'] : '',
 				],
-			]),
+			] ),
 			'method'      => 'POST',
 			'data_format' => 'body',
-		]);
+		];
+		
+		$response = wp_remote_post( $request_url, $request_args);
+		
+		self::add_log( $response, $request_url, $request_args,'pair_reader' );
 		
 		$status_code = (int) wp_remote_retrieve_response_code( $response );
 		
@@ -489,9 +556,307 @@ class UsbSwiperZettle {
 		
 		$body_data = json_decode( $body, true );
 		
+		$message = wp_remote_retrieve_response_message($response);
+		
 		return [
 			'status' => $status_code,
-			'data' => $body_data
+			'data' => $body_data,
+			'message' => $message,
 		];
+	}
+	
+	/**
+	 * Unpairing zettle device request.
+	 *
+	 * @param string $id Get link device id.
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function unpairing_zettle_device( $id )  {
+		
+		if( empty( $id ) ){
+			
+			return [
+				'status' => 404,
+				'message' => __( 'Zettle paired device id not found', 'usb-swiper' ),
+			];
+		}
+		
+		$access_token = self::get_access_token();
+		
+		$request_url = self::$reader_connect_url.'/links/'.$id;
+		
+		$request_args = [
+			'headers' => [
+				'Content-Type'  => 'application/json',
+				'Authorization' => "Bearer {$access_token}",
+			],
+			'timeout' => 10,
+			'method'      => 'DELETE',
+			'data_format' => 'body',
+		];
+		
+		$response = wp_remote_post( $request_url, $request_args);
+		
+		self::add_log( $response, $request_url, $request_args,'unpairing_zettle_device' );
+		
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		
+		if ( is_wp_error( $response ) ) {
+			
+			return [
+				'status' => $status_code,
+				'message' => $response->get_error_message(),
+			];
+			
+		}
+		
+		$body = wp_remote_retrieve_body( $response );
+		$body_data = json_decode( $body, true );
+		
+		$message = wp_remote_retrieve_response_message($response);
+		
+		return [
+			'status' => $status_code,
+			'data' => $body_data,
+			'message' => $message,
+		];
+	}
+	
+	/**
+	 * websocket connection request.
+	 *
+	 * @param string $link_id Get link id.
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function websocket_connection( $link_id ) {
+		
+		if( empty( $link_id ) ) {
+			
+			return [
+				'status' => 404,
+				'message' => __( 'link id is missing for Websocket Connection.', 'usb-swiper' ),
+			];
+		}
+		
+		$access_token = self::get_access_token();
+		
+		$request_url = self::$reader_connect_url.'/sessions';
+		
+		$request_args = [
+			'headers' => [
+				'Content-Type'  => 'application/json',
+				'Authorization' => "Bearer {$access_token}",
+			],
+			'timeout' => 10,
+			'body' =>  json_encode( [
+				'linkId' => $link_id,
+				'channelId' => 'optional',
+			] ),
+			'method'      => 'POST',
+			'data_format' => 'body',
+		];
+		
+		$response = wp_remote_post( $request_url, $request_args );
+		
+		self::add_log( $response, $request_url, $request_args,'websocket_connection' );
+		
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		
+		if ( is_wp_error( $response ) ) {
+			
+			return [
+				'status' => $status_code,
+				'message' => $response->get_error_message(),
+			];
+			
+		}
+		
+		$header = wp_remote_retrieve_header( $response, 'location' );
+		
+		$body = wp_remote_retrieve_body( $response );
+		
+		$body_data = json_decode( $body, true );
+		
+		$message = wp_remote_retrieve_response_message($response);
+		
+		return [
+			'status' => $status_code,
+			'header' => $header,
+			'data' => $body_data,
+			'message' => $message,
+		];
+	}
+
+	public static function get_request_uuid( $transaction_id ) {
+
+		return strtolower( sprintf(
+			'%s-%s-%s-%s-%s',
+			substr( uniqid(), 0, 8),
+			$transaction_id,
+			substr( uniqid(), 0, 4),
+			substr( uniqid(), 0, 4),
+			substr( uniqid(), 0, 12),
+		) );
+	}
+
+	public static function get_transaction_id_from_message_id( $message_id ) {
+
+		if ( empty( $message_id ) ) {
+			return false;
+		}
+
+		$message = explode('-',$message_id );
+
+		return !empty( $message[1] ) ? (int) $message[1] : 0;
+	}
+
+	public static function payment_request( $websocket_url, $args = [] ) {
+		
+		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
+		$amount = !empty( $args['amount'] ) ? $args['amount'] : 0;
+
+		$get_request_uuid = self::get_request_uuid($transaction_id);
+
+		$request_args = json_encode([
+			"type" => "message",
+			"message_id" =>  $get_request_uuid,
+			"message" => json_encode( [
+				"type" => "payment_request",
+				'access_token' => self::get_access_token(),
+				'expires_at' => time() + ( 60 * 5 ),
+				'internal_trace_id' => $get_request_uuid,
+				'amount' => !empty( $amount ) ? (int) ( $amount * 100 ) : 0,
+				'tipping_type' => !empty( $args['tipping'] ) ? 'DEFAULT' : 'NONE',
+			])
+		]);
+		
+		self::add_log( [], $websocket_url, $request_args,'websocket_payment_request', $transaction_id );
+		
+		return [
+			'websocket_url' => $websocket_url,
+			'transaction_id' => $transaction_id,
+			'access_token' => self::get_access_token(),
+			'payment_request' => $request_args,
+			'payment_request_message' => sprintf(__( '%s amount request sent to zettle', 'usb-swiper' ), wc_price( $amount, ['currency' => usbswiper_get_default_currency()])),
+		];
+	}
+
+	public static function refund_payment_request( $websocket_url, $args = [] ) {
+
+		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
+		$amount = !empty( $args['amount'] ) ? $args['amount'] : 0;
+
+		$get_request_uuid = self::get_request_uuid( $transaction_id );
+
+		$request_args = json_encode([
+			"type" => "message",
+			"message_id" =>  $get_request_uuid,
+			"message" => json_encode( [
+				"type" => "refund_request",
+				'access_token' => self::get_access_token(),
+				'expires_at' => time() + ( 60 * 5 ),
+				'refund_trace_id' => $get_request_uuid,
+				'payment_trace_id' => usbswiper_get_zettle_tracking_id( $transaction_id ),
+				'refund_amount' => !empty( $amount ) ? (int) ( $amount * 100 ) : 0,
+			])
+		]);
+
+		self::add_log( [], $websocket_url, $request_args,'websocket_refund_payment_request', $transaction_id );
+
+		return [
+			'websocket_url' => $websocket_url,
+			'transaction_id' => $transaction_id,
+			'access_token' => self::get_access_token(),
+			'refund_request' => $request_args,
+			'refund_request_message' => sprintf(__( '%s refund request sent to zettle', 'usb-swiper' ), wc_price( $amount, ['currency' => usbswiper_get_default_currency()])),
+		];
+	}
+	
+	/**
+	 * Add zettle request and response logs.
+	 *
+	 * @param array $response Get zettle api response
+	 * @param string $url Get url.
+	 * @param array|string $request Get api request
+	 * @param string $action_name Get action name
+	 * @param string $log_file Get log file
+	 * @return void
+	 */
+	public static function add_log( $response, $url, $request, $action_name, $log_file= '' ) {
+	
+		if(  empty( $log_file ) ) {
+			$log_file = self::$default_log_file;
+		}
+		
+		$api_log = new Usb_Swiper_Log();
+		
+		try {
+			
+			$api_log->log("Action: ".ucwords( str_replace('_', ' ', $action_name) ), $log_file);
+			$api_log->log("Time: ".current_time('mysql'), $log_file);
+			$api_log->log('Request URL: '.$url, $log_file );
+			
+			if ( is_wp_error( $response ) ) {
+				
+				$error_message = $response->get_error_message();
+				$error_code = $response->get_error_code();
+
+				if( !empty( $error_code ) ) {
+					$api_log->log('Response Error Code: ' . print_r($error_code, true), $log_file);
+				}
+
+				if( !empty( $error_message ) ) {
+					$api_log->log('Response Error Message: ' . print_r($error_message, true), $log_file);
+				}
+				
+			} else {
+
+				$body = wp_remote_retrieve_body( $response );
+
+				$body_response = !empty($body) ? json_decode($body, true) : '';
+				$body_response = $body_response['body'] ?? $response;
+
+				$status_code = (int) wp_remote_retrieve_response_code( $response );
+				$headers = wp_remote_retrieve_headers( $response );
+
+				if ( !empty( $request['body'] ) && is_array( $request['body'] ) ) {
+					if( !empty( $request ) ) {
+						$api_log->log('Request Body: ' . print_r($request, true), $log_file);
+					}
+				} elseif ( !empty( $request['body'] ) && is_string( $request['body'] ) ) {
+					if( !empty( $request['body'] ) ) {
+						$api_log->log('Request Body: ' . print_r(json_decode($request['body'], true), true), $log_file);
+					}
+				} elseif ( !empty( $request ) ) {
+					$api_log->log('Request Body Json: ' . print_r($request, true), $log_file);
+				}
+
+				if( !empty( $headers ) ) {
+					$api_log->log('Response headers: '.print_r( $headers, true), $log_file);
+				}
+
+				if(  !empty( $status_code ) ) {
+					$api_log->log('Response Code: ' . $status_code, $log_file);
+				}
+
+				$message = wp_remote_retrieve_response_message($response);
+				if( !empty( $message ) ) {
+					$api_log->log('Response Message: ' . $message, $log_file);
+				}
+				
+				if ( !empty( $body_response['body']) && is_array($body_response['body'])) {
+					$api_log->log('Response Body: ' . print_r($body_response['body'], true), $log_file);
+				} elseif ( !empty($body_response) && is_array($body_response)) {
+					$api_log->log('Response Body: ' . print_r($body_response, true), $log_file);
+				} elseif( !empty( $body_response ) ) {
+					$api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($body_response), true), true), $log_file);
+				}
+			}
+			
+		} catch (Exception $ex) {
+		
+		}
 	}
 }

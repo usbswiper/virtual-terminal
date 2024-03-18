@@ -46,8 +46,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .vt-form-contents {width: 100%;}
 .vt-form-contents .vt-row {width: 100%;position: relative;}
 .invoice-content-main-wrap .vt-row {flex-direction: column;margin-bottom: 20px;}
-.vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;}
-.vt-form-contents .vt-row .vt-col.vt-col-payments { margin-top: 20px}
+.vt-form-contents .vt-row .vt-col {display: inline-block;vertical-align: top;margin-bottom: 20px}
 .vt-form-contents .vt-row .vt-col-40 { position: relative;}
 .invoice-content-main-wrap .vt-form-contents .vt-row .vt-col.vt-col-payments:first-child {margin-top: 0;}
 .invoice-content-main-wrap .vt-payment-wrapper, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper {top: 0; transition: all 1s linear;}
@@ -71,6 +70,7 @@ body .vt-form-wrap {width: 100%;max-width: 1000px;}
 .refund-form-wrap .refund-field {width: 100%;display: block;margin: 10px 0;}
 .refund-form-wrap .refund-field label {width: 100%;display: block;}
 .transaction-refund-wrap {width: 100%;display: block;float: left;text-align: right;}
+.transaction-refund-wrap #vt_refund_form {text-align: center;}
 .refund-form-wrap .refund-field input {width: 100%;}
 .refund-form-wrap .refund-field.refund-actions {text-align: right;}
 .refund-form-wrap .refund-field input {background: #fff;color: #666;padding: .75em;height: auto;border-width: 1px;border-style: solid;border-color: #eaeaea;border-radius: 2px;box-shadow: none;box-sizing: border-box;transition: all .2s linear;}
@@ -187,7 +187,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .tool:hover::before, .tool:focus::before {transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;}
 .tool::after {background: #3E474F;border-radius: .25em;top: 150%;color: #EDEFF0;content: attr(data-tip);margin-left: -8.75em;padding: 1em;transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;transform:  scale(.6) translateY(50%);width: 17.5em;}
 .tool:hover::after, .tool:focus::after  {transition: all .65s cubic-bezier(.84,-0.18,.31,1.26);}
-.vt-col-pay-by-invoice fieldset {padding: 0;border: 0;box-shadow: unset;margin: 0;}
+.vt-col-pay-by-invoice fieldset, .vt-col-pay-with-zettle fieldset {padding: 0;border: 0;box-shadow: unset;margin: 0;}
 .woocommerce-MyAccount-content .vt-form-notification {float: left;margin: 0;}
 .vt-capture-popup-wrapper,.vt-refund-popup-wrapper,.vt-payment-timeout-popup-wrapper {background: #0006;bottom: 0;display: none;position: fixed;top: 0;right: 0;left: 0;z-index: 999999}
 .vt-capture-popup-inner, .vt-refund-popup-inner,.vt-payment-timeout-popup-inner {background: #FFFFFF;border-radius: 16px;max-width: 350px;margin: 0 auto;padding: 40px 20px 20px;position: fixed;top: 12%;left: 0;right: 0;width: calc( 100% - 20px );}
@@ -278,6 +278,18 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 .zettle-settings .input-field-wrap {padding: 10px 0;}
 .zettle-wrap .vt-button{line-height: 1.5;}
 .vt-zettle-reader-content .input-field-wrap {margin-bottom: 1rem;}
+
+.input-field-wrap.vt-check-wrap {position: relative;display: flex;flex-direction: row;justify-content: flex-start;gap: 10px;align-items: center;}
+.input-field-wrap.vt-check-wrap .checkmark-container {display: inline-flex;order: 1;}
+.input-field-wrap.vt-check-wrap .checkmark-container input {height: 20px;width: 20px;cursor: pointer;margin: 0;}
+.input-field-wrap.vt-check-wrap label.checkbox-label {display: inline-flex;order: 2;}
+.vt-col-pay-with-zettle .zettle-response, .zettle-refund-response {display: none;margin: 10px 0;text-align: left;}
+.vt-col-pay-with-zettle .zettle-response ul, .zettle-refund-response ul {padding: 0 !important;list-style: none !important;}
+.vt-col-pay-with-zettle .zettle-response ul li, .zettle-refund-response ul li {padding-left: 15px;line-height: 1;position: relative;margin-bottom: 15px;}
+.vt-col-pay-with-zettle .zettle-response ul li:last-child, .zettle-refund-response ul li:last-child{margin-bottom: 0;}
+.vt-col-pay-with-zettle .zettle-response ul li:before, .zettle-refund-response ul li:before{content: "";width: 10px;height: 10px;background: #CCC;position: absolute;left: 0;border-radius: 100%;top: 2px;}
+.vt-col-pay-with-zettle .zettle-response ul li.active, .zettle-refund-response ul li.active{font-weight: bold;}
+.vt-col-pay-with-zettle .zettle-response ul li.active:before, .zettle-refund-response ul li.active:before{background: #3f76ea;}
 
 @media print {
     body{line-height: 1.2 !important;}

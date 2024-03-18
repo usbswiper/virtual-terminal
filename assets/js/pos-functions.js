@@ -81,10 +81,27 @@ jQuery(function( $ ) {
             if(state) {
                 $('#PayByInvoice').show();
                 $('.vt-col-payments').hide();
+                $('.vt-col-pay-with-zettle').hide();
                 $('#BillingEmail').prop('required',true);
             } else {
                 $('#PayByInvoice').hide();
                 $('.vt-col-payments').show();
+                $('.vt-col-pay-with-zettle').show();
+                $('#BillingEmail').prop('required',false);
+            }
+            return false;
+        });
+
+        jQuery('input[name="PayWithZettleDisabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
+            if(state) {
+                $('#PayWithZettle').show();
+                $('.vt-col-payments').hide();
+                $('.vt-col-pay-by-invoice').hide();
+                $('#BillingEmail').prop('required',true);
+            } else {
+                $('#PayWithZettle').hide();
+                $('.vt-col-payments').show();
+                $('.vt-col-pay-by-invoice').show();
                 $('#BillingEmail').prop('required',false);
             }
             return false;
@@ -171,8 +188,13 @@ jQuery(function( $ ) {
                 }
             }
         }, 700);
+
         if(jQuery('#PayByInvoiceDisabled').attr('data-default-checked') != 'TRUE'){
             jQuery('#PayByInvoiceDisabled').bootstrapSwitch('toggleState');
+        }
+
+        if(jQuery('#PayWithZettleDisabled').attr('data-default-checked') != 'TRUE'){
+            jQuery('#PayWithZettleDisabled').bootstrapSwitch('toggleState');
         }
 
         if(jQuery('#shippingDisabled').is(':checked'))

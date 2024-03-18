@@ -168,6 +168,7 @@ class Usb_Swiper {
 		$this->loader->add_filter('woocommerce_account_menu_items', $plugin_public, 'wc_account_menu_items');
 		$this->loader->add_action('woocommerce_account_transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
 		$this->loader->add_action('woocommerce_account_invoices_endpoint', $plugin_public, 'transactions_endpoint_cb');
+		$this->loader->add_action('woocommerce_account_zettle-transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
 		$this->loader->add_action('woocommerce_account_view-transaction_endpoint', $plugin_public, 'view_transactions_endpoint_cb');
         $this->loader->add_filter( 'woocommerce_get_query_vars', $plugin_public, 'update_wc_endpoints' );
         $this->loader->add_action('woocommerce_account_vt-products_endpoint', $plugin_public, 'vt_products_endpoint_cb');
@@ -188,6 +189,7 @@ class Usb_Swiper {
 		$this->loader->add_action('woocommerce_before_edit_account_form', $plugin_public, 'wc_before_edit_account_form');
 
 		$this->loader->add_action('wp_ajax_create_refund_request', $plugin_public,'create_refund_request');
+		$this->loader->add_action('wp_ajax_create_zettle_refund_request', $plugin_public,'manage_refund_payment_request');
 		$this->loader->add_action('woocommerce_after_customer_login_form', $plugin_public,'display_paypal_connect_button');
 		$this->loader->add_action('woocommerce_after_my_account', $plugin_public,'display_paypal_connect_button');
 		$this->loader->add_action('wp_ajax_update_order_status', $plugin_public,'update_order_status');
@@ -222,7 +224,7 @@ class Usb_Swiper {
         $this->loader->add_action( 'init', $plugin_public, 'handle_default_tax' );
 		$this->loader->add_action( 'wp_ajax_delete_tax_data', $plugin_public, 'vt_delete_tax_data');
 		$this->loader->add_action( 'wp_ajax_vt_zettle_pair_reader', $plugin_public, 'vt_zettle_pair_reader');
-
+		
 		if (!is_admin()) {
 			return;
 		}

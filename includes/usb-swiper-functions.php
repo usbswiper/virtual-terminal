@@ -1247,30 +1247,46 @@ function get_total_refund_amount( $transaction_id ) {
 	}
 
 	$GrandTotal = get_post_meta( $transaction_id, 'GrandTotal', true);
-
 	$payment_response = get_post_meta( $transaction_id,'_payment_response', true);
 
-	if( empty( $payment_response ) ) {
-		return;
-	}
+	$transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
 
-	$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
-	$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
-	$captures = !empty( $payment_details['captures'] ) ? $payment_details['captures'] : '';
-	$refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
+    if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
 
-	$total_refund_amount = 0;
-	if( !empty( $refunds ) && is_array( $refunds ) ) {
-		foreach ( $refunds as $key => $refund ) {
+	    $GrandTotal = usbswiper_get_zettle_transaction_total( $transaction_id );
+	    $payment_refund_response = get_post_meta( $transaction_id,'_payment_refund_response', true);
 
-			if( !empty( $refund['amount']['value'] ) && $refund['amount']['value'] > 0 ) {
-				$total_refund_amount = $total_refund_amount + $refund['amount']['value'];
-			}
+	    $result_payload = !empty( $payment_refund_response['result_payload'] ) ? $payment_refund_response['result_payload'] : '';
+	    $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
+	    $original_amount = !empty( $result_payload->ORIGINAL_AMOUNT ) ? $result_payload->ORIGINAL_AMOUNT : 0;
 
-		}
-	}
+	    $total_refund_amount = $refund_amount/100;
 
-	$remaining_amount = $GrandTotal - $total_refund_amount;
+	    $remaining_amount = $GrandTotal - $total_refund_amount;
+    } else {
+
+	    if( empty( $payment_response ) ) {
+		    return;
+	    }
+
+	    $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
+	    $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
+	    $captures = !empty( $payment_details['captures'] ) ? $payment_details['captures'] : '';
+	    $refunds = !empty( $payment_details['refunds'] ) ? $payment_details['refunds'] : '';
+
+	    $total_refund_amount = 0;
+	    if( !empty( $refunds ) && is_array( $refunds ) ) {
+		    foreach ( $refunds as $key => $refund ) {
+
+			    if( !empty( $refund['amount']['value'] ) && $refund['amount']['value'] > 0 ) {
+				    $total_refund_amount = $total_refund_amount + $refund['amount']['value'];
+			    }
+
+		    }
+	    }
+
+	    $remaining_amount = $GrandTotal - $total_refund_amount;
+    }
 
 	$args = array(
 		'ex_tax_label'       => false,
@@ -1282,6 +1298,20 @@ function get_total_refund_amount( $transaction_id ) {
 	);
 
 	return !empty( $remaining_amount ) ? number_format( $remaining_amount, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'] ) : '';
+}
+
+function usbswiper_get_price_format( $price ) {
+
+	$args = array(
+		'ex_tax_label'       => false,
+		'currency'           => '',
+		'decimal_separator'  => wc_get_price_decimal_separator(),
+		'thousand_separator' => wc_get_price_thousand_separator(),
+		'decimals'           => wc_get_price_decimals(),
+		'price_format'       => get_woocommerce_price_format(),
+	);
+
+	return !empty( $price ) ? number_format( $price, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'] ) : 0.00;
 }
 
 /**
@@ -1346,7 +1376,7 @@ function usbswiper_get_transaction_status( $transaction_id ) {
     $transaction_type = usbswiper_get_invoice_transaction_type($transaction_id);
 
 	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
-	$status = !empty( $payment_response['status'] ) ? $payment_response['status'] : '';
+	$status = !empty( $payment_response['status'] ) ? $payment_response['status'] : $global_payment_status;
 
 	$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 	$payments = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
@@ -1405,7 +1435,20 @@ function usbswiper_get_transaction_id( $transaction_id ) {
 		return '';
 	}
 
+    $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
 	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+
+    if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
+
+	    $payment_transaction_id = '';
+        if( !empty( $payment_response['result_status'] ) && strtolower( $payment_response['result_status'] ) == 'completed' ) {
+
+            $result_payload = !empty( $payment_response['result_payload'] ) ? $payment_response['result_payload'] : '';
+	        $payment_transaction_id = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
+        }
+
+        return $payment_transaction_id;
+    }
 
 	$payment_transaction_id = !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
 
@@ -2355,4 +2398,68 @@ function usbswiper_get_user_date_i18n( $user_id = 0, $is_timezone = false ) {
     $date = $custom_datetime->format('Y-m-d H:i:s');
 
     return !empty( $date ) ? $date : '';
+}
+
+function usbswiper_get_zettle_transaction_tip_amount( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return '';
+	}
+
+	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+
+	$tip_amount = 0;
+	if( !empty( $payment_response['result_status'] ) && !empty( $payment_response['result_payload'] ) ) {
+
+		$result_payload = $payment_response['result_payload'];
+		$tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : '';
+		$tip_amount = !empty( $tip_amount) ? ( $tip_amount / 100 ) : 0;
+	}
+
+	return $tip_amount;
+}
+
+function usbswiper_get_zettle_transaction_total( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return '';
+	}
+
+	$transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
+
+	$grand_total = get_post_meta( $transaction_id, 'GrandTotal', true );
+
+    if( !empty( $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
+
+	    $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+
+	    if( !empty( $payment_response['result_status'] ) && !empty( $payment_response['result_payload'] ) ) {
+
+		    $result_payload = $payment_response['result_payload'];
+		    $tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : '';
+		    if( !empty( $tip_amount ) ) {
+			    $grand_total = $grand_total + ( $tip_amount / 100);
+		    }
+	    }
+    }
+
+    return $grand_total;
+}
+
+function usbswiper_get_zettle_tracking_id( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return '';
+	}
+
+	$tracking_id = '';
+	$transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
+	if( !empty( $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
+
+		$payment_response = get_post_meta($transaction_id, '_payment_response', true);
+		$result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
+		$tracking_id = !empty( $result_payload->REFERENCES->trackingId ) ? $result_payload->REFERENCES->trackingId : '';
+	}
+
+    return $tracking_id;
 }

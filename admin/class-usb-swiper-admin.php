@@ -1860,6 +1860,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 $transaction_types = array(
                         'transaction' => __('Transaction','usb-swiper'),
                         'invoice' => __('Invoice','usb-swiper'),
+                        'zettle' => __('Zettle', 'usb-swiper'),
                 );
                 $intent_types = array(
                         'authorize' => __('Authorize','usb-swiper'),

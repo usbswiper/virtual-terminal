@@ -63,8 +63,135 @@ jQuery( document ).ready(function( $ ) {
                 VtForm.unblock();
             }
         }
+    });
 
-    })
+    $(document).on('click','#PayWithZettle', function (data){
+
+        var currentObj = $(this);
+        var notificationWrap = $('.vt-col-pay-with-zettle .zettle-response');
+        var notificationObj = notificationWrap.find('ul');
+        notificationObj.children('li').remove();
+        currentObj.prop('disabled', true);
+        var VtForm = $('form#ae-paypal-pos-form');
+        vt_remove_notification();
+        remove_zettle_notification(notificationObj);
+        if( VtForm.valid() ) {
+            VtForm.block({message: null, overlayCSS: {background: '#fff', opacity: 0.6}});
+            if (VtForm.is('.createOrder') === false) {
+                VtForm.addClass('createOrder');
+                VtForm.unblock();
+                add_zettle_notification(usb_swiper_settings.create_transaction_message, notificationObj);
+                notificationWrap.show();
+
+                return fetch(usb_swiper_settings.create_zettle_request, {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: VtForm.serialize(),
+                }).then(function (res) {
+                    return res.json();
+                }).then(function (response) {
+                    if( response.status ) {
+                        add_zettle_notification(response.data.payment_request_message, notificationObj);
+                        var payment_request = response.data.payment_request;
+
+                        const socket = new WebSocket( response.data.websocket_url );
+
+                        if( socket.readyState === WebSocket.OPEN ) {
+
+                            socket.addEventListener('open', (event) => {
+                                socket.send(payment_request);
+                            });
+
+                            socket.addEventListener('message', (event) => {
+                                console.log(event.data);
+
+                                if( event.data ) {
+                                    var data = JSON.parse( event.data );
+                                    var messageData = JSON.parse(data.message);
+
+                                    if( messageData.payment_progress !== '' && undefined !== messageData.payment_progress ) {
+                                        add_zettle_notification(messageData.payment_progress, notificationObj);
+                                    } else if( messageData.type === 'payment_result_response' && messageData.result_status === 'failed' ) {
+                                        add_zettle_notification(messageData.result_status, notificationObj);
+                                    }
+
+                                    if( messageData.type === 'payment_result_response' ) {
+
+                                        $.ajax({
+                                            url: usb_swiper_settings.zettle_payment_response,
+                                            type: 'POST',
+                                            dataType: 'json',
+                                            data: "action=zettle_payment_response&message_id="+data.message_id+"&response=" + JSON.stringify(messageData),
+                                        }).done(function (response) {
+                                            if( response.status ){
+                                                window.location.href = response.redirect_url;
+                                            } else {
+                                                set_notification( response.message, 'error'  );
+                                            }
+
+                                            currentObj.prop('disabled', false);
+                                            VtForm.removeClass('createOrder');
+                                            vt_remove_notification();
+                                            remove_zettle_notification(notificationObj);
+                                            VtForm.unblock();
+                                        });
+                                    }
+                                }
+                            });
+
+                            socket.addEventListener('error', (event) => {
+
+                                set_notification(usb_swiper_settings.zettle_socket_error_message, 'error', 'Error');
+
+                                console.error('WebSocket error:', event);
+
+                                $.ajax({
+                                    url: usb_swiper_settings.zettle_payment_response,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: "action=zettle_payment_failed_response&transaction_id"+response.transaction_id,
+                                }).done(function (response) {
+                                    if( response.status ){
+                                        window.location.href = response.redirect_url;
+                                    } else {
+                                        set_notification(response.message, 'error', response.message_type);
+                                    }
+                                    currentObj.prop('disabled', false);
+                                    VtForm.removeClass('createOrder');
+                                    vt_remove_notification();
+                                    remove_zettle_notification(notificationObj);
+                                    VtForm.unblock();
+                                });
+                            });
+
+                            socket.addEventListener('close', (event) => {
+                                console.log('WebSocket connection closed:', event);
+                            });
+
+                        } else {
+                            set_notification(response.websocket_message, 'error');
+                            VtForm.removeClass('createOrder');
+                            remove_zettle_notification(notificationObj);
+                        }
+                        currentObj.prop('disabled', false);
+                        VtForm.unblock();
+                    } else {
+                        currentObj.prop('disabled', false);
+                        VtForm.unblock();
+                        remove_zettle_notification(notificationObj);
+                    }
+                });
+
+            } else {
+                currentObj.prop('disabled', false);
+                VtForm.unblock();
+            }
+        } else {
+            currentObj.prop('disabled', false);
+        }
+    });
 
     if( $('#ae-paypal-pos-form').length > 0 ) {
         $(document).scroll(function () {
@@ -93,7 +220,7 @@ jQuery( document ).ready(function( $ ) {
         return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/i.test(value);
     }, usb_swiper_settings.email_validation_message);
 
-    $.validator.addMethod("greaterThanZero", function(value, element) {
+    $.validator.addMethod("greaterThanZero", function(value, elesment) {
         return parseFloat(value) > 0;
     }, usb_swiper_settings.product_min_price);
 
@@ -446,38 +573,119 @@ jQuery( document ).ready(function( $ ) {
         var submitButton = form.find('.confirm-transaction-refund')
         usb_swiper_add_loader(submitButton);
 
-        jQuery.ajax({
-            url: usb_swiper_settings.ajax_url,
-            type: 'POST',
-            dataType: 'json',
-            data: $(this).serialize()+"&action=create_refund_request",
-        }).done(function ( response ) {
+        var transaction_type= form.find('#transaction_type').val();
 
-            if( response.status) {
-                set_notification(response.message, 'success');
-                document.getElementById(form_id).reset();
-                $('.transaction-refund').show();
-                $('.refund-form-wrap').hide();
-                $('.refund-details').html('').html(response.html);
-                $('.payment-status-text').html('').html(response.refund_status);
-                $(".vt-refund-popup-wrapper").hide();
-                if( Number(response.remain_amount) > 0 ){
-                    $('.remain-amount-input').val(response.remain_amount);
-                    $('.refund-amount-input').attr({
-                        max: response.remain_amount,
-                        maxlength: response.remain_amount
-                    });
-                }else{
-                    $('.transaction-refund-wrap').remove();
-                    $('.send-email-btn-wrapper').remove();
+        if( transaction_type === 'zettle' ) {
+
+            var notificationWrap = $('.zettle-refund-response');
+            var notificationObj = notificationWrap.find('ul');
+            notificationObj.children('li').remove();
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: $(this).serialize()+"&action=create_zettle_refund_request",
+            }).done(function ( response ) {
+
+                if(response.status) {
+                    var refund_request = response.data.refund_request;
+
+                    const socket = new WebSocket( response.data.websocket_url );
+
+                    if( socket.readyState === WebSocket.OPEN ) {
+
+                        add_zettle_notification(response.data.refund_request_message, notificationObj);
+                        notificationWrap.show();
+
+                        socket.addEventListener('open', (event) => {
+                            socket.send(refund_request);
+                        });
+
+                        socket.addEventListener('message', (event) => {
+                            console.log(event.data);
+
+                            if( event.data ) {
+                                var data = JSON.parse( event.data );
+                                var messageData = JSON.parse(data.message);
+
+                                if( messageData.payment_progress !== '' && undefined !== messageData.payment_progress ) {
+                                    add_zettle_notification(messageData.payment_progress, notificationObj);
+                                } else if( messageData.type === 'refund_result_response' && messageData.result_status === 'failed' ) {
+                                    add_zettle_notification(messageData.result_error_message, notificationObj);
+                                }
+
+                                if( messageData.type === 'refund_result_response' ) {
+
+                                    $.ajax({
+                                        url: usb_swiper_settings.zettle_payment_response,
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        data: "action=zettle_refund_payment_response&message_id="+data.message_id+"&response=" + JSON.stringify(messageData),
+                                    }).done( function (response) {
+                                        if( response.status ){
+                                            window.location.href = response.redirect_url;
+                                        } else {
+                                            set_notification( response.message, 'error'  );
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+                        socket.addEventListener('error', (event) => {
+
+                        });
+
+                        socket.addEventListener('close', (event) => {
+                            console.log('WebSocket connection closed:', event);
+                        });
+                    } else {
+                        remove_zettle_notification(notificationObj);
+                        add_zettle_notification(response.websocket_message, notificationObj);
+                        notificationWrap.show();
+                        usb_swiper_remove_loader(submitButton);
+                    }
+
+                } else {
+                    set_notification(response.message, 'error');
                 }
-            } else{
-                set_notification(response.message, 'error', response.message_type);
-                $(".vt-refund-popup-wrapper").hide();
-            }
+            });
+        } else {
 
-            usb_swiper_remove_loader(submitButton);
-        });
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: $(this).serialize()+"&action=create_refund_request",
+            }).done(function ( response ) {
+
+                if( response.status) {
+                    set_notification(response.message, 'success');
+                    document.getElementById(form_id).reset();
+                    $('.transaction-refund').show();
+                    $('.refund-form-wrap').hide();
+                    $('.refund-details').html('').html(response.html);
+                    $('.payment-status-text').html('').html(response.refund_status);
+                    $(".vt-refund-popup-wrapper").hide();
+                    if( Number(response.remain_amount) > 0 ){
+                        $('.remain-amount-input').val(response.remain_amount);
+                        $('.refund-amount-input').attr({
+                            max: response.remain_amount,
+                            maxlength: response.remain_amount
+                        });
+                    }else{
+                        $('.transaction-refund-wrap').remove();
+                        $('.send-email-btn-wrapper').remove();
+                    }
+                } else{
+                    set_notification(response.message, 'error', response.message_type);
+                    $(".vt-refund-popup-wrapper").hide();
+                }
+
+                usb_swiper_remove_loader(submitButton);
+            });
+        }
 
         event.preventDefault();
     });
@@ -874,13 +1082,7 @@ jQuery( document ).ready(function( $ ) {
         rules: {
             zettle_api_key: {
                 required: true,
-            },
-            zettle_client_id: {
-                required: true,
-            },
-            zettle_client_secret: {
-                required: true,
-            },
+            }
         },
         submitHandler: function (form, event) {
             return true;
@@ -966,11 +1168,15 @@ function customInput (el) {
     }
 }
 
+function vt_remove_notification() {
+    jQuery('.vt-form-notification').empty();
+}
+
 function vt_set_notification( message, type ='success', message_type='' ) {
     var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
     jQuery('.vt-form-notification').empty().append(notification);
 
-    jQuery([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
+    jQuery([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 20 }, 1000);
 }
 
 function autoSessionLogOut() {
@@ -1001,3 +1207,12 @@ function autoSessionLogOut() {
     }, 1000);
 }
 
+function add_zettle_notification( message, currentObj ) {
+    currentObj.children('li').removeClass('active');
+    currentObj.append('<li class="active">'+message+'</li>');
+}
+
+function remove_zettle_notification(currentObj){
+    currentObj.children('li').removeClass('active');
+    currentObj.parent('.zettle-refund-response').hide();
+}

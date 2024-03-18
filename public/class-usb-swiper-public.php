@@ -124,6 +124,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $query_vars['view-transaction'] = 'view-transaction';
             $query_vars['transactions'] = 'transactions';
             $query_vars['invoices'] = 'invoices';
+	        $query_vars['zettle-transactions'] = 'zettle-transactions';
             $query_vars['vt-products'] = 'vt-products';
             $query_vars['vt-tax-rules'] = 'vt-tax-rules';
             $query_vars['vt-zettle'] = 'vt-zettle';
@@ -262,6 +263,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'three_d_secure_contingency' => apply_filters('usb_swiper_three_d_secure_contingency', 'SCA_WHEN_REQUIRED'),
 					'create_transaction_url' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_transaction', 'utm_nooverride' => '1', 'from' => 'vt_transaction' ), WC()->api_request_url( 'usb_swiper_transaction' ) ),
 					'cc_capture' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'cc_capture', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
+					'create_zettle_request' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_zettle_request', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
+					'zettle_payment_response' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'zettle_payment_response', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
 					'style_color' => apply_filters('usb_swiper_smart_button_style_color','gold'),
 					'style_shape' => apply_filters('usb_swiper_smart_button_style_shape','rect'),
 					'style_height' => apply_filters('usb_swiper_smart_button_style_height',''),
@@ -276,7 +279,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'vt_max_image_size' => __('Failed to upload an Brand logo. The Brand logo image maximum dimension is 250.','usb-swiper'),
                     'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
                     'current_page_id' => get_the_ID(),
-					'product_min_qty_message' => __("Only positive numbers are allowed for QTY.", 'usb-swiper')
+					'product_min_qty_message' => __("Only positive numbers are allowed for QTY.", 'usb-swiper'),
+					'create_transaction_message' => __("Create a new transaction request for zettle", 'usb-swiper'),
+					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -293,6 +298,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'three_d_secure_contingency' => apply_filters('usb_swiper_three_d_secure_contingency', 'SCA_WHEN_REQUIRED'),
 					'create_transaction_url' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_transaction', 'utm_nooverride' => '1', 'from' => 'vt_transaction' ), WC()->api_request_url( 'usb_swiper_transaction' ) ),
 					'cc_capture' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'cc_capture', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
+					'create_zettle_request' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'create_zettle_request', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
+					'zettle_payment_response' => add_query_arg( array( 'usb_swiper_ppcp_action' => 'zettle_payment_response', 'utm_nooverride' => '1' ), WC()->api_request_url('usb_swiper_transaction')),
 					'style_color' => apply_filters('usb_swiper_smart_button_style_color','gold'),
 					'style_shape' => apply_filters('usb_swiper_smart_button_style_shape','rect'),
 					'style_height' => apply_filters('usb_swiper_smart_button_style_height',''),
@@ -309,7 +316,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'vt_paybyinvoice_page_id' => $vt_pay_by_invoice_id,
                     'vt_timeout_message' => __('You are about to be logged out.', 'usb-swiper'),
                     'vt_max_image_size' => __('Failed to upload an Brand logo. The Brand logo image maximum dimension is 250.','usb-swiper'),
-                    'current_page_id' => get_the_ID()
+                    'current_page_id' => get_the_ID(),
+					'create_transaction_message' => __("Create a new transaction request for zettle", 'usb-swiper'),
+					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 				) );
             }
 
@@ -374,12 +383,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				unset( $menu_links['customer-logout'] );
 
-				$menu_links['transactions']    = __( 'Transactions', 'usb-swiper' );
-                $menu_links['invoices']    = __( 'Invoices', 'usb-swiper' );
-                $menu_links['vt-products']    = __( 'Products', 'usb-swiper' );
-                $menu_links['vt-tax-rules']    = __( 'Tax Rules', 'usb-swiper' );
-                $menu_links['vt-zettle']    = __( 'Zettle POS', 'usb-swiper' );
-				$menu_links['customer-logout'] = $logout;
+				$menu_links['transactions']         =   __( 'Transactions', 'usb-swiper' );
+                $menu_links['invoices']             =   __( 'Invoices', 'usb-swiper' );
+				$menu_links['zettle-transactions']  =   __( 'Zettle Transactions', 'usb-swiper' );
+                $menu_links['vt-products']          =   __( 'Products', 'usb-swiper' );
+                $menu_links['vt-tax-rules']         =   __( 'Tax Rules', 'usb-swiper' );
+                $menu_links['vt-zettle']            =   __( 'Zettle POS', 'usb-swiper' );
+				$menu_links['customer-logout']      =   $logout;
 			}
 
 			return $menu_links;
@@ -391,12 +401,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          * @since 1.0.0
 		 */
 		public function endpoint_init() {
+
 			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-tax-rules', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-zettle', EP_ROOT | EP_PAGES );
+			add_rewrite_endpoint( 'zettle-transactions', EP_ROOT | EP_PAGES );
 		}
 
 		/**
@@ -410,7 +422,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 				$current_page   = !empty( $_GET['vt-page'] ) ? $_GET['vt-page'] : 1;
                 $transaction_type   = !empty( $_GET['vt-type'] ) ? sanitize_text_field( $_GET['vt-type'] ) : "";
-
                 $transaction_search   = !empty( $_GET['vt-search'] ) ? sanitize_text_field( $_GET['vt-search'] ) : "";
 
                 $search_date = '';
@@ -519,7 +530,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     </div>
                 </form>
                 <?php
-				usb_swiper_get_template('wc-transactions-lists.php', $args);
+                if( is_wc_endpoint_url('zettle-transactions') ) {
+	                usb_swiper_get_template('wc-transactions-zettle.php', $args);
+                } else {
+	                usb_swiper_get_template('wc-transactions-lists.php', $args);
+                }
 			}
 		}
 
@@ -541,6 +556,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $meta_value = 'transaction';
             }elseif ( is_wc_endpoint_url('invoices') ){
                 $meta_value = 'invoice';
+            } elseif ( is_wc_endpoint_url('zettle-transactions') ){
+	            $meta_value = 'zettle';
             }
 
             if( !empty( $meta_value ) ){
@@ -992,10 +1009,331 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     case "cc_capture":
                         $this->capture_transaction();
                         break;
+                    case "create_zettle_request":
+	                    $this->create_zettle_request();
+                        break;
+	                case "zettle_payment_response":
+
+                        if( !empty( $_POST['action'] ) && 'zettle_payment_failed_response' === $_POST['action'] ) {
+
+                            $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
+                            if( !empty( $transaction_id ) ) {
+	                            update_post_meta($transaction_id, '_payment_status', 'FAILED');
+	                            update_post_meta($transaction_id, '_payment_response', [] );
+                            }
+
+	                        wp_send_json( [
+		                        'status' => false,
+		                        'message' => __( 'Zettle Payment Failed. Please try again.', 'usb-swiper' ),
+		                        'message_type' => "FAILED",
+	                        ], 200 );
+
+                        } elseif ( !empty( $_POST['action'] ) && 'zettle_refund_payment_response' === $_POST['action'] ) {
+
+	                        $transaction_id = !empty( $_POST['message_id'] ) ? UsbSwiperZettle::get_transaction_id_from_message_id( $_POST['message_id'] ) : '';
+
+	                        $this->handle_zettle_refund_payment_response();
+                        } else {
+	                        $this->handle_zettle_payment_response();
+                        }
+		                break;
                     default:
                 }
             }
 		}
+        
+        public function create_zettle_request() {
+         
+	        $current_user_id = get_current_user_id();
+	        
+	        if( empty($current_user_id) ){
+		        wp_send_json( array(
+			        'status' => 'error',
+			        'message' => __("You are not able to create a transaction without a login.",'usb-swiper'),
+			        'message_type' => __("ERROR",'usb-swiper'),
+		        ), 200 );
+	        }
+	        
+	        $zettle_payment = isset( $_POST['PayWithZettleDisabled'] ) && (bool)$_POST['PayWithZettleDisabled'] === true;
+            
+            if( !$zettle_payment )  {
+                return false;
+            }
+	        
+	        $tab_fields = usb_swiper_get_fields_for_transaction();
+	        $transaction = array();
+	        if( !empty( $tab_fields ) && is_array( $tab_fields ) ) {
+		        foreach ( $tab_fields as $tab_id => $tab_field ) {
+			        $form_fields = usb_swiper_get_vt_form_fields( $tab_id );
+			        if( !empty( $form_fields ) && is_array( $form_fields ) ) {
+				        foreach ( $form_fields as $key => $form_field ) {
+					        $field_id = !empty( $form_field['id'] ) ?  $form_field['id'] : '';
+					        if( !empty( $_POST[$field_id] ) && is_array( $_POST[$field_id] ) ) {
+						        $_POST[$field_id] = array_filter($_POST[$field_id], function($value) { return !is_null($value) && $value !== ''; });
+					        }
+					        $transaction[$field_id] = !empty( $_POST[$field_id] ) ? $_POST[$field_id] : '';
+				        }
+			        }
+		        }
+	        }
+	        
+	        $BillingFirstName = !empty( $transaction['BillingFirstName'] ) ? $transaction['BillingFirstName'] : '';
+	        $BillingLastName = !empty( $transaction['BillingLastName'] ) ? $transaction['BillingLastName'] : '';
+	        
+	        $display_name = $BillingFirstName. ' ' . $BillingLastName;
+	        
+	        $transaction_type = 'ZETTLE';
+
+	        $post_args = array(
+		        'post_title'   => wp_strip_all_tags($display_name),
+		        'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
+		        'post_status'  => 'publish',
+		        'post_author'  => $current_user_id,
+		        'post_type'   => 'transactions',
+		        'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
+		        'post_date_gmt' => usbswiper_get_user_date_i18n( $current_user_id ),
+	        );
+	        
+	        $transaction_id = wp_insert_post($post_args);
+	        
+	        if( !is_wp_error( $transaction_id ) ) {
+		        
+		        $user_invoice_id = count_user_invoice_numbers();
+		        update_post_meta($transaction_id, '_transaction_type', $transaction_type);
+		        update_post_meta($transaction_id, '_transaction_user_id', get_current_user_id());
+		        update_post_meta($transaction_id, '_user_invoice_id', sprintf("%04d", $user_invoice_id));
+		        update_post_meta($transaction_id, '_payment_status', 'CREATED');
+		        update_post_meta($transaction_id, 'payment_source', 'Zettle');
+
+		        wp_update_post(array(
+			        'ID' => $transaction_id,
+			        'post_title' => wp_strip_all_tags(sprintf(__('#%s %s', 'usb-swiper'), $transaction_id, $display_name)),
+		        ));
+		        
+		        usb_swiper_set_session('usb_swiper_woo_transaction_id', $transaction_id);
+          
+		        if (!empty($transaction) && is_array($transaction)) {
+			        foreach ($transaction as $key => $value) {
+				        update_post_meta($transaction_id, $key, $value);
+			        }
+		        }
+		        
+		        $vt_product = get_post_meta($transaction_id, 'VTProduct', true);
+		        $vt_product_quantity = get_post_meta($transaction_id, 'VTProductQuantity', true);
+		        $vt_product_price = get_post_meta($transaction_id, 'VTProductPrice', true);
+		        $vt_product_ids = get_post_meta($transaction_id, 'VTProductID', true);
+		        $vt_products = array();
+		        
+		        if (!empty($vt_product) && is_array($vt_product)) {
+			        
+			        for ($i = 0; $i < count($vt_product); $i++) {
+				        
+				        $product = !empty($vt_product[$i]) ? $vt_product[$i] : '';
+				        $quantity = !empty($vt_product_quantity[$i]) ? ltrim($vt_product_quantity[$i], '0') : 1;
+				        $price = !empty($vt_product_price[$i]) ? $vt_product_price[$i] : '';
+				        $product_id = !empty($vt_product_ids[$i]) ? $vt_product_ids[$i] : '';
+				        
+				        $vt_products[] = array(
+					        'product_name' => $product,
+					        'product_quantity' => $quantity,
+					        'product_price' => $price,
+					        'product_id' => $product_id
+				        );
+			        }
+		        }
+		        
+		        update_post_meta($transaction_id, 'vt_products', $vt_products);
+		        
+		        if( !class_exists('UsbSwiperZettle') ) {
+			        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-zettle.php';
+		        }
+          
+		        $reader_data = UsbSwiperZettle::get_zettle_reader_data( $current_user_id );
+		        $id = !empty( $reader_data['id'] ) ? $reader_data['id'] : '';
+		        $response = UsbSwiperZettle::websocket_connection($id);
+		        $response_status = !empty( $response['status'] ) ? $response['status'] :  '';
+		        $message = !empty( $response['message'] ) ? $response['message']: __('Something went wrong. Please try again', 'usb-swiper');
+
+		        $tipping = UsbSwiperZettle::get_settings('enable_zettle_tipping', 'public' );
+		        if( !empty( $response_status ) && ( 200 === (int) $response_status || 201 === (int) $response_status ) ) {
+			        $websocket_url  = !empty( $response['header'] ) ? $response['header'] :  '';
+			        $grand_total = get_post_meta( $transaction_id, 'GrandTotal', true );
+			        $payment_request = UsbSwiperZettle::payment_request( $websocket_url, [
+                        'transaction_id' => $transaction_id,
+                        'reader_data' => $reader_data,
+                        'amount' => $grand_total,
+                        'tipping' => !empty( $tipping ),
+                    ]);
+           
+			        wp_send_json( [
+				        'status' => true,
+				        'message' => $message,
+				        'data' => $payment_request,
+				        'transaction_id' => $transaction_id,
+				        'websocket_message' => __('Zettle device is not ready.', 'usb-swiper'),
+			        ], 200 );
+           
+		        } else {
+			        wp_delete_post($transaction_id);
+			        wp_send_json( [
+				        'status' => false,
+				        'message' => $message,
+			        ], 200 );
+		        }
+	        }
+        }
+
+        public function manage_refund_payment_request() {
+
+	        $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
+	        $refund_amount = !empty( $_POST['refund_amount'] ) ? $_POST['refund_amount'] : 0;
+
+	        $current_user_id = get_current_user_id();
+
+	        if( !class_exists('UsbSwiperZettle') ) {
+		        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-zettle.php';
+	        }
+
+	        $reader_data = UsbSwiperZettle::get_zettle_reader_data( $current_user_id );
+	        $id = !empty( $reader_data['id'] ) ? $reader_data['id'] : '';
+	        $response = UsbSwiperZettle::websocket_connection($id);
+	        $response_status = !empty( $response['status'] ) ? $response['status'] :  '';
+	        $message = !empty( $response['message'] ) ? $response['message']: __('Something went wrong. Please try again', 'usb-swiper');
+
+	        if( !empty( $response_status ) && ( 200 === (int) $response_status || 201 === (int) $response_status ) ) {
+		        $websocket_url = !empty($response['header']) ? $response['header'] : '';
+		        $payment_request = UsbSwiperZettle::refund_payment_request( $websocket_url, [
+			        'transaction_id' => $transaction_id,
+			        'reader_data' => $reader_data,
+			        'amount' => $refund_amount,
+		        ]);
+
+		        wp_send_json( [
+			        'status' => true,
+			        'message' => $message,
+			        'data' => $payment_request,
+			        'transaction_id' => $transaction_id,
+			        'websocket_message' => __('Zettle device is not ready.', 'usb-swiper'),
+		        ], 200 );
+
+	        } else {
+		        wp_send_json( [
+			        'status' => false,
+			        'message' => $message,
+		        ], 200 );
+	        }
+        }
+
+        public function handle_zettle_payment_response() {
+
+            $status = false;
+            $message = __( 'Something went wrong. Please try again.','usb-swiper');
+	        $message_type = 'error';
+	        $redirect_url = '';
+
+            $transaction_id = !empty( $_POST['message_id'] ) ? UsbSwiperZettle::get_transaction_id_from_message_id( $_POST['message_id'] ) : '';
+            $response = !empty( $_POST['response'] ) ? (array) json_decode( stripslashes( $_POST['response'] ) ) : [];
+
+	        UsbSwiperZettle::add_log( $response, '', '','websocket_payment_response', $transaction_id );
+
+            if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
+                $result_status = !empty( $response['result_status'] ) ? $response['result_status'] : 'CREATED';
+	            update_post_meta( $transaction_id, '_payment_response', $response);
+	            update_post_meta($transaction_id, '_payment_status', strtoupper( $result_status ) );
+
+                if( !empty( $result_status ) && strtolower( $result_status ) === 'completed'  ) {
+
+	                $status = true;
+
+	                $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
+
+	                $email_args = array(
+		                'display_name' => wp_strip_all_tags($BillingFirstName)
+	                );
+
+	                $BillingEmail = get_post_meta( $transaction_id,'BillingEmail', true);
+
+	                $current_user_id = get_current_user_id();
+	                $current_user = get_user_by('id', $current_user_id );
+	                $ignore_email = get_user_meta( $current_user_id,'ignore_transaction_email', true );
+
+	                $customer_email = WC()->mailer()->emails['transaction_email'];
+	                $customer_email->recipient = $BillingEmail;
+	                $customer_email->trigger( array(
+		                'transaction_id' => $transaction_id,
+		                'email_args' => $email_args,
+	                ));
+
+	                $admin_email = WC()->mailer()->emails['transaction_email_admin'];
+	                $get_recipient = '';
+	                if( true !== (bool)$ignore_email ){
+		                $get_recipient .= $current_user->user_email;
+	                }
+
+	                $admin_email->recipient = $get_recipient;
+	                $admin_email->trigger( array(
+		                'transaction_id' => $transaction_id,
+		                'email_args' => $email_args,
+	                ));
+
+	                $redirect_url = esc_url(wc_get_endpoint_url('view-transaction', $transaction_id, wc_get_page_permalink('myaccount')));
+                }  else {
+	                $message = __( 'Zettle transaction failed. Please try again.','usb-swiper');
+                }
+            }
+
+	        wp_send_json( [
+		        'status' => $status,
+		        'message' => $message,
+		        'message_type' => $message_type,
+		        'redirect_url' => $redirect_url,
+	        ], 200 );
+        }
+
+        public function handle_zettle_refund_payment_response() {
+
+	        $status = false;
+	        $message = __( 'Something went wrong. Please try again.','usb-swiper');
+	        $message_type = 'error';
+	        $redirect_url = '';
+
+	        $transaction_id = !empty( $_POST['message_id'] ) ? UsbSwiperZettle::get_transaction_id_from_message_id( $_POST['message_id'] ) : '';
+	        $response = !empty( $_POST['response'] ) ? (array) json_decode( stripslashes( $_POST['response'] ) ) : [];
+
+	        UsbSwiperZettle::add_log( $response, '', '','websocket_payment_response', $transaction_id );
+
+	        if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
+		        $result_status = !empty( $response['result_status'] ) ? $response['result_status'] : '';
+		        update_post_meta( $transaction_id, '_payment_refund_response', $response );
+
+		        if( !empty( $result_status ) && strtolower( $result_status ) === 'completed'  ) {
+
+			        $status = true;
+
+			        $result_payload = !empty( $response['result_payload'] ) ? $response['result_payload'] : '';
+                    $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
+                    $original_amount = !empty( $result_payload->ORIGINAL_AMOUNT ) ? $result_payload->ORIGINAL_AMOUNT : 0;
+
+                    $payment_status = 'partially_refunded';
+                    if( $original_amount == $refund_amount ) {
+	                    $payment_status = 'refunded';
+                    }
+
+			        update_post_meta($transaction_id, '_payment_status', strtoupper( $payment_status ) );
+
+			        $redirect_url = esc_url(wc_get_endpoint_url('view-transaction', $transaction_id, wc_get_page_permalink('myaccount')));
+		        }  else {
+			        $message = __( 'Zettle refund request failed. Please try again.', 'usb-swiper' );
+		        }
+	        }
+
+	        wp_send_json( [
+		        'status' => $status,
+		        'message' => $message,
+		        'message_type' => $message_type,
+		        'redirect_url' => $redirect_url,
+	        ], 200 );
+        }
 
 		/**
 		 * Create new transaction.
@@ -2116,8 +2454,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'refund_status' => $refund_status,
                 'remain_amount' => $refund_amount,
 				'html' => $refund_html,
-                'refund_status' => $refund_status,
-                'remain_amount' => $refund_amount,
 			);
 
 			wp_send_json( $response , 200 );
@@ -3378,8 +3714,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        }
 	        
 	        $this->manage_zettle_outh_code();
-	        
 	        $this->disconnect_zettle_app();
+	        $this->unpairing_zettle_device();
         }
 		
 		/**
@@ -3417,7 +3753,40 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        exit();
 	        }
         }
-        
+		
+		/**
+         * Unpairing zettle device.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
+        public function unpairing_zettle_device()  {
+	        
+	        if( is_wc_endpoint_url('vt-zettle') && is_user_logged_in() && !empty( $_GET['unpairing'] ) ) {
+		        
+                $user_id = get_current_user_id();
+                
+		        $reader_data = UsbSwiperZettle::get_zettle_reader_data( $user_id );
+                $id =  !empty( $reader_data['id'] ) ? $reader_data['id'] : '';
+		        $response = UsbSwiperZettle::unpairing_zettle_device($id);
+                if(  !empty( $response['status'] ) && ( 200 === (int) $response['status'] || 201 === (int) $response['status'] ) ) {
+                    
+                    delete_user_meta($user_id, 'usb_swiper_zettle_reader_data');
+                    delete_user_meta($user_id, 'usb_swiper_zettle_websocket_connection_url');
+	                wp_safe_redirect(UsbSwiperZettle::get_redirection_uri());
+	                exit();
+                }
+	        }
+        }
+		
+		/**
+         * Pair zettle device using code and device name.
+         *
+         * @since 2.3.4
+         *
+		 * @return void
+		 */
         public function vt_zettle_pair_reader() {
          
 	        $status = false;
@@ -3427,8 +3796,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             if( !empty( $_POST['_nonce'] ) &&  wp_verify_nonce( $_POST['_nonce'],'vt-zettle-pair-reader') ) {
                 
                 $reader_code = !empty( $_POST['zettle_pair_reader_code'] ) ? $_POST['zettle_pair_reader_code'] : '';
-                $reader_device_name = !empty( $_POST['zettle_pair_reader_device_name'] ) ? $_POST['zettle_pair_reader_device_name'] : __( 'UsbSwiper Terminal', 'usb-swiper' );
-                
+                $reader_device_name = !empty( $_POST['zettle_pair_reader_device_name'] ) ? $_POST['zettle_pair_reader_device_name'] : __( 'USBSwiper Terminal', 'usb-swiper' );
+
                 if( !empty( $reader_code ) ) {
                  
 	                $response = UsbSwiperZettle::pair_reader([
@@ -3444,8 +3813,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         update_user_meta( get_current_user_id(),  'usb_swiper_zettle_reader_data', $data );
 	                    $message = __("<strong>$reader_code</strong> Reader paired successfully.", 'usb-swiper');
                     } else {
-	                    $message = !empty( $response['data']['developerMessage'] ) ? $response['data']['developerMessage'] : '';
-                        $message_type = !empty( $response['data']['errorType'] ) ? $response['data']['errorType'] : '';
+	                    $message = !empty( $response['data']['developerMessage'] ) ? $response['data']['developerMessage'] : __( 'Reader Pairing Failed. Please try again.', 'usb-swiper' );
+                        $message_type = !empty( $response['data']['errorType'] ) ? $response['data']['errorType'] : __( 'Error', 'usb-swiper' );
                         delete_user_meta( get_current_user_id(), 'usb_swiper_zettle_reader_data');
                     }
                 }

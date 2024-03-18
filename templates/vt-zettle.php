@@ -68,14 +68,26 @@
 		                            'class' => 'regular-text vt-input-field',
 		                            'value' =>  !empty( $reader_data['zettle_pair_reader_device_name'] ) ? $reader_data['zettle_pair_reader_device_name'] : '',
 		                            'description' => '',
-                                    'default' => __( 'UsbSwiper Terminal', 'usb-swiper' ),
+                                    'default' => __( 'USBSwiper Terminal', 'usb-swiper' ),
 	                            ] );
                             ?>
                             </div>
                             <div class="input-field-wrap button-wrap">
                                 <input type="hidden" name="form_action" id="vt_zettle_pair_reader_action" value="vt-zettle-pair-reader-form">
                                 <input type="hidden" name="_nonce" id="vt_zettle_pair_reader_nonce" value="<?php echo wp_create_nonce('vt-zettle-pair-reader'); ?>">
-                                <button id="vt_zettle_pair_reader_settings" type="submit" class="vt-button"><?php _e( 'Pair Zettle Device', 'usb-swiper'); ?></button>
+                                <?php if( !empty( $reader_data ) && is_array( $reader_data ) ) {
+	                                
+	                                $unpairing_zettle_device_link = add_query_arg(
+		                                [
+			                                'unpairing' => true,
+		                                ],
+		                                UsbSwiperZettle::get_redirection_uri(),
+	                                );
+                                    ?>
+                                    <a href="<?php echo esc_url( $unpairing_zettle_device_link ); ?>" id="vt_zettle_unpairing_reader_settings" class="vt-button"><?php _e( 'Unpairing Zettle Device', 'usb-swiper'); ?></a>
+                                <?php } else { ?>
+                                    <button id="vt_zettle_pair_reader_settings" type="submit" class="vt-button"><?php _e( 'Pair Zettle Device', 'usb-swiper'); ?></button>
+                                <?php } ?>
                                 <a href="<?php echo esc_url( $disconnect_app_link ); ?>" class="vt-button"><?php _e( 'Disconnect from Zettle', 'usb-swiper'); ?></a>
                             </div>
                         </form>
@@ -84,27 +96,27 @@
                             <table class="form-table zettle-device-information" cellspacing="0" cellpadding="0">
                                 <tbody>
                                     <tr>
-                                        <th><?php esc_html_e('ID', 'usb-swiper' ); ?></th>
+                                        <td><strong><?php esc_html_e('ID', 'usb-swiper' ); ?></strong></td>
                                         <td><?php echo !empty( $reader_data['id'] ) ? $reader_data['id'] : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <th><?php esc_html_e('Organization Uuid', 'usb-swiper' ); ?></th>
+                                        <td><strong><?php esc_html_e('Organization Uuid', 'usb-swiper' ); ?></strong></td>
                                         <td><?php echo !empty( $reader_data['organizationUuid'] ) ? $reader_data['organizationUuid'] : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <th><?php esc_html_e('Model', 'usb-swiper' ); ?></th>
+                                        <td><strong><?php esc_html_e('Model', 'usb-swiper' ); ?></strong></td>
                                         <td><?php echo !empty( $reader_data['readerTags']['model'] ) ? $reader_data['readerTags']['model'] : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <th><?php esc_html_e('Serial Number', 'usb-swiper' ); ?></th>
+                                        <td><strong><?php esc_html_e('Serial Number', 'usb-swiper' ); ?></strong></td>
                                         <td><?php echo !empty( $reader_data['readerTags']['serial_number'] ) ? $reader_data['readerTags']['serial_number'] : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <th><?php esc_html_e('Device Code', 'usb-swiper' ); ?></th>
+                                        <td><strong><?php esc_html_e('Device Code', 'usb-swiper' ); ?></strong></td>
                                         <td><?php echo !empty( $reader_data['zettle_pair_reader_code'] ) ? $reader_data['zettle_pair_reader_code'] : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <th><?php esc_html_e('Device Name', 'usb-swiper' ); ?></th>
+                                        <td><strong><?php esc_html_e('Device Name', 'usb-swiper' ); ?></strong></td>
                                         <td><?php echo !empty( $reader_data['zettle_pair_reader_device_name'] ) ? $reader_data['zettle_pair_reader_device_name'] : ''; ?></td>
                                     </tr>
                                 </tbody>

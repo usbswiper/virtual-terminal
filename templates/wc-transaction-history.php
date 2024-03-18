@@ -77,11 +77,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     $author_id = get_post_field( 'post_author', $transaction_id );
     $author_id = ! empty( $author_id ) ? $author_id : 1;
     $get_current_user_id = get_current_user_id();
-    if( usbswiper_is_allow_capture( $transaction_id ) && $payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
+    if( strtolower( $transaction_type) !== 'zettle' && usbswiper_is_allow_capture( $transaction_id ) && $payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
         $unique_id = usb_swiper_unique_id( array(
            'type' => $payment_action,
            'transaction_id' => $transaction_id,
-           'paypal_transaction_id' => $payment_response['id'],
+           'paypal_transaction_id' => !empty( $payment_response['id'] ) ? $payment_response['id'] : '',
            'nonce' => wp_create_nonce('authorize-transaction-capture')
         ));
         $id = !empty( $id ) ? $id : $transaction_id;
@@ -91,11 +91,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         </div>
         <?php echo refund_confirmation_html();
     }
+
     if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
         $get_refund_status = usbswiper_get_refund_status();
         if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) {
 
 			$refund_amount = get_total_refund_amount($transaction_id);
+            $transaction_total = usbswiper_get_zettle_transaction_total( $transaction_id );
 			?>
             <div class="send-email-btn-wrapper">
                 <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
@@ -106,7 +108,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <form method="post" action="" name="vt_refund_form_data" id="vt_refund_form_data">
                         <div class="refund-field">
                             <label for="transaction_amount_display"><?php _e('Total Amount', 'usb-swiper'); ?></label>
-                            <input type="text" readonly name="transaction_amount_display" id="transaction_amount_display" value="<?php echo $GrandTotal; ?>" />
+                            <input type="text" readonly name="transaction_amount_display" id="transaction_amount_display" value="<?php echo usbswiper_get_price_format( $transaction_total ); ?>" />
                         </div>
                         <div class="refund-field">
                             <label for="remaining_amount_display"><?php _e('Remaining Amount', 'usb-swiper'); ?></label>
@@ -133,15 +135,18 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                                 <p><?php _e('Are you sure you want to process this refund?','usb-swiper'); ?></p>
                             </div>
                             <div class="input-field-wrap button-wrap">
+                                <div class="vt-form-notification"></div>
                                 <form method="post" action="" name="vt_refund_form" id="vt_refund_form">
                                     <input type="hidden" readonly name="transaction_amount" id="transaction_amount" value="<?php echo $GrandTotal; ?>" />
                                     <input type="hidden" readonly class="remain-amount-input" name="remaining_amount" id="remaining_amount" value="<?php echo $refund_amount; ?>" />
                                     <input type="hidden" name="refund_amount" id="refund_amount" value="" />
                                     <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('refund-request'); ?>">
                                     <input type="hidden" name="transaction_id" id="transaction_id" value="<?php echo $transaction_id; ?>">
+                                    <input type="hidden" name="transaction_type" id="transaction_type" value="<?php echo esc_attr( strtolower( $transaction_type) ); ?>">
                                     <button type="submit" class="vt-button confirm-transaction-refund" id="transaction_refund_btn" name="transaction_refund_btn"><?php _e('Refund','usb-swiper'); ?></button>
                                     <button type="button" class="vt-button-normal cancel-refund"><?php _e('Cancel','usb-swiper'); ?></button>
                                 </form>
+                                <div class="zettle-refund-response"><ul></ul></div>
                             </div>
                         </div>
                     </div>
@@ -329,6 +334,29 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Tax Amount','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($TaxAmount, array('currency' => $transaction_currency)); ?></td>
             </tr>
+            <?php
+
+            if( !empty( $transaction_type ) && strtolower( $transaction_type) === 'zettle') {
+
+	            $tip_amount = usbswiper_get_zettle_transaction_tip_amount( $transaction_id );
+
+                if( !empty( $tip_amount ) && $tip_amount > 0 ) {
+
+                    ?>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Sub Total','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($GrandTotal, array('currency' => $transaction_currency)); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Tip Amount','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($tip_amount, array('currency' => $transaction_currency)); ?></td>
+                    </tr>
+                    <?php
+
+	                $GrandTotal = usbswiper_get_zettle_transaction_total( $transaction_id );
+                }
+
+            } ?>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Grand Total','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($GrandTotal, array('currency' => $transaction_currency)); ?></td>
@@ -336,7 +364,76 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tbody>
         </table>
     </div>
-    <?php if( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
+    <?php
+    if( !empty( $transaction_type ) && strtolower($transaction_type) === 'zettle' ) {
+
+        $result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
+
+        $reference_number = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
+        $application_identifier = !empty( $result_payload->APPLICATION_IDENTIFIER ) ? $result_payload->APPLICATION_IDENTIFIER : '';
+	    $card_payment_uuid = !empty( $result_payload->CARD_PAYMENT_UUID ) ? $result_payload->CARD_PAYMENT_UUID : '';
+        $card_payment_entry_mode = !empty( $result_payload->CARD_PAYMENT_ENTRY_MODE ) ? $result_payload->CARD_PAYMENT_ENTRY_MODE : '';
+        $tracking_id = !empty( $result_payload->REFERENCES->trackingId ) ? $result_payload->REFERENCES->trackingId : '';
+        $checkout_uuid = !empty( $result_payload->REFERENCES->checkoutUUID ) ? $result_payload->REFERENCES->checkoutUUID : '';
+        $card_holder_verification_method = !empty( $result_payload->CARDHOLDER_VERIFICATION_METHOD ) ? $result_payload->CARDHOLDER_VERIFICATION_METHOD : '';
+        $application_name = !empty( $result_payload->APPLICATION_NAME ) ? $result_payload->APPLICATION_NAME : '';
+        $authorization_code = !empty( $result_payload->AUTHORIZATION_CODE ) ? $result_payload->AUTHORIZATION_CODE : '';
+        $card_type = !empty( $result_payload->CARD_TYPE ) ? $result_payload->CARD_TYPE : '';
+        $card_hase = !empty( $result_payload->CARD_HASH ) ? $result_payload->CARD_HASH : '';
+        ?>
+        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 20px 0;padding: 0;float: left;">
+            <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
+            <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+                <tbody>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Reference Number','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $reference_number ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Application Identifier','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $application_identifier ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Card Payment UUID','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $card_payment_uuid ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Card Payment Entry Mode','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $card_payment_entry_mode ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Tracking ID','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $tracking_id ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Checkout UUID','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $checkout_uuid ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Card Holder Verification Method','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $card_holder_verification_method ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Application Name','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $application_name ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Authorization Code','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $authorization_code ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Card Type','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $card_type ); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Card Hase','usb-swiper'); ?></th>
+                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $card_hase ); ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <?php
+    } elseif( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
         <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 20px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
