@@ -1304,7 +1304,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 	        if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
 		        $result_status = !empty( $response['result_status'] ) ? $response['result_status'] : '';
-		        update_post_meta( $transaction_id, '_payment_refund_response', $response );
+
+		        $payment_refund_response = get_post_meta( $transaction_id, '_payment_refund_response',  true);
+
+		        $refund_response = $response;
+		        if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
+			        $refund_response = array_merge( $response, $payment_refund_response);
+		        }
+
+		        update_post_meta( $transaction_id, '_payment_refund_response', $refund_response );
 
 		        if( !empty( $result_status ) && strtolower( $result_status ) === 'completed'  ) {
 
@@ -3696,7 +3704,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        
 	        if( is_wc_endpoint_url('vt-zettle') ) {
                 
-                if( !empty( $_POST['action'] && 'vt-zettle-form' === $_POST['action'] ) && !empty( $_POST['_nonce'] ) && wp_verify_nonce( $_POST['_nonce'], 'vt-zettle-form-nonce') ) {
+                if( !empty( $_POST['action'] ) && 'vt-zettle-form' === $_POST['action'] && !empty( $_POST['_nonce'] ) && wp_verify_nonce( $_POST['_nonce'], 'vt-zettle-form-nonce') ) {
 	                
 	                $get_setting_fields = UsbSwiperZettle::get_setting_fields();
 	                

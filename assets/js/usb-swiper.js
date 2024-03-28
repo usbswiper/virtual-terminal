@@ -98,9 +98,10 @@ jQuery( document ).ready(function( $ ) {
 
                         const socket = new WebSocket( response.data.websocket_url );
 
-                        if( socket.readyState === WebSocket.OPEN ) {
+                        if( 1 === WebSocket.OPEN ) {
 
                             socket.addEventListener('open', (event) => {
+                                console.log(payment_request);
                                 socket.send(payment_request);
                             });
 
@@ -593,7 +594,7 @@ jQuery( document ).ready(function( $ ) {
 
                     const socket = new WebSocket( response.data.websocket_url );
 
-                    if( socket.readyState === WebSocket.OPEN ) {
+                    if( 1 === WebSocket.OPEN ) {
 
                         add_zettle_notification(response.data.refund_request_message, notificationObj);
                         notificationWrap.show();
@@ -1210,6 +1211,8 @@ function autoSessionLogOut() {
 function add_zettle_notification( message, currentObj ) {
     currentObj.children('li').removeClass('active');
     currentObj.append('<li class="active">'+message+'</li>');
+
+    currentObj.scrollTop(currentObj[0].scrollHeight);
 }
 
 function remove_zettle_notification(currentObj){

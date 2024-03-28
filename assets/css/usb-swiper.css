@@ -284,7 +284,7 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 .input-field-wrap.vt-check-wrap .checkmark-container input {height: 20px;width: 20px;cursor: pointer;margin: 0;}
 .input-field-wrap.vt-check-wrap label.checkbox-label {display: inline-flex;order: 2;}
 .vt-col-pay-with-zettle .zettle-response, .zettle-refund-response {display: none;margin: 10px 0;text-align: left;}
-.vt-col-pay-with-zettle .zettle-response ul, .zettle-refund-response ul {padding: 0 !important;list-style: none !important;}
+.vt-col-pay-with-zettle .zettle-response ul, .zettle-refund-response ul {padding: 0 !important;list-style: none !important;max-height: 300px;overflow: scroll;}
 .vt-col-pay-with-zettle .zettle-response ul li, .zettle-refund-response ul li {padding-left: 15px;line-height: 1;position: relative;margin-bottom: 15px;}
 .vt-col-pay-with-zettle .zettle-response ul li:last-child, .zettle-refund-response ul li:last-child{margin-bottom: 0;}
 .vt-col-pay-with-zettle .zettle-response ul li:before, .zettle-refund-response ul li:before{content: "";width: 10px;height: 10px;background: #CCC;position: absolute;left: 0;border-radius: 100%;top: 2px;}
