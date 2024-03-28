@@ -83,7 +83,7 @@ class UsbSwiperZettle {
 		
 		$api_create_link = add_query_arg(
 			[
-				'name' => 'UsbSwiper integration',
+				'name' => __( 'UsbSwiper integration', 'usb-swiper' ),
 				'scopes' => implode(
 					'%20',
 					self::$scopes
@@ -269,8 +269,8 @@ class UsbSwiperZettle {
 		$interval = $date1->diff($date2);
 		$difference = $interval->s + ($interval->i * 60) + ($interval->h * 3600) + ($interval->d * 86400);
 		
-		if( $difference >= 7200 ){
-			$response = self::generate_refresh_token($refresh_token);
+		if( $difference >= 7200 ) {
+			$response = self::generate_refresh_token( $refresh_token );
 			$access_token = !empty( $response['access_token'] ) ? $response['access_token'] : '';
 		}
 		
@@ -428,19 +428,23 @@ class UsbSwiperZettle {
 			$body = wp_remote_retrieve_body($response);
 			$body_data = json_decode($body, true);
 		}
-		
+
 		$token_response = [
 			'status' => $status_code,
 			'access_token' => !empty( $body_data['access_token'] ) ? $body_data['access_token'] : '',
 			'refresh_token' => !empty( $body_data['refresh_token'] ) ? $body_data['refresh_token'] : '',
 			'time' => current_time('mysql'),
 		];
-		
+
 		if( !empty( $token_response ) && (int) $token_response['status'] == 200 ) {
+
 			update_user_meta( get_current_user_id(), 'usb_swiper_zettle_token', $token_response );
+			return $token_response;
+		} else {
+			delete_user_meta( get_current_user_id(), 'usb_swiper_zettle_token' );
 		}
 		
-		return $token_response;
+		return [];
 	}
 	
 	/**
@@ -689,6 +693,14 @@ class UsbSwiperZettle {
 		];
 	}
 
+	/**
+     * Get request uuid.
+     *
+     * @since 2.3.4
+     *
+	 * @param int $transaction_id Get transaction id.
+	 * @return string
+	 */
 	public static function get_request_uuid( $transaction_id ) {
 
 		return strtolower( sprintf(
@@ -701,6 +713,14 @@ class UsbSwiperZettle {
 		) );
 	}
 
+	/**
+     * Get transaction id from message id.
+     *
+     * @since 2.3.4
+     *
+	 * @param string $message_id Get message id.
+	 * @return false|int
+	 */
 	public static function get_transaction_id_from_message_id( $message_id ) {
 
 		if ( empty( $message_id ) ) {
@@ -712,6 +732,14 @@ class UsbSwiperZettle {
 		return !empty( $message[1] ) ? (int) $message[1] : 0;
 	}
 
+	/**
+     * Get Zettle payment request.
+     *
+	 * @param string $websocket_url Get websocket url.
+	 * @param array $args Get payment request arguments.
+	 * @return array
+	 * @throws Exception
+	 */
 	public static function payment_request( $websocket_url, $args = [] ) {
 		
 		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
@@ -743,6 +771,14 @@ class UsbSwiperZettle {
 		];
 	}
 
+	/**
+     * Get Zettle refund payment request.
+     *
+	 * @param string $websocket_url Get websocket url.
+	 * @param array $args Get payment request arguments.
+	 * @return array
+	 * @throws Exception
+	 */
 	public static function refund_payment_request( $websocket_url, $args = [] ) {
 
 		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
@@ -777,7 +813,7 @@ class UsbSwiperZettle {
 	/**
 	 * Add zettle request and response logs.
 	 *
-	 * @param array $response Get zettle api response
+	 * @param array|object $response Get zettle api response
 	 * @param string $url Get url.
 	 * @param array|string $request Get api request
 	 * @param string $action_name Get action name
@@ -858,5 +894,61 @@ class UsbSwiperZettle {
 		} catch (Exception $ex) {
 		
 		}
+	}
+
+	/**
+	 * Get the refund html.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $transaction_id get transaction id
+	 * @return false|string
+	 */
+	public static function get_refund_html( $transaction_id ) {
+
+		$refund_html = '';
+
+		if( !empty( $transaction_id ) && $transaction_id > 0 ) {
+
+			$refund_response = get_post_meta( $transaction_id, '_payment_refund_response', true);
+
+			if( !empty( $refund_response ) && is_array( $refund_response ) ) {
+
+				ob_start();
+				?>
+				<h2 class="transaction-details__title" style="font-size: 1.625rem;padding: 10px 0;"><?php _e('Refund Details','usb-swiper'); ?></h2>
+				<table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table refund_details">
+					<thead>
+					<tr>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-id"><?php _e('ID','usb-swiper'); ?></th>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-amount"><?php _e('Amount','usb-swiper'); ?></th>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-date"><?php _e('Date','usb-swiper'); ?></th>
+					</tr>
+					</thead>
+					<tbody>
+					<?php
+					foreach ( $refund_response as $key => $payment_refund ) {
+
+						$result_payload = !empty( $payment_refund['result_payload'] ) ? $payment_refund['result_payload'] : '';
+
+						$amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? usbswiper_convert_zettle_amount($result_payload->REFUNDED_AMOUNT) : 0;
+						$transaction_id = !empty( $result_payload->TRANSACTION_ID ) ? $result_payload->TRANSACTION_ID : '';
+						?>
+						<tr>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $transaction_id ) ? $transaction_id : ''; ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $amount ) ? wc_price( $amount ) : 0; ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['create_time'] ) ? date('Y/m/d g:i a', strtotime($payment_refund['create_time'])) : '' ?></td>
+						</tr>
+						<?php
+					}
+					?>
+					</tbody>
+				</table>
+				<?php
+				$refund_html = ob_get_contents();
+				ob_get_clean();
+			}
+		}
+		return $refund_html;
 	}
 }

@@ -58,7 +58,7 @@ if( $has_transactions ) : ?>
                             $unique_id = usb_swiper_unique_id( array(
                                'type' => $payment_action,
                                'transaction_id' => $id,
-                               'paypal_transaction_id' => $payment_response['id'],
+                               'paypal_transaction_id' => !empty( $payment_response['id'] ) ? $payment_response['id'] : '',
                                'nonce' => wp_create_nonce('authorize-transaction-capture')
                             ));
                             ?>

@@ -471,7 +471,10 @@ jQuery( document ).ready(function( $ ) {
         }
     }
 
-    render_cc_form();
+    var VtForm = $('form#ae-paypal-pos-form');
+    if( undefined !== VtForm && VtForm.length > 0 ) {
+        render_cc_form();
+    }
 
     const usb_swiper_add_loader = ( current_obj) => {
         current_obj.append('<span class="vt-loader"></span>');
@@ -568,6 +571,8 @@ jQuery( document ).ready(function( $ ) {
         $('.refund-form-wrap').hide();
     });
 
+
+
     $( "#vt_refund_form" ).submit(function( event ) {
         var form = $(this);
         var form_id = form.attr('id');
@@ -600,6 +605,7 @@ jQuery( document ).ready(function( $ ) {
                         notificationWrap.show();
 
                         socket.addEventListener('open', (event) => {
+                            console.log(refund_request);
                             socket.send(refund_request);
                         });
 
@@ -610,8 +616,8 @@ jQuery( document ).ready(function( $ ) {
                                 var data = JSON.parse( event.data );
                                 var messageData = JSON.parse(data.message);
 
-                                if( messageData.payment_progress !== '' && undefined !== messageData.payment_progress ) {
-                                    add_zettle_notification(messageData.payment_progress, notificationObj);
+                                if( messageData.refund_progress !== '' && undefined !== messageData.refund_progress ) {
+                                    add_zettle_notification(messageData.refund_progress, notificationObj);
                                 } else if( messageData.type === 'refund_result_response' && messageData.result_status === 'failed' ) {
                                     add_zettle_notification(messageData.result_error_message, notificationObj);
                                 }
@@ -1112,6 +1118,7 @@ jQuery( document ).ready(function( $ ) {
                 data: jQuery('#'+form_id).serialize()+"&action=vt_zettle_pair_reader",
             }).done(function ( response ) {
                 if(response.status) {
+                    set_notification(response.message);
                     location.reload();
                 } else {
                     set_notification(response.message, 'error', response.message_type);

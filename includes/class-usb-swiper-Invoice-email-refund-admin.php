@@ -26,7 +26,7 @@ class UsbSwiperInvoiceEmailRefundedAdmin extends WC_Email {
 
         // these are the default heading and subject lines that can be overridden using the settings
         $this->heading = __( '{#transaction_type#} {#invoice_number#} refunded', 'usb-swiper' );
-        $this->subject = __( 'Your {#transaction_type#} {#invoice_number#} has been refunded', 'usb-swiper');
+        $this->subject = __( '{#transaction_type#} {#invoice_number#} has been refunded', 'usb-swiper');
 
         // these define the locations of the templates that this email should use
         $this->template_base  = USBSWIPER_PATH . 'templates/';

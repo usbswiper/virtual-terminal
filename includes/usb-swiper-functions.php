@@ -1300,6 +1300,14 @@ function get_total_refund_amount( $transaction_id ) {
 	return !empty( $remaining_amount ) ? number_format( $remaining_amount, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'] ) : '';
 }
 
+/**
+ * Manage price format.
+ *
+ * @since 2.3.4
+ *
+ * @param float $price Get Price.
+ * @return float|string
+ */
 function usbswiper_get_price_format( $price ) {
 
 	$args = array(
@@ -1531,6 +1539,7 @@ function usbswiper_get_brand_name() {
 	$company_name = get_user_meta( get_current_user_id(),'brand_name', true);
 	return !empty( $company_name ) ? $company_name : get_bloginfo('name');
 }
+
 /**
  * Get the brand logo.
  *
@@ -2400,6 +2409,14 @@ function usbswiper_get_user_date_i18n( $user_id = 0, $is_timezone = false ) {
     return !empty( $date ) ? $date : '';
 }
 
+/**
+ * Get zettle transaction tip amount.
+ *
+ * @since 2.3.4
+ *
+ * @param int $transaction_id Get transaction id.
+ * @return float|int|string
+ */
 function usbswiper_get_zettle_transaction_tip_amount( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -2419,6 +2436,14 @@ function usbswiper_get_zettle_transaction_tip_amount( $transaction_id ) {
 	return $tip_amount;
 }
 
+/**
+ * Get zettle transaction grand total amount.
+ *
+ * @since 2.3.4
+ *
+ * @param int $transaction_id Get $transaction id.
+ * @return float|int|mixed|string
+ */
 function usbswiper_get_zettle_transaction_total( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -2446,6 +2471,14 @@ function usbswiper_get_zettle_transaction_total( $transaction_id ) {
     return $grand_total;
 }
 
+/**
+ * Get zettle transaction tracking id.
+ *
+ * @since 2.3.4
+ *
+ * @param int $transaction_id Get $transaction id.
+ * @return string
+ */
 function usbswiper_get_zettle_tracking_id( $transaction_id ) {
 
 	if( empty( $transaction_id ) ) {
@@ -2462,4 +2495,17 @@ function usbswiper_get_zettle_tracking_id( $transaction_id ) {
 	}
 
     return $tracking_id;
+}
+
+/**
+ * Convert zettle amount to display amount.
+ *
+ * @since 2.3.4
+ *
+ * @param float $amount Get amount.
+ * @return float|int
+ */
+function usbswiper_convert_zettle_amount( $amount ) {
+
+    return !empty( $amount ) ? $amount / 100 : 0;
 }

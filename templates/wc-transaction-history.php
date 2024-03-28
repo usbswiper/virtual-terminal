@@ -513,12 +513,15 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     <?php } ?>
 
     <div class="refund-details transaction-history-field" style="width: 100%;float: left;display: block;margin: 0 0 10px 0;padding: 0;">
-        <?php if( !empty( $payment_refunds ) && is_array($payment_refunds)) {
+        <?php if( !empty( $payment_refunds ) && is_array($payment_refunds) && !empty( $transaction_type ) && strtolower($transaction_type) !== 'zettle') {
             if( !class_exists('Usb_Swiper_Paypal_request') ) {
                 include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
             }
             $Paypal_request = new Usb_Swiper_Paypal_request();
             echo $Paypal_request->get_refund_html($transaction_id);
+        } elseif ( !empty( $transaction_type ) && strtolower($transaction_type) === 'zettle' ) {
+
+            echo UsbSwiperZettle::get_refund_html( $transaction_id );
         } ?>
     </div>
     <?php if( !$is_email ) { ?>

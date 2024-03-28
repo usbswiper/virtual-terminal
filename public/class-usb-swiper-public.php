@@ -1029,9 +1029,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	                        ], 200 );
 
                         } elseif ( !empty( $_POST['action'] ) && 'zettle_refund_payment_response' === $_POST['action'] ) {
-
-	                        $transaction_id = !empty( $_POST['message_id'] ) ? UsbSwiperZettle::get_transaction_id_from_message_id( $_POST['message_id'] ) : '';
-
 	                        $this->handle_zettle_refund_payment_response();
                         } else {
 	                        $this->handle_zettle_payment_response();
@@ -1296,20 +1293,23 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        $message = __( 'Something went wrong. Please try again.','usb-swiper');
 	        $message_type = 'error';
 	        $redirect_url = '';
+	        $refund_response = [];
 
 	        $transaction_id = !empty( $_POST['message_id'] ) ? UsbSwiperZettle::get_transaction_id_from_message_id( $_POST['message_id'] ) : '';
 	        $response = !empty( $_POST['response'] ) ? (array) json_decode( stripslashes( $_POST['response'] ) ) : [];
 
 	        UsbSwiperZettle::add_log( $response, '', '','websocket_payment_response', $transaction_id );
 
-	        if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
+	        if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_refund_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
 		        $result_status = !empty( $response['result_status'] ) ? $response['result_status'] : '';
 
 		        $payment_refund_response = get_post_meta( $transaction_id, '_payment_refund_response',  true);
 
-		        $refund_response = $response;
+		        $response['create_time'] = current_time('mysql');
+
+		        $refund_response[] = $response;
 		        if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
-			        $refund_response = array_merge( $response, $payment_refund_response);
+			        $refund_response = array_merge( $refund_response, $payment_refund_response);
 		        }
 
 		        update_post_meta( $transaction_id, '_payment_refund_response', $refund_response );
@@ -1328,6 +1328,45 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     }
 
 			        update_post_meta($transaction_id, '_payment_status', strtoupper( $payment_status ) );
+
+			        $billing_email = get_post_meta( $transaction_id,'BillingEmail', true);
+			        $billing_first_name = get_post_meta( $transaction_id,'BillingFirstName', true);
+			        $attachment = apply_filters( 'usb_swiper_email_attachment', '', $transaction_id );
+
+			        $customer_email = WC()->mailer()->emails['payment_email_refund'];
+			        $customer_email->recipient = $billing_email;
+			        $customer_email->heading = __( '{#transaction_type#} Transaction {#transaction_id#} refunded', 'usb-swiper' );
+			        $customer_email->subject = __( 'Your {#transaction_type#} Transaction {#transaction_id#} has been refunded', 'usb-swiper');
+			        $customer_email->trigger([
+				        'transaction_id' => $transaction_id,
+				        'email_args' => [
+					        'invoice' => false,
+					        'display_name' => wp_strip_all_tags($billing_first_name)
+				        ],
+				        'attachment' => [ $attachment ],
+                    ]);
+
+			        $get_recipient = '';
+			        $author_id = get_post_field( 'post_author', $transaction_id );
+			        $author_id = ! empty( $author_id ) ? $author_id : 1;
+			        $current_user = get_user_by('id', $author_id );
+			        $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
+			        if( true !== (bool)$ignore_email ){
+				        $get_recipient = $current_user->user_email;
+			        }
+
+			        $admin_email = WC()->mailer()->emails['payment_email_refund_admin'];
+			        $admin_email->recipient = $get_recipient;
+			        $admin_email->heading = __( '{#transaction_type#} Transaction {#transaction_id#} refunded', 'usb-swiper' );
+			        $admin_email->subject = __( '{#transaction_type#} Transaction {#transaction_id#} has been refunded', 'usb-swiper');
+
+			        $admin_email->trigger( [
+				        'transaction_id' => $transaction_id,
+				        'email_args' => [
+					        'invoice' => false,
+					        'display_name' => wp_strip_all_tags($billing_first_name)
+                        ],
+                    ]);
 
 			        $redirect_url = esc_url(wc_get_endpoint_url('view-transaction', $transaction_id, wc_get_page_permalink('myaccount')));
 		        }  else {
@@ -2410,6 +2449,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                         'invoice' => true,
                                         'display_name' => wp_strip_all_tags($BillingFirstName)
                                     );
+
                                     $customer_email = WC()->mailer()->emails['payment_email_refund'];
                                     $customer_email->recipient = $BillingEmail;
                                     $customer_email->trigger( array(
@@ -3177,7 +3217,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @param string $string
          * @param object $data
-         * @return array|mixed|string|string[]
+         * @return array|string|string[]
          */
         public function format_email_subject_and_heading( $string, $data ) {
 
@@ -3188,7 +3228,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 if( 'invoice' === strtolower( $transaction_type ) ){
                     $user_invoice_id = get_post_meta( $transaction_id,'_user_invoice_id', true );
-                    $string  = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
+                    $string = str_replace('{#invoice_number#}', '#'.$user_invoice_id, $string );
+                } else {
+	                $string = str_replace('{#invoice_number#}', '#'.$transaction_id, $string );
                 }
 
 				$author_id = get_post_field( 'post_author', $transaction_id );
@@ -3545,7 +3587,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
-         * Add tax rules on the my account page.
+         * Add tax rules on my-account page.
          *
          * @return void
          */
@@ -3692,13 +3734,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'zettle_token' => UsbSwiperZettle::get_token_data(),
             ]);
         }
-		
+
 		/**
          * Manage zettle settings.
          *
          * @since 2.3.4
          *
 		 * @return void
+		 * @throws Exception
 		 */
         public function manage_zettle_settings() {
 	        
@@ -3745,13 +3788,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        exit();
 	        }
         }
-		
+
 		/**
          * Disconnect zettle application.
          *
          * @since 2.3.4
          *
 		 * @return void
+		 * @throws Exception
 		 */
         public function disconnect_zettle_app() {
 	        
@@ -3761,15 +3805,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        exit();
 	        }
         }
-		
+
 		/**
          * Unpairing zettle device.
          *
          * @since 2.3.4
          *
 		 * @return void
+		 * @throws Exception
 		 */
-        public function unpairing_zettle_device()  {
+		public function unpairing_zettle_device()  {
 	        
 	        if( is_wc_endpoint_url('vt-zettle') && is_user_logged_in() && !empty( $_GET['unpairing'] ) ) {
 		        
@@ -3787,13 +3832,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
 	        }
         }
-		
+
 		/**
          * Pair zettle device using code and device name.
          *
          * @since 2.3.4
          *
 		 * @return void
+		 * @throws Exception
 		 */
         public function vt_zettle_pair_reader() {
          
@@ -3815,7 +3861,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     
                     if( !empty( $response['status'] ) && 200 === (int) $response['status'] ) {
 	                    $status = true;
-                        $data = !empty( $response['data'] ) ? $response['data'] : '';
+                        $data = !empty( $response['data'] ) ? $response['data'] : [];
 	                    $data['zettle_pair_reader_code'] = $reader_code;
 	                    $data['zettle_pair_reader_device_name'] = $reader_device_name;
                         update_user_meta( get_current_user_id(),  'usb_swiper_zettle_reader_data', $data );
