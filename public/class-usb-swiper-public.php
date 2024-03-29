@@ -1317,13 +1317,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        if( !empty( $result_status ) && strtolower( $result_status ) === 'completed'  ) {
 
 			        $status = true;
-
-			        $result_payload = !empty( $response['result_payload'] ) ? $response['result_payload'] : '';
-                    $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
-                    $original_amount = !empty( $result_payload->ORIGINAL_AMOUNT ) ? $result_payload->ORIGINAL_AMOUNT : 0;
+                    $refund_amount = usbswiper_get_zettle_transaction_refund_total( $transaction_id );
+                    $original_amount = usbswiper_get_zettle_transaction_total($transaction_id);
 
                     $payment_status = 'partially_refunded';
-                    if( $original_amount == $refund_amount ) {
+                    if( $refund_amount >= $original_amount ) {
 	                    $payment_status = 'refunded';
                     }
 

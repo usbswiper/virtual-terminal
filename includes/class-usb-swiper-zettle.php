@@ -755,7 +755,7 @@ class UsbSwiperZettle {
 				'access_token' => self::get_access_token(),
 				'expires_at' => time() + ( 60 * 5 ),
 				'internal_trace_id' => $get_request_uuid,
-				'amount' => !empty( $amount ) ? (int) ( $amount * 100 ) : 0,
+				'amount' => !empty( $amount ) ? (int) round( $amount * 100 ) : 0,
 				'tipping_type' => !empty( $args['tipping'] ) ? 'DEFAULT' : 'NONE',
 			])
 		]);
@@ -795,7 +795,7 @@ class UsbSwiperZettle {
 				'expires_at' => time() + ( 60 * 5 ),
 				'refund_trace_id' => $get_request_uuid,
 				'payment_trace_id' => usbswiper_get_zettle_tracking_id( $transaction_id ),
-				'refund_amount' => !empty( $amount ) ? (int) ( $amount * 100 ) : 0,
+				'refund_amount' => !empty( $amount ) ? (int)   round( $amount * 100 ) : 0,
 			])
 		]);
 

@@ -1256,11 +1256,17 @@ function get_total_refund_amount( $transaction_id ) {
 	    $GrandTotal = usbswiper_get_zettle_transaction_total( $transaction_id );
 	    $payment_refund_response = get_post_meta( $transaction_id,'_payment_refund_response', true);
 
-	    $result_payload = !empty( $payment_refund_response['result_payload'] ) ? $payment_refund_response['result_payload'] : '';
-	    $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
-	    $original_amount = !empty( $result_payload->ORIGINAL_AMOUNT ) ? $result_payload->ORIGINAL_AMOUNT : 0;
+	    $total_refund_amount = 0;
+        if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
 
-	    $total_refund_amount = $refund_amount/100;
+            foreach ( $payment_refund_response as $key => $refund_response ) {
+
+                $result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
+	            $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
+	            $refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
+	            $total_refund_amount =  $total_refund_amount + $refund_amount;
+            }
+        }
 
 	    $remaining_amount = $GrandTotal - $total_refund_amount;
     } else {
@@ -2508,4 +2514,35 @@ function usbswiper_get_zettle_tracking_id( $transaction_id ) {
 function usbswiper_convert_zettle_amount( $amount ) {
 
     return !empty( $amount ) ? $amount / 100 : 0;
+}
+
+/**
+ * Get zettle transaction refund total.
+ *
+ * @since 2.3.4
+ *
+ * @param int $transaction_id Get transaction id.
+ * @return float|int|mixed $total_refund_amount
+ */
+function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
+
+	if( empty( $transaction_id ) ) {
+		return 0;
+	}
+
+	$payment_refund_response = get_post_meta( $transaction_id,'_payment_refund_response', true);
+
+	$total_refund_amount = 0;
+	if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
+
+		foreach ( $payment_refund_response as $key => $refund_response ) {
+
+			$result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
+			$refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
+			$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
+			$total_refund_amount =  $total_refund_amount + $refund_amount;
+		}
+	}
+
+    return $total_refund_amount;
 }

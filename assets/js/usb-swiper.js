@@ -565,7 +565,7 @@ jQuery( document ).ready(function( $ ) {
         updateGrandTotal();
     });
 
-    $(document).on('click','.cancel-refund', function (event) {
+    $(document).on('click','.refund-form-wrap .cancel-refund', function (event) {
         event.preventDefault();
         $('.transaction-refund').show();
         $('.refund-form-wrap').hide();
@@ -1041,6 +1041,14 @@ jQuery( document ).ready(function( $ ) {
     $(document).on("click",".vt-refund-popup-wrapper .cancel-refund,.vt-refund-popup-wrapper  .close a",function(){
         $('.vt-refund-popup-wrapper .capture-transaction').attr('href',"javascript:void(0);");
         $(".vt-refund-popup-wrapper").hide();
+
+        var form = jQuery('#vt_refund_form');
+        var submitButton = form.find('.confirm-transaction-refund');
+        usb_swiper_remove_loader(submitButton);
+
+        var zettleResponse = jQuery('.zettle-refund-response');
+        zettleResponse.find('ul li').remove();
+        zettleResponse.hide();
     });
 
     $(document).on("focusout",".input-field-wrap.product .vt-product-input", function (){
