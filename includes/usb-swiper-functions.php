@@ -2474,7 +2474,7 @@ function usbswiper_get_zettle_transaction_total( $transaction_id ) {
 	    }
     }
 
-    return $grand_total;
+    return !empty( $grand_total ) ?  trim( $grand_total ) : 0;
 }
 
 /**
@@ -2544,5 +2544,5 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 		}
 	}
 
-    return $total_refund_amount;
+    return !empty( $total_refund_amount ) ? trim($total_refund_amount) : 0;
 }
