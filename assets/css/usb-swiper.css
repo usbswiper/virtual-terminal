@@ -324,10 +324,11 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
     .vt-row {flex-direction: column;padding: 0 20px;}
     .invoice-content-main-wrap .d-flex {flex-direction: column;}
     .invoice-content-main-wrap .invoice-wrap,.invoice-content-main-wrap .paypal-payment, .vt-row .vt-col-60,.vt-row .vt-col-40 {width: 100% !important;}
-    .vt-row .vt-col-40 {margin: 20px 0;}
+    .vt-row .vt-col-40 {margin: 0 0 20px 0;}
     .vt-row .vt-col {margin: 0;width: 100%}
     .vt-form-contents .vt-col.vt-col-100.vt-col-payments.pay-with-paypal.fixed,.invoice-content-main-wrap .vt-form-contents .vt-col.vt-col-100.vt-col-payments.fixed {position: unset;width: 100%; margin: 10px 0;}
-    .invoice-content-main-wrap .vt-payment-wrapper.fixed, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper.fixed {position: unset;width: 100%; margin: 20px 0 0 0;}
+    .invoice-content-main-wrap .vt-payment-wrapper.fixed, .vt-form-contents .vt-row .vt-col-40 .vt-payment-wrapper.fixed {position: unset;width: 100%; margin: 0 0 0 0;}
+    .vt-row .vt-payment-wrapper .vt-col {margin-left: 0;}
     .vt-fields-wrap .input-field-wrap .vt-input-field {margin: 0;width: 100%;}
     .vt-row fieldset {width: 100%;}
     .vt-form-contents .paypal-payment {padding: 0;}
@@ -373,5 +374,4 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .date-range-label {margin-right: 0;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .vt-date-field {width: 100%;}
     .transaction-filter-form .transaction-filter-wrap .date-field-wrap .start-date {margin-right: 0;}
-
 }
