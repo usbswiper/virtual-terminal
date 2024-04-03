@@ -22,7 +22,8 @@ if( true === $profile_status && !empty($merchant_id)) {
             <div class="vt-row">
                 <div class="vt-col vt-col-60 vt-col-form-fields">
                     <fieldset>
-                        <label><?php _e('Currency Information','usb-swiper'); ?><span class="tool" data-tip="<?php _e('Zettle is only available for use with USD transactions.','usb-swiper'); ?>" tabindex="1">?</span></label>
+                        <label><?php _e('Currency Information','usb-swiper'); ?></label>
+                        <p class="description"><?php _e('Zettle transactions can only be processed in US dollars.','usb-swiper'); ?></p>
                         <div class="vt-fields-wrap">
                             <?php echo usb_swiper_get_html_field( array(
                                 'type' => 'select',

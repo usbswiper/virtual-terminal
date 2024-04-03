@@ -291,6 +291,7 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 .vt-col-pay-with-zettle .zettle-response ul li:before, .zettle-refund-response ul li:before{content: "";width: 10px;height: 10px;background: #CCC;position: absolute;left: 0;border-radius: 100%;top: 2px;}
 .vt-col-pay-with-zettle .zettle-response ul li.active, .zettle-refund-response ul li.active{font-weight: bold;}
 .vt-col-pay-with-zettle .zettle-response ul li.active:before, .zettle-refund-response ul li.active:before{background: #3f76ea;}
+.vt-form-contents p.description {color: red;font-size: 12px;margin-top: 5px;}
 
 @media print {
     body{line-height: 1.2 !important;}
