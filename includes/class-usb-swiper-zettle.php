@@ -83,7 +83,7 @@ class UsbSwiperZettle {
 		
 		$api_create_link = add_query_arg(
 			[
-				'name' => __( 'UsbSwiper integration', 'usb-swiper' ),
+				'name' => __( 'USBSwiper Integration', 'usb-swiper' ),
 				'scopes' => implode(
 					'%20',
 					self::$scopes
@@ -174,7 +174,7 @@ class UsbSwiperZettle {
 		
 		return apply_filters( 'usb_swiper_zettle_setting_fields', $get_fields, $type );
 	}
-	
+
 	/**
 	 * Get settings values.
 	 *
