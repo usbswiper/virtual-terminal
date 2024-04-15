@@ -3,7 +3,7 @@
  * Plugin Name: USBSwiper Hosted Virtual Terminal
  * Plugin URI: http://store.usbswiper.com/
  * Description: Create PayPal transaction using swiper or manually and manage transactions.
- * Version: 2.3.4
+ * Version: 3.0.0
  * Author:  USBSwiper
  * Author URI:  http://store.usbswiper.com/
  * License: GNU General Public License v3.0
@@ -11,7 +11,7 @@
  * Text Domain: usb-swiper
  * Domain Path: /languages
  *
- * Tested up to: 6.4.2
+ * Tested up to: 6.5.2
  */
 
 // If this file is called directly, abort.
@@ -26,7 +26,7 @@ if ( ! defined( 'USBSWIPER_PLUGIN_NAME' ) ) {
 
 //Define plugin version.
 if ( ! defined( 'USBSWIPER_VERSION' ) ) {
-	define( 'USBSWIPER_VERSION', '2.3.4' );
+	define( 'USBSWIPER_VERSION', '3.0.0' );
 }
 
 // Define plugin dir.
