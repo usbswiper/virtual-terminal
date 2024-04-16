@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.2
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 3.0.1 =
+Feature - Added Zettle transactions supported currency notice.
 
 = 3.0.0 =
 Feature - Added Zettle Integration.
