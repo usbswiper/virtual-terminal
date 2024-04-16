@@ -571,8 +571,6 @@ jQuery( document ).ready(function( $ ) {
         $('.refund-form-wrap').hide();
     });
 
-
-
     $( "#vt_refund_form" ).submit(function( event ) {
         var form = $(this);
         var form_id = form.attr('id');
@@ -1135,6 +1133,24 @@ jQuery( document ).ready(function( $ ) {
             });
         }
     });
+
+    $(document).on('click','.notice-cancel-btn', function (event) {
+        event.preventDefault();
+        const currentObj = $(this);
+        usb_swiper_add_loader(currentObj);
+        jQuery.ajax({
+            url: usb_swiper_settings.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: "action=disable_vt_form_warning",
+        }).done(function ( response ) {
+            if( response.status ) {
+                $(".warning-description").hide();
+                usb_swiper_remove_loader(currentObj);
+            }
+        });
+    });
+
 });
 
 function removeInterval( LoaderInterval ) {
