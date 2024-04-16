@@ -38,10 +38,10 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Changelog ==
 
 = 3.0.1 =
-Feature - Added Zettle transactions supported currency notice.
+* Feature - Added Zettle transactions supported currency notice.
 
 = 3.0.0 =
-Feature - Added Zettle Integration.
+* Feature - Added Zettle Integration.
 
 = 2.3.4 =
 * Feature - Added option for merchant to set time zone in the profile / dashboard.
