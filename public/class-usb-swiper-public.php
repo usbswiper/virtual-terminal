@@ -3880,5 +3880,24 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        )
 	        );
         }
+
+		/**
+         * Disable vt form zettle warning.
+         *
+		 * @return void
+         * @since 3.0.1
+		 */
+		public function disable_vt_form_warning() {
+
+            $status = false;
+			if( is_user_logged_in() ) {
+				$status = true;
+				update_user_meta( get_current_user_id(), 'usb_swiper_vt_notice', 1 );
+			}
+
+			wp_send_json([
+				'status' => $status,
+            ]);
+		}
     }
 }

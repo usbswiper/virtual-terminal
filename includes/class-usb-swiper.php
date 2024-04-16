@@ -224,6 +224,7 @@ class Usb_Swiper {
         $this->loader->add_action( 'init', $plugin_public, 'handle_default_tax' );
 		$this->loader->add_action( 'wp_ajax_delete_tax_data', $plugin_public, 'vt_delete_tax_data');
 		$this->loader->add_action( 'wp_ajax_vt_zettle_pair_reader', $plugin_public, 'vt_zettle_pair_reader');
+		$this->loader->add_action( 'wp_ajax_disable_vt_form_warning', $plugin_public, 'disable_vt_form_warning');
 		
 		if (!is_admin()) {
 			return;
