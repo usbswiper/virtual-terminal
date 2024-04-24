@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.2
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,10 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 3.0.2 =
+* Feature - Added credit card AVS and CVV2 result Codes on the transaction details page.
+* Fix - Display only merchant transaction instead of all accounts in transactions search.
 
 = 3.0.1 =
 * Feature - Added Zettle transactions supported currency notice.
