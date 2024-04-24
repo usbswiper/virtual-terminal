@@ -439,7 +439,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'post_status' => ['publish','future'],
                     'posts_per_page' => !empty( get_option( 'posts_per_page' ) ) ? get_option( 'posts_per_page' ) : 10,
                     'paged' => $current_page,
-                    'author' => get_current_user_id(),
+                    'author__in' => ( get_current_user_id() ),
                     'order' => $order,
                     'orderby' => 'date',
                     'transaction_search' => 1
@@ -550,6 +550,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             global $wpdb;
 
+            $user_id = get_current_user_id();
+
             $meta_key = '_transaction_type';
             $meta_value = '';
             if( is_wc_endpoint_url('transactions') ){
@@ -574,10 +576,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $where .= $transaction_type_query;
             }
 
+            $post_author = '';
+	        if ( is_user_logged_in() && $user_id > 0 && !current_user_can( 'administrator' ) ) {
+		        $post_author  = 'wp_posts.post_author IN ('.$user_id.') AND';
+	        }
+
             $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
             $search_term = !empty( $wp_query->get( 'search_prod_title' ) ) ? $wp_query->get( 'search_prod_title' ) : '';
             if ( '1' == $transaction_search && !empty( $search_term ) ) {
-                $where .= ' OR  ( (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\' AND '.$wpdb->posts.'.post_type=\'transactions\')' . $transaction_type_query . ' )' ;
+                $where .= ' OR  ( (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\'AND '.$post_author.$wpdb->posts.'.post_type=\'transactions\')' . $transaction_type_query . ' )' ;
             }
             return $where;
         }
