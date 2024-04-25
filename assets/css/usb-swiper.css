@@ -295,6 +295,7 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 .vt-form-contents .warning-description { position: relative;padding: 0.5rem 1.5rem 0.5rem 0.5rem;margin-top: 0.3125rem;background-color: #ffffff;border: 0.0625rem solid #bfc9d4;border-left: 0.25rem solid #dba617 ;box-shadow: 0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.04);}
 .vt-form-contents .warning-description .notice-cancel-btn { position: absolute;padding:0;top: 10px;right: 5px;border: none;margin: 0;background: 0 0;color: #787c82; }
 a.notice-cancel-btn .vt-loader {position: absolute;top: -1px;left: -1px;border-color: #4078ea;border-top-color: #FFF;width: 20px;height: 20px;}
+button[disabled] {opacity: 0.5;}
 @media print {
     body{line-height: 1.2 !important;}
     .transaction-column{width: calc(33% - 15px);}

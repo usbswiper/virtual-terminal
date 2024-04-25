@@ -41,11 +41,8 @@ class Usb_Swiper_Paypal_request{
 		$this->settings = $settings;
 		$this->is_sandbox = !empty( $settings['is_paypal_sandbox'] );
 
-        $brand_name = !empty( get_bloginfo('name') ) ? get_bloginfo('name') : "";
-		$user_brand = get_user_meta(get_current_user_id(),'brand_name', true);
-        if( !empty( $user_brand ) ) {
-			$brand_name = $user_brand;
-		}
+        $brand_name = get_user_meta(get_current_user_id(),'brand_name', true);
+        $brand_name = !empty( $brand_name ) ? esc_html($brand_name) : '';
 
 		$this->brand_name = apply_filters( 'usb_swiper_brand_name',  $brand_name);
 

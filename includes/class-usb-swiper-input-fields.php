@@ -718,7 +718,9 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			$attributes = '';
 			if( !empty($args['attributes']) && is_array($args['attributes'])) {
 				foreach ($args['attributes'] as $key => $attribute ) {
-					$attributes .= $key.'="'.$attribute.'"';
+                    if( !empty( $key ) ){
+                        $attributes .= $key.'="'.$attribute.'"';
+                    }
 				}
 			}
 

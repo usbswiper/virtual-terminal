@@ -5,6 +5,18 @@ $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
 $get_merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
 $merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
 if( true === $profile_status && !empty($merchant_id)) {
+
+    $disable_payment = '';
+
+    if( ! usbswiper_get_brand_name() ){
+        $disable_payment = 'disabled';
+        $edit_page =  wc_get_account_endpoint_url( 'edit-account' );
+        $notifications[] = [
+                'type' => 'error',
+            'message' => sprintf(__('Kindly add the Brand Name on %s to initiate the transaction.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('My account', 'usb-swiper').'</a>')
+        ];
+    }
+
 ?>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
@@ -132,6 +144,9 @@ if( true === $profile_status && !empty($merchant_id)) {
                                         'value' => __( 'Send Invoice', 'usb-swiper'),
                                         'description' => '',
                                         'class' => 'vt-button',
+                                        'attributes' => [
+                                            $disable_payment => !empty( $disable_payment ) ? true : false
+                                        ]
                                     ));
                                     ?>
                                 </div>
@@ -165,6 +180,9 @@ if( true === $profile_status && !empty($merchant_id)) {
 						                    'value' => __( 'Pay With Zettle', 'usb-swiper'),
 						                    'description' => '',
 						                    'class' => 'vt-button',
+                                            'attributes' => [
+                                                $disable_payment => !empty( $disable_payment ) ? true : false
+                                            ]
 					                    ));
 				                    ?>
                                 </div>
@@ -190,7 +208,7 @@ if( true === $profile_status && !empty($merchant_id)) {
                                     </div>
                                 </div>
                                 <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
-                                <button type="submit" class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
+                                <button type="submit" <?php echo esc_attr($disable_payment); ?> class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
                             </div>
                             <div class="usb-swiper-ppcp-cc-form"><div id="angelleye_ppcp_checkout"></div></div>
                         </div>
