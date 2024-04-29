@@ -113,7 +113,7 @@ p.signature-text{display: none;}
 .vt-product-wrapper span {color: #777777;font-size: 14px;}
 .vt-product-wrapper .close {cursor: pointer;position: absolute;height: 26px;right: 10px;top: 10px;margin: 0 auto;width: 26px;}
 .vt-product-wrapper .close a {display: block;color: #000;}
-.input-field-wrap.vt-image-upload-wrap {display: flex;flex-direction: row;max-width: 100%;flex-wrap: wrap;align-items: center;gap: 30px;justify-content: space-between;}
+.input-field-wrap.vt-image-upload-wrap {display: flex;flex-direction: row;max-width: 100%;flex-wrap: wrap;align-items: center;gap: 30px;justify-content: space-between;position: relative;}
 .input-field-wrap.vt-image-upload-wrap:has(img) {width: 100%;}
 .input-field-wrap.vt-image-upload-wrap:has(img) label{max-height: 53px;}
 .vt-upload-brand-logo-wrapper > .brand-logo-preview {position: relative;}
