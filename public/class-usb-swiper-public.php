@@ -1160,7 +1160,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 		        $tipping = UsbSwiperZettle::get_settings('enable_zettle_tipping', 'public' );
 		        if( !empty( $response_status ) && ( 200 === (int) $response_status || 201 === (int) $response_status ) ) {
-			        $websocket_url  = !empty( $response['header'] ) ? $response['header'] :  '';
+			        $websocket_url  = !empty( $response['data']['location'] ) ? $response['data']['location'] :  '';
 			        $grand_total = get_post_meta( $transaction_id, 'GrandTotal', true );
 			        $payment_request = UsbSwiperZettle::payment_request( $websocket_url, [
                         'transaction_id' => $transaction_id,
@@ -1205,7 +1205,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        $message = !empty( $response['message'] ) ? $response['message']: __('Something went wrong. Please try again', 'usb-swiper');
 
 	        if( !empty( $response_status ) && ( 200 === (int) $response_status || 201 === (int) $response_status ) ) {
-		        $websocket_url = !empty($response['header']) ? $response['header'] : '';
+		        $websocket_url = !empty($response['data']['location']) ? $response['data']['location'] : '';
 		        $payment_request = UsbSwiperZettle::refund_payment_request( $websocket_url, [
 			        'transaction_id' => $transaction_id,
 			        'reader_data' => $reader_data,
@@ -1241,7 +1241,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        UsbSwiperZettle::add_log( $response, '', '','websocket_payment_response', $transaction_id );
 
             if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
-                $result_status = !empty( $response['result_status'] ) ? $response['result_status'] : 'CREATED';
+                $result_status = !empty( $response['resultStatus'] ) ? $response['resultStatus'] : 'CREATED';
 	            update_post_meta( $transaction_id, '_payment_response', $response);
 	            update_post_meta($transaction_id, '_payment_status', strtoupper( $result_status ) );
 
@@ -1308,7 +1308,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        UsbSwiperZettle::add_log( $response, '', '','websocket_payment_response', $transaction_id );
 
 	        if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_refund_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
-		        $result_status = !empty( $response['result_status'] ) ? $response['result_status'] : '';
+		        $result_status = !empty( $response['resultStatus'] ) ? $response['resultStatus'] : '';
 
 		        $payment_refund_response = get_post_meta( $transaction_id, '_payment_refund_response',  true);
 
@@ -3828,10 +3828,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        $reader_data = UsbSwiperZettle::get_zettle_reader_data( $user_id );
                 $id =  !empty( $reader_data['id'] ) ? $reader_data['id'] : '';
 		        $response = UsbSwiperZettle::unpairing_zettle_device($id);
-                if(  !empty( $response['status'] ) && ( 200 === (int) $response['status'] || 201 === (int) $response['status'] ) ) {
-                    
-                    delete_user_meta($user_id, 'usb_swiper_zettle_reader_data');
-                    delete_user_meta($user_id, 'usb_swiper_zettle_websocket_connection_url');
+                if(  !empty( $response['status'] ) ) {
+
+	                delete_user_meta($user_id, 'usb_swiper_zettle_reader_data');
 	                wp_safe_redirect(UsbSwiperZettle::get_redirection_uri());
 	                exit();
                 }

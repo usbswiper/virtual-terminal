@@ -370,6 +370,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     if( !empty( $transaction_type ) && strtolower($transaction_type) === 'zettle' ) {
 
         $result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
+	    $result_payload = !empty( $payment_response['resultPayload'] ) ? $payment_response['resultPayload'] : $result_payload;
 
         $reference_number = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
         $application_identifier = !empty( $result_payload->APPLICATION_IDENTIFIER ) ? $result_payload->APPLICATION_IDENTIFIER : '';

@@ -97,27 +97,30 @@
                                 <tbody>
                                     <tr>
                                         <td><strong><?php esc_html_e('ID', 'usb-swiper' ); ?></strong></td>
-                                        <td><?php echo !empty( $reader_data['id'] ) ? $reader_data['id'] : ''; ?></td>
+                                        <td><?php echo !empty( $reader_data['id'] ) ? esc_html( $reader_data['id'] ) : ''; ?></td>
                                     </tr>
                                     <tr>
                                         <td><strong><?php esc_html_e('Organization Uuid', 'usb-swiper' ); ?></strong></td>
-                                        <td><?php echo !empty( $reader_data['organizationUuid'] ) ? $reader_data['organizationUuid'] : ''; ?></td>
+                                        <td><?php echo !empty( $reader_data['organizationUuid'] ) ? esc_html( $reader_data['organizationUuid'] ) : ''; ?></td>
                                     </tr>
                                     <tr>
                                         <td><strong><?php esc_html_e('Model', 'usb-swiper' ); ?></strong></td>
-                                        <td><?php echo !empty( $reader_data['readerTags']['model'] ) ? $reader_data['readerTags']['model'] : ''; ?></td>
+                                        <td><?php echo !empty( $reader_data['readerTags']['model'] ) ? esc_html( $reader_data['readerTags']['model'] ) : ''; ?></td>
                                     </tr>
                                     <tr>
                                         <td><strong><?php esc_html_e('Serial Number', 'usb-swiper' ); ?></strong></td>
-                                        <td><?php echo !empty( $reader_data['readerTags']['serial_number'] ) ? $reader_data['readerTags']['serial_number'] : ''; ?></td>
+                                        <td><?php
+                                            $serial_number = !empty( $reader_data['readerTags']['serial_number'] ) ? esc_html( $reader_data['readerTags']['serial_number'] ) : '';
+                                            echo !empty( $reader_data['readerTags']['serialNumber'] ) ? esc_html( $reader_data['readerTags']['serialNumber'] ) : $serial_number; ?>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td><strong><?php esc_html_e('Device Code', 'usb-swiper' ); ?></strong></td>
-                                        <td><?php echo !empty( $reader_data['zettle_pair_reader_code'] ) ? $reader_data['zettle_pair_reader_code'] : ''; ?></td>
+                                        <td><?php echo !empty( $reader_data['zettle_pair_reader_code'] ) ? esc_html( $reader_data['zettle_pair_reader_code'] ) : ''; ?></td>
                                     </tr>
                                     <tr>
                                         <td><strong><?php esc_html_e('Device Name', 'usb-swiper' ); ?></strong></td>
-                                        <td><?php echo !empty( $reader_data['zettle_pair_reader_device_name'] ) ? $reader_data['zettle_pair_reader_device_name'] : ''; ?></td>
+                                        <td><?php echo !empty( $reader_data['zettle_pair_reader_device_name'] ) ? esc_html( $reader_data['zettle_pair_reader_device_name'] ) : ''; ?></td>
                                     </tr>
                                 </tbody>
                             </table>
