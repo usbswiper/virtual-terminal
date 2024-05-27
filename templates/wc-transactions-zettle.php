@@ -64,7 +64,10 @@ if( $has_transactions ) : ?>
 			?>
 		</tbody>
 	</table>
-    <?php echo refund_confirmation_html(); ?>
+    <?php
+    echo refund_confirmation_html();
+	echo void_confirmation_html();
+    ?>
 	<div class="woocommerce-pagination woocommerce-pagination--without-numbers woocommerce-Pagination">
 		<?php if ( 1 !== $current_page ) :
             $next_page = $current_page - 1;

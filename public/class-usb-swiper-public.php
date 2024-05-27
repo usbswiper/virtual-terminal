@@ -932,6 +932,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			    $this->capture_authorize_transaction($_GET['unique_id']);
 			}
 
+			if( !empty( $_GET['action'] ) && 'void' === $_GET['action'] && !empty( $_GET['unique_id'] ) ) {
+
+				$this->void_authorize_transaction($_GET['unique_id']);
+			}
+
 			if( !is_user_logged_in()) {
 
 				if( !empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
@@ -3906,5 +3911,107 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				'status' => $status,
             ]);
 		}
+
+		/**
+		 * Void authorize transaction.
+		 *
+		 * @since 3.0.3
+		 *
+		 * @param string $unique_id Get transaction data.
+		 */
+        public function void_authorize_transaction( $unique_id ) {
+
+	        $data =  usb_swiper_get_unique_id_data($unique_id);
+	        $transaction_url = wc_get_endpoint_url( 'transactions' ,'');
+
+	        if( !empty( $data ) && is_array( $data) ) {
+
+		        $post_id = !empty( $data['transaction_id'] ) ? $data['transaction_id'] : '';
+		        $paypal_transaction_id = !empty( $data['paypal_transaction_id'] ) ? $data['paypal_transaction_id'] : '';
+		        if( !empty( $post_id ) && $post_id > 0 ) {
+
+			        $transaction_status = usbswiper_get_transaction_status($post_id);
+			        $payment_intent = usbswiper_get_transaction_type($post_id);
+
+			        $payment_response = get_post_meta( $post_id,'_payment_response', true);
+			        $purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
+			        $payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
+			        $payment_authorizations = !empty( $payment_details['authorizations'][0] ) ? $payment_details['authorizations'][0] : '';
+			        $payment_links = !empty( $payment_authorizations['links'] ) ? $payment_authorizations['links'] : '';
+
+			        $log_action_name = 'void_authorized_order';
+			        if( !empty( $payment_intent ) && $payment_intent === 'CAPTURE' && !empty( $transaction_status ) && $transaction_status === 'CREATED' ) {
+				        $log_action_name = 'void_created_order';
+				        $payment_links = !empty( $payment_response['links'] ) ? $payment_response['links'] : '';
+			        }
+
+			        if( !empty( $payment_links ) && is_array( $payment_links ) ) {
+
+				        $void_url = '';
+				        foreach ( $payment_links as $key => $value ) {
+
+					        if( !empty( $value['rel']) && 'void' === $value['rel']) {
+						        $void_url = !empty( $value['href'] ) ? $value['href'] : '';
+					        }
+				        }
+
+				        $this->api_log = new Usb_Swiper_Log();
+
+				        if( !class_exists('Usb_Swiper_Paypal_request') ) {
+					        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
+				        }
+
+				        $Paypal_request = Usb_Swiper_Paypal_request::instance();
+
+				        $args = array(
+					        'method' => 'POST',
+					        'timeout' => 60,
+					        'redirection' => 5,
+					        'httpversion' => '1.1',
+					        'blocking' => true,
+					        'headers' => array(
+						        'Content-Type' => 'application/json',
+						        'Authorization' => 'Bearer '.$Paypal_request->get_access_token(),
+					        ),
+                            'body' => '',
+				        );
+
+				        $this->api_response = $Paypal_request->request($void_url, $args, $log_action_name, $post_id);
+
+				        $status_code = !empty( $Paypal_request->result ) ? (int) wp_remote_retrieve_response_code( $Paypal_request->result ) : '';
+
+                        if( !empty( $status_code ) && 204 === $status_code )  {
+
+	                        $Paypal_request->handle_paypal_debug_id($this->api_response, $post_id);
+
+	                        $order_args = array(
+		                        'method' => 'GET',
+		                        'timeout' => 60,
+		                        'redirection' => 5,
+		                        'httpversion' => '1.1',
+		                        'blocking' => true,
+		                        'headers' => array(
+			                        'Content-Type' => 'application/json',
+			                        'Authorization' => 'Bearer ' . $Paypal_request->get_access_token(),
+		                        ),
+	                        );
+
+	                        $response = $Paypal_request->request($Paypal_request->order_url . $paypal_transaction_id, $order_args, 'order_response', $post_id);
+	                        $Paypal_request->handle_paypal_debug_id($response, $post_id);
+
+	                        if ( !empty( $response ) ) {
+		                        update_post_meta($post_id, '_payment_response', $response);
+		                        update_post_meta($post_id, '_payment_status', usbswiper_get_transaction_status($post_id) );
+	                        }
+                        }
+			        }
+
+			        $transaction_url = esc_url( wc_get_endpoint_url( 'view-transaction', $post_id, wc_get_page_permalink( 'myaccount' ) ) );
+		        }
+	        }
+
+	        wp_safe_redirect($transaction_url);
+	        exit();
+        }
     }
 }

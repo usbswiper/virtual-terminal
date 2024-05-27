@@ -1030,6 +1030,17 @@ jQuery( document ).ready(function( $ ) {
         $(".vt-capture-popup-wrapper").hide();
     });
 
+    $(document).on("click",".void-transaction-button",function(){
+        var link= $(this).attr('data-href');
+        $('.vt-void-popup-wrapper .void-transaction').attr('href',link);
+        $('.vt-void-popup-wrapper').show();
+    });
+
+    $(document).on("click",".vt-void-popup-wrapper #vt_void_cancel,.vt-void-popup-wrapper  .close a",function(){
+        $('.vt-void-popup-wrapper .void-transaction').attr('href',"javascript:void(0);");
+        $(".vt-void-popup-wrapper").hide();
+    });
+
     $(document).on("click",".confirm-transaction-refund-notification",function(){
         var refund_amount = $(this).parent().siblings('.refund-amount-field').children('#refund_amount_display').val();
         $('.vt-refund-popup-wrapper #refund_amount').val(refund_amount);

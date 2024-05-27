@@ -1404,12 +1404,12 @@ function usbswiper_get_transaction_status( $transaction_id ) {
         }
 	} elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
 		$status = !empty( $authorizations['status']) ? $authorizations['status'] : '';
-        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && ( $payment_intent === 'authorize' || $payment_intent== 'capture' )  ) {
+        if( !empty( $transaction_type ) && $transaction_type === 'INVOICE' && !empty( $payment_intent ) && ( $payment_intent === 'authorize' || $payment_intent== 'capture' ) && $status !== 'VOIDED' ) {
             $status = __('Authorized', 'usb-swiper');
         }
 	}
 
-    if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && !in_array($status , array('PARTIALLY_REFUNDED', 'CREATED', 'Authorized', 'REFUNDED', 'Paid')) )) {
+    if( strtolower($global_payment_status) === 'failed' || ( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' && !in_array($status , array('PARTIALLY_REFUNDED', 'CREATED', 'VOIDED' ,'Authorized', 'REFUNDED', 'Paid')) )) {
         $status = $global_payment_status;
     }
 
@@ -1979,7 +1979,8 @@ function count_user_invoice_numbers( $count = 1, $paged = 1 ) {
         'posts_per_page' => 100,
         'paged' => $paged,
         'meta_key' => '_transaction_type',
-        'meta_value' => 'INVOICE'
+        'meta_value' => 'INVOICE',
+	    'post_status' => ['publish','future'],
     );
 
     $query = new WP_Query($args);
@@ -2545,4 +2546,38 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 	}
 
     return !empty( $total_refund_amount ) ? trim($total_refund_amount) : 0;
+}
+
+/**
+ * Get the Void confirmation popup html
+ *
+ * @since 1.1.17
+ *
+ * @return string
+ */
+function void_confirmation_html(){
+
+	ob_start(); ?>
+
+    <div class="vt-void-popup-wrapper">
+        <div class="popup-loader"></div>
+        <div class="vt-void-popup-inner">
+            <div class="close">
+                <a href="javascript:void(0);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></a>
+            </div>
+            <div class="vt-notification-content">
+                <div class="input-field-wrap ">
+                    <p><?php _e('Are you sure you want to void this authorization?','usb-swiper'); ?></p>
+                </div>
+                <div class="input-field-wrap button-wrap">
+                    <button id="vt_void_cancel" type="reset" class="vt-button"><?php _e('Cancel','usb-swiper'); ?></button>
+                    <a class="vt-button void-transaction" href="#"><?php _e('VOID','usb-swiper'); ?></a>
+                </div>
+            </div>
+        </div>
+    </div>
+	<?php
+	$html = ob_get_clean();
+
+	return !empty( $html ) ? $html : '';
 }

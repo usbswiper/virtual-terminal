@@ -89,9 +89,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $id = !empty( $id ) ? $id : $transaction_id;
         ?>
         <div class="transaction-refund-wrap transaction-history-field">
+            <a class="vt-button void-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'void',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('VOID','usb-swiper'); ?></a>
             <a class="vt-button capture-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
         </div>
-        <?php echo refund_confirmation_html();
+        <?php
+        echo refund_confirmation_html();
+	    echo void_confirmation_html();
     }
 
     if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {

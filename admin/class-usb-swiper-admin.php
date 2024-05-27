@@ -1444,6 +1444,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             $args = array(
                 'post_type' => 'transactions',
                 'posts_per_page' => 100,
+	            'post_status' => ['publish','future'],
                 'paged' => $paged,
                 'fields' => 'ids'
             );
