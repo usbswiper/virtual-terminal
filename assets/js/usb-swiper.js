@@ -101,10 +101,15 @@ jQuery( document ).ready(function( $ ) {
                         if( 1 === WebSocket.OPEN ) {
 
                             socket.addEventListener('open', (event) => {
+                                console.log(payment_request);
                                 socket.send(payment_request);
+                                /*let temp = '{"type":"MESSAGE","linkId": "'+response.data.link_id+'","channelId": "1","messageId":"'+response.data.message_id+'","payload":{"type":"PAYMENT_REQUEST","accessToken":"'+response.data.access_token+'","expiresAt":'+response.data.expiresAt+',"internalTraceId":"'+response.data.message_id+'","amount":100,"tippingType":"DEFAULT"}}'
+                                console.log(temp);
+                                socket.send(temp);*/
                             });
 
                             socket.addEventListener('message', (event) => {
+                                console.log(event.data );
                                 if( event.data ) {
                                     var data = JSON.parse( event.data );
                                     var messageData = JSON.parse(data.payload);
