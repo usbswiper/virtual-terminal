@@ -7,6 +7,7 @@ $product_description = '';
 $product_price = '';
 $product_sku = '';
 $product_image_id = '';
+$is_taxable = false;
 
 if( ! empty( $product_id ) ){
     $product             = wc_get_product( $product_id );
@@ -15,6 +16,7 @@ if( ! empty( $product_id ) ){
     $product_price       = $product->get_price();
     $product_sku         = $product->get_sku();
     $product_image_id    = $product->get_image_id();
+	$is_taxable          = get_post_meta( $product_id, 'is_product_taxable', true );
 }
 
 $add_product_form_fields = array(
@@ -71,6 +73,18 @@ $add_product_form_fields = array(
         'value' => ! empty( $product_sku ) ? usbswiper_get_product_sku($product_sku, true) : '',
         'class' => 'vt-input-field'
     ),
+	array(
+		'type' => 'checkbox',
+		'id' => 'is_product_taxable',
+		'name' => 'is_product_taxable',
+		'label' => __( 'Taxable', 'usb-swiper'),
+		'description' => '',
+		'readonly' => false,
+		'checked' => !empty( $is_taxable ) ? $is_taxable : false,
+		'value' => true,
+		'class' => 'vt-input-field',
+		'wrapper_class' => 'taxable-field'
+	),
     array(
         'type' => 'file',
         'id' => 'vt_product_image',
@@ -110,6 +124,11 @@ $add_product_form_fields = array(
                     if( !empty( $form_field['id'] ) && 'price' === $form_field['id'] ) {
                         $value = wc_price( $value, ['currency' => usbswiper_get_default_currency()] );
                     }
+
+	                if( !empty( $form_field['id'] ) && 'is_product_taxable' === $form_field['id'] ) {
+		                $value = ( $is_taxable ) ? "Yes" : "No";
+	                }
+
                     ?>
                     <div class="view-product" id="view_<?php echo !empty( $form_field['id'] ) ? $form_field['id'] : ''; ?>">
                         <div class="label"><?php echo !empty( $label ) ? $label : $placeholder; ?></div>

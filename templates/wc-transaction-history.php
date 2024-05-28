@@ -31,6 +31,11 @@ $ShippingAmount = get_post_meta( $transaction_id, 'ShippingAmount', true);
 $ShippingAmount = usb_swiper_price_formatter($ShippingAmount);
 $HandlingAmount = get_post_meta( $transaction_id, 'HandlingAmount', true);
 $HandlingAmount = usb_swiper_price_formatter($HandlingAmount);
+$tax_rate = get_post_meta( $transaction_id, 'TaxRate', true);
+$tax_rate_label = '';
+if( !empty( $tax_rate ) ){
+	$tax_rate_label = __("&nbsp;<span style='font-size: 11px;font-weight: bold;'>($tax_rate%)</span>", 'usb-swiper');
+}
 $TaxAmount = get_post_meta( $transaction_id, 'TaxAmount', true);
 $TaxAmount = usb_swiper_price_formatter($TaxAmount);
 $GrandTotal = get_post_meta( $transaction_id, 'GrandTotal', true);
@@ -297,9 +302,15 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <?php
             if( ! empty( $vt_products ) && is_array( $vt_products ) ) {
                 foreach ( $vt_products as $vt_product ) {
+	                $product_id = !empty( $vt_product['product_id'] ) ? $vt_product['product_id'] : 0;
+	                $is_taxable = get_post_meta( $product_id, 'is_product_taxable', true );
+	                $is_taxable_label = '';
+                    if( !empty( $is_taxable ) ) {
+	                    $is_taxable_label = __('&nbsp;<span style="font-size: 11px;font-weight: bold;">(Taxable)</span>', 'usb-swiper');
+                    }
                     ?>
                     <tr>
-                        <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_name'] ) ? $vt_product['product_name'] : '-'; ?></td>
+                        <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_name'] ) ? $vt_product['product_name'].$is_taxable_label : '-'; ?></td>
                         <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_quantity'] ) ? $vt_product['product_quantity'] : '-'; ?></td>
                         <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_price'] ) ? wc_price($vt_product['product_price'], array('currency' => $transaction_currency)) : 0; ?></td>
                     </tr>
@@ -333,7 +344,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($HandlingAmount, array('currency' => $transaction_currency)); ?></td>
             </tr>
             <tr>
-                <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Tax Amount','usb-swiper'); ?></th>
+                <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo sprintf( __('Tax Amount %s','usb-swiper' ), $tax_rate_label ); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo wc_price($TaxAmount, array('currency' => $transaction_currency)); ?></td>
             </tr>
             <?php

@@ -892,6 +892,8 @@ jQuery( document ).ready(function( $ ) {
             'vt-add-product-nonce': nonce
         };
 
+        vt_product_input.attr('data-product-taxable', false);
+
         repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
         if(search_val.length >= 3) {
@@ -952,6 +954,7 @@ jQuery( document ).ready(function( $ ) {
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             if (response.status) {
                 $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
+                $('#'+wrapper_id).children('.product').children('input').attr('data-product-taxable', response.is_taxable);
                 $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
                 $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
                 $('#'+wrapper_id).children('#VTProductID_'+wrap_id).val(response.product_id);
