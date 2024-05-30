@@ -799,14 +799,14 @@ class UsbSwiperZettle {
 			"linkId" => $link_id,
             "channelId" => 'optional',
 			"messageId" =>  $get_request_uuid,
-			"payload" => json_encode( [
+			"payload" => [
 				"type" => "REFUND_REQUEST",
 				'accessToken' => self::get_access_token(),
 				'expiresAt' => time() + ( 60 * 5 ),
 				'refundTraceId' => $get_request_uuid,
 				'paymentTraceId' => usbswiper_get_zettle_tracking_id( $transaction_id ),
 				'refundAmount' => !empty( $amount ) ? (int)   round( $amount * 100 ) : 0,
-			])
+			]
 		]);
 
 		self::add_log( [], $websocket_url, $request_args,'websocket_refund_payment_request', $transaction_id );
