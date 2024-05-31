@@ -797,7 +797,7 @@ class UsbSwiperZettle {
 		$request_args = json_encode([
 			"type" => "MESSAGE",
 			"linkId" => $link_id,
-            "channelId" => 'optional',
+            "channelId" =>  '1',
 			"messageId" =>  $get_request_uuid,
 			"payload" => [
 				"type" => "REFUND_REQUEST",

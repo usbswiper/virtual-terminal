@@ -607,8 +607,8 @@ jQuery( document ).ready(function( $ ) {
 
                             if( event.data ) {
                                 var data = JSON.parse( event.data );
-                                var messageData = data.message;
-
+                                var messageData = data.payload;
+                                
                                 if( messageData.refundProgress !== '' && undefined !== messageData.refundProgress ) {
                                     add_zettle_notification(messageData.refundProgress, notificationObj);
                                 } else if( messageData.type === 'REFUND_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
