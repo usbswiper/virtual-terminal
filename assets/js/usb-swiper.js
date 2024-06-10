@@ -101,30 +101,27 @@ jQuery( document ).ready(function( $ ) {
                         if( 1 === WebSocket.OPEN ) {
 
                             socket.addEventListener('open', (event) => {
-                                console.log(payment_request);
                                 socket.send(payment_request);
                             });
 
                             socket.addEventListener('message', (event) => {
-                                console.log(event.data);
-
                                 if( event.data ) {
                                     var data = JSON.parse( event.data );
-                                    var messageData = JSON.parse(data.message);
+                                    var messageData = data.payload;
 
-                                    if( messageData.payment_progress !== '' && undefined !== messageData.payment_progress ) {
-                                        add_zettle_notification(messageData.payment_progress, notificationObj);
-                                    } else if( messageData.type === 'payment_result_response' && messageData.result_status === 'failed' ) {
-                                        add_zettle_notification(messageData.result_status, notificationObj);
+                                    if( messageData.paymentProgress !== '' && undefined !== messageData.paymentProgress ) {
+                                        add_zettle_notification(messageData.paymentProgress, notificationObj);
+                                    } else if( messageData.type === 'PAYMENT_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
+                                        add_zettle_notification(messageData.resultErrorDescription, notificationObj);
                                     }
 
-                                    if( messageData.type === 'payment_result_response' ) {
+                                    if( messageData.type === 'PAYMENT_RESULT_RESPONSE' ) {
 
                                         $.ajax({
                                             url: usb_swiper_settings.zettle_payment_response,
                                             type: 'POST',
                                             dataType: 'json',
-                                            data: "action=zettle_payment_response&message_id="+data.message_id+"&response=" + JSON.stringify(messageData),
+                                            data: "action=zettle_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
                                         }).done(function (response) {
                                             if( response.status ){
                                                 window.location.href = response.redirect_url;
@@ -603,30 +600,28 @@ jQuery( document ).ready(function( $ ) {
                         notificationWrap.show();
 
                         socket.addEventListener('open', (event) => {
-                            console.log(refund_request);
                             socket.send(refund_request);
                         });
 
                         socket.addEventListener('message', (event) => {
-                            console.log(event.data);
 
                             if( event.data ) {
                                 var data = JSON.parse( event.data );
-                                var messageData = JSON.parse(data.message);
-
-                                if( messageData.refund_progress !== '' && undefined !== messageData.refund_progress ) {
-                                    add_zettle_notification(messageData.refund_progress, notificationObj);
-                                } else if( messageData.type === 'refund_result_response' && messageData.result_status === 'failed' ) {
-                                    add_zettle_notification(messageData.result_error_message, notificationObj);
+                                var messageData = data.payload;
+                                
+                                if( messageData.refundProgress !== '' && undefined !== messageData.refundProgress ) {
+                                    add_zettle_notification(messageData.refundProgress, notificationObj);
+                                } else if( messageData.type === 'REFUND_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
+                                    add_zettle_notification(messageData.resultErrorCode, notificationObj);
                                 }
 
-                                if( messageData.type === 'refund_result_response' ) {
+                                if( messageData.type === 'REFUND_RESULT_RESPONSE' ) {
 
                                     $.ajax({
                                         url: usb_swiper_settings.zettle_payment_response,
                                         type: 'POST',
                                         dataType: 'json',
-                                        data: "action=zettle_refund_payment_response&message_id="+data.message_id+"&response=" + JSON.stringify(messageData),
+                                        data: "action=zettle_refund_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
                                     }).done( function (response) {
                                         if( response.status ){
                                             window.location.href = response.redirect_url;

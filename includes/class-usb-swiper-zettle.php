@@ -534,7 +534,7 @@ class UsbSwiperZettle {
 			'body' =>  json_encode( [
 				'code' => !empty( $args['code'] ) ? $args['code'] : '',
 				'tags' => [
-					'device_name' => !empty( $args['device_name'] ) ? $args['device_name'] : '',
+					'deviceName' => !empty( $args['device_name'] ) ? $args['device_name'] : '',
 				],
 			] ),
 			'method'      => 'POST',
@@ -654,10 +654,11 @@ class UsbSwiperZettle {
 				'Authorization' => "Bearer {$access_token}",
 			],
 			'timeout' => 10,
-			'body' =>  json_encode( [
-				'linkId' => $link_id,
-				'channelId' => 'optional',
-			] ),
+            'body' =>  json_encode( (object) [
+                'links' => (object) [
+                    "$link_id" => ["1"]
+                ]
+            ] ),
 			'method'      => 'POST',
 			'data_format' => 'body',
 		];
@@ -744,20 +745,23 @@ class UsbSwiperZettle {
 		
 		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
 		$amount = !empty( $args['amount'] ) ? $args['amount'] : 0;
+		$link_id = !empty( $args['reader_data']['id'] ) ? $args['reader_data']['id'] : '';
 
 		$get_request_uuid = self::get_request_uuid($transaction_id);
 
 		$request_args = json_encode([
-			"type" => "message",
-			"message_id" =>  $get_request_uuid,
-			"message" => json_encode( [
-				"type" => "payment_request",
-				'access_token' => self::get_access_token(),
-				'expires_at' => time() + ( 60 * 5 ),
-				'internal_trace_id' => $get_request_uuid,
+			"type" => "MESSAGE",
+			"linkId" => $link_id,
+			"channelId" => '1',
+			"messageId" =>  $get_request_uuid,
+			"payload" =>  [
+				"type" => "PAYMENT_REQUEST",
+				'accessToken' => self::get_access_token(),
+				'expiresAt' => time() + ( 60 * 5 ),
+				'internalTraceId' => $get_request_uuid,
 				'amount' => !empty( $amount ) ? (int) round( $amount * 100 ) : 0,
-				'tipping_type' => !empty( $args['tipping'] ) ? 'DEFAULT' : 'NONE',
-			])
+				'tippingType' => !empty( $args['tipping'] ) ? 'DEFAULT' : 'NONE',
+			]
 		]);
 		
 		self::add_log( [], $websocket_url, $request_args,'websocket_payment_request', $transaction_id );
@@ -766,6 +770,9 @@ class UsbSwiperZettle {
 			'websocket_url' => $websocket_url,
 			'transaction_id' => $transaction_id,
 			'access_token' => self::get_access_token(),
+			'message_id' => $get_request_uuid,
+			'link_id' => $link_id,
+			'expiresAt' => time() + ( 60 * 5 ),
 			'payment_request' => $request_args,
 			'payment_request_message' => sprintf(__( '%s amount request sent to zettle', 'usb-swiper' ), wc_price( $amount, ['currency' => usbswiper_get_default_currency()])),
 		];
@@ -783,20 +790,23 @@ class UsbSwiperZettle {
 
 		$transaction_id = !empty( $args['transaction_id'] ) ? $args['transaction_id'] : '';
 		$amount = !empty( $args['amount'] ) ? $args['amount'] : 0;
+		$link_id = !empty( $args['reader_data']['id'] ) ? $args['reader_data']['id'] : '';
 
 		$get_request_uuid = self::get_request_uuid( $transaction_id );
 
 		$request_args = json_encode([
-			"type" => "message",
-			"message_id" =>  $get_request_uuid,
-			"message" => json_encode( [
-				"type" => "refund_request",
-				'access_token' => self::get_access_token(),
-				'expires_at' => time() + ( 60 * 5 ),
-				'refund_trace_id' => $get_request_uuid,
-				'payment_trace_id' => usbswiper_get_zettle_tracking_id( $transaction_id ),
-				'refund_amount' => !empty( $amount ) ? (int)   round( $amount * 100 ) : 0,
-			])
+			"type" => "MESSAGE",
+			"linkId" => $link_id,
+            "channelId" =>  '1',
+			"messageId" =>  $get_request_uuid,
+			"payload" => [
+				"type" => "REFUND_REQUEST",
+				'accessToken' => self::get_access_token(),
+				'expiresAt' => time() + ( 60 * 5 ),
+				'refundTraceId' => $get_request_uuid,
+				'paymentTraceId' => usbswiper_get_zettle_tracking_id( $transaction_id ),
+				'refundAmount' => !empty( $amount ) ? (int)   round( $amount * 100 ) : 0,
+			]
 		]);
 
 		self::add_log( [], $websocket_url, $request_args,'websocket_refund_payment_request', $transaction_id );
@@ -863,7 +873,7 @@ class UsbSwiperZettle {
 					}
 				} elseif ( !empty( $request['body'] ) && is_string( $request['body'] ) ) {
 					if( !empty( $request['body'] ) ) {
-						$api_log->log('Request Body: ' . print_r(json_decode($request['body'], true), true), $log_file);
+						$api_log->log('Request Body JSON: ' . print_r($request['body'], true), $log_file);
 					}
 				} elseif ( !empty( $request ) ) {
 					$api_log->log('Request Body Json: ' . print_r($request, true), $log_file);
@@ -930,6 +940,7 @@ class UsbSwiperZettle {
 					foreach ( $refund_response as $key => $payment_refund ) {
 
 						$result_payload = !empty( $payment_refund['result_payload'] ) ? $payment_refund['result_payload'] : '';
+						$result_payload = !empty( $payment_refund['resultPayload'] ) ? $payment_refund['resultPayload'] : $result_payload;
 
 						$amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? usbswiper_convert_zettle_amount($result_payload->REFUNDED_AMOUNT) : 0;
 						$transaction_id = !empty( $result_payload->TRANSACTION_ID ) ? $result_payload->TRANSACTION_ID : '';

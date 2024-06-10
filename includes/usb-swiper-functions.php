@@ -1262,6 +1262,7 @@ function get_total_refund_amount( $transaction_id ) {
             foreach ( $payment_refund_response as $key => $refund_response ) {
 
                 $result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
+                $result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
 	            $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
 	            $refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
 	            $total_refund_amount =  $total_refund_amount + $refund_amount;
@@ -1454,10 +1455,14 @@ function usbswiper_get_transaction_id( $transaction_id ) {
 
     if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
 
+	    $result_status = !empty( $payment_response['result_status'] ) ? $payment_response['result_status'] : '';
+	    $result_status = !empty( $payment_response['resultStatus'] ) ? $payment_response['resultStatus'] : $result_status;
+
 	    $payment_transaction_id = '';
-        if( !empty( $payment_response['result_status'] ) && strtolower( $payment_response['result_status'] ) == 'completed' ) {
+        if( !empty( $result_status ) && strtolower( $result_status ) == 'completed' ) {
 
             $result_payload = !empty( $payment_response['result_payload'] ) ? $payment_response['result_payload'] : '';
+            $result_payload = !empty( $payment_response['resultPayload'] ) ? $payment_response['resultPayload'] : $result_payload;
 	        $payment_transaction_id = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
         }
 
@@ -2432,10 +2437,14 @@ function usbswiper_get_zettle_transaction_tip_amount( $transaction_id ) {
 
 	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
 
-	$tip_amount = 0;
-	if( !empty( $payment_response['result_status'] ) && !empty( $payment_response['result_payload'] ) ) {
+    $result_payload = !empty( $payment_response['result_payload'] ) ? $payment_response['result_payload'] : '';
+	$result_payload = !empty( $payment_response['resultPayload'] ) ? $payment_response['resultPayload'] : $result_payload;
 
-		$result_payload = $payment_response['result_payload'];
+    $result_status = !empty( $payment_response['result_status'] ) ? $payment_response['result_status'] : '';
+    $result_status = !empty( $payment_response['resultStatus'] ) ? $payment_response['resultStatus'] : $result_status;
+
+	$tip_amount = 0;
+	if( !empty( $result_status ) && !empty( $result_payload ) ) {
 		$tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : '';
 		$tip_amount = !empty( $tip_amount) ? ( $tip_amount / 100 ) : 0;
 	}
@@ -2465,9 +2474,14 @@ function usbswiper_get_zettle_transaction_total( $transaction_id ) {
 
 	    $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
 
-	    if( !empty( $payment_response['result_status'] ) && !empty( $payment_response['result_payload'] ) ) {
+        $result_payload = !empty( $payment_response['result_payload'] ) ? $payment_response['result_payload'] : '';
+        $result_payload = !empty( $payment_response['resultPayload'] ) ? $payment_response['resultPayload'] : $result_payload;
 
-		    $result_payload = $payment_response['result_payload'];
+	    $result_status = !empty( $payment_response['result_status'] ) ? $payment_response['result_status'] : '';
+	    $result_status = !empty( $payment_response['resultStatus'] ) ? $payment_response['resultStatus'] : $result_status;
+
+	    if( !empty( $result_status ) && !empty( $result_payload ) ) {
+
 		    $tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : '';
 		    if( !empty( $tip_amount ) ) {
 			    $grand_total = $grand_total + ( $tip_amount / 100);
@@ -2498,6 +2512,7 @@ function usbswiper_get_zettle_tracking_id( $transaction_id ) {
 
 		$payment_response = get_post_meta($transaction_id, '_payment_response', true);
 		$result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
+		$result_payload = !empty( $payment_response['resultPayload'] )  ? $payment_response['resultPayload'] : $result_payload;
 		$tracking_id = !empty( $result_payload->REFERENCES->trackingId ) ? $result_payload->REFERENCES->trackingId : '';
 	}
 
@@ -2539,6 +2554,7 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 		foreach ( $payment_refund_response as $key => $refund_response ) {
 
 			$result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
+			$result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
 			$refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
 			$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
 			$total_refund_amount =  $total_refund_amount + $refund_amount;
