@@ -1,8 +1,8 @@
 === USBSwiper Hosted Virtual Terminal ===
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
-Tested up to: 6.5.2
-Stable tag: 3.0.3
+Tested up to: 6.5.4
+Stable tag: 3.1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,11 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 3.1.0 =
+* Feature - Added void button on authorize transactions.
+* Update - PayPal/Zettle api with latest version.
+* Compatibility with latest WordPress version 6.5.4
 
 = 3.0.3 =
 * Fix - Brand Name not saving the updated value when merchants try to update.
