@@ -340,8 +340,8 @@ function updateSalesTax() {
     });
 
     var discountAmount = 0;
-    var discountInput = ( $('#Discount').val().replace(/,/g, '') * 1 );
-    var discountType = $('#DiscountType').val();
+    var discountInput = ( jQuery('#Discount').val().replace(/,/g, '') * 1 );
+    var discountType = jQuery('#DiscountType').val();
     if ( !isNaN(tempTaxableAmount) && !isNaN(discountInput) && discountInput !== '') {
         discountInput = parseFloat(discountInput); // Convert to float
         if (discountType === 'percent') {
