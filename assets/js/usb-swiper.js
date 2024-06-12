@@ -560,9 +560,13 @@ jQuery( document ).ready(function( $ ) {
         if ( !isNaN(orderAmount) && !isNaN(discountAmount) ) {
             netAmount = orderAmount.toFixed(2) - discountAmount.toFixed(2);
         }
-        $('#NetAmount').val(netAmount.toFixed(2));
-        updateSalesTax();
-        updateGrandTotal();
+
+        setTimeout( function () {
+            $('#NetAmount').val(netAmount.toFixed(2));
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
+
     });
 
     $(document).on('click','.refund-form-wrap .cancel-refund', function (event) {
@@ -824,11 +828,13 @@ jQuery( document ).ready(function( $ ) {
             net_price += Number(quantity) * Number(price);
         });
 
-        $('#NetAmount').val(net_price.toFixed(2));
-        $('#OrderAmount').val(net_price.toFixed(2));
-        jQuery('#Discount').trigger('change');
-        updateSalesTax();
-        updateGrandTotal();
+        setTimeout( function () {
+            $('#NetAmount').val(net_price.toFixed(2));
+            $('#OrderAmount').val(net_price.toFixed(2));
+            jQuery('#Discount').trigger('change');
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
     });
 
     $(document).on('click','#vt_add_item', function () {
@@ -974,11 +980,13 @@ jQuery( document ).ready(function( $ ) {
                     net_price = Number(net_price_array[i]) + Number(net_price);
                 }
 
-                $('#OrderAmount').val(net_price.toFixed(2));
-                $('#NetAmount').val(net_price.toFixed(2));
-                jQuery('#Discount').trigger('change');
-                updateSalesTax();
-                updateGrandTotal();
+                setTimeout( function () {
+                    $('#OrderAmount').val(net_price.toFixed(2));
+                    $('#NetAmount').val(net_price.toFixed(2));
+                    jQuery('#Discount').trigger('change');
+                    updateSalesTax();
+                    updateGrandTotal();
+                }, 800);
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -994,8 +1002,10 @@ jQuery( document ).ready(function( $ ) {
             $("#TaxOnShipping").prop('checked', false);
         }
         $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
-        updateSalesTax();
-        updateGrandTotal();
+        setTimeout( function () {
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
     });
 
     $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
@@ -1015,11 +1025,13 @@ jQuery( document ).ready(function( $ ) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
 
-        $('#OrderAmount').val(net_price.toFixed(2));
-        $('#NetAmount').val(net_price.toFixed(2));
-        jQuery('#Discount').trigger('change');
-        updateSalesTax();
-        updateGrandTotal();
+        setTimeout( function () {
+            $('#OrderAmount').val(net_price.toFixed(2));
+            $('#NetAmount').val(net_price.toFixed(2));
+            jQuery('#Discount').trigger('change');
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
     });
 
     $(document).on("click",".capture-transaction-button",function(){
