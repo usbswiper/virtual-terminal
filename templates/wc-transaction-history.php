@@ -59,7 +59,6 @@ $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
 
 $processor_response = !empty( $payment_details['captures']['0']['processor_response'] ) ? $payment_details['captures']['0']['processor_response'] : '';
-
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
     include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 }
@@ -495,6 +494,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('CVV2 Code','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['cvv_code'] ) ? strtoupper( $processor_response['cvv_code'] ) : ''; ?></td>
             </tr>
+
+            <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { ?>
+                <tr>
+                    <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Processor Response Code','usb-swiper'); ?></th>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['response_code'] ) ? $processor_response['response_code'] : ''; ?></td>
+                </tr>
+            <?php } ?>
+
             <?php if( !empty( $transaction_debug_id ) ) { ?>
                 <tr>
                     <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('PayPal Debug ID','usb-swiper'); ?></th>
