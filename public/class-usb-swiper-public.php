@@ -2708,6 +2708,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$description  = ! empty( $fields['description'] ) ? sanitize_text_field( $fields['description'] ) : '';
 				$price        = ! empty( $fields['price'] ) ? sanitize_text_field( $fields['price'] ) : '';
 				$sku          = ! empty( $fields['sku'] ) ? sanitize_text_field( $fields['sku'] ) : '';
+				$is_taxable     = !empty($fields['is_product_taxable']) ? sanitize_text_field($fields['is_product_taxable']) : false;
 
 				$images    = ! empty( $_FILES['product_image'] ) ?  $_FILES['product_image'] : '';
 				$images_id = !empty( $images ) ? $this->vt_upload_from_path( $images ) : 0;
@@ -2746,6 +2747,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 							$get_sku = usbswiper_get_product_sku($sku);
 							$product->set_sku($get_sku);
 						}
+
+                        $product->update_meta_data( 'is_product_taxable', $is_taxable );
 
 						$product->save();
 					}
@@ -2999,6 +3002,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $message_type = __('ERROR','usb-swiper');
             $product_name = '';
             $product_price = '';
+	        $is_taxable = false;
 
 			$product_id = 0;
             if( ! empty( $_POST['vt-add-product-nonce'] ) && wp_verify_nonce( $_POST['vt-add-product-nonce'],'vt_add_product_nonce') ) {
@@ -3008,8 +3012,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $product = wc_get_product( $product_id );
 
-                $product_name = $product->get_name();
+                $product_name  = $product->get_name();
                 $product_price = $product->get_price();
+	            $is_taxable    = get_post_meta( $product_id, 'is_product_taxable', true );
             }
 
             $response = array(
@@ -3019,6 +3024,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'product_name' => $product_name,
                 'product_price' => $product_price,
                 'product_id' => $product_id,
+                'is_taxable' => ( $is_taxable ) ? true : false,
             );
 
             wp_send_json( $response , 200 );

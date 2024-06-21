@@ -241,7 +241,9 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'name' => 'VTProduct[]',
                 'required' => true,
                 'placeholder' => __( 'Search Product', 'usb-swiper'),
-                'attributes' => '',
+	            'attributes'  => [
+		            'data-product-taxable' => false
+	            ],
                 'description' => '',
                 'readonly' => false,
                 'disabled' => false,

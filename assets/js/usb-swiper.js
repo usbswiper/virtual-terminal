@@ -557,15 +557,23 @@ jQuery( document ).ready(function( $ ) {
         if ( !isNaN(orderAmount) && !isNaN(discountAmount) ) {
             netAmount = orderAmount.toFixed(2) - discountAmount.toFixed(2);
         }
-        $('#NetAmount').val(netAmount.toFixed(2));
-        updateSalesTax();
-        updateGrandTotal();
+
+        setTimeout( function () {
+            $('#NetAmount').val(netAmount.toFixed(2));
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
+
     });
 
     $(document).on('click','.refund-form-wrap .cancel-refund', function (event) {
         event.preventDefault();
         $('.transaction-refund').show();
         $('.refund-form-wrap').hide();
+    });
+
+    $(document).on('click','#print_transaction_receipt', function (event) {
+        window.print();
     });
 
     $( "#vt_refund_form" ).submit(function( event ) {
@@ -819,11 +827,13 @@ jQuery( document ).ready(function( $ ) {
             net_price += Number(quantity) * Number(price);
         });
 
-        $('#NetAmount').val(net_price.toFixed(2));
-        $('#OrderAmount').val(net_price.toFixed(2));
-        jQuery('#Discount').trigger('change');
-        updateSalesTax();
-        updateGrandTotal();
+        setTimeout( function () {
+            $('#NetAmount').val(net_price.toFixed(2));
+            $('#OrderAmount').val(net_price.toFixed(2));
+            jQuery('#Discount').trigger('change');
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
     });
 
     $(document).on('click','#vt_add_item', function () {
@@ -887,6 +897,8 @@ jQuery( document ).ready(function( $ ) {
             'vt-add-product-nonce': nonce
         };
 
+        vt_product_input.attr('data-product-taxable', false);
+
         repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
         if(search_val.length >= 3) {
@@ -947,6 +959,7 @@ jQuery( document ).ready(function( $ ) {
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             if (response.status) {
                 $('#'+wrapper_id).children('.product').children('input').val(response.product_name);
+                $('#'+wrapper_id).children('.product').children('input').attr('data-product-taxable', response.is_taxable);
                 $('#'+wrapper_id).children('.product_quantity').children('input').val('1');
                 $('#'+wrapper_id).children('.price').children('input').val(response.product_price);
                 $('#'+wrapper_id).children('#VTProductID_'+wrap_id).val(response.product_id);
@@ -966,11 +979,13 @@ jQuery( document ).ready(function( $ ) {
                     net_price = Number(net_price_array[i]) + Number(net_price);
                 }
 
-                $('#OrderAmount').val(net_price.toFixed(2));
-                $('#NetAmount').val(net_price.toFixed(2));
-                jQuery('#Discount').trigger('change');
-                updateSalesTax();
-                updateGrandTotal();
+                setTimeout( function () {
+                    $('#OrderAmount').val(net_price.toFixed(2));
+                    $('#NetAmount').val(net_price.toFixed(2));
+                    jQuery('#Discount').trigger('change');
+                    updateSalesTax();
+                    updateGrandTotal();
+                }, 800);
             } else {
                 set_notification(response.message, 'error', response.message_type);
             }
@@ -986,8 +1001,10 @@ jQuery( document ).ready(function( $ ) {
             $("#TaxOnShipping").prop('checked', false);
         }
         $('.input-field-wrap.tax_rate_wrapper .vt-search-result').remove();
-        updateSalesTax();
-        updateGrandTotal();
+        setTimeout( function () {
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
     });
 
     $(document).on('change keyup','.vt-product-quantity, .vt-product-price', function () {
@@ -1007,11 +1024,13 @@ jQuery( document ).ready(function( $ ) {
             net_price = Number(net_price_array[i]) + Number(net_price);
         }
 
-        $('#OrderAmount').val(net_price.toFixed(2));
-        $('#NetAmount').val(net_price.toFixed(2));
-        jQuery('#Discount').trigger('change');
-        updateSalesTax();
-        updateGrandTotal();
+        setTimeout( function () {
+            $('#OrderAmount').val(net_price.toFixed(2));
+            $('#NetAmount').val(net_price.toFixed(2));
+            jQuery('#Discount').trigger('change');
+            updateSalesTax();
+            updateGrandTotal();
+        }, 800);
     });
 
     $(document).on("click",".capture-transaction-button",function(){

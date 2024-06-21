@@ -316,10 +316,34 @@ function ToggleIssueNumber()
 }
 
 /* Update Sales Tax */
-function updateSalesTax()
-{
+function updateSalesTax() {
     var currencySign = jQuery('#ae-paypal-pos-form').attr('data-currency-sign');
     var taxableAmount = jQuery('#NetAmount').val().replace(/,/g, '');
+
+    var tempTaxableAmount = 0;
+    jQuery('.vt-repeater-field .vt-fields-wrap').each(function() {
+        let is_taxable = jQuery(this).children('.product').find('input').data('product-taxable');
+        if( is_taxable ) {
+            let qty = jQuery(this).children('.product_quantity').find('input.vt-product-quantity').val();
+            let price = jQuery(this).children('.price').find('input.vt-product-price').val();
+            tempTaxableAmount = tempTaxableAmount + (Number(qty) * Number(price));
+        }
+    });
+
+    var discountAmount = 0;
+    var discountInput = ( jQuery('#Discount').val().replace(/,/g, '') * 1 );
+    var discountType = jQuery('#DiscountType').val();
+    if ( !isNaN(tempTaxableAmount) && !isNaN(discountInput) && discountInput !== '') {
+        discountInput = parseFloat(discountInput); // Convert to float
+        if (discountType === 'percent') {
+            discountAmount = (tempTaxableAmount * discountInput) / 100;
+        } else {
+            discountAmount = discountInput;
+        }
+    }
+
+    taxableAmount = tempTaxableAmount - discountAmount;
+
     var ShippingAmount = jQuery('#ShippingAmount').val().replace(/,/g, '');
     var TaxOnShipping = jQuery('#TaxOnShipping').is(":checked");
     var TotalTaxableAmount = Number(taxableAmount);
