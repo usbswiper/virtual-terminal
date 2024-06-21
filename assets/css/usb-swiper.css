@@ -297,14 +297,24 @@ form#default_tax_form select#default_tax {padding: 13px 30px 13px 15px;cursor: p
 a.notice-cancel-btn .vt-loader {position: absolute;top: -1px;left: -1px;border-color: #4078ea;border-top-color: #FFF;width: 20px;height: 20px;}
 button[disabled] {opacity: 0.5;}
 @media print {
-    body{line-height: 1.2 !important;}
+    @page {
+        margin: 0;
+    }
+    body{line-height: 1.2 !important;margin: 0 !important;padding: 0!important;}
     .transaction-column{width: calc(33% - 15px);}
-    .transaction-table-header{text-align:left;width: 50%;padding: 2px !important;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
-    .transaction-history-title{font-size: 1.2rem !important;padding: 0;}
-    address{margin:0 !important;}
-    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:180px;}
-    p{margin:0 !important;}
-    .hide-me-in-print{display: none!important;}
+    .form-heading-detail{display: block;width: 100%;margin-bottom: 10px;}
+    .receipt-header-ul {display: block;width: 100%;}
+    .receipt-header-ul li {display: inline-block;width: 25%;float: left;}
+    .receipt-header-ul li strong {width: 100%;display: block;}
+    .transaction-table-product-td{padding: 5px !important; font-size: 10px !important;}
+    .transaction-table-header{text-align:left;width: 50%;padding: 5px !important;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;font-size: 10px!important;}
+    .transaction-history-title{font-size: 14px !important;padding:2px 0 !important;}
+    .transaction-details__title{font-size: 14px !important;padding:2px 0 !important;}
+    table.shop_table.refund_details th, table.shop_table.refund_details td{font-size: 10px !important;padding: 5px !important;}
+    address{margin:5px 0 !important;}
+    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:110px; line-height: 15px !important;}
+    p{margin:0 !important; padding: 0 !important;}
+    .hide-me-in-print{display: none!important; height: 0 !important;}
     .show-me-only-in-print{display: inline-block ;}
     .show-me-only-in-print ul {display:inline ;list-style-type: none;}
     p.signature-text{padding-top: 20px;display: inline;}
@@ -316,6 +326,12 @@ button[disabled] {opacity: 0.5;}
     nav.woocommerce-MyAccount-navigation {display: none;}
     .edit-link {display: none;}
     .transaction-refund{display:none;}
+    .Print-Receipt-logo{width: 100% !important; display: block !important;}
+    .transaction-history-field{margin: 0 !important; padding: 0 !important;}
+    .order_details{margin: 0 !important; padding: 0 !important;}
+    table.shop_table{margin: 10px 0 !important;}
+    .print-header{width: 100%;}
+    .print-header-td{padding: 0 40px !important;}
     /*compatibility for Divi Theme*/
     #main-header{display:none;}
     #main-footer{display: none;}

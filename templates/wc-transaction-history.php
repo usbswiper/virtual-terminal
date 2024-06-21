@@ -104,10 +104,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 			$refund_amount = get_total_refund_amount($transaction_id);
             $transaction_total = usbswiper_get_zettle_transaction_total( $transaction_id );
 			?>
-            <div class="send-email-btn-wrapper">
-                <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
+            <div class="send-email-btn-wrapper hide-me-in-print">
+                <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn hide-me-in-print"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
             </div>
-            <div class="transaction-refund-wrap transaction-history-field">
+            <div class="transaction-refund-wrap transaction-history-field hide-me-in-print">
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
                 <div class="refund-form-wrap">
                     <form method="post" action="" name="vt_refund_form_data" id="vt_refund_form_data">
@@ -163,7 +163,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 
     $vt_invoice_id = 'invoice' === strtolower( $transaction_type ) ? $user_invoice_id : $transaction_id;
     ?>
-    <table style="width: 100%;border-radius: 0;margin-bottom: 20px;border: 0;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
+    <table style="width: 100%;border-radius: 0;margin-bottom: 10px !important;border: 0;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
         <tbody>
         <tr>
             <td class="transaction-table-product-td" style="padding: 12px 12px 12px 0;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Receipt ID: ','usb-swiper'); ?></td>
@@ -214,11 +214,22 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $ShippingEmail = get_post_meta( $transaction_id, 'ShippingEmail', true);
         ?>
 
+	    <?php if( !$is_email ) { ?>
+            <div class="Print-Receipt-logo printArea" style="display:none;text-align: center;">
+                <?php $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false,[250,50]);
+
+                $attachment_id = $brand_logo['attachment_id'];
+                if ($brand_logo['image_html']) {
+                    echo $brand_logo['image_html'];
+                }?>
+            </div>
+        <?php } ?>
+
         <?php if( !$is_email ) { ?>
             <!-- Receipt Information-->
-            <div style="width: calc(33% - 15px);vertical-align: top;margin-left: 10px;float: left;" class=" form-detail show-me-only-in-print">
+            <div style="width: 100%;vertical-align: top;margin-left: 10px;" class="form-heading-detail form-detail show-me-only-in-print">
 
-                <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;">
+                <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;" class="receipt-header-ul">
                     <li class="transaction_history_receipt_info">
                         <strong>
                             <?php _e('Receipt ID : ','usb-swiper'); ?>
@@ -247,50 +258,52 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 </ul>
             </div>
         <?php }  ?>
-        <!-- Billing Address-->
-        <div style="float: left;display: inline-block;vertical-align: top;margin-right: 10px;width: calc( 50% - 10px ); <?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
-            <h2 class="transaction-details__title transaction-history-title"><?php _e('Billing Address','usb-swiper'); ?></h2>
-            <address class="address-wrap" >
-                <p style="margin-bottom: 0"><strong><?php echo $company_name ;?></strong></p>
-                <?php
-                // Splitting the Address Values
-                echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
-                if( !empty( $BillingPhoneNumber ) ) { ?>
-                    <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
-                    <?php
-                }
-                if( !empty( $BillingEmail ) ) { ?>
-                    <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
-                <?php } ?>
-            </address>
-        </div>
-        <!--Shipping Address-->
-        <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
-            <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
-            <address class="address-wrap" >
-                <?php if( 'true' !== $shippingDisabled ) {
-                    if( 'true' !== $shippingSameAsBilling ) { ?>
-                        <!-- Splitting the Address Values-->
-                        <?php  echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';?>
-                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo esc_attr($ShippingPhoneNumber); ?></p>
-                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
-                    <?php } else {
-                        echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';
-                        if(!empty($BillingPhoneNumber)){ ?>
-                            <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
-                        <?php }
-                        if(!empty($BillingEmail)){ ?>
-                            <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
-                            <?php
-                        }
-                    }
-                } ?>
-            </address>
+        <div class="print printArea" style="clear:both;">
+            <!-- Billing Address-->
+            <div style="float: left;display: inline-block;vertical-align: top;margin-right: 10px;width: calc( 50% - 10px ); <?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
+                <h2 class="transaction-details__title transaction-history-title"><?php _e('Billing Address','usb-swiper'); ?></h2>
+                <address class="address-wrap" >
+                    <p style="margin-bottom: 0"><strong><?php echo $company_name ;?></strong></p>
+			        <?php
+			        // Splitting the Address Values
+			        echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
+			        if( !empty( $BillingPhoneNumber ) ) { ?>
+                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
+				        <?php
+			        }
+			        if( !empty( $BillingEmail ) ) { ?>
+                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+			        <?php } ?>
+                </address>
+            </div>
+            <!--Shipping Address-->
+            <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
+                <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
+                <address class="address-wrap" >
+			        <?php if( 'true' !== $shippingDisabled ) {
+				        if( 'true' !== $shippingSameAsBilling ) { ?>
+                            <!-- Splitting the Address Values-->
+					        <?php  echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';?>
+                            <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo esc_attr($ShippingPhoneNumber); ?></p>
+                            <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo esc_attr($ShippingEmail); ?></p>
+				        <?php } else {
+					        echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';
+					        if(!empty($BillingPhoneNumber)){ ?>
+                                <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--phone"><?php echo $BillingPhoneNumber; ?></p>
+					        <?php }
+					        if(!empty($BillingEmail)){ ?>
+                                <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+						        <?php
+					        }
+				        }
+			        } ?>
+                </address>
+            </div>
         </div>
     </div>
-    <div class="transaction-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 20px 0;padding: 0;">
+    <div class="transaction-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Product Details','usb-swiper'); ?></h2>
-        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 20px;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
                 <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Product Name','usb-swiper'); ?></td>
@@ -313,7 +326,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tbody>
         </table>
         <h2 class="transaction-details__title transaction-history-title"><?php _e('Order Totals','usb-swiper'); ?></h2>
-        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Order Amount','usb-swiper'); ?></th>
@@ -387,9 +400,9 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $card_type = !empty( $result_payload->CARD_TYPE ) ? $result_payload->CARD_TYPE : '';
         $card_hase = !empty( $result_payload->CARD_HASH ) ? $result_payload->CARD_HASH : '';
         ?>
-        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 20px 0;padding: 0;float: left;">
+        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
             <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
-            <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+            <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
                 <tbody>
                     <tr>
                         <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Reference Number','usb-swiper'); ?></th>
@@ -440,9 +453,9 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         </div>
         <?php
     } elseif( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
-        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 20px 0;padding: 0;float: left;">
+        <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
-        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
+        <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
             <tbody>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Intent ID','usb-swiper'); ?></th>
@@ -538,6 +551,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             echo UsbSwiperZettle::get_refund_html( $transaction_id );
         } ?>
     </div>
+	<?php if( !$is_email ) { ?>
+        <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt">Print Receipt</button>
+    <?php } ?>
+
     <?php if( !$is_email ) { ?>
         <div class="custom-payment-notes signature" style="clear:both;">
             <br/>

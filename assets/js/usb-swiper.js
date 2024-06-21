@@ -568,6 +568,10 @@ jQuery( document ).ready(function( $ ) {
         $('.refund-form-wrap').hide();
     });
 
+    $(document).on('click','#print_transaction_receipt', function (event) {
+        window.print();
+    });
+
     $( "#vt_refund_form" ).submit(function( event ) {
         var form = $(this);
         var form_id = form.attr('id');
