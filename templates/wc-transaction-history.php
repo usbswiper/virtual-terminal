@@ -265,10 +265,10 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </address>
         </div>
         <!--Shipping Address-->
-        <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' === $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
+        <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' !== $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
             <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
             <address class="address-wrap" >
-                <?php if( 'true' !== $shippingDisabled ) {
+                <?php if( 'true' === $shippingDisabled ) {
                     if( 'true' !== $shippingSameAsBilling ) { ?>
                         <!-- Splitting the Address Values-->
                         <?php  echo !empty( $addresses['shipping_address'] ) ? $addresses['shipping_address'] : '';?>

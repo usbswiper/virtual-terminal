@@ -332,7 +332,7 @@ class Usb_Swiper_Paypal_request{
 		if( !empty( $transaction_id ) && $transaction_id > 0 ) {
 
 			$shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true ) ;
-			if( empty( $shippingDisabled) ) {
+			if( !empty( $shippingDisabled) ) {
 				$shipping_preference = 'SET_PROVIDED_ADDRESS';
 			}
 		}
@@ -630,7 +630,7 @@ class Usb_Swiper_Paypal_request{
 
 		$shippingDisabled = get_post_meta( $transaction_id,'shippingDisabled', true);
 
-		if( $shippingDisabled !== 'true') {
+		if( $shippingDisabled === 'true') {
 
 			$shippingSameAsBilling = get_post_meta( $transaction_id,'shippingSameAsBilling', true);
 

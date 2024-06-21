@@ -58,7 +58,7 @@ if (!empty($state)) {
     $addresses_line2[] = $state;
 }
 
-if( $shippingDisabled !== 'true') {
+if( $shippingDisabled === 'true') {
     $shippingSameAsBilling = get_post_meta($invoice_id, 'shippingSameAsBilling', true);
     if( $shippingSameAsBilling !== true ) {
         $ShippingPhoneNumber = get_post_meta( $invoice_id, 'ShippingPhoneNumber', true);

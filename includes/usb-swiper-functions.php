@@ -553,7 +553,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'type' => 'checkbox',
 				'id' => 'billingInfo',
 				'name' => 'billingInfo',
-				'label' => __( 'Enter Billing Address', 'usb-swiper'),
+				'label' => __( 'Address Required?', 'usb-swiper'),
 				'required' => false,
 				'value' => "true",
 				'checked' => true,
@@ -654,11 +654,12 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'type' => 'checkbox',
 				'id' => 'shippingDisabled',
 				'name' => 'shippingDisabled',
-				'label' => __( 'Shipping Not Req.', 'usb-swiper'),
+				'label' => __( 'Address Required?', 'usb-swiper'),
 				'required' => false,
 				'value' => "true",
+                'checked' => "true",
 				'attributes' => array(
-					'data-default-checked' => "TRUE"
+					'data-default-checked' => "FALSE"
 				),
 				'description' => '',
 				'class' => '',
@@ -2113,9 +2114,9 @@ function get_transaction_address_format( $transaction_id , $is_email = false ){
         'shipping_address'=> ''
     );
 
-    if( 'true' !== $shippingDisabled && 'true' !== $shippingSameAsBilling ){
+    if( 'true' === $shippingDisabled && 'true' !== $shippingSameAsBilling ){
         $response['shipping_address'] = $shipping_address_html;
-    } elseif ( 'true' !== $shippingDisabled ) {
+    } elseif ( 'true' === $shippingDisabled && 'true' === $shippingSameAsBilling  ) {
         $response['shipping_address'] = $billing_address_html;
     }
 

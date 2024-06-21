@@ -38,15 +38,14 @@ jQuery(function( $ ) {
 
         /* Toggle Billing Fields */
         jQuery('input[name="billingInfo"]').on('switchChange.bootstrapSwitch', function(event, state) {
-            //console.log(this); // DOM element
-            //console.log(event); // jQuery event
-            //console.log(state); // true | false
             if(state) {
                 jQuery('#BillingStreet, #BillingCity, #BillingState, #BillingCountryCode, #BillingPostalCode').attr('required', 'required');
                 jQuery('.vt-billing-address-field').parents('.input-field-wrap').show();
+                jQuery('input[name="shippingDisabled"]').bootstrapSwitch('state', true);
             } else {
                 jQuery('#BillingStreet, #BillingCity, #BillingState, #BillingCountryCode, #BillingPostalCode').removeAttr('required');
                 jQuery('.vt-billing-address-field').parents('.input-field-wrap').hide();
+                jQuery('input[name="shippingDisabled"]').bootstrapSwitch('state', false);
             }
             //jQuery('#FormBillingAddress').slideToggle('400');
             return false;
@@ -54,18 +53,15 @@ jQuery(function( $ ) {
 
        /* Toggle Shipping Fields */
         jQuery('input[name="shippingDisabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
-            //console.log(this); // DOM element
-            //console.log(event); // jQuery event
-            //console.log(state); // true | false
             if(state) {
                 jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').removeAttr('required');
                 //jQuery('#FormShippingAddress').slideUp('400');
                 //jQuery('#sameAsBilling').hide();
                 //jQuery('.vt-billing-address-field').parents('.input-field-wrap').show();
                 jQuery('.vt-shipping-address-field').parents('.input-field-wrap').hide();
-                jQuery('#shippingSameAsBilling').parents('.input-field-wrap').hide();
-            } else {
                 jQuery('#shippingSameAsBilling').parents('.input-field-wrap').show();
+            } else {
+                jQuery('#shippingSameAsBilling').parents('.input-field-wrap').hide();
                 //jQuery('#sameAsBilling').show();
                 if(!jQuery('#shippingSameAsBilling').bootstrapSwitch('state')) {
                     //jQuery('#FormShippingAddress').slideDown('400');
@@ -168,22 +164,17 @@ jQuery(function( $ ) {
 
         /* Toggle defaults on checkboxes */
         window.setTimeout(function(){
-            if(jQuery('#billingInfo').attr('data-default-checked') != 'TRUE')
-            {
+            if(jQuery('#billingInfo').attr('data-default-checked') !== 'TRUE') {
                 jQuery('#billingInfo').bootstrapSwitch('toggleState');
             }
-            if(jQuery('#shippingDisabled').attr('data-default-checked') == 'TRUE')
-            {
-                if(jQuery('#shippingSameAsBilling').attr('data-default-checked') == 'TRUE')
-                {
+            if(jQuery('#shippingDisabled').attr('data-default-checked') === 'TRUE') {
+                if(jQuery('#shippingSameAsBilling').attr('data-default-checked') === 'TRUE') {
                     jQuery('#shippingSameAsBilling').bootstrapSwitch('state', true, true);
                 }
+
                 jQuery('#shippingDisabled').bootstrapSwitch('toggleState');
-            }
-            else
-            {
-                if(jQuery('#shippingSameAsBilling').attr('data-default-checked') == 'TRUE' && jQuery('#shippingDisabled').attr('data-default-checked') != 'TRUE')
-                {
+            } else {
+                if(jQuery('#shippingSameAsBilling').attr('data-default-checked') === 'TRUE' && jQuery('#shippingDisabled').attr('data-default-checked') !== 'TRUE') {
                     jQuery('#shippingSameAsBilling').bootstrapSwitch('toggleState');
                 }
             }
