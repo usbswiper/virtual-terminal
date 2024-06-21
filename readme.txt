@@ -38,11 +38,11 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Changelog ==
 
 = 3.2.0 =
-Feature - Added Product level tax enable and disable setting.
-Feature - Added Processor Response Code on transaction.
-Feature - Adjust Print Receipt button and print styling.
-Update - Adjust billing and shipping address logic.
-Update - Validation form adjustments on Zettle payment.
+* Feature - Added Product level tax enable and disable setting.
+* Feature - Added Processor Response Code on transaction.
+* Feature - Adjust Print Receipt button and print styling.
+* Update - Adjust billing and shipping address logic.
+* Update - Validation form adjustments on Zettle payment.
 
 = 3.1.0 =
 * Feature - Added void button on authorize transactions.
