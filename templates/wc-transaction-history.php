@@ -166,24 +166,32 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     }
 
     $vt_invoice_id = 'invoice' === strtolower( $transaction_type ) ? $user_invoice_id : $transaction_id;
+    $heading_label_style =  'padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;';
+    $heading_th_style =  'padding: 12px 12px 12px 0;color:#000;font-weight: 400;vertical-align: top;';
+    $heading_table_border_style = '0';
+    if( is_admin() ) {
+	    $heading_label_style =  'padding: 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;border:1px solid #ebebeb;';
+	    $heading_th_style =  'padding: 12px;color:#000;font-weight: 400;vertical-align: top;border:1px solid #ebebeb;';
+	    $heading_table_border_style  =  '1px solid #ebebeb;';
+    }
     ?>
-    <table style="width: 100%;border-radius: 0;margin-bottom: 10px !important;border: 0;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
+    <table style="width: 100%;border-radius: 0;margin-bottom: 10px !important;border: <?php echo $heading_table_border_style; ?>;" cellspacing="0" cellpadding="0" width="100%" class="hide-me-in-print woocommerce-table woocommerce-table--order-details shop_table order_details">
         <tbody>
         <tr>
-            <td class="transaction-table-product-td" style="padding: 12px 12px 12px 0;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Receipt ID: ','usb-swiper'); ?></td>
-            <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Date: ','usb-swiper'); ?></td>
-            <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Status: ','usb-swiper'); ?></td>
-            <td class="transaction-table-product-td" style="padding: 12px;color:#000;font-weight: 400;vertical-align: top;"><?php _e('Payment Method: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="<?php echo $heading_th_style; ?>"><?php _e('Receipt ID: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="<?php echo $heading_th_style; ?>"><?php _e('Date: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="<?php echo $heading_th_style; ?>"><?php _e('Status: ','usb-swiper'); ?></td>
+            <td class="transaction-table-product-td" style="<?php echo $heading_th_style; ?>"><?php _e('Payment Method: ','usb-swiper'); ?></td>
         </tr>
         <tr>
             <?php if( $is_email && $is_admin ) { ?>
-                <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><a style='text-decoration: none;' href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $vt_invoice_id, wc_get_page_permalink( 'myaccount' ) ) ); ?>"><?php echo $vt_invoice_id; ?></a></td>
+                <td class="transaction-table-product-td" style="<?php echo $heading_label_style; ?>"><a style='text-decoration: none;' href="<?php echo esc_url( wc_get_endpoint_url( 'view-transaction', $vt_invoice_id, wc_get_page_permalink( 'myaccount' ) ) ); ?>"><?php echo $vt_invoice_id; ?></a></td>
             <?php } else { ?>
-                <td class="transaction-table-product-td" style="padding: 0 12px 12px 0;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo $vt_invoice_id; ?></td>
+                <td class="transaction-table-product-td" style="<?php echo $heading_label_style; ?>"><?php echo $vt_invoice_id; ?></td>
             <?php } ?>
-            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo get_the_date('Y-m-d',$transaction_id); ?></td>
-            <td class="transaction-table-product-td payment-status-text" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
-            <td class="transaction-table-product-td" style="padding: 0 12px 12px;color:#000;font-weight: 700;border: 0;vertical-align: top;"><?php echo !empty( $payment_source_type ) ? strtoupper($payment_source_type) : $credit_card_number; ?></td>
+            <td class="transaction-table-product-td" style="<?php echo $heading_label_style; ?>"><?php echo get_the_date('Y-m-d',$transaction_id); ?></td>
+            <td class="transaction-table-product-td payment-status-text" style="<?php echo $heading_label_style; ?>"><?php echo usbswiper_get_payment_status($payment_status); ?></td>
+            <td class="transaction-table-product-td" style="<?php echo $heading_label_style; ?>"><?php echo !empty( $payment_source_type ) ? strtoupper($payment_source_type) : $credit_card_number; ?></td>
         </tr>
         </tbody>
     </table>
@@ -207,7 +215,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     <div class="customer-details transaction-history-field" style="float: left;width: 100%;display: block;margin: 0 0 10px 0;padding: 0;">
         <?php
         $addresses = get_transaction_address_format($transaction_id);
-        $address_style = isset($is_email) ? 'margin: 0;font-size: 12px;padding:0;' : 'padding:0;margin:0';
+        $address_style = isset($is_email) ? 'margin: 0;font-size: 14px;padding:0;font-style: normal;' : 'padding:0;margin:0';
 
         $billingInfo = get_post_meta( $transaction_id, 'billingInfo', true);
         $shippingDisabled = get_post_meta( $transaction_id, 'shippingDisabled', true);
@@ -232,7 +240,6 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         <?php if( !$is_email ) { ?>
             <!-- Receipt Information-->
             <div style="width: 100%;vertical-align: top;margin-left: 10px;" class="form-heading-detail form-detail show-me-only-in-print">
-
                 <ul style="margin: 10px 0;padding: 0;width: 100%;display: block;" class="receipt-header-ul">
                     <li class="transaction_history_receipt_info">
                         <strong>
@@ -250,14 +257,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                         <strong>
                             <?php _e('Status : ','usb-swiper'); ?>
                         </strong>
-
                         <?php echo usbswiper_get_payment_status($payment_status); ?>
                     </li>
                     <li class="transaction_history_receipt_info">
                         <strong>
                             <?php _e('Card Detail : ','usb-swiper'); ?>
                         </strong><?php echo $credit_card_number; ?>
-
                     </li>
                 </ul>
             </div>
@@ -266,8 +271,8 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <!-- Billing Address-->
             <div style="float: left;display: inline-block;vertical-align: top;margin-right: 10px;width: calc( 50% - 10px ); <?php echo ('true' !== $billingInfo ) ? 'display:none': ''; ?>" class="transaction-column billing-details form-detail <?php echo ( 'true' === $shippingDisabled ) ? 'no-shipping-address' :''; ?>">
                 <h2 class="transaction-details__title transaction-history-title"><?php _e('Billing Address','usb-swiper'); ?></h2>
-                <address class="address-wrap" >
-                    <p style="margin-bottom: 0"><strong><?php echo $company_name ;?></strong></p>
+                <address class="address-wrap" style="padding: 10px;border: 2px solid #ebebeb;min-height: <?php echo ( is_admin() ) ? '150px;' : '200px;'; ?>">
+                    <p style="margin: 0;font-size: 14px;padding:0;font-style: normal;"><strong><?php echo $company_name ;?></strong></p>
 			        <?php
 			        // Splitting the Address Values
 			        echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
@@ -283,7 +288,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <!--Shipping Address-->
             <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' !== $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
                 <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
-                <address class="address-wrap" >
+                <address class="address-wrap" style="padding: 10px;border: 2px solid #ebebeb;min-height: <?php echo ( is_admin() ) ? '150px;' : '200px;'; ?>">
 			        <?php if( 'true' === $shippingDisabled ) {
 				        if( 'true' !== $shippingSameAsBilling ) { ?>
                             <!-- Splitting the Address Values-->
@@ -569,16 +574,17 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             echo UsbSwiperZettle::get_refund_html( $transaction_id );
         } ?>
     </div>
-	<?php if( !$is_email ) { ?>
+	<?php if( !$is_email && !is_admin()) { ?>
         <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt">Print Receipt</button>
     <?php } ?>
 
     <?php if( !$is_email ) { ?>
         <div class="custom-payment-notes signature" style="clear:both;">
+            <?php if( !is_admin()) {?>
             <br/>
             <br/>
-            <p class="signature-text"><?php _e('Signature........................................','ubs-swiper') ; ?>
-            </p>
+            <p class="signature-text"><?php _e('Signature........................................','ubs-swiper') ; ?></p>
+            <?php } ?>
         </div>
     <?php } ?>
 </div>
