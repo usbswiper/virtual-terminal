@@ -41,11 +41,13 @@ jQuery(function( $ ) {
             if(state) {
                 jQuery('#BillingStreet, #BillingCity, #BillingState, #BillingCountryCode, #BillingPostalCode').attr('required', 'required');
                 jQuery('.vt-billing-address-field').parents('.input-field-wrap').show();
-                jQuery('input[name="shippingDisabled"]').bootstrapSwitch('state', true);
+                jQuery('input[name="shippingDisabled"]').bootstrapSwitch('state', false);
+                jQuery('input[name="shippingDisabled"]').bootstrapSwitch('disabled', false);
             } else {
                 jQuery('#BillingStreet, #BillingCity, #BillingState, #BillingCountryCode, #BillingPostalCode').removeAttr('required');
                 jQuery('.vt-billing-address-field').parents('.input-field-wrap').hide();
                 jQuery('input[name="shippingDisabled"]').bootstrapSwitch('state', false);
+                jQuery('input[name="shippingDisabled"]').bootstrapSwitch('disabled', true);
             }
             //jQuery('#FormBillingAddress').slideToggle('400');
             return false;
