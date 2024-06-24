@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.4
-Stable tag: 3.1.0
+Stable tag: 3.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,13 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 3.2.0 =
+* Feature - Added Product level tax enable and disable setting.
+* Feature - Added Processor Response Code on transaction.
+* Feature - Adjust Print Receipt button and print styling.
+* Update - Adjust billing and shipping address logic.
+* Update - Validation form adjustments on Zettle payment.
 
 = 3.1.0 =
 * Feature - Added void button on authorize transactions.

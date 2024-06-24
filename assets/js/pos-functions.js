@@ -93,7 +93,9 @@ jQuery(function( $ ) {
                 $('#PayWithZettle').show();
                 $('.vt-col-payments').hide();
                 $('.vt-col-pay-by-invoice').hide();
-                $('#BillingEmail').prop('required',true);
+                $('#BillingFirstName').prop('required',false);
+                $('#BillingLastName').prop('required',false);
+                $('#BillingEmail').prop('required',false);
             } else {
                 $('#PayWithZettle').hide();
                 $('.vt-col-payments').show();
