@@ -346,6 +346,10 @@ function updateSalesTax() {
 
     taxableAmount = tempTaxableAmount - discountAmount;
 
+    var handlingAmount = ( jQuery('#HandlingAmount').val().replace(/,/g, '') * 1 );
+
+    taxableAmount = taxableAmount + handlingAmount;
+
     var ShippingAmount = jQuery('#ShippingAmount').val().replace(/,/g, '');
     var TaxOnShipping = jQuery('#TaxOnShipping').is(":checked");
     var TotalTaxableAmount = Number(taxableAmount);
