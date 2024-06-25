@@ -483,7 +483,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'symbol' => '%',
 				'symbol_wrap_class' => 'currency-sign after',
                 'value' => $tax_rate,
-                'tooltip' => true,
+                'tooltip' => !empty( $tax_rate ),
                 'tooltip_text' => $tax_label,
 			),
             array(
