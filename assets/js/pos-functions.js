@@ -109,9 +109,6 @@ jQuery(function( $ ) {
 
         /* Toggle Shipping Fields */
         jQuery('input[name="shippingSameAsBilling"]').on('switchChange.bootstrapSwitch', function(event, state) {
-            //console.log(this); // DOM element
-            //console.log(event); // jQuery event
-            //console.log(state); // true | false
             if(state)
             {
                 jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').removeAttr('required');
@@ -284,10 +281,7 @@ function ParseStripeData() {
         jQuery('#CreditCardNumber').val(p.account);
         jQuery('#CreditCardType').val(CardType);
 
-        console.log('update input');
-
         jQuery('#card-number iframe').contents().find('#credit-card-number').val('adsadasdasd');
-        console.log(jQuery('#card-number iframe').contents().find('#credit-card-number').val());
     }
     else
     {
@@ -325,9 +319,11 @@ function updateSalesTax() {
     var taxableAmount = jQuery('#NetAmount').val().replace(/,/g, '');
 
     var tempTaxableAmount = 0;
+    var isTaxableProduct = false;
     jQuery('.vt-repeater-field .vt-fields-wrap').each(function() {
-        let is_taxable = jQuery(this).children('.product').find('input').data('product-taxable');
-        if( is_taxable ) {
+        let is_taxable = jQuery(this).children('.product').find('input').attr('data-product-taxable');
+        if( is_taxable === 'true' ) {
+            isTaxableProduct = true;
             let qty = jQuery(this).children('.product_quantity').find('input.vt-product-quantity').val();
             let price = jQuery(this).children('.price').find('input.vt-product-price').val();
             tempTaxableAmount = tempTaxableAmount + (Number(qty) * Number(price));
@@ -344,34 +340,36 @@ function updateSalesTax() {
         } else {
             discountAmount = discountInput;
         }
+
+        taxableAmount = tempTaxableAmount - discountAmount;
     }
 
-    taxableAmount = tempTaxableAmount - discountAmount;
-
-    var handlingAmount = ( jQuery('#HandlingAmount').val().replace(/,/g, '') * 1 );
-
-    taxableAmount = taxableAmount + handlingAmount;
-
-    var ShippingAmount = jQuery('#ShippingAmount').val().replace(/,/g, '');
     var TaxOnShipping = jQuery('#TaxOnShipping').is(":checked");
     var TotalTaxableAmount = Number(taxableAmount);
-    if( TaxOnShipping && undefined !== ShippingAmount && Number(ShippingAmount) > 0){
+
+    var ShippingAmount = jQuery('#ShippingAmount').val().replace(/,/g, '');
+    if( isTaxableProduct && TaxOnShipping && undefined !== ShippingAmount && Number(ShippingAmount) > 0){
        TotalTaxableAmount = Number(taxableAmount) + Number(ShippingAmount);
     }
+    var handlingAmount = ( jQuery('#HandlingAmount').val().replace(/,/g, '') * 1 );
+    if( isTaxableProduct && TaxOnShipping && undefined !== handlingAmount && Number(handlingAmount) > 0){
+        TotalTaxableAmount = Number(TotalTaxableAmount) + Number(handlingAmount);
+    }
+
     var taxAmount = ( jQuery('#TaxRate').val().replace(/,/g, '') / 100 ) * Number(TotalTaxableAmount);
     if(!taxAmount) taxAmount = 0;
     jQuery('#TaxAmountDisplay').html('<i>(' + currencySign + ' ' + roundNumber(taxAmount, 2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ')</i>');
     var taxAmountRounded = roundNumber(taxAmount,2);
-    if( NaN === taxAmountRounded || undefined === taxAmountRounded || null === taxAmountRounded){
+    if( isNaN(taxAmountRounded) || undefined === taxAmountRounded || null === taxAmountRounded){
         taxAmountRounded = roundNumber(0,2);
     }
+
     jQuery('#TaxAmount').val(taxAmountRounded);
     return false;
 }
 
 /* Update Grand Total */
-function updateGrandTotal()
-{
+function updateGrandTotal() {
     var currencySign = jQuery('#ae-paypal-pos-form').attr('data-currency-sign');
     // var orderAmount = ( jQuery('#OrderAmount').val());
     var netAmount = ( jQuery('#NetAmount').val().replace(/,/g, '') * 1 );
@@ -379,7 +377,7 @@ function updateGrandTotal()
     var handlingAmount = ( jQuery('#HandlingAmount').val().replace(/,/g, '') * 1 );
     var taxAmount = jQuery('#TaxAmount').val().replace(/,/g, '') * 1;
     var grandTotal = (netAmount + shippingAmount + handlingAmount + taxAmount);
-    var grandTotal = grandTotal.toFixed(2);
+    grandTotal = grandTotal.toFixed(2);
     jQuery('#GrandTotalDisplay').html('<strong>' + currencySign + ' ' + grandTotal.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + '</strong>');
     jQuery('#GrandTotal').val(grandTotal);
     return false;

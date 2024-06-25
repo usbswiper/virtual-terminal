@@ -868,6 +868,11 @@ jQuery( document ).ready(function( $ ) {
             'vt-add-tax-nonce': nonce
         };
 
+        var taxLabel = '';
+        var taxToolTip = vt_product_input.parents('.tax_rate_wrapper').find('span[data-tip]');
+        var defaultToolTipText = taxToolTip.attr('data-default');
+        taxToolTip.attr('data-tip', defaultToolTipText+ taxLabel);
+
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             if (response.status) {
                 if(response.product_select) {
@@ -897,7 +902,12 @@ jQuery( document ).ready(function( $ ) {
             'vt-add-product-nonce': nonce
         };
 
+        /*var isTaxable = vt_product_input.attr('data-product-taxable');*/
         vt_product_input.attr('data-product-taxable', false);
+        /*if(isTaxable === 'true' ) {
+            vt_product_input.parents('.vt-fields-wrap').children('.product_quantity').find('input.vt-product-quantity').val('');
+            vt_product_input.parents('.vt-fields-wrap').children('.price').find('input.vt-product-price').val('');
+        }*/
 
         repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
@@ -913,6 +923,10 @@ jQuery( document ).ready(function( $ ) {
                         }
                     } else {
                         vt_product_input.parents('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+                        setTimeout( function () {
+                            updateSalesTax();
+                            updateGrandTotal();
+                        }, 800);
                     }
                 } else {
                     set_notification(response.message, 'error', response.message_type);
@@ -994,6 +1008,10 @@ jQuery( document ).ready(function( $ ) {
 
     $(document).on('click','.tax_rate_wrapper .tax-item', function () {
         let tax_input = $(this).parents('.tax_rate_wrapper').find('.vt-tax-input');
+        var taxLabel = $(this).text();
+        var taxToolTip = $(this).parents('.tax_rate_wrapper').find('span[data-tip]');
+        var defaultToolTipText = taxToolTip.attr('data-default');
+        taxToolTip.attr('data-tip', defaultToolTipText+ taxLabel);
         tax_input.val($(this).attr('data-id'));
         if( undefined !== $(this).attr('data-include-tax') && '' !== $(this).attr('data-include-tax') ){
             $("#TaxOnShipping").prop('checked', true);

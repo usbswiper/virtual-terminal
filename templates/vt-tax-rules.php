@@ -34,7 +34,7 @@
             'type' => 'checkbox',
             'id' => 'tax_on_shipping',
             'name' => 'tax_on_shipping',
-            'label' => __( 'Include Shipping', 'usb-swiper' ),
+            'label' => __( 'Include Shipping & Handling', 'usb-swiper' ),
             'wrapper_class' => 'inline-checkbox',
             'attributes' => '',
             'description' => '',
@@ -106,7 +106,7 @@
             <tr>
                 <th class="tax-label"><?php _e( 'Tax Label', 'usb-swiper'); ?></th>
                 <th class="tax-rate"><?php _e( 'Tax Rate (%)', 'usb-swiper'); ?></th>
-                <th class="tax-shipping"><?php _e( 'Include Shipping', 'usb-swiper'); ?></th>
+                <th class="tax-shipping"><?php _e( 'Include Shipping & Handling', 'usb-swiper'); ?></th>
                 <th class="tax-actions"><?php _e( 'Action', 'usb-swiper'); ?></th>
             </tr>
         </thead>
