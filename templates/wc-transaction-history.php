@@ -83,38 +83,44 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     $author_id = get_post_field( 'post_author', $transaction_id );
     $author_id = ! empty( $author_id ) ? $author_id : 1;
     $get_current_user_id = get_current_user_id();
-    if( strtolower( $transaction_type) !== 'zettle' && usbswiper_is_allow_capture( $transaction_id ) && $payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
-        $unique_id = usb_swiper_unique_id( array(
-           'type' => $payment_action,
-           'transaction_id' => $transaction_id,
-           'paypal_transaction_id' => !empty( $payment_response['id'] ) ? $payment_response['id'] : '',
-           'nonce' => wp_create_nonce('authorize-transaction-capture')
-        ));
-        $id = !empty( $id ) ? $id : $transaction_id;
-        ?>
-        <div class="transaction-refund-wrap transaction-history-field">
-            <a class="vt-button void-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'void',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('VOID','usb-swiper'); ?></a>
-            <a class="vt-button capture-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
-        </div>
-        <?php
-        echo refund_confirmation_html();
-	    echo void_confirmation_html();
-    }
 
     if( !empty( $myaccount_page_id ) && $myaccount_page_id === get_the_ID() ) {
         $get_refund_status = usbswiper_get_refund_status();
-        if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) {
 
-			$refund_amount = get_total_refund_amount($transaction_id);
-            $transaction_total = usbswiper_get_zettle_transaction_total( $transaction_id );
-			?>
-            <div class="send-email-btn-wrapper hide-me-in-print" style="text-align: right;">
+        $refund_amount = get_total_refund_amount($transaction_id);
+        $transaction_total = usbswiper_get_zettle_transaction_total( $transaction_id );
+        ?>
+        <div class="send-email-btn-wrapper hide-me-in-print" style="text-align: right;">
+            <?php if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) { ?>
                 <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn hide-me-in-print"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
-	            <?php if( !$is_email && !is_admin()) { ?>
-                    <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt"><?php _e('Print Receipt', 'usb-swiper') ?></button>
-	            <?php } ?>
+            <?php } ?>
+
+            <?php if( !$is_email && !is_admin()) { ?>
+                <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt"><?php _e('Print Receipt', 'usb-swiper') ?></button>
+            <?php } ?>
+
+            <?php if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) { ?>
                 <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
-            </div>
+            <?php } ?>
+
+            <?php
+            if( strtolower( $transaction_type) !== 'zettle' && usbswiper_is_allow_capture( $transaction_id ) && $payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
+	            $unique_id = usb_swiper_unique_id( array(
+		            'type' => $payment_action,
+		            'transaction_id' => $transaction_id,
+		            'paypal_transaction_id' => !empty( $payment_response['id'] ) ? $payment_response['id'] : '',
+		            'nonce' => wp_create_nonce('authorize-transaction-capture')
+	            ));
+	            $id = !empty( $id ) ? $id : $transaction_id;
+	            ?>
+                <a class="vt-button void-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'void',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('VOID','usb-swiper'); ?></a>
+                <a class="vt-button capture-transaction-button" data-href="<?php echo add_query_arg( array( 'action' => 'capture',  'unique_id' => $unique_id), esc_url( wc_get_endpoint_url( 'view-transaction', $id, wc_get_page_permalink( 'myaccount' ) ) )); ?>"><?php _e('CAPTURE','usb-swiper'); ?></a>
+                <?php
+            }
+            ?>
+        </div>
+
+        <?php if( !empty( $payment_status ) && in_array( $payment_status, $get_refund_status) && !$is_email ) { ?>
             <div class="transaction-refund-wrap transaction-history-field hide-me-in-print">
                 <div class="refund-form-wrap">
                     <form method="post" action="" name="vt_refund_form_data" id="vt_refund_form_data">
@@ -164,8 +170,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     </div>
                 </div>
             </div>
-            <?php
+        <?php
         }
+
+	    if( strtolower( $transaction_type) !== 'zettle' && usbswiper_is_allow_capture( $transaction_id ) && $payment_status !== 'FAILED' && is_wc_endpoint_url('view-transaction') && $get_current_user_id === (int)$author_id ) {
+		    echo refund_confirmation_html();
+		    echo void_confirmation_html();
+	    }
     }
 
     $vt_invoice_id = 'invoice' === strtolower( $transaction_type ) ? $user_invoice_id : $transaction_id;
