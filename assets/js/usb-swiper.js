@@ -868,6 +868,8 @@ jQuery( document ).ready(function( $ ) {
             'vt-add-tax-nonce': nonce
         };
 
+        $("#TaxOnShipping").prop('checked', false);
+
         var taxLabel = '';
         var taxToolTip = vt_product_input.parents('.tax_rate_wrapper').find('span[data-tip]');
         var defaultToolTipText = taxToolTip.attr('data-default');
