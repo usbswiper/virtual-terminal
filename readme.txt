@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.4
-Stable tag: 3.2.0
+Stable tag: 3.2.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,12 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 3.2.1 =
+* Update - Adjust billing and shipping address logic. ([VT-99](https://github.com/usbswiper/virtual-terminal/pull/67))
+* Fix - Zettle transaction environment Column is Empty in admin side. ([VT-105](https://github.com/usbswiper/virtual-terminal/pull/64))
+* Update - Shipping/Billing Address Styling in admin and transaction page. ([VT-107](https://github.com/usbswiper/virtual-terminal/pull/67))
+* Update - Include handling amount in tax calculation. ([VT-108](https://github.com/usbswiper/virtual-terminal/pull/65))
 
 = 3.2.0 =
 * Feature - Added Product level tax enable and disable setting.
