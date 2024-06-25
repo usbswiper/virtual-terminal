@@ -911,7 +911,7 @@ jQuery( document ).ready(function( $ ) {
         };
 
         /*var isTaxable = vt_product_input.attr('data-product-taxable');*/
-        vt_product_input.attr('data-product-taxable', false);
+        //vt_product_input.attr('data-product-taxable', false);
         /*if(isTaxable === 'true' ) {
             vt_product_input.parents('.vt-fields-wrap').children('.product_quantity').find('input.vt-product-quantity').val('');
             vt_product_input.parents('.vt-fields-wrap').children('.price').find('input.vt-product-price').val('');
