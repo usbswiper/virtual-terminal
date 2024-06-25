@@ -108,11 +108,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 			$refund_amount = get_total_refund_amount($transaction_id);
             $transaction_total = usbswiper_get_zettle_transaction_total( $transaction_id );
 			?>
-            <div class="send-email-btn-wrapper hide-me-in-print">
+            <div class="send-email-btn-wrapper hide-me-in-print" style="text-align: right;">
                 <button id="send_email_btn_<?php echo $transaction_id; ?>" data-transaction_id="<?php echo $transaction_id; ?>" class="vt-button send-email-btn hide-me-in-print"><?php _e('Send Email Receipt','usb-swiper'); ?></button>
+	            <?php if( !$is_email && !is_admin()) { ?>
+                    <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt"><?php _e('Print Receipt', 'usb-swiper') ?></button>
+	            <?php } ?>
+                <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
             </div>
             <div class="transaction-refund-wrap transaction-history-field hide-me-in-print">
-                <button data-id="<?php echo $transaction_id; ?>" class="vt-button transaction-refund"><?php _e('Refund','usb-swiper'); ?></button>
                 <div class="refund-form-wrap">
                     <form method="post" action="" name="vt_refund_form_data" id="vt_refund_form_data">
                         <div class="refund-field">
@@ -574,9 +577,6 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             echo UsbSwiperZettle::get_refund_html( $transaction_id );
         } ?>
     </div>
-	<?php if( !$is_email && !is_admin()) { ?>
-        <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt">Print Receipt</button>
-    <?php } ?>
 
     <?php if( !$is_email ) { ?>
         <div class="custom-payment-notes signature" style="clear:both;">
