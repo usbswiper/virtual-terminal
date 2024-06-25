@@ -93,7 +93,7 @@ div.brand-logo {padding-bottom: 20px;}
 .paypal-connect-button-wrap {text-align: center;margin-top: 20px;}
 p.signature-text{display: none;}
 .transaction-history-title{font-size: 1.5rem;padding: 10px 0;}
-.address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:280px;}
+.address-wrap{padding: 10px;border: 2px solid #ebebeb;min-height:200px;}
 .show-me-only-in-print{display: none ;}
 .transaction-table-header{text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
 .transaction-column{width: calc(50% - 15px);}
@@ -316,7 +316,8 @@ button[disabled] {opacity: 0.5;}
     .transaction-details__title{font-size: 14px !important;padding:2px 0 !important;}
     table.shop_table.refund_details th, table.shop_table.refund_details td{font-size: 10px !important;padding: 5px !important;}
     address{margin:5px 0 !important;}
-    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:110px; line-height: 15px !important;}
+    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:140px !important; line-height: 16px !important;}
+    .address-wrap p {font-size: 10px !important;}
     p{margin:0 !important; padding: 0 !important;}
     .hide-me-in-print{display: none!important; height: 0 !important;}
     .show-me-only-in-print{display: inline-block ;}

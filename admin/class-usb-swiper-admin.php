@@ -392,7 +392,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                     break;
                 case 'transaction_environment':
 	                $environment = get_post_meta( $post_id, '_environment', true);
-	                echo !empty( $environment ) ? strtoupper($environment) : '';
+                    if( 'zettle' === strtolower($transaction_type) && empty( $environment ) ) {
+                        echo 'LIVE';
+                    } else {
+	                    echo !empty( $environment ) ? strtoupper($environment) : '';
+                    }
 	                break;
                 case 'company' :
                     $company = get_post_meta($post_id,'company',true);

@@ -1113,6 +1113,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        update_post_meta($transaction_id, '_user_invoice_id', sprintf("%04d", $user_invoice_id));
 		        update_post_meta($transaction_id, '_payment_status', 'CREATED');
 		        update_post_meta($transaction_id, 'payment_source', 'Zettle');
+		        update_post_meta( $transaction_id,'_environment', 'live');
 
 		        wp_update_post(array(
 			        'ID' => $transaction_id,
