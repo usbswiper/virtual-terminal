@@ -282,6 +282,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'product_min_qty_message' => __("Only positive numbers are allowed for QTY.", 'usb-swiper'),
 					'create_transaction_message' => __("Create a new transaction request for zettle", 'usb-swiper'),
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
+					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -319,6 +320,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'current_page_id' => get_the_ID(),
 					'create_transaction_message' => __("Create a new transaction request for zettle", 'usb-swiper'),
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
+					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
 				) );
             }
 

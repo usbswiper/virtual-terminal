@@ -862,28 +862,41 @@ jQuery( document ).ready(function( $ ) {
         let search_val = $(this).val();
         let vt_product_input = $(this);
         let nonce = $('#vt_add_tax_nonce').val();
-        let data = {
-            'action': 'vt_search_tax',
-            'tax-key': search_val,
-            'vt-add-tax-nonce': nonce
-        };
 
-        $.post(usb_swiper_settings.ajax_url, data, function (response) {
-            if (response.status) {
-                if(response.product_select) {
-                    if (vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children().hasClass('vt-search-result')) {
-                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
-                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+        vt_product_input.parents('.tax_rate_wrapper').find('span[data-tip]').remove();
+        $("#TaxOnShipping").prop('checked', false);
+        if(search_val.length >= 2) {
+
+            let data = {
+                'action': 'vt_search_tax',
+                'tax-key': search_val,
+                'vt-add-tax-nonce': nonce
+            };
+            $.post(usb_swiper_settings.ajax_url, data, function (response) {
+                if (response.status) {
+                    if(response.product_select) {
+                        if (vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children().hasClass('vt-search-result')) {
+                            vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                            vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        } else {
+                            vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        }
                     } else {
-                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').append('<div class="vt-search-result">' + response.product_select + '</div>')
+                        $("#TaxOnShipping").prop('checked', true);
+                        vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                        setTimeout( function () {
+                            updateSalesTax();
+                            updateGrandTotal();
+                        }, 800);
                     }
                 } else {
-                    vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+                    set_notification(response.message, 'error', response.message_type);
                 }
-            } else {
-                set_notification(response.message, 'error', response.message_type);
-            }
-        });
+            });
+        } else  {
+            vt_product_input.parents('.tax_rate_wrapper').children('.currency-sign').children('.vt-search-result').remove();
+            $("#TaxOnShipping").prop('checked', true);
+        }
     });
 
     $(document).on('keyup','.vt-product-input', function () {
@@ -897,7 +910,12 @@ jQuery( document ).ready(function( $ ) {
             'vt-add-product-nonce': nonce
         };
 
-        vt_product_input.attr('data-product-taxable', false);
+        /*var isTaxable = vt_product_input.attr('data-product-taxable');*/
+        //vt_product_input.attr('data-product-taxable', false);
+        /*if(isTaxable === 'true' ) {
+            vt_product_input.parents('.vt-fields-wrap').children('.product_quantity').find('input.vt-product-quantity').val('');
+            vt_product_input.parents('.vt-fields-wrap').children('.price').find('input.vt-product-price').val('');
+        }*/
 
         repeater.children('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
 
@@ -913,6 +931,10 @@ jQuery( document ).ready(function( $ ) {
                         }
                     } else {
                         vt_product_input.parents('.vt-fields-wrap').children('.product').children('.vt-search-result').remove();
+                        setTimeout( function () {
+                            updateSalesTax();
+                            updateGrandTotal();
+                        }, 800);
                     }
                 } else {
                     set_notification(response.message, 'error', response.message_type);
@@ -994,6 +1016,11 @@ jQuery( document ).ready(function( $ ) {
 
     $(document).on('click','.tax_rate_wrapper .tax-item', function () {
         let tax_input = $(this).parents('.tax_rate_wrapper').find('.vt-tax-input');
+
+        var taxLabel = $(this).text();
+        var defaultToolTipText = usb_swiper_settings.default_tax_tooltip_message;
+        $(this).parents('.tax_rate_wrapper').find('label').append('<span class="tool" data-default="'+defaultToolTipText+'" data-tip="'+defaultToolTipText+taxLabel+'" tabindex="1">?</span>');
+
         tax_input.val($(this).attr('data-id'));
         if( undefined !== $(this).attr('data-include-tax') && '' !== $(this).attr('data-include-tax') ){
             $("#TaxOnShipping").prop('checked', true);

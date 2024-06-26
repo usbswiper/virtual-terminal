@@ -202,6 +202,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
     $tax_data = get_user_meta($user_id, 'user_tax_data', true);
     $default_tax = get_user_meta($user_id,'default_tax',true);
     $default_tax = ( !empty( $default_tax ) && isset($tax_data[$default_tax]) ) ? $tax_data[$default_tax] : '';
+    $tax_label = !empty( $default_tax['tax_label'] ) ? $default_tax['tax_label'] : '';
     $tax_rate = !empty( $default_tax['tax_rate'] ) ? $default_tax['tax_rate'] : '';
     $tax_on_shipping = !empty( $default_tax['tax_on_shipping'] ) ? $default_tax['tax_on_shipping'] : false;
 
@@ -471,7 +472,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'type' => 'text',
 				'id' => 'TaxRate',
 				'name' => 'TaxRate',
-				'label' => __( 'Tax Rate', 'usb-swiper'),
+				'label' => __( 'Tax Rate for Taxable Product', 'usb-swiper'),
 				'required' => false,
 				'is_percentage' => true,
                 'placeholder' => __( 'Search Tax', 'usb-swiper'),
@@ -481,7 +482,9 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'is_symbol' => true,
 				'symbol' => '%',
 				'symbol_wrap_class' => 'currency-sign after',
-                'value' => $tax_rate
+                'value' => $tax_rate,
+                'tooltip' => !empty( $tax_rate ),
+                'tooltip_text' => $tax_label,
 			),
             array(
                 'type' => 'checkbox',

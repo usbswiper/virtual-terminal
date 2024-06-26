@@ -180,7 +180,7 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-transaction-history.woocommerce-page .transaction-overview ul li strong{padding-left: 0px !important;}
 .transaction-overview .transaction-basic-info .w-25{width: calc(25% - 5px) !important;}
 .woocommerce-message.vt-transactions-info {float: left;width: 100%;}
-.tool {cursor: pointer;position: relative;background: #3e474f;padding: 0px 7px;border-radius: 100%;margin-left: 5px;color: #FFF;}
+.tool {cursor: pointer;position: relative;background: #3e474f;padding: 0 6px;border-radius: 100%;margin-left: 5px;color: #FFF;font-size: 12px;line-height: 1.5;}
 .tool::before, .tool::after {left: 50%;opacity: 0;position: absolute;z-index: -100;}
 .tool:hover::before, .tool:focus::before, .tool:hover::after, .tool:focus::after {opacity: 1;transform: scale(1) translateY(0);z-index: 100;}
 .tool::before {border-left: 1em solid transparent;border-right: 1em solid transparent;border-bottom: 1em solid #3e474f;top: 100%;content: "";margin-left: -0.5em;transition: all .65s cubic-bezier(.84,-0.18,.31,1.26), opacity .65s .5s;transform:  scale(.6) translateY(-90%);left: 5px;}

@@ -39,6 +39,8 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
                 'is_symbol' => false,
                 'symbol' => '',
                 'symbol_wrap_class' => '',
+                'tooltip' => false,
+                'tooltip_text' => '',
 			);
 		}
 
@@ -128,7 +130,13 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 				return '';
 			}
 
-            return '<label for="'.$args['id'].'">'.$args['label'].'</label>';
+            $tool_tip = '';
+            if( !empty( $args['tooltip'] ) ) {
+                $default_text = __( 'Tax Rule: ', 'usb-swiper');
+                $tool_tip = '<span class="tool" data-default="'.$default_text.'" data-tip="'.$default_text.$args['tooltip_text'].'" tabindex="1">?</span>';
+            }
+
+            return '<label for="'.$args['id'].'">'.$args['label'].$tool_tip.'</label>';
 		}
 
         /**
