@@ -285,7 +285,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
-                    'is_customers' => false
+                    'is_customers' => false,
+					'timeout_option' => usb_swiper_get_user_timeout_option(),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -337,6 +338,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
                     'is_customers' => is_wc_endpoint_url('vt-customers'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
+					'timeout_option' => usb_swiper_get_user_timeout_option(),
 				) );
             }
 
@@ -2292,6 +2294,28 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				));
 				?>
 			</p>
+            <P class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+				<?php
+				echo  usb_swiper_get_html_field( array(
+					'type' => 'select',
+					'id' => 'timeout_option',
+					'name' => 'timeout_option',
+					'label' => __( 'Screen Timout Options', 'usb-swiper'),
+					'required' => true,
+                    'value' => usb_swiper_get_user_timeout_option(),
+					'options' => usb_swiper_get_timeout_options(),
+					'default' => usb_swiper_get_default_timeout(),
+					'attributes' => '',
+					'description' => '',
+					'readonly' => false,
+					'disabled' => false,
+					'class' => 'woocommerce-Select',
+					'wrapper' => false,
+					'tooltip' => true,
+					'tooltip_text' => __( 'This setting allows you to specify the duration of inactivity after user automatically logout. By default, screen timeout is 30 minutes.', 'usb-swiper'),
+				));
+				?>
+            </P>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
@@ -2384,6 +2408,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
                 $brand_logo = !empty( $_FILES['BrandLogo'] ) ? $_FILES['BrandLogo'] : '';
                 $user_timezone = !empty( $_POST['vt_user_timezone'] ) ? $_POST['vt_user_timezone'] : '';
+                $timeout_option = !empty( $_POST['timeout_option'] ) ? $_POST['timeout_option'] : usb_swiper_get_default_timeout();
 
                 $logo_id = !empty( $brand_logo ) ? $this->vt_upload_from_path( $brand_logo ) : 0;
 
@@ -2394,6 +2419,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
                 update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
                 update_user_meta( $user_id, "vt_user_timezone", $user_timezone );
+                update_user_meta( $user_id, "timeout_option", $timeout_option );
 
                 if( !empty( $logo_id ) && $logo_id > 0 ) {
                     update_user_meta( $user_id, "brand_logo", $logo_id );
