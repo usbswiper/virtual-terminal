@@ -26,6 +26,8 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 		 */
 		public static function activate() {
 
+			self::create_customer_table();
+
             $settings = get_option( 'usb_swiper_settings' );
 
             if( empty( $settings ) ) {
@@ -105,6 +107,47 @@ if( !class_exists( 'Usb_Swiper_Activator' ) ) {
 
                 update_option('usb_swiper_settings', $settings);
             }
+		}
+
+		public static function create_customer_table() {
+
+			global $wpdb;
+
+			$customer = $wpdb->prefix . 'customers';
+			$customer_meta = $wpdb->prefix . 'customer_meta';
+			$collate = $wpdb->get_charset_collate();
+
+			if( ! $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $customer ) ) ) ) {
+
+				$customer_sql = "CREATE TABLE {$customer} (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            email varchar(100) NULL DEFAULT '',
+            first_name varchar(100) NULL DEFAULT '',
+            last_name varchar(100) NULL DEFAULT '',
+            company varchar(100) NULL DEFAULT '',
+            date datetime NOT NULL default '0000-00-00 00:00:00',
+            modified_date datetime NOT NULL default '0000-00-00 00:00:00',
+            PRIMARY KEY  (id)
+        ) $collate;";
+
+				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+				dbDelta( $customer_sql );
+			}
+
+			if( ! $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $customer_meta ) ) ) ) {
+
+				$customer_meta_sql = "CREATE TABLE {$customer_meta} (
+            customer_meta_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            customer_id bigint(20) unsigned NOT NULL default '0',
+            meta_key varchar(255) default NULL,
+            meta_value longtext,
+            PRIMARY KEY (customer_meta_id),
+            KEY customer_id (customer_id)
+        ) $collate;";
+
+				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+				dbDelta( $customer_meta_sql );
+			}
 		}
 	}
 }

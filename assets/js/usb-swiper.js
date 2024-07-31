@@ -1,32 +1,34 @@
 jQuery( document ).ready(function( $ ) {
-    var company = localStorage.getItem('Company');
-    var BillingFirstName = localStorage.getItem('BillingFirstName');
-    var BillingLastName = localStorage.getItem('BillingLastName');
-    var BillingEmail = localStorage.getItem('BillingEmail');
-    var OrderAmount = localStorage.getItem('OrderAmount');
-    var Discount = localStorage.getItem('Discount');
-    var NetAmount = localStorage.getItem('NetAmount');
-    var ShippingAmount = localStorage.getItem('ShippingAmount');
-    var HandlingAmount = localStorage.getItem('HandlingAmount');
-    var TaxRate = localStorage.getItem('TaxRate');
-    var InvoiceNumber = localStorage.getItem('InvoiceNumber');
-    var Notes = localStorage.getItem('Notes');
-    if (company !== null) $('#company').val(company);
-    if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
-    if (BillingLastName !== null) $('#BillingLastName').val(BillingLastName);
-    if (BillingEmail !== null) $('#BillingEmail').val(BillingEmail);
-    if (OrderAmount !== null) $('#OrderAmount').val(OrderAmount);
-    if (Discount !== null) $('#Discount').val(Discount);
-    if (NetAmount !== null) $('#NetAmount').val(NetAmount);
-    if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
-    if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
-    if( !isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null){
-        TaxRate = parseInt(TaxRate);
-        $('#TaxRate').val(TaxRate);
-    }
-    if (InvoiceNumber !== null) $('#InvoiceID').val(InvoiceNumber);
-    if (Notes !== null) $('#Notes').val(Notes);
+    if(!usb_swiper_settings.is_customers) {
+        var company = localStorage.getItem('Company');
+        var BillingFirstName = localStorage.getItem('BillingFirstName');
+        var BillingLastName = localStorage.getItem('BillingLastName');
+        var BillingEmail = localStorage.getItem('BillingEmail');
+        var OrderAmount = localStorage.getItem('OrderAmount');
+        var Discount = localStorage.getItem('Discount');
+        var NetAmount = localStorage.getItem('NetAmount');
+        var ShippingAmount = localStorage.getItem('ShippingAmount');
+        var HandlingAmount = localStorage.getItem('HandlingAmount');
+        var TaxRate = localStorage.getItem('TaxRate');
+        var InvoiceNumber = localStorage.getItem('InvoiceNumber');
+        var Notes = localStorage.getItem('Notes');
 
+        if (company !== null && company !== 'undefined') $('#company').val(company);
+        if (BillingFirstName !== null && BillingFirstName !== 'undefined') $('#BillingFirstName').val(BillingFirstName);
+        if (BillingLastName !== null && BillingLastName !== 'undefined') $('#BillingLastName').val(BillingLastName);
+        if (BillingEmail !== null && BillingEmail !== 'undefined') $('#BillingEmail').val(BillingEmail);
+        if (OrderAmount !== null && OrderAmount !== 'undefined') $('#OrderAmount').val(OrderAmount);
+        if (Discount !== null && Discount !== 'undefined') $('#Discount').val(Discount);
+        if (NetAmount !== null && NetAmount !== 'undefined') $('#NetAmount').val(NetAmount);
+        if (ShippingAmount !== null && ShippingAmount !== 'undefined') $('#ShippingAmount').val(ShippingAmount);
+        if (HandlingAmount !== null && HandlingAmount !== 'undefined') $('#HandlingAmount').val(HandlingAmount);
+        if (!isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null && TaxRate !== 'undefined') {
+            TaxRate = parseInt(TaxRate);
+            $('#TaxRate').val(TaxRate);
+        }
+        if (InvoiceNumber !== null && InvoiceNumber !== 'undefined') $('#InvoiceID').val(InvoiceNumber);
+        if (Notes !== null && Notes !== 'undefined') $('#Notes').val(Notes);
+    }
     $(document).on('click','#PayByInvoice', function (){
 
         var VtForm = $('form#ae-paypal-pos-form');
@@ -481,7 +483,7 @@ jQuery( document ).ready(function( $ ) {
         current_obj.children('.vt-loader').remove();
     };
 
-    $(document).on('change','#TransactionCurrency', function () {
+    $(document).on('change','.usbswiper-change-currency', function () {
         var BillingLastName = $('#BillingLastName').val();
         var BillingFirstName = $('#BillingFirstName').val();
         var BillingEmail = $('#BillingEmail').val();
@@ -1203,6 +1205,165 @@ jQuery( document ).ready(function( $ ) {
         });
     });
 
+    $(document).on('keyup','#customerInformation', function (event) {
+        let currentObj = $(this);
+        let searchVal = currentObj.val();
+        if(searchVal.length >= 2) {
+            let data = {
+                'action': 'vt_search_customer',
+                'customer': searchVal,
+            };
+            $.post(usb_swiper_settings.ajax_url, data, function (response) {
+                if (response.status) {
+                    $('.vt-customer-search-result').remove();
+                    if(response.customer_html) {
+                        currentObj.parents('.input-field-wrap').append('<div class="vt-search-result vt-customer-search-result">' + response.customer_html + '</div>')
+                    }
+                } else {
+                    $('.vt-customer-search-result').remove();
+                }
+            });
+        } else {
+            $('.vt-customer-search-result').remove();
+        }
+    });
+
+    $(document).on('click','.vt-customer-search-result .customer-item', function (event) {
+        let currentObj = $(this);
+        let customer_id = currentObj.attr('data-customer_id');
+        let data = {
+            'action': 'vt_get_customer_by_id',
+            'customer_id': customer_id,
+        };
+        $.post(usb_swiper_settings.ajax_url, data, function (response) {
+            $('.vt-customer-search-result').remove();
+            if (response.status) {
+                if( response.customer ) {
+                    let customer = JSON.parse(response.customer);
+                    $.each(customer, function(key, value) {
+                        if(key === 'save_customer_details') {
+                            $('#'+key).prop('checked','checked');
+                        }else if( key === 'billingInfo' || key === 'shippingDisabled' || key === 'shippingSameAsBilling' ) {
+                            if( value === 'true' ) {
+                                jQuery('#' + key).bootstrapSwitch('state', true);
+                            } else {
+                                jQuery('#' + key).bootstrapSwitch('state', false);
+                            }
+                        } else {
+                            $('#'+key).val(value);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    $(document).on('click','.vt_delete_customer', function (event) {
+       let customer_id = $(this).attr('data-id');
+
+        if ( true === confirm(usb_swiper_settings.delete_customer_confirm_message) ) {
+
+            let data = {
+                'action': 'vt_delete_customer_by_id',
+                'customer_id': customer_id,
+            };
+
+            $.post(usb_swiper_settings.ajax_url, data, function (response) {
+                if(response.status) {
+                    set_notification(response.message, 'success', response.message_type);
+                    setTimeout( function () {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    set_notification(response.message, 'error', response.message_type);
+                }
+            });
+        }
+    });
+
+    $('#vt-customer-form').validate({
+        rules: {},
+        messages: {},
+        submitHandler: function(form, event) {
+
+            event.preventDefault();
+            var currentFormObj = $("#vt-customer-form");
+            var submitButton = currentFormObj.find('#vt_submit_button');
+            usb_swiper_add_loader(submitButton);
+
+            jQuery.ajax({
+                url: usb_swiper_settings.ajax_url,
+                type: 'POST',
+                dataType: 'json',
+                data: currentFormObj.serialize()+"&action=vt_handle_customer_form",
+            }).done(function ( response ) {
+
+                if( response.status) {
+                    set_notification(response.message, 'success');
+                    setTimeout( function () {
+                        window.location.href = response.redirection_url;
+                    }, 1000);
+                } else{
+                    set_notification(response.message, 'error', response.message_type);
+                }
+
+                usb_swiper_remove_loader(submitButton);
+            });
+
+        }
+    });
+    if(usb_swiper_settings.is_customers) {
+        let isBillingInfo = jQuery('#billingInfo').is(':checked');
+        let isShippingDisabled = jQuery('#shippingDisabled').is(':checked');
+        let isShippingSameAsBilling = jQuery('#shippingSameAsBilling').is(':checked');
+        window.setTimeout(function(){
+            jQuery('#billingInfo').bootstrapSwitch('state', isBillingInfo);
+            jQuery('#shippingDisabled').bootstrapSwitch('state', isShippingDisabled);
+            jQuery('#shippingSameAsBilling').bootstrapSwitch('state', isShippingSameAsBilling);
+            if(!isBillingInfo) {
+                jQuery('#BillingStreet, #BillingCity, #BillingState, #BillingCountryCode, #BillingPostalCode').removeAttr('required');
+                jQuery('.vt-billing-address-field').parents('.input-field-wrap').hide();
+                jQuery('#shippingSameAsBilling').parents('.input-field-wrap').hide();
+            } else {
+                jQuery('#BillingStreet, #BillingCity, #BillingState, #BillingCountryCode, #BillingPostalCode').attr('required', 'required');
+                jQuery('.vt-billing-address-field').parents('.input-field-wrap').show();
+                jQuery('#shippingSameAsBilling').parents('.input-field-wrap').show();
+            }
+
+            if( isShippingDisabled ) {
+                if(!isShippingDisabled) {
+                    jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').removeAttr('required');
+                    jQuery('.vt-shipping-address-field').parents('.input-field-wrap').hide();
+
+                    if(isBillingInfo) {
+                        jQuery('#shippingSameAsBilling').parents('.input-field-wrap').show();
+                    } else {
+                        jQuery('#shippingSameAsBilling').parents('.input-field-wrap').hide();
+                    }
+                } else {
+                    jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').attr('required', 'required');
+                    jQuery('.vt-shipping-address-field').parents('.input-field-wrap').show();
+                    if(isBillingInfo) {
+                        jQuery('#shippingSameAsBilling').parents('.input-field-wrap').show();
+                    } else {
+                        jQuery('#shippingSameAsBilling').parents('.input-field-wrap').hide();
+                    }
+                }
+
+                if (!isShippingSameAsBilling) {
+                    jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').attr('required', 'required');
+                    jQuery('.vt-shipping-address-field').parents('.input-field-wrap').show();
+                } else {
+                    jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').removeAttr('required');
+                    jQuery('.vt-shipping-address-field').parents('.input-field-wrap').hide();
+                }
+            } else {
+                jQuery('#ShippingFirstName, #ShippingLastName, #ShippingStreet, #ShippingCity, #ShippingState, #ShippingCountryCode, #ShippingPostalCode').removeAttr('required');
+                jQuery('.vt-shipping-address-field').parents('.input-field-wrap').hide();
+                jQuery('#shippingSameAsBilling').parents('.input-field-wrap').hide();
+            }
+        }, 1000);
+    }
 });
 
 function removeInterval( LoaderInterval ) {

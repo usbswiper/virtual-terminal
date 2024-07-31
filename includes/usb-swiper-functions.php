@@ -135,6 +135,7 @@ function usb_swiper_get_vt_tab_fields() {
 		'payment_info' => __( 'Payment Information' ,'usb-swiper' ),
 		'billing_address' => __( 'Billing Address' ,'usb-swiper' ),
 		'shipping_address' => __( 'Shipping Address' ,'usb-swiper' ),
+		'save_customer_info' => __( 'Save Customer Details' ,'usb-swiper' ),
 	);
 
 	return apply_filters( 'usb_swiper_get_vt_tab_fields', $tab_fields );
@@ -485,6 +486,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'value' => $tax_rate,
                 'tooltip' => !empty( $tax_rate ),
                 'tooltip_text' => $tax_label,
+                'default_tool_text' => __( 'Tax Rule: ', 'usb-swiper'),
 			),
             array(
                 'type' => 'checkbox',
@@ -662,7 +664,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'label' => __( 'Address Required?', 'usb-swiper'),
 				'required' => false,
 				'value' => "true",
-                'checked' => "true",
+				'checked' => true,
 				'attributes' => array(
 					'data-default-checked' => "FALSE"
 				),
@@ -676,6 +678,7 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'label' => __( 'Same as Billing', 'usb-swiper'),
 				'required' => false,
 				'value' => "true",
+				'checked' => true,
 				'attributes' => array(
 					'data-default-checked' => "TRUE"
 				),
@@ -802,6 +805,21 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'class' => 'vt-shipping-address-field',
 			),
 		)),
+        'save_customer_info' => apply_filters( 'usb_swiper_shipping_address_fields', array(
+	        array(
+		        'type' => 'checkbox',
+		        'id' => 'save_customer_details',
+		        'name' => 'save_customer_details',
+		        'label' => __( 'Save customer’s details for future use.', 'usb-swiper'),
+		        'required' => false,
+		        'description' => '',
+		        'class' => '',
+		        'wrapper_class' => '',
+		        'symbol_wrap_class' => '',
+		        'value' => true,
+		        'checked' => false
+	        ),
+        )),
 	);
 
     $form_fields = apply_filters( 'usb_swiper_get_vt_form_fields', $form_fields );

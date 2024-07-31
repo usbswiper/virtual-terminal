@@ -35,6 +35,22 @@ if( true === $profile_status && !empty($merchant_id)) {
             <div class="vt-row">
                 <div class="vt-col vt-col-60 vt-col-form-fields">
                     <fieldset>
+                        <div class="vt-fields-wrap">
+			                <?php echo usb_swiper_get_html_field( array(
+				                'type' => 'text',
+				                'id' => 'customerInformation',
+				                'name' => 'customerInformation',
+				                'label' => __('Search Customer Information','usb-swiper'),
+				                'required' => false,
+				                'attributes' => '',
+				                'class' => '',
+                                'placeholder' => __( 'Search Customer', 'usb-swiper'),
+				                'tooltip' => true,
+				                'tooltip_text' => __( 'Search Customer using firstname, lastname, email and company.', 'usb-swiper'),
+			                )); ?>
+                        </div>
+                    </fieldset>
+                    <fieldset>
                         <label><?php _e('Currency Information','usb-swiper'); ?></label>
                         <div class="vt-fields-wrap">
                             <?php echo usb_swiper_get_html_field( array(

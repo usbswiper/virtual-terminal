@@ -128,6 +128,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $query_vars['vt-products'] = 'vt-products';
             $query_vars['vt-tax-rules'] = 'vt-tax-rules';
             $query_vars['vt-zettle'] = 'vt-zettle';
+            $query_vars['vt-customers'] = 'vt-customers';
             return $query_vars;
         }
 
@@ -283,8 +284,21 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'create_transaction_message' => __("Create a new transaction request for zettle", 'usb-swiper'),
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
+					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
+                    'is_customers' => false
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
+
+				if( is_wc_endpoint_url('vt-customers') )  {
+                    wp_enqueue_style( 'bootstrap-switch', USBSWIPER_URL . 'assets/css/bootstrap-switch.min.css' );
+                    wp_enqueue_style( 'select2', USBSWIPER_URL . 'assets/css/select2.min.css' );
+                    wp_enqueue_script( 'bootstrap-min', USBSWIPER_URL . 'assets/js/bootstrap.min.js', array( 'jquery' ), $this->version, true );
+                    wp_enqueue_script( 'bootstrap-switch', USBSWIPER_URL . 'assets/js/bootstrap-switch.min.js', array( 'jquery' ), $this->version, true );
+                    wp_enqueue_script( 'pos-functions', USBSWIPER_URL . 'assets/js/pos-functions.js', array( 'jquery' ), $this->version, true );
+                    wp_enqueue_script( 'validate-credit-card-number', USBSWIPER_URL . 'assets/js/validate-credit-card-number.js', array( 'jquery' ), $this->version, true );
+                    wp_enqueue_script( 'parse-track-data', USBSWIPER_URL . 'assets/js/parse-track-data.js', array( 'jquery' ), $this->version, true );
+                    wp_enqueue_script( 'autoNumeric', USBSWIPER_URL . 'assets/js/autoNumeric.js', array( 'jquery' ), $this->version, true );
+				}
 
 				$sdk_obj = $this->get_paypal_sdk_obj();
 				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
@@ -321,6 +335,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'create_transaction_message' => __("Create a new transaction request for zettle", 'usb-swiper'),
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
+                    'is_customers' => is_wc_endpoint_url('vt-customers'),
+					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
 				) );
             }
 
@@ -391,6 +407,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $menu_links['vt-products']          =   __( 'Products', 'usb-swiper' );
                 $menu_links['vt-tax-rules']         =   __( 'Tax Rules', 'usb-swiper' );
                 $menu_links['vt-zettle']            =   __( 'Zettle POS', 'usb-swiper' );
+                $menu_links['vt-customers']            =   __( 'Customers', 'usb-swiper' );
 				$menu_links['customer-logout']      =   $logout;
 			}
 
@@ -411,6 +428,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             add_rewrite_endpoint( 'vt-tax-rules', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-zettle', EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'zettle-transactions', EP_ROOT | EP_PAGES );
+			add_rewrite_endpoint( 'vt-customers', EP_ROOT | EP_PAGES );
 		}
 
 		/**
@@ -420,7 +438,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		public function transactions_endpoint_cb() {
 
-			if( usb_swiper_allow_user_by_role('administrator')  || usb_swiper_allow_user_by_role('customer') ) {
+			if( usb_swiper_allow_user_by_role('administrator') || usb_swiper_allow_user_by_role('customer') ) {
 
 				$current_page   = !empty( $_GET['vt-page'] ) ? $_GET['vt-page'] : 1;
                 $transaction_type   = !empty( $_GET['vt-type'] ) ? sanitize_text_field( $_GET['vt-type'] ) : "";
@@ -900,7 +918,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
             }
 
-
 			if( ! empty( $vt_page_id ) && $vt_page_id === get_the_ID() ) {
 
 				if( isset($_REQUEST['merchantId']) && !empty( esc_attr( $_REQUEST['merchantId'] ) ) ) {
@@ -1155,7 +1172,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        }
 		        
 		        update_post_meta($transaction_id, 'vt_products', $vt_products);
-		        
+
+		        if( !class_exists('Usb_Swiper_Customers') ) {
+			        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+		        }
+
+                $usb_swiper_customers = new Usb_Swiper_Customers();
+		        $usb_swiper_customers->handle_customer($_POST);
+
 		        if( !class_exists('UsbSwiperZettle') ) {
 			        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-zettle.php';
 		        }
@@ -1514,6 +1538,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 }
 
                 update_post_meta( $transaction_id, 'vt_products', $vt_products );
+
+				if( !class_exists('Usb_Swiper_Customers') ) {
+					include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+				}
+
+				$usb_swiper_customers = new Usb_Swiper_Customers();
+				$usb_swiper_customers->handle_customer($_POST);
 
 			    if( !class_exists('Usb_Swiper_Paypal_request') ) {
 				    include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
@@ -4020,6 +4051,187 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 	        wp_safe_redirect($transaction_url);
 	        exit();
+        }
+
+        public function vt_search_customer() {
+
+	        $status = false;
+	        $message = __( 'Something went Wrong, please try after some time.', 'usb-swiper');
+	        $message_type = __('ERROR','usb-swiper');
+	        $customer_html = '';
+
+            if( !empty( $_POST['customer'] ) ) {
+
+	            if( !class_exists('Usb_Swiper_Customers') ) {
+		            include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+	            }
+
+	            $usb_swiper_customers = new Usb_Swiper_Customers();
+	            $customer_results = $usb_swiper_customers->get_customers([
+                    'customer' => esc_attr( $_POST['customer'] ),
+                    'per_page' => 100,
+                ]);
+
+	            $customer_lists = !empty( $customer_results['customers'] ) ? $customer_results['customers'] : [];
+
+                if( !empty( $customer_lists ) && is_array( $customer_lists ) ) {
+	                $status = true;
+                    foreach ( $customer_lists as $customer_list ) {
+                        $customer_id = !empty( $customer_list['customer_id'] ) ? $customer_list['customer_id'] : 0;
+                        $billing_email = !empty( $customer_list['BillingEmail'] ) ? $customer_list['BillingEmail'] : '';
+                        $first_name = !empty( $customer_list['BillingFirstName'] ) ? $customer_list['BillingFirstName'] : '';
+                        $last_name = !empty( $customer_list['BillingLastName'] ) ? $customer_list['BillingLastName'] : '';
+                        $full_name = "{$first_name} {$last_name} ({$billing_email})";
+	                    $customer_html .= "<span class='customer-item' data-customer_id='$customer_id' >$full_name</span>";
+                    }
+                } else {
+	                $message = __( 'Customers not found.', 'usb-swiper');
+                }
+            }
+
+	        $response = array(
+		        'status' => $status,
+		        'message' => $message,
+		        'message_type' => $message_type,
+		        'customer_html' => $customer_html,
+	        );
+
+	        wp_send_json( $response , 200 );
+        }
+
+        public function vt_get_customer_by_id() {
+
+	        $status = false;
+	        $message = __( 'Something went Wrong, please try after some time.', 'usb-swiper');
+	        $message_type = __('ERROR','usb-swiper');
+	        $customer = '';
+
+	        if( !empty( $_POST['customer_id'] ) ) {
+
+		        if( !class_exists('Usb_Swiper_Customers') ) {
+			        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+		        }
+
+		        $usb_swiper_customers = new Usb_Swiper_Customers();
+		        $customer_results = $usb_swiper_customers->get_customer_by_id(esc_attr( $_POST['customer_id'] ));
+                if( !empty( $customer_results ) && is_array( $customer_results ) ) {
+                    $status = true;
+	                $message = __('Customer data found','usb-swiper');
+	                $message_type = __('SUCCESS','usb-swiper');
+	                $customer = json_encode( $customer_results );
+                }
+	        }
+
+	        $response = array(
+		        'status' => $status,
+		        'message' => $message,
+		        'message_type' => $message_type,
+		        'customer' => $customer,
+	        );
+
+	        wp_send_json( $response , 200 );
+        }
+
+        public function vt_customers_endpoint_cb() {
+
+	        if( !class_exists('Usb_Swiper_Customers') ) {
+		        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+	        }
+
+	        $usb_swiper_customers = new Usb_Swiper_Customers();
+
+            if( !empty( $_GET['action'] ) && in_array( $_GET['action'],['create', 'view', 'edit'])) {
+	            $customer_id = !empty( $_GET['customer_id'] ) ? esc_attr( $_GET['customer_id'] ) : 0;
+	            $customer = $usb_swiper_customers->get_customer_by_id($customer_id);
+
+	            usb_swiper_get_template('wc-customer-detail.php', [
+                    'action' => esc_attr( $_GET['action'] ),
+                    'customer_id' => ( 'create' !== $_GET['action'] ) ? $customer_id : 0,
+                    'customer_data' => ( 'create' !== $_GET['action'] ) ? $customer : '',
+                ]);
+            } else {
+
+	            $customers = $usb_swiper_customers->get_customers([
+		            'customer' => !empty($_GET['s']) ? $_GET['s'] : '',
+		            'per_page' => 20,
+		            'current_page' => !empty( $_GET['vt-page'] ) ? (int) $_GET['vt-page'] : 1,
+	            ]);
+
+	            $args = !empty( $customers ) ? $customers : [];
+
+	            usb_swiper_get_template('wc-customers-lists.php', $args);
+            }
+        }
+
+        public function vt_delete_customer_by_id() {
+
+	        $status = false;
+	        $message = __( 'Something went Wrong, please try after some time.', 'usb-swiper');
+	        $message_type = __('ERROR','usb-swiper');
+            if( !empty( $_POST['customer_id'] ) && $_POST['customer_id'] > 0 ) {
+	            if( !class_exists('Usb_Swiper_Customers') ) {
+		            include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+	            }
+
+	            $usb_swiper_customers = new Usb_Swiper_Customers();
+	            $deleted_customer = $usb_swiper_customers->delete_customer($_POST['customer_id']);
+                if( !empty( $deleted_customer['status'] ) && true === $deleted_customer['status'] ) {
+	                $status = true;
+	                $message = !empty( $deleted_customer['message'] ) ? $deleted_customer['message'] : '';
+	                $message_type = __('SUCCESS','usb-swiper');
+                }
+            }
+
+	        $response = array(
+		        'status' => $status,
+		        'message' => $message,
+		        'message_type' => $message_type,
+	        );
+
+	        wp_send_json( $response , 200 );
+        }
+
+        public function vt_handle_customer_form() {
+	        $status = false;
+	        $message = __('Something went wrong. Please try again.','usb-swiper');
+	        $message_type = __('ERROR','usb-swiper');
+	        $redirection_url = '';
+
+	        if( !empty( $_POST['nonce'] ) && wp_verify_nonce($_POST['nonce'],'vt-customer-form') ) {
+
+		        if( !class_exists('Usb_Swiper_Customers') ) {
+			        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+		        }
+
+                $action_type = !empty( $_POST['action_type'] ) ? $_POST['action_type'] : 'create';
+
+                $customer_id = !empty( $_POST['customer_id']) ? $_POST['customer_id'] : 0;
+                $customer_data = $_POST;
+                unset($customer_data['customer_id']);
+                unset($customer_data['action']);
+                unset($customer_data['action_type']);
+                unset($customer_data['nonce']);
+
+		        $usb_swiper_customers = new Usb_Swiper_Customers();
+		        $customer_data = $usb_swiper_customers->handle_customer($customer_data,$customer_id);
+
+                if( !empty( $customer_data['status'] ) ) {
+
+                    $status = true;
+	                $message = !empty( $customer_data['message'] ) ? $customer_data['message'] : '';
+	                $message_type = __('SUCCESS','usb-swiper');
+	                $redirection_url = esc_url( wc_get_endpoint_url( 'vt-customers', '', wc_get_page_permalink( 'myaccount' )) );
+                }
+	        }
+
+	        $response = array(
+		        'status' => $status,
+		        'message' => $message,
+		        'message_type' => $message_type,
+		        'redirection_url' => $redirection_url,
+	        );
+
+	        wp_send_json( $response , 200 );
         }
     }
 }

@@ -108,6 +108,11 @@ class Usb_Swiper {
 		require_once USBSWIPER_PATH.'includes/class-usb-swiper-i18n.php';
 
 		/**
+		 * The class responsible for defining all actions manage for customers infomration.
+		 */
+		require_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once USBSWIPER_PATH.'/admin/class-usb-swiper-admin.php';
@@ -174,6 +179,7 @@ class Usb_Swiper {
         $this->loader->add_action('woocommerce_account_vt-products_endpoint', $plugin_public, 'vt_products_endpoint_cb');
         $this->loader->add_action('woocommerce_account_vt-tax-rules_endpoint', $plugin_public, 'vt_tax_rules_endpoint_cb');
         $this->loader->add_action('woocommerce_account_vt-zettle_endpoint', $plugin_public, 'vt_zettle_endpoint_cb');
+        $this->loader->add_action('woocommerce_account_vt-customers_endpoint', $plugin_public, 'vt_customers_endpoint_cb');
 
 		add_shortcode( 'usb_swiper_paypal_connect', array( $plugin_public, 'usb_swiper_paypal_connect') );
 		add_shortcode( 'usb_swiper_vt_verification_form', array( $plugin_public, 'usb_swiper_vt_verification_form') );
@@ -225,7 +231,11 @@ class Usb_Swiper {
 		$this->loader->add_action( 'wp_ajax_delete_tax_data', $plugin_public, 'vt_delete_tax_data');
 		$this->loader->add_action( 'wp_ajax_vt_zettle_pair_reader', $plugin_public, 'vt_zettle_pair_reader');
 		$this->loader->add_action( 'wp_ajax_disable_vt_form_warning', $plugin_public, 'disable_vt_form_warning');
-		
+		$this->loader->add_action( 'wp_ajax_vt_search_customer', $plugin_public, 'vt_search_customer');
+		$this->loader->add_action( 'wp_ajax_vt_get_customer_by_id', $plugin_public, 'vt_get_customer_by_id');
+		$this->loader->add_action( 'wp_ajax_vt_delete_customer_by_id', $plugin_public, 'vt_delete_customer_by_id');
+		$this->loader->add_action( 'wp_ajax_vt_handle_customer_form', $plugin_public, 'vt_handle_customer_form');
+
 		if (!is_admin()) {
 			return;
 		}
