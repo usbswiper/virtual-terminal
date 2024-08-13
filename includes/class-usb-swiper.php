@@ -167,8 +167,8 @@ class Usb_Swiper {
 		$this->loader->add_action('init', $plugin_public, 'endpoint_init');
 		$this->loader->add_filter('woocommerce_account_menu_items', $plugin_public, 'wc_account_menu_items');
 		$this->loader->add_action('woocommerce_account_transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
-		$this->loader->add_action('woocommerce_account_invoices_endpoint', $plugin_public, 'transactions_endpoint_cb');
-		$this->loader->add_action('woocommerce_account_zettle-transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
+		//$this->loader->add_action('woocommerce_account_invoices_endpoint', $plugin_public, 'transactions_endpoint_cb');
+		//$this->loader->add_action('woocommerce_account_zettle-transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
 		$this->loader->add_action('woocommerce_account_view-transaction_endpoint', $plugin_public, 'view_transactions_endpoint_cb');
         $this->loader->add_filter( 'woocommerce_get_query_vars', $plugin_public, 'update_wc_endpoints' );
         $this->loader->add_action('woocommerce_account_vt-products_endpoint', $plugin_public, 'vt_products_endpoint_cb');
