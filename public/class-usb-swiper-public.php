@@ -123,8 +123,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $query_vars['view-transaction'] = 'view-transaction';
             $query_vars['transactions'] = 'transactions';
-            $query_vars['invoices'] = 'invoices';
-	        $query_vars['zettle-transactions'] = 'zettle-transactions';
+            //$query_vars['invoices'] = 'invoices';
+	        //$query_vars['zettle-transactions'] = 'zettle-transactions';
             $query_vars['vt-products'] = 'vt-products';
             $query_vars['vt-tax-rules'] = 'vt-tax-rules';
             $query_vars['vt-zettle'] = 'vt-zettle';
@@ -404,8 +404,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				unset( $menu_links['customer-logout'] );
 
 				$menu_links['transactions']         =   __( 'Transactions', 'usb-swiper' );
-                $menu_links['invoices']             =   __( 'Invoices', 'usb-swiper' );
-				$menu_links['zettle-transactions']  =   __( 'Zettle Transactions', 'usb-swiper' );
+                //$menu_links['invoices']             =   __( 'Invoices', 'usb-swiper' );
+				//$menu_links['zettle-transactions']  =   __( 'Zettle Transactions', 'usb-swiper' );
                 $menu_links['vt-products']          =   __( 'Products', 'usb-swiper' );
                 $menu_links['vt-tax-rules']         =   __( 'Tax Rules', 'usb-swiper' );
                 $menu_links['vt-zettle']            =   __( 'Zettle POS', 'usb-swiper' );
@@ -425,11 +425,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
-			add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
+			//add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-tax-rules', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-zettle', EP_ROOT | EP_PAGES );
-			add_rewrite_endpoint( 'zettle-transactions', EP_ROOT | EP_PAGES );
+			//add_rewrite_endpoint( 'zettle-transactions', EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'vt-customers', EP_ROOT | EP_PAGES );
 		}
 
@@ -547,16 +547,32 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="text" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
                         </div>
                         <div class="input-field-wrap form-row">
+                            <?php echo usb_swiper_get_html_field(array(
+                                'type' => 'select',
+                                'id' => 'transaction_type',
+                                'name' => 'transaction_type',
+                                'options' => array(
+                                    '' => __('All Types', 'usb-swiper'),
+                                    'transaction' => __('Transaction', 'usb-swiper'),
+                                    'invoice' => __('Invoice', 'usb-swiper'),
+                                    'zettle' => __('Zettle', 'usb-swiper')
+                                ),
+                                'class' => 'transaction-select',
+                                'default' => '',
+                                'value' => isset($_GET['transaction_type']) ? sanitize_text_field($_GET['transaction_type']) : ''
+                            )); ?>
+                        </div>
+                        <div class="input-field-wrap form-row">
                             <button type="submit" class="vt-button"><?php _e('FILTER','usb-swiper'); ?></button>
                         </div>
                     </div>
                 </form>
                 <?php
-                if( is_wc_endpoint_url('zettle-transactions') ) {
-	                usb_swiper_get_template('wc-transactions-zettle.php', $args);
-                } else {
+                //if( is_wc_endpoint_url('zettle-transactions') ) {
+	                //usb_swiper_get_template('wc-transactions-zettle.php', $args);
+                //} else {
 	                usb_swiper_get_template('wc-transactions-lists.php', $args);
-                }
+                //}
 			}
 		}
 
@@ -575,14 +591,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $user_id = get_current_user_id();
 
             $meta_key = '_transaction_type';
-            $meta_value = '';
-            if( is_wc_endpoint_url('transactions') ){
-                $meta_value = 'transaction';
-            }elseif ( is_wc_endpoint_url('invoices') ){
-                $meta_value = 'invoice';
-            } elseif ( is_wc_endpoint_url('zettle-transactions') ){
-	            $meta_value = 'zettle';
-            }
+            $meta_value = !empty( $_REQUEST['transaction_type'] ) ? $_REQUEST['transaction_type'] : '';
+            // if( is_wc_endpoint_url('transactions') ){
+            //     $meta_value = 'transaction';
+            // }elseif ( is_wc_endpoint_url('invoices') ){
+            //     $meta_value = 'invoice';
+            // } elseif ( is_wc_endpoint_url('zettle-transactions') ){
+	        //     $meta_value = 'zettle';
+            // }
 
             if( !empty( $meta_value ) ){
                 $transaction_type_query = $wpdb->prepare(

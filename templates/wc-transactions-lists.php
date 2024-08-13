@@ -15,6 +15,7 @@ if( $has_transactions ) : ?>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-tid"><?php _e('Transaction ID','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-status"><?php _e('Status','usb-swiper'); ?></th>
                 <th class="woocommerce-orders-table__header woocommerce-orders-table__header-intent"><?php _e('Intent','usb-swiper'); ?></th>
+                <th class="woocommerce-orders-table__header woocommerce-orders-table__header-type"><?php _e('Type','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-total"><?php _e('Total','usb-swiper'); ?></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-date"><?php _e('Date','usb-swiper'); ?><span id="date-toggle" class="toggle-icon <?php echo isset($_GET['date_toggle']) && $_GET['date_toggle'] === 'asc' ? 'asc' : 'desc'; ?>"><?php echo isset($_GET['date_toggle']) && $_GET['date_toggle'] === 'asc' ? '&#x25B2;' : '&#x25BC;'; ?></span></th>
 				<th class="woocommerce-orders-table__header woocommerce-orders-table__header-actions"><?php _e('Actions','usb-swiper'); ?></th>
@@ -50,9 +51,10 @@ if( $has_transactions ) : ?>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-id"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-status"><?php echo !empty( $payment_status ) ? strtoupper(usbswiper_get_payment_status(esc_attr($payment_status))) : '-'; ?></td>
                     <td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-intent"><?php echo !empty( $payment_action ) ? strtoupper(esc_attr( $payment_action )) : '-'; ?></td>
+                    <td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-type"><?php echo !empty( $transaction_type ) ? strtoupper(esc_attr( $transaction_type )) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-total"><?php echo !empty( $grand_total ) ? wc_price(esc_attr( $grand_total ), array('currency' => $transaction_currency)) : '-'; ?></td>
 					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-date"><?php echo esc_attr( get_the_time( __( 'Y/m/d g:i a' ), $transaction ) ); ?></td>
-					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions">
+					<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-transaction-actions transaction-actions">
 						<a href="<?php echo esc_url( wc_get_endpoint_url( $end_point, $id, wc_get_page_permalink( 'myaccount' ) ) ); ?>" class="vt-button view"><?php _e('View', 'usb-swiper'); ?></a>
                         <?php if( usbswiper_is_allow_capture( $id ) && $payment_status !== 'FAILED' ) {
                             $unique_id = usb_swiper_unique_id( array(
@@ -94,16 +96,20 @@ if( $has_transactions ) : ?>
                 $next_args['vt-search'] = sanitize_text_field($_GET['vt-search']);
             }
             if (!empty($_GET['start-date'])) {
-                $previous_args['start-date'] = sanitize_text_field($_GET['start-date']);
+                $next_args['start-date'] = sanitize_text_field($_GET['start-date']);
             }
             if (!empty($_GET['end-date'])) {
-                $previous_args['end-date'] = sanitize_text_field($_GET['end-date']);
+                $next_args['end-date'] = sanitize_text_field($_GET['end-date']);
             }
-            if( is_wc_endpoint_url('transactions') ){
-                $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'transactions' ,'') );
-            } elseif ( is_wc_endpoint_url('invoices') ) {
-                $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'invoices' ,'') );
+
+            if (!empty($_GET['transaction_type'])) {
+                $next_args['transaction_type'] = sanitize_text_field($_GET['transaction_type']);
             }
+
+            if (!empty($_GET['date_toggle'])) {
+                $next_args['date_toggle'] = sanitize_text_field($_GET['date_toggle']);
+            }
+            $next_page_url = add_query_arg($next_args,  wc_get_endpoint_url( 'transactions' ,'') );
 
             ?>
 			<a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url($next_page_url); ?>"><?php esc_html_e( 'Previous', 'woocommerce' ); ?></a>
@@ -126,12 +132,14 @@ if( $has_transactions ) : ?>
             if (!empty($_GET['end-date'])) {
                 $previous_args['end-date'] = sanitize_text_field($_GET['end-date']);
             }
-
-            if( is_wc_endpoint_url('transactions') ){
-                $previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'transactions' ,'') );
-            } elseif ( is_wc_endpoint_url('invoices') ) {
-                $previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'invoices' ,'') );
+            if (!empty($_GET['transaction_type'])) {
+                $previous_args['transaction_type'] = sanitize_text_field($_GET['transaction_type']);
             }
+            if (!empty($_GET['date_toggle'])) {
+                $previous_args['date_toggle'] = sanitize_text_field($_GET['date_toggle']);
+            }
+
+            $previous_page_url = add_query_arg($previous_args,  wc_get_endpoint_url( 'transactions' ,'') );
             ?>
 			<a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button" href="<?php echo esc_url( $previous_page_url ); ?>"><?php esc_html_e( 'Next', 'woocommerce' ); ?></a>
 		<?php endif; ?>
