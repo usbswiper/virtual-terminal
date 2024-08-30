@@ -850,6 +850,14 @@ jQuery( document ).ready(function( $ ) {
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             if (response.status) {
                 $('#vt_repeater_field').append( response.html );
+                jQuery('.vt-product-price').autoNumeric('init', {
+                    mDec: '2',
+                    aSign: '',
+                    wEmpty: '0',
+                    lZero: 'allow',
+                    aForm: false,
+                    vMin: '0'
+                });
                 usb_swiper_remove_loader(loader);
                 loader.removeAttr('disabled');
             } else {
@@ -1203,6 +1211,14 @@ jQuery( document ).ready(function( $ ) {
         });
     });
 
+    jQuery('.vt-form-product-price').autoNumeric('init', {
+        mDec: '2',
+        aSign: '',
+        wEmpty: '0',
+        lZero: 'allow',
+        aForm: false,
+        vMin: '0'
+    });
 });
 
 function removeInterval( LoaderInterval ) {

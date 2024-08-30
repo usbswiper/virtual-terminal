@@ -25,7 +25,7 @@ jQuery(function( $ ) {
         }
 
         /* AutoNumeric JavaScript plugin */
-        jQuery('#NetAmount, #ShippingAmount, #HandlingAmount').autoNumeric('init',
+        jQuery('#NetAmount, #ShippingAmount, #HandlingAmount, .vt-product-price').autoNumeric('init',
             {
                 mDec: '2',
                 aSign: '',
