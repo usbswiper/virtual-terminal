@@ -269,12 +269,14 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'wrapper_class' => 'product_quantity'
             ),
             array(
-                'type' => 'number',
+                'type' => 'text',
                 'id' => 'VTProductPrice',
                 'name' => 'VTProductPrice[]',
                 'placeholder' => __( 'Price', 'usb-swiper'),
                 'required' => true,
-                'attributes' => '',
+	            'attributes' => array(
+		            'pattern' => '([0-9]|\$|,|.)+'
+	            ),
                 'description' => '',
                 'readonly' => false,
                 'disabled' => false,

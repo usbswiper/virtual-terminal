@@ -46,17 +46,18 @@ $add_product_form_fields = array(
         'class' => 'vt-input-field vt-textarea-field'
     ),
     array(
-        'type' => 'number',
+        'type' => 'text',
         'id' => 'price',
         'name' => 'price',
         'placeholder' => __( 'Price:', 'usb-swiper'),
         'attributes' => array(
             "step" => usbswiper_get_price_step(),
+	        'pattern' => '([0-9]|\$|,|.)+'
         ),
         'description' => '',
         'readonly' => false,
         'value' => ! empty( $product_price ) ? $product_price : '',
-        'class' => 'vt-input-field',
+        'class' => 'vt-input-field vt-form-product-price',
         'is_symbol' => true,
         'symbol' => usbswiper_get_currency_symbol(),
         'symbol_wrap_class' => 'currency-sign',

@@ -304,7 +304,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$sdk_obj = $this->get_paypal_sdk_obj();
 				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
 				wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
-
+				wp_enqueue_script( 'autoNumeric', USBSWIPER_URL . 'assets/js/autoNumeric.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'jquery-validate', USBSWIPER_URL . 'assets/js/jquery.validate.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
 
