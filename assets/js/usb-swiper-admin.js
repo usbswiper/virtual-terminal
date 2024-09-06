@@ -1,4 +1,23 @@
 jQuery( document ).ready(function( $ ) {
+
+    $('.datepicker').datepicker({
+        dateFormat: "yy-mm-dd"
+    });
+
+    var startDatePicker = $( "#start_date" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function(selectedDate) {
+            endDatePicker.datepicker("option", "minDate", selectedDate);
+        }
+    });
+
+    var endDatePicker = $( "#end_date" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function(selectedDate) {
+            startDatePicker.datepicker("option", "maxDate", selectedDate);
+        }
+    });
+
     $('.select2-original').select2({
         placeholder: "Choose Users",
         width: "50%"
