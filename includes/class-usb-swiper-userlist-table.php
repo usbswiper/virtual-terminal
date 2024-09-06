@@ -5,7 +5,7 @@ if (!class_exists('WP_List_Table')) {
  }
 
 /**
- * The Users_List_Table class is responsible for Users table lists.
+ * The Users_List_Table class is responsible for Merchants Transactions report table lists.
  *
  * @since 1.0.0
  */
@@ -29,7 +29,6 @@ class Users_List_Table extends WP_List_Table {
      */
     public function prepare_items() {
 
-    
         $columns = $this->get_columns();
         $hidden = $this->get_hidden_columns();
         $sortable = $this->get_sortable_columns();
@@ -53,10 +52,10 @@ class Users_List_Table extends WP_List_Table {
      */
     public function get_columns() {
         $columns = array(
-            'id'            => __( 'ID', 'bulk-featured-image'),
-            'user_login'         => __( 'User Login', 'bulk-featured-image'),
-            'display_name' => __( 'Display Name', 'bulk-featured-image'),
-            'user_email' => __( 'User Email', 'bulk-featured-image')
+            'id'            => __( 'ID', 'usb-swiper'),
+            'user_login'         => __( 'User Login', 'usb-swiper'),
+            'display_name' => __( 'Display Name', 'usb-swiper'),
+            'user_email' => __( 'User Email', 'usb-swiper')
         );
         return $columns;
     }

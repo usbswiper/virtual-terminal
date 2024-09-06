@@ -523,6 +523,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     );
                 }
 
+                echo '<pre>';
+                print_r($transaction_args);
+                echo '</pre>';
+
                 add_filter( 'posts_where',array($this, 'vt_title_filter'), 10, 2 );
                 $transactions = new WP_Query( $transaction_args );
                 remove_filter( 'posts_where',array($this,'vt_title_filter'), 10, 2 );

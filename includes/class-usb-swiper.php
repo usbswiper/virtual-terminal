@@ -256,6 +256,7 @@ class Usb_Swiper {
 		$this->loader->add_action('usb_swiper_section_content_advanced', $plugin_admin, 'advanced_settings');
 		$this->loader->add_action('usb_swiper_section_content_logs', $plugin_admin, 'logs_settings');
 		$this->loader->add_action('usb_swiper_section_content_zettle', $plugin_admin, 'zettle_settings');
+		$this->loader->add_action('usb_swiper_section_content_reports', $plugin_admin, 'reports_settings');
 		$this->loader->add_action('usb_swiper_save_section_partner_fees', $plugin_admin, 'save_partner_fees');
 		$this->loader->add_action('usb_swiper_section_content_uninstall', $plugin_admin, 'uninstall_settings');
 		$this->loader->add_action('wp_ajax_insert_new_partner_fee', $plugin_admin, 'insert_new_partner_fee');
