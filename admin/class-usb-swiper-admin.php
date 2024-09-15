@@ -2036,7 +2036,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 			$report_table = new Merchant_Report_Table();
 
-			echo '<div class="wrap">';
+			echo '<div class="wrap merchant-report-wrap">';
                 echo '<h1>'.esc_html__('Merchant Report', 'usb-swiper').'</h1>';
                 // Prepare table
                 $report_table->prepare_items();
@@ -2044,5 +2044,70 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 $report_table->display();
 			echo '</div>';
 		}
+
+        public function get_merchant_report() {
+
+
+            $status = false;
+            $message = __('Nonce not verified. Please try again.', 'usb-swiper' );
+            $html = '';
+            $max_page = 0;
+
+            $new_nonce = wp_create_nonce('report_table');
+
+            if( !empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'report_table') ) {
+                $status = true;
+                $page = !empty($_POST['page']) ? (int)sanitize_text_field($_POST['page']) : 1;
+                $offset = !empty($_POST['offset']) ? (int)sanitize_text_field($_POST['offset'])  : 1;
+                $merchant = !empty($_POST['merchant']) ? sanitize_text_field($_POST['merchant']) : '';
+                $report_start_date = !empty($_POST['start_date']) ? sanitize_text_field($_POST['start_date']) : '';
+                $report_end_date = !empty($_POST['end_date']) ? sanitize_text_field($_POST['end_date']) : '';
+                $total_volume = !empty($_POST['total_volume']) ? (float)sanitize_text_field($_POST['total_volume']) : '';
+                $amex_volume= !empty($_POST['amex_volume']) ? (float)sanitize_text_field($_POST['amex_volume']) : '';
+                $items = !empty($_POST['items']) ? (array)$_POST['items'] : [];
+
+                $data = [
+                    'merchant' => $merchant,
+                    'start_date' => $report_start_date,
+                    'end_date' => $report_end_date,
+                    'page' => $page,
+                    'total_volume' => $total_volume,
+                    'amex_volume' => $amex_volume,
+                    'items' =>  $items,
+                ];
+
+                if (!class_exists('Merchant_Report_Table')) {
+                    require_once USBSWIPER_PLUGIN_DIR . '/admin/class-usb-swiper-merchant-reports.php';
+                }
+
+                $report_table = new Merchant_Report_Table();
+
+                $response = $report_table->prepare_ajax_items($data, $offset);
+
+                $html = $response['html'];
+                $max_page = $response['max_page'];
+            }
+
+            if( !empty( $response['total_item'] ) ) {
+                $response['total_item'] = (int)$response['total_item'] > 1 ? (int)$response['total_item'].' items' : (int)$response['total_item'].' item';
+                $response['total_count'] = (int)$response['total_item'] > 0 ? (int)$response['total_item'] : 0;
+                $response['pagination'] = !empty($response['pagination']) ? $response['pagination'] : '';
+            }
+
+            $response = array(
+                'status' => $status,
+                'max_page' => $max_page,
+                'total_volume' => $response['total_volume'],
+                'amex_volume' => $response['amex_volume'],
+                'html' => $html,
+                'message' => $message,
+                'items' => $response['items'],
+                'total_item' => !empty($response['total_item']) ? $response['total_item'] : '0 items',
+                'pagination_html' => !empty($response['pagination']) ? $response['pagination'] : '',
+                'total_count' => !empty($response['total_count']) ? $response['total_count'] : 0,
+            );
+
+            wp_send_json( $response , 200 );
+        }
 	}
 }

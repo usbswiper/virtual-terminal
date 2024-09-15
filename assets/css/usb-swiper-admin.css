@@ -36,3 +36,6 @@ div#transaction-log {overflow-x: scroll;}
 .select2-result-label .wrap.checked:before{content:"\f14a";}
 .select2-result-label .wrap{margin-left:15px;}
 .total-volume {margin-left: 1rem;}
+.usb-swiper-loader-report-page {background: #000;position: fixed;height: 100%;width: -webkit-fill-available;top: 0;opacity: 0.5;display: flex;justify-content: center;align-items: center;z-index: 9999;}
+.spinner-report-page {width: 60px;height: 60px;border:6px solid #000;border-top-color: #fff;border-radius: 50%;animation: spin 1s linear infinite;}
+@keyframes spin { 0%{transform: rotate(0deg); } 100%{transform: rotate(360deg);} }
