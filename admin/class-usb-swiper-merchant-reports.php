@@ -414,68 +414,17 @@ class Merchant_Report_Table extends WP_List_Table {
 	 */
 	public function prepare_items() {
 
-        $transactions = $this->get_merchant_transaction_by_id([]);
-
-        $items = [];
-        if( !empty( $transactions ) && is_array( $transactions ) ){
-
-            foreach ( $transactions as $transaction_id ) {
-
-                $transaction_status = usbswiper_get_transaction_status($transaction_id);
-
-                if( !empty( $transaction_status ) &&  in_array( strtolower($transaction_status), ['paid','completed'])  ) {
-
-                    $transaction = get_post($transaction_id);
-                    $grand_total = get_post_meta( $transaction_id, 'GrandTotal', true );
-                    $grand_total = !empty( $grand_total ) ? $grand_total : 0;
-                    $payment_response = get_post_meta($transaction_id, '_payment_response', true);
-                    $payment_data = maybe_unserialize($payment_response);
-
-                    $amex_amount = 0;
-                    if (isset($payment_data['payment_source']['card']['brand']) && $payment_data['payment_source']['card']['brand'] === 'AMEX') {
-                        $amex_amount = $grand_total;
-                    }
-                    $post_author = !empty($transaction->post_author) ? $transaction->post_author : 0;
-                    $post_date = !empty($transaction->post_date) ? $transaction->post_date : '';
-                    $unique_key = $post_author.'_'.date('Y-m',strtotime($post_date));
-
-                    $this->total_volume = floatval($this->total_volume) + floatval($grand_total);
-	                $this->total_amex_volume = floatval($this->total_amex_volume) + floatval($amex_amount);
-
-	                if( !empty( $items[$unique_key]  )) {
-                        $temp_total_volume = !empty( $items[$unique_key]['total_volume'] ) ? $items[$unique_key]['total_volume'] : 0;
-                        $temp_amex_volume = !empty( $items[$unique_key]['amex_volume'] ) ? $items[$unique_key]['amex_volume'] : 0;
-		                $items[$unique_key]['total_volume'] = floatval( $temp_total_volume ) + floatval( $grand_total );
-		                $items[$unique_key]['amex_volume'] = floatval( $temp_amex_volume ) + floatval( $amex_amount );
-	                } else {
-		                $items[$unique_key] = [
-			                'total_volume' => floatval($grand_total),
-			                'amex_volume' => floatval($amex_amount),
-			                'month' => date('Y-m',strtotime($post_date)),
-			                'merchant_name' => $post_author,
-		                ];
-	                }
-                }
-            }
-        }
-
 		$columns = $this->get_columns();
 		$hidden = [];
 		$sortable = [];
 
         $this->set_pagination_args( [
-			'total_items' => !empty( $items ) ? count( $items ) : 0,
+			'total_items' => 0,
 			'per_page'    => $this->per_page
         ]);
 
 		$this->_column_headers = [$columns, $hidden, $sortable];
 
-        if( !empty( $items ) && count( $items ) > $this->per_page ) {
-	        $offset = $this->per_page * ( $this->current_page - 1);
-	        $items = array_slice($items, $offset, $this->per_page);
-        }
-
-		$this->items = $items;
 	}
 
 	/**
