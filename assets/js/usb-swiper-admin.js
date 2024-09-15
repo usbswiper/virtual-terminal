@@ -246,7 +246,8 @@ function update_merchat_report(page = 1,loop = 1, found = 0,total_volume = 0, am
 
                 if(response.total_count > 20){
                     jQuery('.tablenav-pages').removeClass('one-page');
-                } else if(jQuery('.tablenav-pages').hasClass('one-page')) {
+                    jQuery('.tablenav-pages').removeClass('no-pages');
+                } else if(!jQuery('.tablenav-pages').hasClass('one-page')) {
                     jQuery('.tablenav-pages').addClass('one-page');
                 }
 
