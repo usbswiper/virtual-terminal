@@ -1032,11 +1032,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     case "create_transaction":
                         $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
 
-                        if( !empty( $transaction_id ) && (int)$transaction_id > 0 ) {
-                            $this->pay_by_invoice_transaction($transaction_id);
+                        if( !empty( $_POST['transaction_type'] ) && 'retry' === $_POST['transaction_type'] ) {
+                            $this->create_new_transaction($transaction_id);
                         } else {
-                            $this->create_new_transaction();
+                            if( !empty( $transaction_id ) && (int)$transaction_id > 0 ) {
+                                $this->pay_by_invoice_transaction($transaction_id);
+                            } else {
+                                $this->create_new_transaction();
+                            }
                         }
+
                         break;
                     case "cc_capture":
                         $this->capture_transaction();
@@ -1418,7 +1423,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @since 1.0.0
 		 */
-		public function create_new_transaction() {
+		public function create_new_transaction( $transaction_id = 0) {
 
             $current_user_id = get_current_user_id();
 
@@ -1469,17 +1474,19 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $invoice_status = 'PENDING';
             }
 
-            $post_args = array(
-                'post_title'   => wp_strip_all_tags($display_name),
-                'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
-                'post_status'  => 'publish',
-                'post_author'  => $current_user_id,
-                'post_type'   => 'transactions',
-                'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
-                'post_date_gmt' => usbswiper_get_user_date_i18n( $current_user_id ),
-            );
+            if( !$transaction_id ) {
+                $post_args = array(
+                    'post_title'   => wp_strip_all_tags($display_name),
+                    'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
+                    'post_status'  => 'publish',
+                    'post_author'  => $current_user_id,
+                    'post_type'   => 'transactions',
+                    'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
+                    'post_date_gmt' => usbswiper_get_user_date_i18n( $current_user_id ),
+                );
 
-			$transaction_id = wp_insert_post($post_args);
+                $transaction_id = wp_insert_post($post_args);
+            }
 
 			if( !is_wp_error( $transaction_id ) ) {
 
@@ -2632,41 +2639,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $order_id = ! empty( $_POST['order_id'] ) ? $_POST['order_id'] : '';
             $message = ! empty( $_POST['message'] ) ? $_POST['message'] : '';
+            $transaction_id = ! empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : '';
+            $error = !empty( $_POST['error'] ) ? (array) json_decode( stripslashes( $_POST['error'] ) ) : [];
+            $debug_id = !empty( $error['debug_id'] ) ? $error['debug_id'] : '';
+            if( !empty( $transaction_id ) && $transaction_id > 0  ) {
+                // $transactions = get_posts( array(
+                //     'post_type' => 'transactions',
+                //     'posts_per_page' => 1,
+                //     'meta_query' => array(
+                //         'relation' => 'AND',
+                //         array(
+                //             'key' => '_paypal_transaction_id',
+                //             'value' => $order_id,
+                //             'compare' => 'LIKE',
+                //         )
+                //     ),
+                //     'fields' => 'ids',
+                // ));
 
-            if( !empty( $order_id ) ) {
-                $transactions = get_posts( array(
-                    'post_type' => 'transactions',
-                    'posts_per_page' => 1,
-                    'meta_query' => array(
-                        'relation' => 'AND',
-                        array(
-                            'key' => '_paypal_transaction_id',
-                            'value' => $order_id,
-                            'compare' => 'LIKE',
-                        )
-                    ),
-                    'fields' => 'ids',
-                ));
+                // $transaction_id = !empty( $transactions[0] ) ? $transactions[0] : '';
 
-                $transaction_id = !empty( $transactions[0] ) ? $transactions[0] : '';
-                if( !empty( $transaction_id ) && $transaction_id > 0 ) {
-
-                    $response = get_post_meta( $transaction_id, '_payment_response', true);
-                    $order_status = !empty( $response['status'] ) ? $response['status'] : '';
-                    $order_intent = !empty( $response['intent'] ) ? $response['intent'] : '';
-                    update_post_meta($transaction_id, '_payment_status', 'FAILED');
-                    update_post_meta($transaction_id, '_payment_status_notes', $message);
-                    $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
-                    if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
-                        update_post_meta($transaction_id, '_payment_status', 'PENDING');
-                    }
-
-                    $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
-                    $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
-                    $api_log->log('Response Order Status: '.$order_status, $transaction_id);
-                    $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
-                    $api_log->log('Response Message: '.$message, $transaction_id);
+                $response = get_post_meta( $transaction_id, '_payment_response', true);
+                $order_status = !empty( $response['status'] ) ? $response['status'] : '';
+                $order_intent = !empty( $response['intent'] ) ? $response['intent'] : '';
+                update_post_meta($transaction_id, '_payment_status', 'FAILED');
+                // update_post_meta($transaction_id, '_payment_status_notes', '');
+                $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
+                if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
+                    update_post_meta($transaction_id, '_payment_status', 'PENDING');
                 }
+                update_post_meta( $transaction_id, '_payment_failed_response', $error );
+                update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
+
+                $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
+                $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
+                $api_log->log('Response Order Status: '.$order_status, $transaction_id);
+                $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
+                $api_log->log('Response Message: '.$message, $transaction_id);
             }
 
             $response = array(

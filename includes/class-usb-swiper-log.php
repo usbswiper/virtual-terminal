@@ -126,19 +126,21 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			}
 
 			if( !is_dir($this->basedir.'/'.$this->handle)) {
-				mkdir($this->basedir.'/'.$this->handle);
+				mkdir($this->basedir.'/'.$this->handle, 0755, true);
 			}
 
 			$file_name = self::get_log_name($file_name);
-
 			$file_path = $this->basedir.'/'.$this->handle.'/'.$file_name;
 
 			$time    = date_i18n( 'm-d-Y @ H:i:s' );
 			$entry   = "{$time} {$level} {$message}";
 
-			$fopen = fopen( $file_path,"a");
-			$result = fwrite( $fopen, $entry . PHP_EOL );
-			fclose( $fopen );
+			if ($fopen = fopen($file_path, "a")) {
+				fwrite($fopen, $entry . PHP_EOL);
+				fclose($fopen);
+			} else {
+				error_log("Failed to open file for writing: " . $file_path);
+			}
 		}
 
 		/**
@@ -180,9 +182,8 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 			$files = array();
 
 			if( !empty( $log_files ) && is_array( $log_files ) ) {
-
 				foreach ( $log_files as $key => $log_file ) {
-					if ( str_contains( $log_file, $this->handle . '-onboarding-' ) ) {
+					if ( strpos($log_file, $this->handle . '-onboarding-') !== false ) {
 						$files[] = $log_file;
 					}
 				}

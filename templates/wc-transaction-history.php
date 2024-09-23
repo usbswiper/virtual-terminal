@@ -44,6 +44,7 @@ $ItemName = get_post_meta( $transaction_id, 'ItemName', true);
 $Notes = get_post_meta( $transaction_id, 'Notes', true);
 $InvoiceID = get_post_meta( $transaction_id, 'InvoiceID', true);
 $transaction_debug_id = get_post_meta( $transaction_id, '_paypal_transaction_debug_id', true);
+$transaction_issue = get_post_meta( $transaction_id, '_payment_failed_response', true);
 $status_note = get_post_meta( $transaction_id, '_payment_status_notes', true);
 $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
 $payment_source = !empty( $payment_response['payment_source'] ) ? $payment_response['payment_source'] : '';
@@ -551,6 +552,23 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo $transaction_debug_id; ?></td>
                 </tr>
             <?php } ?>
+
+            <?php if( !empty( $transaction_issue ) ) {
+                
+                $issue_message = !empty( $transaction_issue['message'] ) ? $transaction_issue['message'] : '';
+                $issue_details = !empty( $transaction_issue['details'][0] ) ? (array) $transaction_issue['details'][0] : [];
+                $issue_type = !empty( $issue_details['issue'] ) ? $issue_details['issue'] : '';
+                $issue_description = !empty( $issue_details['description'] ) ? $issue_details['description'] : '';
+
+                $transaction_issue_message = sprintf('<p><strong>%s</strong> %s<p><p>%s</p>',$issue_type, $issue_message, $issue_description);
+
+                ?>
+                <tr>
+                    <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Error Message','usb-swiper'); ?></th>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo $transaction_issue_message; ?></td>
+                </tr>
+            <?php } ?>
+
             </tbody>
         </table>
     </div>
