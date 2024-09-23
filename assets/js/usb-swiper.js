@@ -11,21 +11,22 @@ jQuery( document ).ready(function( $ ) {
     var TaxRate = localStorage.getItem('TaxRate');
     var InvoiceNumber = localStorage.getItem('InvoiceNumber');
     var Notes = localStorage.getItem('Notes');
-    if (company !== null) $('#company').val(company);
-    if (BillingFirstName !== null) $('#BillingFirstName').val(BillingFirstName);
-    if (BillingLastName !== null) $('#BillingLastName').val(BillingLastName);
-    if (BillingEmail !== null) $('#BillingEmail').val(BillingEmail);
-    if (OrderAmount !== null) $('#OrderAmount').val(OrderAmount);
-    if (Discount !== null) $('#Discount').val(Discount);
-    if (NetAmount !== null) $('#NetAmount').val(NetAmount);
-    if (ShippingAmount !== null) $('#ShippingAmount').val(ShippingAmount);
-    if (HandlingAmount !== null) $('#HandlingAmount').val(HandlingAmount);
-    if( !isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null){
+
+    if (company !== null && company !== 'undefined') $('#company').val(company);
+    if (BillingFirstName !== null && BillingFirstName !== 'undefined') $('#BillingFirstName').val(BillingFirstName);
+    if (BillingLastName !== null && BillingLastName !== 'undefined') $('#BillingLastName').val(BillingLastName);
+    if (BillingEmail !== null && BillingEmail !== 'undefined') $('#BillingEmail').val(BillingEmail);
+    if (OrderAmount !== null && OrderAmount !== 'undefined') $('#OrderAmount').val(OrderAmount);
+    if (Discount !== null && Discount !== 'undefined') $('#Discount').val(Discount);
+    if (NetAmount !== null && NetAmount !== 'undefined') $('#NetAmount').val(NetAmount);
+    if (ShippingAmount !== null && ShippingAmount !== 'undefined') $('#ShippingAmount').val(ShippingAmount);
+    if (HandlingAmount !== null && HandlingAmount !== 'undefined') $('#HandlingAmount').val(HandlingAmount);
+    if (!isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null && TaxRate !== 'undefined') {
         TaxRate = parseInt(TaxRate);
         $('#TaxRate').val(TaxRate);
     }
-    if (InvoiceNumber !== null) $('#InvoiceID').val(InvoiceNumber);
-    if (Notes !== null) $('#Notes').val(Notes);
+    if (InvoiceNumber !== null && InvoiceNumber !== 'undefined') $('#InvoiceID').val(InvoiceNumber);
+    if (Notes !== null && Notes !== 'undefined') $('#Notes').val(Notes);
 
     $(document).on('click','#PayByInvoice', function (){
 
@@ -481,7 +482,7 @@ jQuery( document ).ready(function( $ ) {
         current_obj.children('.vt-loader').remove();
     };
 
-    $(document).on('change','#TransactionCurrency', function () {
+    $(document).on('change','.usbswiper-change-currency', function () {
         var BillingLastName = $('#BillingLastName').val();
         var BillingFirstName = $('#BillingFirstName').val();
         var BillingEmail = $('#BillingEmail').val();
@@ -1121,28 +1122,32 @@ jQuery( document ).ready(function( $ ) {
         },300);
     });
 
-    if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
-        const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
-        localStorage.removeItem('sessionExpireTimer');
-        localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
 
-        $(document).on('mousemove keydown', function() {
-            var InactiveTimerTime = localStorage.getItem('sessionExpireTimer');
-            if(InactiveTimerTime === null || InactiveTimerTime === '' || InactiveTimerTime === undefined ) {
-                const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
-                localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
-            }
-        });
+    if (usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id) {
+        if( usb_swiper_settings.timeout_option !== 'never' && parseInt(usb_swiper_settings.timeout_option) > 0 ) {
 
-        const timeoutInterval = setInterval(function () {
-            var currentTime = new Date().getTime();
-            if ( currentTime >= localStorage.getItem('sessionInactiveTimer')) {
-                clearInterval(timeoutInterval);
-                $('.vt-payment-timeout-popup-wrapper').show();
-                localStorage.removeItem('sessionInactiveTimer');
-                autoSessionLogOut();
-            }
-        }, 1000);
+            const getTenMinuteAfterTime = new Date(new Date().getTime() + (parseInt(usb_swiper_settings.timeout_option) * 60000)).getTime();
+            localStorage.removeItem('sessionExpireTimer');
+            localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
+
+            $(document).on('mousemove keydown', function () {
+                var InactiveTimerTime = localStorage.getItem('sessionExpireTimer');
+                if (InactiveTimerTime === null || InactiveTimerTime === '' || InactiveTimerTime === undefined) {
+                    const getTenMinuteAfterTime = new Date(new Date().getTime() + (parseInt(usb_swiper_settings.timeout_option) * 60000)).getTime();
+                    localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
+                }
+            });
+
+            const timeoutInterval = setInterval(function () {
+                var currentTime = new Date().getTime();
+                if (currentTime >= localStorage.getItem('sessionInactiveTimer')) {
+                    clearInterval(timeoutInterval);
+                    $('.vt-payment-timeout-popup-wrapper').show();
+                    localStorage.removeItem('sessionInactiveTimer');
+                    autoSessionLogOut();
+                }
+            }, 1000);
+        }
     }
 
     $(document).on('click','#vt_form_timeout, .vt-payment-timeout-popup-inner .close-btn', function (){
