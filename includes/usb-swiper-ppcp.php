@@ -294,10 +294,14 @@ class Usb_Swiper_PPCP{
 							update_user_meta( $user_id, "_primary_currency", $primary_currency );
 						}
 
+						$brand_name = !empty( $response['legal_name'] ) ? $response['legal_name'] : '';
+						if ( ! empty( $brand_name ) ) {
+							update_user_meta( $user_id, 'brand_name', $brand_name );
+						}
+
 						wc_set_customer_auth_cookie( $user_id );
 						update_user_meta( $user_id, '_merchant_onboarding_response', $response );
 						update_user_meta( $user_id, '_merchant_onboarding_user', $user_data );
-
 
 						$settings = usb_swiper_get_settings('general');
 						$vt_page_id = !empty( $settings['virtual_terminal_page'] ) ? (int)$settings['virtual_terminal_page'] : '';
