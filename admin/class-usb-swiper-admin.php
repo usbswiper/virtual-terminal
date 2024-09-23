@@ -88,10 +88,12 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		 * @since    1.0.0
 		 */
 		public function enqueue_scripts() {
+			wp_enqueue_style( 'jquery-ui-datepicker-style' , '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
 			wp_enqueue_style('select2-css', USBSWIPER_URL . 'assets/css/select2.css', array(), '4.1.0-rc.0');
 			wp_enqueue_script('select2-js', USBSWIPER_URL . 'assets/js/select2.js', array('jquery'), '4.1.0-rc.0', true);
 			wp_enqueue_style($this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper-admin.css');
-			wp_enqueue_script($this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper-admin.js', array('jquery'), $this->version, true);
+			wp_enqueue_script( 'jquery-ui-datepicker' );
+            wp_enqueue_script($this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper-admin.js', array('jquery'), $this->version, true);
 			wp_localize_script( $this->plugin_name, 'usb_swiper_settings', array(
                 'ajax_url' => admin_url( 'admin-ajax.php' ),
                 'remove_fee_message' => __( 'Are you sure you want to remove this fee?','usb-swiper' ),
@@ -512,7 +514,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
          */
 		public function exclude_form_tab() {
 
-		    return apply_filters( 'usb_swiper_exclude_form_tab' , array('logs','advanced'));
+		    return apply_filters( 'usb_swiper_exclude_form_tab' , array('logs','advanced','reports'));
 		}
 
 		/**
@@ -530,6 +532,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					'advanced'  => __( 'Advanced', 'usb-swiper' ),
 					'logs'  => __( 'Logs', 'usb-swiper' ),
 					'zettle'  => __( 'Zettle POS', 'usb-swiper' ),
+					'reports' => __( 'Reports', 'usb-swiper' ),
 					'uninstall'     => __( 'Uninstall', 'usb-swiper' ),
 				)
 			);
@@ -592,15 +595,22 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		}
 
 		/**
-		 * Display heading title.
-		 *
-		 * @since    1.0.0
+         * Display heading title.
+         *
+         * @since 1.0.0
+         *
+		 * @return string|void
 		 */
 		public function heading_title() {
 
 			$menu_items      = $this->menu_items();
 			$current_section = $this->current_section();
-			$heading_title   = ! empty( $menu_items[ $current_section ] ) ? esc_attr( $menu_items[ $current_section ] ) . ' ' . __( 'settings', 'usb-swiper' ) : '';
+
+            if( in_array( $current_section, ['reports'])) {
+                return '';
+            }
+
+            $heading_title   = ! empty( $menu_items[ $current_section ] ) ? esc_attr( $menu_items[ $current_section ] ) . ' ' . __( 'settings', 'usb-swiper' ) : '';
 			?>
             <h1 class="wp-heading-inline"><?php echo esc_attr( apply_filters( 'usb_swiper_heading_title', $heading_title ) ); ?></h1>
 			<?php
@@ -2009,6 +2019,95 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                 </tbody>
             </table>
 	        <?php
+        }
+
+		/**
+         * Merchants Transactions total amount report.
+         *
+         * @since 3.2.2
+         *
+		 * @return void
+		 */
+		public function reports_settings() {
+
+			if( !class_exists('Merchant_Report_Table')) {
+				require_once USBSWIPER_PLUGIN_DIR.'/admin/class-usb-swiper-merchant-reports.php';
+			}
+
+			$report_table = new Merchant_Report_Table();
+
+			echo '<div class="wrap merchant-report-wrap">';
+                echo '<h1>'.esc_html__('Merchant Report', 'usb-swiper').'</h1>';
+                // Prepare table
+                $report_table->prepare_items();
+                // Display table
+                $report_table->display();
+			echo '</div>';
+		}
+
+        public function get_merchant_report() {
+
+
+            $status = false;
+            $message = __('Nonce not verified. Please try again.', 'usb-swiper' );
+            $html = '';
+            $max_page = 0;
+
+            $new_nonce = wp_create_nonce('report_table');
+
+            if( !empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'report_table') ) {
+                $status = true;
+                $page = !empty($_POST['page']) ? (int)sanitize_text_field($_POST['page']) : 1;
+                $offset = !empty($_POST['offset']) ? (int)sanitize_text_field($_POST['offset'])  : 1;
+                $merchant = !empty($_POST['merchant']) ? sanitize_text_field($_POST['merchant']) : '';
+                $report_start_date = !empty($_POST['start_date']) ? sanitize_text_field($_POST['start_date']) : '';
+                $report_end_date = !empty($_POST['end_date']) ? sanitize_text_field($_POST['end_date']) : '';
+                $total_volume = !empty($_POST['total_volume']) ? (float)sanitize_text_field($_POST['total_volume']) : '';
+                $amex_volume= !empty($_POST['amex_volume']) ? (float)sanitize_text_field($_POST['amex_volume']) : '';
+                $items = !empty($_POST['items']) ? (array)$_POST['items'] : [];
+
+                $data = [
+                    'merchant' => $merchant,
+                    'start_date' => $report_start_date,
+                    'end_date' => $report_end_date,
+                    'page' => $page,
+                    'total_volume' => $total_volume,
+                    'amex_volume' => $amex_volume,
+                    'items' =>  $items,
+                ];
+
+                if (!class_exists('Merchant_Report_Table')) {
+                    require_once USBSWIPER_PLUGIN_DIR . '/admin/class-usb-swiper-merchant-reports.php';
+                }
+
+                $report_table = new Merchant_Report_Table();
+
+                $response = $report_table->prepare_ajax_items($data, $offset);
+
+                $html = $response['html'];
+                $max_page = $response['max_page'];
+            }
+
+            if( !empty( $response['total_item'] ) ) {
+                $response['total_item'] = (int)$response['total_item'] > 1 ? (int)$response['total_item'].' items' : (int)$response['total_item'].' item';
+                $response['total_count'] = (int)$response['total_item'] > 0 ? (int)$response['total_item'] : 0;
+                $response['pagination'] = !empty($response['pagination']) ? $response['pagination'] : '';
+            }
+
+            $response = array(
+                'status' => $status,
+                'max_page' => $max_page,
+                'total_volume' => $response['total_volume'],
+                'amex_volume' => $response['amex_volume'],
+                'html' => $html,
+                'message' => $message,
+                'items' => $response['items'],
+                'total_item' => !empty($response['total_item']) ? $response['total_item'] : '0 items',
+                'pagination_html' => !empty($response['pagination']) ? $response['pagination'] : '',
+                'total_count' => !empty($response['total_count']) ? $response['total_count'] : 0,
+            );
+
+            wp_send_json( $response , 200 );
         }
 	}
 }

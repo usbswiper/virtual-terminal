@@ -171,12 +171,13 @@ a.vt-add-item {color: #3b3f5c;cursor: pointer;font-size: 1rem;text-decoration: n
 .vt-repeater-field .input-field-wrap .select2-container {width: 100% !important;}
 .vt-repeater-field svg {cursor: pointer;padding-top: 10px;}
 .transaction-filter-form .submit{margin-top: 0 !important;}
-.transaction-filter-form .transaction-filter-wrap {display: flex;align-items:center;flex-direction:row;flex-wrap:wrap;max-width:100%;}
+.transaction-filter-form .transaction-filter-wrap {display: flex;align-items:center;flex-direction:row;max-width:100%;border: 1px solid #f2f2f2;margin-bottom: 5px;border-radius: 5px;background: #f2f2f2;}
 .transaction-filter-form .transaction-filter-wrap .input-field-wrap .transaction-input-field {border: 1px solid #bfc9d4;color: #3b3f5c;font-size: 12px;padding: 6px 8px;letter-spacing: 1px;height: calc(1.4em + 1.4rem + 2px);border-radius: 6px;width: 100%;}
 .transaction-filter-form .transaction-filter-wrap .date-field-wrap {display: flex;align-items: center;justify-content: space-between;}
 .transaction-filter-form .transaction-filter-wrap .date-field-wrap .date-range-label {margin-right: 5px;}
 .transaction-filter-form .transaction-filter-wrap .date-field-wrap .start-date {margin-right: 5px;}
 .transaction-filter-form .transaction-filter-wrap .date-field-wrap .vt-date-field {width: 140px;}
+.transaction-select {padding: 10px;font-size: 15px;border-radius: 5px;color: #bfc9d4;}
 .vt-transaction-history.woocommerce-page .transaction-overview ul li strong{padding-left: 0px !important;}
 .transaction-overview .transaction-basic-info .w-25{width: calc(25% - 5px) !important;}
 .woocommerce-message.vt-transactions-info {float: left;width: 100%;}
@@ -299,7 +300,9 @@ button[disabled] {opacity: 0.5;}
 .vt-product-content .input-field-wrap.taxable-field {flex-direction: row;gap: 10px;align-items: center;}
 .taxable-field .checkmark-container {line-height: 0;}
 .vt-product-content .input-field-wrap.taxable-field input {width: 20px;height: 20px;cursor: pointer;}
-
+.woocommerce-account  .woocommerce .woocommerce-MyAccount-navigation {width: 20%;}
+.woocommerce-account  .woocommerce .woocommerce-MyAccount-content {width: 80%;}
+.woocommerce-account  .woocommerce .woocommerce-MyAccount-content .transaction-actions .vt-button{margin: 0 0 5px 0;}
 @media print {
     @page {
         margin: 0;

@@ -123,8 +123,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $query_vars['view-transaction'] = 'view-transaction';
             $query_vars['transactions'] = 'transactions';
-            $query_vars['invoices'] = 'invoices';
-	        $query_vars['zettle-transactions'] = 'zettle-transactions';
+            //$query_vars['invoices'] = 'invoices';
+	        //$query_vars['zettle-transactions'] = 'zettle-transactions';
             $query_vars['vt-products'] = 'vt-products';
             $query_vars['vt-tax-rules'] = 'vt-tax-rules';
             $query_vars['vt-zettle'] = 'vt-zettle';
@@ -285,7 +285,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
-                    'is_customers' => false
+                    'is_customers' => false,
+					'timeout_option' => usb_swiper_get_user_timeout_option(),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -303,7 +304,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$sdk_obj = $this->get_paypal_sdk_obj();
 				wp_register_script( 'usb-swiper-paypal-checkout-sdk', add_query_arg( $sdk_obj, 'https://www.paypal.com/sdk/js' ), array(), null, false );
 				wp_enqueue_script( 'usb-swiper-paypal-checkout-sdk' );
-
+				wp_enqueue_script( 'autoNumeric', USBSWIPER_URL . 'assets/js/autoNumeric.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( 'jquery-validate', USBSWIPER_URL . 'assets/js/jquery.validate.min.js', array( 'jquery' ), $this->version, true );
 				wp_enqueue_script( $this->plugin_name, USBSWIPER_URL . 'assets/js/usb-swiper.js', array( 'jquery' ), $this->version, true );
 
@@ -337,6 +338,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
                     'is_customers' => is_wc_endpoint_url('vt-customers'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
+                    'timeout_option' => usb_swiper_get_user_timeout_option(),
 				) );
             }
 
@@ -402,8 +404,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				unset( $menu_links['customer-logout'] );
 
 				$menu_links['transactions']         =   __( 'Transactions', 'usb-swiper' );
-                $menu_links['invoices']             =   __( 'Invoices', 'usb-swiper' );
-				$menu_links['zettle-transactions']  =   __( 'Zettle Transactions', 'usb-swiper' );
+                //$menu_links['invoices']             =   __( 'Invoices', 'usb-swiper' );
+				//$menu_links['zettle-transactions']  =   __( 'Zettle Transactions', 'usb-swiper' );
                 $menu_links['vt-products']          =   __( 'Products', 'usb-swiper' );
                 $menu_links['vt-tax-rules']         =   __( 'Tax Rules', 'usb-swiper' );
                 $menu_links['vt-zettle']            =   __( 'Zettle POS', 'usb-swiper' );
@@ -423,11 +425,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			add_rewrite_endpoint( 'transactions',  EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'view-transaction', EP_ROOT | EP_PAGES );
-			add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
+			//add_rewrite_endpoint( 'invoices', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-products', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-tax-rules', EP_ROOT | EP_PAGES );
             add_rewrite_endpoint( 'vt-zettle', EP_ROOT | EP_PAGES );
-			add_rewrite_endpoint( 'zettle-transactions', EP_ROOT | EP_PAGES );
+			//add_rewrite_endpoint( 'zettle-transactions', EP_ROOT | EP_PAGES );
 			add_rewrite_endpoint( 'vt-customers', EP_ROOT | EP_PAGES );
 		}
 
@@ -545,16 +547,32 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             <span class="date-range-label"><?php _e( 'To:', 'usb-swiper' ); ?></span><input type="text" id="end-date" class="vt-date-field transaction-input-field" name="end-date" value="<?php echo isset($_GET['end-date']) ? sanitize_text_field( $_GET['end-date'] ) : ''; ?>" placeholder="<?php echo __('yyyy-mm-dd'); ?>" autocomplete="off">
                         </div>
                         <div class="input-field-wrap form-row">
+                            <?php echo usb_swiper_get_html_field(array(
+                                'type' => 'select',
+                                'id' => 'transaction_type',
+                                'name' => 'transaction_type',
+                                'options' => array(
+                                    '' => __('All Types', 'usb-swiper'),
+                                    'transaction' => __('Transaction', 'usb-swiper'),
+                                    'invoice' => __('Invoice', 'usb-swiper'),
+                                    'zettle' => __('Zettle', 'usb-swiper')
+                                ),
+                                'class' => 'transaction-select',
+                                'default' => '',
+                                'value' => isset($_GET['transaction_type']) ? sanitize_text_field($_GET['transaction_type']) : ''
+                            )); ?>
+                        </div>
+                        <div class="input-field-wrap form-row">
                             <button type="submit" class="vt-button"><?php _e('FILTER','usb-swiper'); ?></button>
                         </div>
                     </div>
                 </form>
                 <?php
-                if( is_wc_endpoint_url('zettle-transactions') ) {
-	                usb_swiper_get_template('wc-transactions-zettle.php', $args);
-                } else {
+                //if( is_wc_endpoint_url('zettle-transactions') ) {
+	                //usb_swiper_get_template('wc-transactions-zettle.php', $args);
+                //} else {
 	                usb_swiper_get_template('wc-transactions-lists.php', $args);
-                }
+                //}
 			}
 		}
 
@@ -573,14 +591,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $user_id = get_current_user_id();
 
             $meta_key = '_transaction_type';
-            $meta_value = '';
-            if( is_wc_endpoint_url('transactions') ){
-                $meta_value = 'transaction';
-            }elseif ( is_wc_endpoint_url('invoices') ){
-                $meta_value = 'invoice';
-            } elseif ( is_wc_endpoint_url('zettle-transactions') ){
-	            $meta_value = 'zettle';
-            }
+            $meta_value = !empty( $_REQUEST['transaction_type'] ) ? $_REQUEST['transaction_type'] : '';
+            // if( is_wc_endpoint_url('transactions') ){
+            //     $meta_value = 'transaction';
+            // }elseif ( is_wc_endpoint_url('invoices') ){
+            //     $meta_value = 'invoice';
+            // } elseif ( is_wc_endpoint_url('zettle-transactions') ){
+	        //     $meta_value = 'zettle';
+            // }
 
             if( !empty( $meta_value ) ){
                 $transaction_type_query = $wpdb->prepare(
@@ -1031,11 +1049,16 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     case "create_transaction":
                         $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
 
-                        if( !empty( $transaction_id ) && (int)$transaction_id > 0 ) {
-                            $this->pay_by_invoice_transaction($transaction_id);
+                        if( !empty( $_POST['transaction_type'] ) && 'retry' === $_POST['transaction_type'] ) {
+                            $this->create_new_transaction($transaction_id);
                         } else {
-                            $this->create_new_transaction();
+                            if( !empty( $transaction_id ) && (int)$transaction_id > 0 ) {
+                                $this->pay_by_invoice_transaction($transaction_id);
+                            } else {
+                                $this->create_new_transaction();
+                            }
                         }
+
                         break;
                     case "cc_capture":
                         $this->capture_transaction();
@@ -1424,7 +1447,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
          *
          * @since 1.0.0
 		 */
-		public function create_new_transaction() {
+		public function create_new_transaction( $transaction_id = 0) {
 
             $current_user_id = get_current_user_id();
 
@@ -1475,17 +1498,19 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 $invoice_status = 'PENDING';
             }
 
-            $post_args = array(
-                'post_title'   => wp_strip_all_tags($display_name),
-                'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
-                'post_status'  => 'publish',
-                'post_author'  => $current_user_id,
-                'post_type'   => 'transactions',
-                'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
-                'post_date_gmt' => usbswiper_get_user_date_i18n( $current_user_id ),
-            );
+            if( !$transaction_id ) {
+                $post_args = array(
+                    'post_title'   => wp_strip_all_tags($display_name),
+                    'post_content' => !empty( $transaction['Notes'] ) ? esc_attr($transaction['Notes']) : '',
+                    'post_status'  => 'publish',
+                    'post_author'  => $current_user_id,
+                    'post_type'   => 'transactions',
+                    'post_date' => usbswiper_get_user_date_i18n( $current_user_id ),
+                    'post_date_gmt' => usbswiper_get_user_date_i18n( $current_user_id ),
+                );
 
-			$transaction_id = wp_insert_post($post_args);
+                $transaction_id = wp_insert_post($post_args);
+            }
 
 			if( !is_wp_error( $transaction_id ) ) {
 
@@ -2292,6 +2317,28 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				));
 				?>
 			</p>
+            <P class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+				<?php
+				echo  usb_swiper_get_html_field( array(
+					'type' => 'select',
+					'id' => 'timeout_option',
+					'name' => 'timeout_option',
+					'label' => __( 'Screen Timout Options', 'usb-swiper'),
+					'required' => true,
+                    'value' => usb_swiper_get_user_timeout_option(),
+					'options' => usb_swiper_get_timeout_options(),
+					'default' => usb_swiper_get_default_timeout(),
+					'attributes' => '',
+					'description' => '',
+					'readonly' => false,
+					'disabled' => false,
+					'class' => 'woocommerce-Select',
+					'wrapper' => false,
+					'tooltip' => true,
+					'tooltip_text' => __( 'This setting allows you to specify the duration of inactivity after user automatically logout. By default, screen timeout is 30 minutes.', 'usb-swiper'),
+				));
+				?>
+            </P>
             <h2 class="wc-account-title paypal-accpunt-info"><?php _e('PayPal Account Information','usb-swiper'); ?></h2>
             <table class="form-table paypal-account-information" cellspacing="0" cellpadding="0">
                 <tbody>
@@ -2384,6 +2431,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				$brand_name = !empty( $_POST['BrandName'] ) ? $_POST['BrandName'] : '';
                 $brand_logo = !empty( $_FILES['BrandLogo'] ) ? $_FILES['BrandLogo'] : '';
                 $user_timezone = !empty( $_POST['vt_user_timezone'] ) ? $_POST['vt_user_timezone'] : '';
+                $timeout_option = !empty( $_POST['timeout_option'] ) ? $_POST['timeout_option'] : usb_swiper_get_default_timeout();
 
                 $logo_id = !empty( $brand_logo ) ? $this->vt_upload_from_path( $brand_logo ) : 0;
 
@@ -2394,6 +2442,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_user_meta( $user_id, "invoice_prefix", $invoice_prefix );
                 update_user_meta( $user_id, "ignore_transaction_email", $ignore_transaction_email );
                 update_user_meta( $user_id, "vt_user_timezone", $user_timezone );
+                update_user_meta( $user_id, "timeout_option", $timeout_option );
 
                 if( !empty( $logo_id ) && $logo_id > 0 ) {
                     update_user_meta( $user_id, "brand_logo", $logo_id );
@@ -2621,41 +2670,43 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $order_id = ! empty( $_POST['order_id'] ) ? $_POST['order_id'] : '';
             $message = ! empty( $_POST['message'] ) ? $_POST['message'] : '';
+            $transaction_id = ! empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : '';
+            $error = !empty( $_POST['error'] ) ? (array) json_decode( stripslashes( $_POST['error'] ) ) : [];
+            $debug_id = !empty( $error['debug_id'] ) ? $error['debug_id'] : '';
+            if( !empty( $transaction_id ) && $transaction_id > 0  ) {
+                // $transactions = get_posts( array(
+                //     'post_type' => 'transactions',
+                //     'posts_per_page' => 1,
+                //     'meta_query' => array(
+                //         'relation' => 'AND',
+                //         array(
+                //             'key' => '_paypal_transaction_id',
+                //             'value' => $order_id,
+                //             'compare' => 'LIKE',
+                //         )
+                //     ),
+                //     'fields' => 'ids',
+                // ));
 
-            if( !empty( $order_id ) ) {
-                $transactions = get_posts( array(
-                    'post_type' => 'transactions',
-                    'posts_per_page' => 1,
-                    'meta_query' => array(
-                        'relation' => 'AND',
-                        array(
-                            'key' => '_paypal_transaction_id',
-                            'value' => $order_id,
-                            'compare' => 'LIKE',
-                        )
-                    ),
-                    'fields' => 'ids',
-                ));
+                // $transaction_id = !empty( $transactions[0] ) ? $transactions[0] : '';
 
-                $transaction_id = !empty( $transactions[0] ) ? $transactions[0] : '';
-                if( !empty( $transaction_id ) && $transaction_id > 0 ) {
-
-                    $response = get_post_meta( $transaction_id, '_payment_response', true);
-                    $order_status = !empty( $response['status'] ) ? $response['status'] : '';
-                    $order_intent = !empty( $response['intent'] ) ? $response['intent'] : '';
-                    update_post_meta($transaction_id, '_payment_status', 'FAILED');
-                    update_post_meta($transaction_id, '_payment_status_notes', $message);
-                    $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
-                    if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
-                        update_post_meta($transaction_id, '_payment_status', 'PENDING');
-                    }
-
-                    $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
-                    $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
-                    $api_log->log('Response Order Status: '.$order_status, $transaction_id);
-                    $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
-                    $api_log->log('Response Message: '.$message, $transaction_id);
+                $response = get_post_meta( $transaction_id, '_payment_response', true);
+                $order_status = !empty( $response['status'] ) ? $response['status'] : '';
+                $order_intent = !empty( $response['intent'] ) ? $response['intent'] : '';
+                update_post_meta($transaction_id, '_payment_status', 'FAILED');
+                // update_post_meta($transaction_id, '_payment_status_notes', '');
+                $transaction_type = get_post_meta($transaction_id, '_transaction_type', true);
+                if( !empty( $transaction_type ) && strtolower($transaction_type) === 'invoice' ){
+                    update_post_meta($transaction_id, '_payment_status', 'PENDING');
                 }
+                update_post_meta( $transaction_id, '_payment_failed_response', $error );
+                update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
+
+                $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
+                $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
+                $api_log->log('Response Order Status: '.$order_status, $transaction_id);
+                $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
+                $api_log->log('Response Message: '.$message, $transaction_id);
             }
 
             $response = array(

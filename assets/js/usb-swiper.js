@@ -59,10 +59,10 @@ jQuery( document ).ready(function( $ ) {
                         set_notification(data.message, 'error', data.message_type);
                     }
                     $(this).prop('disabled', false);
-                    VtForm.unblock();
+                    VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                 });
             } else {
-                VtForm.unblock();
+                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
             }
         }
     });
@@ -126,16 +126,17 @@ jQuery( document ).ready(function( $ ) {
                                             data: "action=zettle_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
                                         }).done(function (response) {
                                             if( response.status ){
+                                                localStorage.removeItem('vt_order_id');
+                                                localStorage.removeItem('transaction_id');
                                                 window.location.href = response.redirect_url;
                                             } else {
                                                 set_notification( response.message, 'error'  );
                                             }
 
                                             currentObj.prop('disabled', false);
-                                            VtForm.removeClass('createOrder');
                                             vt_remove_notification();
                                             remove_zettle_notification(notificationObj);
-                                            VtForm.unblock();
+                                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                         });
                                     }
                                 }
@@ -154,39 +155,40 @@ jQuery( document ).ready(function( $ ) {
                                     data: "action=zettle_payment_failed_response&transaction_id"+response.transaction_id,
                                 }).done(function (response) {
                                     if( response.status ){
+                                        localStorage.removeItem('vt_order_id');
+                                        localStorage.removeItem('transaction_id');
                                         window.location.href = response.redirect_url;
                                     } else {
                                         set_notification(response.message, 'error', response.message_type);
                                     }
                                     currentObj.prop('disabled', false);
-                                    VtForm.removeClass('createOrder');
                                     vt_remove_notification();
                                     remove_zettle_notification(notificationObj);
-                                    VtForm.unblock();
+                                    VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 });
                             });
 
                             socket.addEventListener('close', (event) => {
                                 console.log('WebSocket connection closed:', event);
+                                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                             });
 
                         } else {
                             set_notification(response.websocket_message, 'error');
-                            VtForm.removeClass('createOrder');
                             remove_zettle_notification(notificationObj);
                         }
                         currentObj.prop('disabled', false);
-                        VtForm.unblock();
+                        VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                     } else {
                         currentObj.prop('disabled', false);
-                        VtForm.unblock();
+                        VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                         remove_zettle_notification(notificationObj);
                     }
                 });
 
             } else {
                 currentObj.prop('disabled', false);
-                VtForm.unblock();
+                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
             }
         } else {
             currentObj.prop('disabled', false);
@@ -268,12 +270,19 @@ jQuery( document ).ready(function( $ ) {
                             }
                         });
 
+                        var transaction_id = localStorage.getItem("transaction_id");
+
+                        var transactionData = VtForm.serialize();
+                        if(transaction_id) {
+                            transactionData += '&transaction_type=retry&transaction_id='+transaction_id;
+                        }
+
                         return fetch(usb_swiper_settings.create_transaction_url, {
                             method: 'post',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             },
-                            body: VtForm.serialize(),
+                            body: transactionData,
                         }).then(function (res) {
                             return res.json();
                         }).then(function (data) {
@@ -284,6 +293,7 @@ jQuery( document ).ready(function( $ ) {
                                 return data.orderID;
                             } else {
                                 set_notification(data.message, 'error', data.message_type);
+                                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                             }
                         });
                     }
@@ -312,7 +322,7 @@ jQuery( document ).ready(function( $ ) {
 
                     }
                 });
-
+                
                 VtForm.validate({
                     rules: {
                         'VTProductQuantity[]': {
@@ -384,6 +394,7 @@ jQuery( document ).ready(function( $ ) {
                                     message += '<span>'+value.description+'</span>';
                                 });
                                 var order_id = localStorage.getItem("vt_order_id");
+                                var transaction_id = localStorage.getItem("transaction_id");
                                 localStorage.removeItem('vt_order_id');
                                 set_notification(message, 'error', error.name);
                                 VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
@@ -391,9 +402,9 @@ jQuery( document ).ready(function( $ ) {
                                     url: usb_swiper_settings.ajax_url,
                                     type: 'POST',
                                     dataType: 'json',
-                                    data: "action=update_order_status&order_id=" + order_id+'&message='+message,
+                                    data: "action=update_order_status&order_id=" + order_id+'&message='+message+'&transaction_id='+transaction_id+'&error='+JSON.stringify(error),
                                 }).done(function ( response ) {
-
+                                    VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 });
                             }
                         );
@@ -430,14 +441,19 @@ jQuery( document ).ready(function( $ ) {
                                 return res.json();
                             }).then(function (data) {
 
-                                if (typeof data.success !== 'undefined') {
-
-                                } else {
+                                if( data.orderID ) {
+                                    localStorage.setItem("vt_order_id", data.orderID);
+                                    localStorage.setItem("transaction_id", data.transaction_id);
                                     return data.orderID;
+                                } else {
+                                    set_notification(data.message, 'error', data.message_type);
+                                    VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 }
 
                                 return data.orderID;
                             });
+                        } else {
+                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                         }
                     },
                     onApprove: function(data, actions) {
@@ -463,6 +479,8 @@ jQuery( document ).ready(function( $ ) {
                                     VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                                 }
                             });
+                        } else {
+                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
                         }
                     }
                 }).render('#angelleye_ppcp_checkout');
@@ -780,7 +798,6 @@ jQuery( document ).ready(function( $ ) {
         }
     });
 
-
     $("#vt_verification_form").validate({
         rules: {
             email_address: {
@@ -852,6 +869,14 @@ jQuery( document ).ready(function( $ ) {
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             if (response.status) {
                 $('#vt_repeater_field').append( response.html );
+                jQuery('.vt-product-price').autoNumeric('init', {
+                    mDec: '2',
+                    aSign: '',
+                    wEmpty: '0',
+                    lZero: 'allow',
+                    aForm: false,
+                    vMin: '0'
+                });
                 usb_swiper_remove_loader(loader);
                 loader.removeAttr('disabled');
             } else {
@@ -1115,28 +1140,32 @@ jQuery( document ).ready(function( $ ) {
         },300);
     });
 
-    if( usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id ){
-        const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
-        localStorage.removeItem('sessionExpireTimer');
-        localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
 
-        $(document).on('mousemove keydown', function() {
-            var InactiveTimerTime = localStorage.getItem('sessionExpireTimer');
-            if(InactiveTimerTime === null || InactiveTimerTime === '' || InactiveTimerTime === undefined ) {
-                const getTenMinuteAfterTime = new Date(new Date().getTime() + (10 * 60000)).getTime();
-                localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
-            }
-        });
+    if (usb_swiper_settings.vt_page_id === usb_swiper_settings.current_page_id || usb_swiper_settings.vt_paybyinvoice_page_id === usb_swiper_settings.current_page_id) {
+        if( usb_swiper_settings.timeout_option !== 'never' && parseInt(usb_swiper_settings.timeout_option) > 0 ) {
 
-        const timeoutInterval = setInterval(function () {
-            var currentTime = new Date().getTime();
-            if ( currentTime >= localStorage.getItem('sessionInactiveTimer')) {
-                clearInterval(timeoutInterval);
-                $('.vt-payment-timeout-popup-wrapper').show();
-                localStorage.removeItem('sessionInactiveTimer');
-                autoSessionLogOut();
-            }
-        }, 1000);
+            const getTenMinuteAfterTime = new Date(new Date().getTime() + (parseInt(usb_swiper_settings.timeout_option) * 60000)).getTime();
+            localStorage.removeItem('sessionExpireTimer');
+            localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
+
+            $(document).on('mousemove keydown', function () {
+                var InactiveTimerTime = localStorage.getItem('sessionExpireTimer');
+                if (InactiveTimerTime === null || InactiveTimerTime === '' || InactiveTimerTime === undefined) {
+                    const getTenMinuteAfterTime = new Date(new Date().getTime() + (parseInt(usb_swiper_settings.timeout_option) * 60000)).getTime();
+                    localStorage.setItem('sessionInactiveTimer', getTenMinuteAfterTime);
+                }
+            });
+
+            const timeoutInterval = setInterval(function () {
+                var currentTime = new Date().getTime();
+                if (currentTime >= localStorage.getItem('sessionInactiveTimer')) {
+                    clearInterval(timeoutInterval);
+                    $('.vt-payment-timeout-popup-wrapper').show();
+                    localStorage.removeItem('sessionInactiveTimer');
+                    autoSessionLogOut();
+                }
+            }, 1000);
+        }
     }
 
     $(document).on('click','#vt_form_timeout, .vt-payment-timeout-popup-inner .close-btn', function (){
@@ -1364,6 +1393,15 @@ jQuery( document ).ready(function( $ ) {
             }
         }, 1000);
     }
+
+    jQuery('.vt-form-product-price').autoNumeric('init', {
+        mDec: '2',
+        aSign: '',
+        wEmpty: '0',
+        lZero: 'allow',
+        aForm: false,
+        vMin: '0'
+    });
 });
 
 function removeInterval( LoaderInterval ) {

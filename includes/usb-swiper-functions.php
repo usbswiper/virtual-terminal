@@ -269,12 +269,14 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 'wrapper_class' => 'product_quantity'
             ),
             array(
-                'type' => 'number',
+                'type' => 'text',
                 'id' => 'VTProductPrice',
                 'name' => 'VTProductPrice[]',
                 'placeholder' => __( 'Price', 'usb-swiper'),
                 'required' => true,
-                'attributes' => '',
+	            'attributes' => array(
+		            'pattern' => '([0-9]|\$|,|.)+'
+	            ),
                 'description' => '',
                 'readonly' => false,
                 'disabled' => false,
@@ -2620,4 +2622,56 @@ function void_confirmation_html(){
 	$html = ob_get_clean();
 
 	return !empty( $html ) ? $html : '';
+}
+
+/**
+ * Get Screen Timeout options.
+ *
+ * @since 3.2.2
+ *
+ * @return mixed|null
+ */
+function usb_swiper_get_timeout_options() {
+
+    return apply_filters( 'usb_swiper_get_timeout_options', [
+	    'never' => __( 'Never', 'usb-swiper'),
+	    '15' => __( '15 Min of Inactivity', 'usb-swiper'),
+	    '30' => __( '30 Min of Inactivity', 'usb-swiper'),
+	    '60' => __( '60 Min of Inactivity', 'usb-swiper'),
+    ]);
+}
+
+/**
+ * Get Default Screen Timeout option.
+ *
+ * @since 3.2.2
+ *
+ * @return mixed|null
+ */
+function usb_swiper_get_default_timeout() {
+
+	return apply_filters( 'usb_swiper_get_default_timeout', '30');
+}
+
+/**
+ * Get user selected timout option using user id.
+ *
+ * @since 3.2.2
+ *
+ * @param int $user_id Get user id.
+ * @return string $timeout
+ */
+function usb_swiper_get_user_timeout_option( $user_id = 0 ) {
+
+	if( empty( $user_id ) ) {
+		$user_id = get_current_user_id();
+	}
+
+	$timeout = usb_swiper_get_default_timeout();
+	if( is_user_logged_in() ) {
+		$timeout_option = get_user_meta( $user_id, 'timeout_option', true);
+		$timeout = !empty( $timeout_option ) ? $timeout_option : usb_swiper_get_default_timeout();
+	}
+
+    return apply_filters( 'usb_swiper_get_user_timeout_option', $timeout);
 }

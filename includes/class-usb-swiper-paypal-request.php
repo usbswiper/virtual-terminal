@@ -290,7 +290,12 @@ class Usb_Swiper_Paypal_request{
 
 		$debug_id = !empty( $response['debug_id'] ) ? $response['debug_id'] : '';
 		if( !empty( $debug_id ) && $transaction_id > 0 ) {
+			update_post_meta( $transaction_id, '_payment_failed_response', $response );
 			update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
+		} else {
+			delete_post_meta( $transaction_id, '_payment_status');
+			delete_post_meta( $transaction_id, '_payment_failed_response');
+			delete_post_meta( $transaction_id, '_paypal_transaction_debug_id');
 		}
 	}
 

@@ -172,8 +172,8 @@ class Usb_Swiper {
 		$this->loader->add_action('init', $plugin_public, 'endpoint_init');
 		$this->loader->add_filter('woocommerce_account_menu_items', $plugin_public, 'wc_account_menu_items');
 		$this->loader->add_action('woocommerce_account_transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
-		$this->loader->add_action('woocommerce_account_invoices_endpoint', $plugin_public, 'transactions_endpoint_cb');
-		$this->loader->add_action('woocommerce_account_zettle-transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
+		//$this->loader->add_action('woocommerce_account_invoices_endpoint', $plugin_public, 'transactions_endpoint_cb');
+		//$this->loader->add_action('woocommerce_account_zettle-transactions_endpoint', $plugin_public, 'transactions_endpoint_cb');
 		$this->loader->add_action('woocommerce_account_view-transaction_endpoint', $plugin_public, 'view_transactions_endpoint_cb');
         $this->loader->add_filter( 'woocommerce_get_query_vars', $plugin_public, 'update_wc_endpoints' );
         $this->loader->add_action('woocommerce_account_vt-products_endpoint', $plugin_public, 'vt_products_endpoint_cb');
@@ -256,10 +256,12 @@ class Usb_Swiper {
 		$this->loader->add_action('usb_swiper_section_content_advanced', $plugin_admin, 'advanced_settings');
 		$this->loader->add_action('usb_swiper_section_content_logs', $plugin_admin, 'logs_settings');
 		$this->loader->add_action('usb_swiper_section_content_zettle', $plugin_admin, 'zettle_settings');
+		$this->loader->add_action('usb_swiper_section_content_reports', $plugin_admin, 'reports_settings');
 		$this->loader->add_action('usb_swiper_save_section_partner_fees', $plugin_admin, 'save_partner_fees');
 		$this->loader->add_action('usb_swiper_section_content_uninstall', $plugin_admin, 'uninstall_settings');
 		$this->loader->add_action('wp_ajax_insert_new_partner_fee', $plugin_admin, 'insert_new_partner_fee');
 		$this->loader->add_action('wp_ajax_remove_partner_fee', $plugin_admin, 'remove_partner_fee');
+		$this->loader->add_action('wp_ajax_merchant_report', $plugin_admin, 'get_merchant_report');
 		$this->loader->add_action('wp_ajax_sync_transaction_status', $plugin_admin, 'sync_transaction_status');
 		$this->loader->add_action( 'show_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
 		$this->loader->add_action( 'edit_user_profile',  $plugin_admin, 'add_customer_meta_fields' );

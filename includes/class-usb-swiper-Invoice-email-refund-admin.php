@@ -137,7 +137,7 @@ class UsbSwiperInvoiceEmailRefundedAdmin extends WC_Email {
             'subject'            => array(
                 'title'       => __( 'Subject', 'usb-swiper' ),
                 'type'        => 'text',
-                'placeholder' => __( 'Your {#transaction_type#} {#invoice_number#} has been refunded', 'usb-swiper'),
+                'placeholder' => __( '{#transaction_type#} {#invoice_number#} has been refunded', 'usb-swiper'),
                 'default'     => '',
             ),
             'heading'            => array(
