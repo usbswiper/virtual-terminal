@@ -2335,7 +2335,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'class' => 'woocommerce-Select',
 					'wrapper' => false,
 					'tooltip' => true,
-					'tooltip_text' => __( 'This setting allows you to specify the duration of inactivity after user automatically logout. By default, screen timeout is 30 minutes.', 'usb-swiper'),
+					'tooltip_text' => __( 'This setting allows you to specify the duration of time before you are automatically logged out.  The default is 30 min.', 'usb-swiper'),
 				));
 				?>
             </P>
