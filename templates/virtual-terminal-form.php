@@ -46,7 +46,7 @@ if( true === $profile_status && !empty($merchant_id)) {
 				                'class' => '',
                                 'placeholder' => __( 'Search Customer', 'usb-swiper'),
 				                'tooltip' => true,
-				                'tooltip_text' => __( 'Search Customer using firstname, lastname, email and company.', 'usb-swiper'),
+                                'tooltip_text' => __( 'Search for a customer using First Name, Last  Name, Email or Company Name.', 'usb-swiper'),
 			                )); ?>
                         </div>
                     </fieldset>
