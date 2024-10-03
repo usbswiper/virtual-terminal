@@ -1,5 +1,4 @@
 jQuery( document ).ready(function( $ ) {
-
     if(!usb_swiper_settings.is_customers) {
         var company = localStorage.getItem('Company');
         var BillingFirstName = localStorage.getItem('BillingFirstName');

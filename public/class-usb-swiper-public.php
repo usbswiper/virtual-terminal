@@ -338,7 +338,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
                     'is_customers' => is_wc_endpoint_url('vt-customers'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
-					'timeout_option' => usb_swiper_get_user_timeout_option(),
+                    'timeout_option' => usb_swiper_get_user_timeout_option(),
 				) );
             }
 
