@@ -13,7 +13,7 @@ if( true === $profile_status && !empty($merchant_id)) {
         $edit_page =  wc_get_account_endpoint_url( 'edit-account' );
         $notifications[] = [
                 'type' => 'error',
-            'message' => sprintf(__('Kindly add the Brand Name on %s to initiate the transaction.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('My account', 'usb-swiper').'</a>')
+            'message' => sprintf(__('Please add a Brand Name under your %s settings.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('My account', 'usb-swiper').'</a>')
         ];
     }
 
@@ -46,7 +46,7 @@ if( true === $profile_status && !empty($merchant_id)) {
 				                'class' => '',
                                 'placeholder' => __( 'Search Customer', 'usb-swiper'),
 				                'tooltip' => true,
-				                'tooltip_text' => __( 'Search Customer using firstname, lastname, email and company.', 'usb-swiper'),
+                                'tooltip_text' => __( 'Search for a customer using First Name, Last  Name, Email or Company Name.', 'usb-swiper'),
 			                )); ?>
                         </div>
                     </fieldset>
