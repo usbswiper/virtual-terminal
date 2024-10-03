@@ -553,7 +553,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 'name' => 'transaction_type',
                                 'options' => array(
                                     '' => __('All Types', 'usb-swiper'),
-                                    'transaction' => __('Transaction', 'usb-swiper'),
+                                    'transaction' => __('Manual Entry (Keyed)', 'usb-swiper'),
                                     'invoice' => __('Invoice', 'usb-swiper'),
                                     'zettle' => __('Zettle', 'usb-swiper')
                                 ),
