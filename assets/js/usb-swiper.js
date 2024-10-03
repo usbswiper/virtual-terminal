@@ -1071,7 +1071,7 @@ jQuery( document ).ready(function( $ ) {
             let quantity = $(this).val();
             let wrapper_id = $(this).parents('.vt-fields-wrap').attr('id');
             let price = $('#'+wrapper_id).children('.price').children('input').val();
-            net_price_array[index] = Number(quantity) * Number(price);
+            net_price_array[index] = Number(quantity) * Number(price.replace(/,/g, ''));
         });
 
         for (let i = 0; i < net_price_array.length; i++) {
@@ -1396,6 +1396,7 @@ jQuery( document ).ready(function( $ ) {
 
     jQuery('.vt-form-product-price').autoNumeric('init', {
         mDec: '2',
+        aSep: '',      // Thousands separator (comma)
         aSign: '',
         wEmpty: '0',
         lZero: 'allow',
