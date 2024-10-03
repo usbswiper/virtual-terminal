@@ -2557,11 +2557,18 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                     $author_id = ! empty( $author_id ) ? $author_id : 1;
                                     $current_user = get_user_by('id', $author_id );
                                     $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
-                                    if( true !== (bool)$ignore_email ){
-                                        $get_recipient = $current_user->user_email;
+                                    $recipients = [];
+                                    if (isset($admin_email->enabled) && $admin_email->enabled === 'yes') {
+                                        $recipients[] = $admin_email->recipient;
                                     }
-                                    $admin_email->recipient = $get_recipient;
-                                    $admin_email->trigger( array(
+                                    if (false === (bool)$ignore_email) {
+                                        $recipients[] = $current_user->user_email;
+                                    }
+
+                                    $recipient_string = implode(',', $recipients);
+                                    $admin_email->recipient = $recipient_string;
+
+                                    $admin_email->trigger(array(
                                         'transaction_id' => $transaction_id,
                                         'email_args' => $email_args,
                                     ));
