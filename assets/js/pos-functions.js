@@ -12,7 +12,7 @@ jQuery(function( $ ) {
         }
         else
         {
-            jQuery('#BillingFirstName').focus();
+            jQuery('#customerInformation').focus();
         }
 
         /* Bootstrap Switch Plugin on checkboxes for POS form */
