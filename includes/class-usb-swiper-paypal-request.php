@@ -261,6 +261,13 @@ class Usb_Swiper_Paypal_request{
 				if ( !empty( $response['body']) && is_array($response['body'])) {
 					$this->api_log->log('Response Body: ' . print_r($response['body'], true), $log_file);
 				} elseif ( !empty($response) && is_array($response)) {
+                    $response_code = ( isset($response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code']) && !empty($response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code'])) ? $response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code'] : '';
+                    if( !empty($response_code) ){
+                        $response_description = vt_response_code_description($response_code);
+                        if( !empty($response_description) ){
+                            $response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_description'] = $response_description;
+                        }
+                    }
 					$this->api_log->log('Response Body: ' . print_r($response, true), $log_file);
 				} else {
 					$this->api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($response), true), true), $log_file);
