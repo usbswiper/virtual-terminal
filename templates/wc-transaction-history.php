@@ -300,6 +300,21 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 			        <?php } ?>
                 </address>
             </div>
+            <!-- Personal Info -->
+            <?php
+            $billingInfoEnabled = 'true' === $billingInfo;
+            ?>
+            <div style="float: left; display: inline-block; vertical-align: top; margin-right: 10px; width: calc(50% - 10px); <?php echo $billingInfoEnabled ? 'display:none;' : ''; ?>" class="transaction-column billing-details form-detail <?php echo ('true' === $shippingDisabled) ? 'no-shipping-address' : ''; ?>">
+                <h2 class="transaction-details__title transaction-history-title"><?php _e('Personal Info', 'usb-swiper'); ?></h2>
+                <address class="address-wrap" style="padding: 10px; border: 2px solid #ebebeb; min-height: <?php echo (is_admin()) ? '150px;' : '200px;'; ?>">
+                    <p style="margin: 0;font-size: 14px;padding:0;font-style: normal;"><strong><?php echo $company_name ;?></strong></p>
+                    <?php
+                    echo !empty( $addresses['billing_address'] ) ? $addresses['billing_address'] : '';
+                    if( !empty( $BillingEmail ) ) { ?>
+                        <p style="<?php echo $address_style; ?>" class="woocommerce-customer-details--email"><?php echo $BillingEmail; ?></p>
+                    <?php } ?>
+                </address>
+            </div>
             <!--Shipping Address-->
             <div style="float: left;display: inline-block;vertical-align: top;margin-left: 10px;width: calc( 50% - 10px );<?php echo ('true' !== $shippingDisabled ) ? 'display:none': ''; ?>" class="shipping-details form-detail  transaction-column">
                 <h2 class="transaction-details__title transaction-history-title" ><?php _e('Shipping Address','usb-swiper'); ?></h2>
