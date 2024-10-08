@@ -594,6 +594,7 @@ jQuery( document ).ready(function( $ ) {
     });
 
     $(document).on('click','#print_transaction_receipt', function (event) {
+        updatePageSize();
         window.print();
     });
 
@@ -1602,3 +1603,26 @@ function checkPaymentButton() {
 }
 
 document.addEventListener('DOMContentLoaded', checkPaymentButton);
+
+function updatePageSize() {
+    var pageSize = $('#page-size').val();
+    var css = '';
+    if (pageSize === 'a4') {
+        css = `@page { size: 210mm 297mm; }`;
+    }
+    else if (pageSize === 'envelope-3.5') {
+        css = `@page { size: 89mm 187mm;}`;
+    }
+
+    var styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.id = 'dynamic-page-size';
+    styleSheet.innerText = css;
+
+    var existingStyle = document.getElementById('dynamic-page-size');
+    if (existingStyle) {
+        existingStyle.parentNode.removeChild(existingStyle);
+    }
+
+    document.head.appendChild(styleSheet);
+}

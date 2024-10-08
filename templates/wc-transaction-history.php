@@ -97,6 +97,14 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <?php } ?>
 
             <?php if( !$is_email && !is_admin()) { ?>
+                <label><?php _e('Page Size: ', 'usb-swiper'); ?></label>
+                <select id="page-size" name="page-size" class="woocommerce-Select">
+                    <option value="a4"><?php _e('A4','usb-swiper'); ?></option>
+                    <option value="envelope-3.5"><?php _e('Envelope 3.5','usb-swiper'); ?></option>
+                </select>
+            <?php } ?>
+
+            <?php if( !$is_email && !is_admin()) { ?>
                 <button class="vt-button print hide-me-in-print"  id="print_transaction_receipt"><?php _e('Print Receipt', 'usb-swiper') ?></button>
             <?php } ?>
 
