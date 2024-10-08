@@ -1257,6 +1257,11 @@ jQuery( document ).ready(function( $ ) {
         }
     });
 
+    var checkboxLabel = $('#save_customer_details').closest('.vt-fields-wrap').find('label');
+    var checkbox = $('.review_changes').closest('.vt-fields-wrap');
+    var defaultLabel = 'Do you want to Save this customer’s record?';
+    checkboxLabel.text(defaultLabel);
+    $('#save_customer_details').prop('checked', false);
     $(document).on('click','.vt-customer-search-result .customer-item', function (event) {
         let currentObj = $(this);
         let customer_id = currentObj.attr('data-customer_id');
@@ -1264,25 +1269,97 @@ jQuery( document ).ready(function( $ ) {
             'action': 'vt_get_customer_by_id',
             'customer_id': customer_id,
         };
+
+        var originalInfo = {};
+
+        // Store the original info (before customer selection)
+        $('.personal_info, .billingInfo, .shipping_address').each(function () {
+            var fieldId = $(this).attr('id');
+            originalInfo[fieldId] = $(this).val();
+        });
+
+        $('.vt-input-field').on('change', function() {
+            FormData = window.customerData
+
+            if( undefined !== FormData && FormData.hasOwnProperty($(this).attr('id')) ){
+                var changedFields = '';
+                $.each(FormData, function(key, value) {
+                    if($('#'+key).val() !== value && key !== 'customer_id'){
+                        changedFields = changedFields + '<li>' + key + '</li>';
+                    }
+                });
+                let reviewChanges = $('.review-changes');
+                if( '' !== changedFields && ( undefined === reviewChanges || null === reviewChanges || reviewChanges.length < 1 ) ){
+                    reviewChangesButton = $('<button class="review-changes" type="button" data-toggle="collapse" aria-controls="collapseExample" aria-expanded="false" data-target="#reviewChangesCollapse">Review Changes</button><div class="reviewChangesList collapse" id="reviewChangesCollapse"></div>');
+                    checkbox.after(reviewChangesButton);
+                } else if('' === changedFields){
+                    $('.review-changes').remove();
+                    $('.user-review-list').remove();
+                }
+
+            }
+        });
+
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             $('.vt-customer-search-result').remove();
             if (response.status) {
-                if( response.customer ) {
+                if (response.customer) {
                     let customer = JSON.parse(response.customer);
-                    $.each(customer, function(key, value) {
-                        if(key === 'save_customer_details') {
-                            $('#'+key).prop('checked','checked');
-                        }else if( key === 'billingInfo' || key === 'shippingDisabled' || key === 'shippingSameAsBilling' ) {
-                            if( value === 'true' ) {
-                                jQuery('#' + key).bootstrapSwitch('state', true);
-                            } else {
-                                jQuery('#' + key).bootstrapSwitch('state', false);
+                    var updatedFields = [];
+
+                    // Change label to "Update this customer’s record"
+                    checkboxLabel.text('Do you want to Update this customer’s record?');
+                    $('#save_customer_details').prop('checked', false);
+                    function compareValues(obj, originalObj, path = '') {
+                        for (var key in obj) {
+                            if (obj.hasOwnProperty(key)) {
+                                var newPath = path + (path ? '.' : '') + key;
+                                if (typeof obj[key] === 'object') {
+                                    compareValues(obj[key], originalObj[key], newPath);
+                                } else {
+                                    var originalValue = originalObj[key];
+                                    var newValue = obj[key];
+                                    if (originalValue !== newValue) {
+                                        updatedFields.push(newPath); // Track updated fields
+                                    }
+                                    $('#' + newPath).val(newValue); // Update field value
+                                }
                             }
-                        } else {
-                            $('#'+key).val(value);
                         }
-                    });
+                    }
+
+                    compareValues(customer, originalInfo);
+
+                    window.customerData = customer;
                 }
+            }
+        });
+    });
+
+    $(document).on('click', '.review-changes', function (e) {
+        e.preventDefault();
+        var changesList = $('.reviewChangesList');
+        FormData = window.customerData
+
+        if( undefined !== FormData ){
+            var changedFields = '';
+            $.each(FormData, function(key, value) {
+                if($('#'+key).val() !== value && key !== 'customer_id'){
+                    changedFields = changedFields + '<div class="review-changes-list">' + key + '</div>';
+                }
+            });
+            changesList.html(changedFields);
+        }
+    });
+
+    $(document).ready(function() {
+        $('#save_customer_details').on('change', function() {
+            var checkbox = $(this);
+            var fields = $('.personal_info, .billingInfo, .shipping_address');
+            if (checkbox.is(':checked')) {
+                fields.prop('readonly', false);
+            } else {
+                fields.prop('readonly', true);
             }
         });
     });

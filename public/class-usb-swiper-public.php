@@ -4284,5 +4284,47 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 	        wp_send_json( $response , 200 );
         }
+
+        /**
+         * Check email is exists or not.
+         *
+         * @since 4.0.0
+         *
+         * @return void
+         */
+        public function vt_check_email_exists(){
+            $email = isset($_POST['data']['BillingEmail']) ? sanitize_email($_POST['data']['BillingEmail']) : '';
+            $data = !empty($_POST['data']) ?  $_POST['data'] : [];
+
+            if (empty($email)) {
+                wp_send_json_error(['message' => 'No email provided']);
+            }
+            $customer = new Usb_Swiper_Customers();
+            $customers = $customer->get_customers(array('customer'=> $email));
+            $current_user = !empty($customers['customers'][0]) ?  $customers['customers'][0] : '';
+
+            $existing_customer = !empty($current_user);
+            $response = [];
+            if( !empty($data)  && !empty($current_user) ){
+                foreach($data as $key => $value){
+                    if( isset($current_user[$key]) ) {
+                        $response[] = $key;
+                        if( $current_user[$key] === $value ){
+                            $response_key = array_search($key, $response);
+                            unset($response[$response_key]);
+                        }
+                    }
+                }
+            }
+
+            if (!empty($response)) {
+                wp_send_json_success([
+                    'email_exists' => true,
+                    'customer_data' => $response
+                ]);
+            } else {
+                wp_send_json_success(['email_exists' => false]);
+            }
+        }
     }
 }

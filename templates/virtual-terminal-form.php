@@ -133,6 +133,30 @@ if( true === $profile_status && !empty($merchant_id)) {
                     <div class="vt-payment-wrapper">
                         <div class="vt-col vt-col-pay-by-invoice">
                             <fieldset>
+                                <label><?php _e('Customer Information', 'usb-swiper'); ?><span class="tool" data-tip="<?php _e('Select if you want to update the customer’s record with the new details.', 'usb-swiper'); ?>" tabindex="1">?</span></label>
+
+                                <div class="vt-fields-wrap review_changes">
+                                    <?php
+                                    echo usb_swiper_get_html_field(array(
+                                        'type' => 'checkbox',
+                                        'id' => 'save_customer_details',
+                                        'name' => 'save_customer_details',
+                                        'label' => __( 'Do you want to Save this customer’s record?', 'usb-swiper'),
+                                        'required' => false,
+                                        'value' => true,
+                                        'checked' => false,
+                                        'attributes' => array(
+                                            'data-default-checked' => 'FALSE'
+                                        ),
+                                        'description' => '',
+                                        'class' => '',
+                                    ));
+                                    ?>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="vt-col vt-col-pay-by-invoice">
+                            <fieldset>
                                 <label><?php _e('Invoicing','usb-swiper'); ?><span class="tool" data-tip="<?php _e('Enable invoicing to send an email invoice to your buyer. They can pay the invoice using PayPal or a credit card.','usb-swiper'); ?>" tabindex="1">?</span></label>
 
                                 <div class="vt-fields-wrap">
