@@ -1582,27 +1582,31 @@ function remove_zettle_notification(currentObj){
     currentObj.parent('.zettle-refund-response').hide();
 }
 
-function checkPaymentButton() {
-    const paymentButton = document.getElementById('pos-submit-btn');
-    const vtProductInput = document.getElementById('VTProduct_0');
-    const VTProductQuantity = document.getElementById('VTProductQuantity_0');
-    const VTProductprice = document.getElementById('VTProductPrice_0');
-    const vtaddproductbtn = document.getElementById('vt_add_item');
+const paymentButton = document.getElementById('pos-submit-btn');
 
-    if (paymentButton.disabled) {
-        vtProductInput.disabled = true;
-        VTProductQuantity.disabled = true;
-        VTProductprice.disabled = true;
-        vtaddproductbtn.disabled = true;
-    } else {
-        vtProductInput.disabled = false;
-        VTProductQuantity.disabled = false;
-        VTProductprice.disabled = false;
-        vtaddproductbtn.disabled = false;
+if(paymentButton) {
+    function checkPaymentButton() {
+        const paymentButton = document.getElementById('pos-submit-btn');
+        const vtProductInput = document.getElementById('VTProduct_0');
+        const VTProductQuantity = document.getElementById('VTProductQuantity_0');
+        const VTProductprice = document.getElementById('VTProductPrice_0');
+        const vtaddproductbtn = document.getElementById('vt_add_item');
+
+        if (paymentButton.disabled) {
+            vtProductInput.disabled = true;
+            VTProductQuantity.disabled = true;
+            VTProductprice.disabled = true;
+            vtaddproductbtn.disabled = true;
+        } else {
+            vtProductInput.disabled = false;
+            VTProductQuantity.disabled = false;
+            VTProductprice.disabled = false;
+            vtaddproductbtn.disabled = false;
+        }
     }
-}
 
-document.addEventListener('DOMContentLoaded', checkPaymentButton);
+    document.addEventListener('DOMContentLoaded', checkPaymentButton);
+}
 
 function updatePageSize() {
     var pageSize = $('#page-size').val();
