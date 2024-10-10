@@ -4,6 +4,7 @@ $is_notice = get_user_meta( get_current_user_id(),'usb_swiper_vt_notice', true )
 $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
 $get_merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
 $merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
+$notifications = [];
 if( true === $profile_status && !empty($merchant_id)) {
 
     $disable_payment = '';
