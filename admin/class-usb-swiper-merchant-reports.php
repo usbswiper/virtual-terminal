@@ -193,7 +193,9 @@ class Merchant_Report_Table extends WP_List_Table {
         $items = [];
         if( !empty($transactions) ){
             foreach ($transactions as $transaction) {
-                $unique_key = $transaction['user_id'] . '_' . date('Y-m', strtotime($transaction['post_date']));
+                $date = !empty($transaction['post_date']) ? date('Y-m', strtotime($transaction['post_date'])) : date('Y-m');
+
+                $unique_key = $transaction['user_id'] . '_' . $date;
                 $total_volume = $transaction['total_transactions'] ?: 0;
                 $amex_volume = $transaction['amex_transactions'] ?: 0;
 
