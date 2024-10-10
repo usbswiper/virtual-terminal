@@ -141,6 +141,21 @@ function usb_swiper_get_vt_tab_fields() {
 }
 
 /**
+ * Get sub tabs for report section.
+ *
+ * @since 3.2.2
+ *
+ * @return mixed|null
+ */
+function get_report_sections() {
+    $report_sections = array(
+        'amex'
+    );
+
+    return apply_filters( 'usb_swiper_get_report_sections', $report_sections );
+}
+
+/**
  * Get form tab fields for transaction.
  *
  * @since 1.0.0

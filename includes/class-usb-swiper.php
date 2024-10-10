@@ -263,7 +263,6 @@ class Usb_Swiper {
 		$this->loader->add_action('usb_swiper_section_content_uninstall', $plugin_admin, 'uninstall_settings');
 		$this->loader->add_action('wp_ajax_insert_new_partner_fee', $plugin_admin, 'insert_new_partner_fee');
 		$this->loader->add_action('wp_ajax_remove_partner_fee', $plugin_admin, 'remove_partner_fee');
-		$this->loader->add_action('wp_ajax_merchant_report', $plugin_admin, 'get_merchant_report');
 		$this->loader->add_action('wp_ajax_sync_transaction_status', $plugin_admin, 'sync_transaction_status');
 		$this->loader->add_action( 'show_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
 		$this->loader->add_action( 'edit_user_profile',  $plugin_admin, 'add_customer_meta_fields' );
