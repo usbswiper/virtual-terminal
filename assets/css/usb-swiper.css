@@ -93,7 +93,7 @@ div.brand-logo {padding-bottom: 20px;}
 .paypal-connect-button-wrap {text-align: center;margin-top: 20px;}
 p.signature-text{display: none;}
 .transaction-history-title{font-size: 1.5rem;padding: 10px 0;}
-.address-wrap{padding: 10px;border: 2px solid #ebebeb;min-height:200px;}
+.address-wrap{padding: 10px;border: 2px solid #ebebeb;min-height:50px !important;}
 .show-me-only-in-print{display: none ;}
 .transaction-table-header{text-align:left;width: 50%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;}
 .transaction-column{width: calc(50% - 15px);}
