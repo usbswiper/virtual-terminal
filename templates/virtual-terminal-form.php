@@ -23,7 +23,7 @@ if( true === $profile_status && !empty($merchant_id)) {
         $edit_page =  wc_get_account_endpoint_url( 'edit-account' );
         $notifications[] = [
             'type' => 'error',
-            'message' => sprintf(__('Please add an Invoice Prefix under your %s.  If you have questions about this or would like some help, please call 224-677-0283 x4.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('Account Details Settings', 'usb-swiper').'</a>')
+            'message' => sprintf(__('Please add an Invoice Prefix under your %s.  <br />If you have questions about this or would like some help, please call 224-677-0283 x4.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('Account Details Settings', 'usb-swiper').'</a>')
         ];
     }
 
