@@ -249,6 +249,18 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         $ShippingEmail = get_post_meta( $transaction_id, 'ShippingEmail', true);
         ?>
 
+        <?php if( !$is_email ) { ?>
+            <div class="Print-Receipt-phone-number printArea" style="display:none;text-align: center;">
+                <?php
+                $serialized_data = get_option('et_divi');
+                $phone_number = maybe_unserialize($serialized_data);
+
+                if (isset($phone_number['phone_number'])) {
+                    echo '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" margin-right="2"><path d="M21.384,17.752a2.108,2.108,0,0,1-.522,3.359,7.543,7.543,0,0,1-5.476.642C10.5,20.523,3.477,13.5,2.247,8.614a7.543,7.543,0,0,1,.642-5.476,2.108,2.108,0,0,1,3.359-.522L8.333,4.7a2.094,2.094,0,0,1,.445,2.328A3.877,3.877,0,0,1,8,8.2c-2.384,2.384,5.417,10.185,7.8,7.8a3.877,3.877,0,0,1,1.173-.781,2.092,2.092,0,0,1,2.328.445Z"/></svg>' . $phone_number['phone_number'];
+                } ?>
+            </div>
+        <?php } ?>
+
 	    <?php if( !$is_email ) { ?>
             <div class="Print-Receipt-logo printArea" style="display:none;text-align: center;">
                 <?php $brand_logo = usbswiper_get_brand_logo(get_current_user_id(), false,[250,50]);
