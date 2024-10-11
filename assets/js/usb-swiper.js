@@ -1341,16 +1341,20 @@ jQuery( document ).ready(function( $ ) {
     $(document).on('click', '.review-changes', function (e) {
         e.preventDefault();
         var changesList = $('.reviewChangesList');
-        FormData = window.customerData
+        FormData = window.customerData;
 
-        if( undefined !== FormData ){
-            var changedFields = '';
-            $.each(FormData, function(key, value) {
-                if($('#'+key).val() !== value && key !== 'customer_id'){
-                    changedFields = changedFields + '<div class="review-changes-list">' + key + '</div>';
-                }
-            });
-            changesList.html(changedFields);
+        if(changesList){
+            changesList.toggleClass('show');
+
+            if( undefined !== FormData ){
+                var changedFields = '';
+                $.each(FormData, function(key, value) {
+                    if($('#'+key).val() !== value && key !== 'customer_id'){
+                        changedFields = changedFields + '<div class="review-changes-list">' + key + '</div>';
+                    }
+                });
+                changesList.html(changedFields);
+            }
         }
     });
 
