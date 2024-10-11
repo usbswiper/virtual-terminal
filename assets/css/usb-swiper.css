@@ -303,9 +303,14 @@ button[disabled] {opacity: 0.5;}
 .woocommerce-account  .woocommerce .woocommerce-MyAccount-navigation {width: 20%;}
 .woocommerce-account  .woocommerce .woocommerce-MyAccount-content {width: 80%;}
 .woocommerce-account  .woocommerce .woocommerce-MyAccount-content .transaction-actions .vt-button{margin: 0 0 5px 0;}
-.review-changes {overflow: hidden;text-overflow: ellipsis; white-space: nowrap; background: transparent; border: none; color: blue; }
-.reviewChangesList[aria-expanded="false"] {display: none;}
-.review-changes-list {padding-left: 6px;}
+.review-changes {cursor: pointer; text-decoration: underline; background: transparent; border: none; color: #2EA3F2; font-weight: bold;}
+#save_customer_details{cursor: pointer;}
+.reviewChangesList { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.4s ease, opacity 0.4s ease; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; padding: 0;}
+.reviewChangesList.show { max-height: 300px; opacity: 1;}
+.reviewChangesList .review-changes-list:first-child {margin-top: 5px}
+.reviewChangesList .review-changes-list:last-child {margin-bottom: 5px}
+.review-changes-list { list-style-type: circle; padding-left: 6px;}
+.review-changes-list::before { font-size: 18px; display: inline-block; width: 1rem; content: "\2022";}
 @media print {
     @page {
         margin: 0;
