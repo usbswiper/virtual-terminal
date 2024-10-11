@@ -2251,7 +2251,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'name' => 'BrandName',
                     'label' => __( 'Brand Name', 'usb-swiper'),
                     'attributes' => '',
-                    'description' => '',
+                    'description' => 'This is the name your customers should see on their credit card statement.',
                     'readonly' => false,
                     'disabled' => false,
                     'class' => 'woocommerce-Input woocommerce-Input--text input-text',
