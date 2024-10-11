@@ -322,7 +322,7 @@ button[disabled] {opacity: 0.5;}
     .transaction-details__title{font-size: 14px !important;padding:2px 0 !important;}
     table.shop_table.refund_details th, table.shop_table.refund_details td{font-size: 10px !important;padding: 5px !important;}
     address{margin:5px 0 !important;}
-    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:140px !important; line-height: 16px !important;}
+    .address-wrap{padding: 10px;border: 1px solid #ebebeb;min-height:50px !important; line-height: 16px !important;}
     .address-wrap p {font-size: 10px !important;}
     p{margin:0 !important; padding: 0 !important;}
     .hide-me-in-print{display: none!important; height: 0 !important;}
