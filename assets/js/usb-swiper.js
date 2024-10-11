@@ -1294,7 +1294,7 @@ jQuery( document ).ready(function( $ ) {
                     checkbox.after(reviewChangesButton);
                 } else if('' === changedFields){
                     $('.review-changes').remove();
-                    $('.user-review-list').remove();
+                    $('.reviewChangesList').remove();
                 }
 
             }
