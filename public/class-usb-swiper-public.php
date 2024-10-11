@@ -2232,7 +2232,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'name' => 'InvoicePrefix',
                     'label' => __( 'Invoice Prefix', 'usb-swiper'),
                     'attributes' => '',
-                    'description' => '',
+                    'description' => 'Enter a unique value here to avoid duplicate invoice ID errors from PayPal.  For example, if your 
+                    company name is Acme, Inc. you might use ACME- as your prefix.',
                     'readonly' => false,
                     'disabled' => false,
                     'class' => 'woocommerce-Input woocommerce-Input--text input-text',
