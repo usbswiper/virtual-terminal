@@ -308,6 +308,7 @@ button[disabled] {opacity: 0.5;}
         margin: 0;
     }
     body{line-height: 1.2 !important;margin: 0 !important;padding: 0!important;}
+    .clearfix{display: none!important; height: 0 !important;}
     .transaction-column{width: calc(33% - 15px);}
     .form-heading-detail{display: block;width: 100%;margin-bottom: 10px;}
     .receipt-header-ul {display: block;width: 100%;}
@@ -331,10 +332,11 @@ button[disabled] {opacity: 0.5;}
     footer#colophon {display: none;}
     div#secondary {display: none;}
     header.entry-header {display: none;}
-    nav.woocommerce-MyAccount-navigation {display: none;}
+    nav.woocommerce-MyAccount-navigation {display: none !important;}
     .edit-link {display: none;}
     .transaction-refund{display:none;}
     .Print-Receipt-logo{width: 100% !important; display: block !important;}
+    .Print-Receipt-phone-number{width: 100% !important; display: block !important;  margin-bottom: 10px !important;}
     .transaction-history-field{margin: 0 !important; padding: 0 !important;}
     .order_details{margin: 0 !important; padding: 0 !important;}
     table.shop_table{margin: 10px 0 !important;}
