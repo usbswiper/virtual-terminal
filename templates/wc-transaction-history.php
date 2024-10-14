@@ -532,11 +532,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('AVS Code','usb-swiper'); ?></th>
-                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['avs_code'] ) ? strtoupper( $processor_response['avs_code'] ) : ''; ?></td>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['avs_code'] ) ? strtoupper( $processor_response['avs_code'] ) : 'N/A'; ?></td>
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('CVV2 Code','usb-swiper'); ?></th>
-                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['cvv_code'] ) ? strtoupper( $processor_response['cvv_code'] ) : ''; ?></td>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['cvv_code'] ) ? strtoupper( $processor_response['cvv_code'] ) : 'N/A'; ?></td>
             </tr>
 
             <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { ?>

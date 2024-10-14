@@ -553,7 +553,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 'name' => 'transaction_type',
                                 'options' => array(
                                     '' => __('All Types', 'usb-swiper'),
-                                    'transaction' => __('Transaction', 'usb-swiper'),
+                                    'transaction' => __('Manual Entry (Keyed)', 'usb-swiper'),
                                     'invoice' => __('Invoice', 'usb-swiper'),
                                     'zettle' => __('Zettle', 'usb-swiper')
                                 ),
@@ -2557,11 +2557,18 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                     $author_id = ! empty( $author_id ) ? $author_id : 1;
                                     $current_user = get_user_by('id', $author_id );
                                     $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
-                                    if( true !== (bool)$ignore_email ){
-                                        $get_recipient = $current_user->user_email;
+                                    $recipients = [];
+                                    if (isset($admin_email->enabled) && $admin_email->enabled === 'yes') {
+                                        $recipients[] = $admin_email->recipient;
                                     }
-                                    $admin_email->recipient = $get_recipient;
-                                    $admin_email->trigger( array(
+                                    if (false === (bool)$ignore_email) {
+                                        $recipients[] = $current_user->user_email;
+                                    }
+
+                                    $recipient_string = implode(',', $recipients);
+                                    $admin_email->recipient = $recipient_string;
+
+                                    $admin_email->trigger(array(
                                         'transaction_id' => $transaction_id,
                                         'email_args' => $email_args,
                                     ));
@@ -2702,11 +2709,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_post_meta( $transaction_id, '_payment_failed_response', $error );
                 update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
 
+                $api_log->log("", $transaction_id, true);
+
                 $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
                 $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
                 $api_log->log('Response Order Status: '.$order_status, $transaction_id);
                 $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
                 $api_log->log('Response Message: '.$message, $transaction_id);
+                $api_log->log('Debug ID: '.$debug_id, $transaction_id);
+                $api_log->log('Transaction failed with error: '.json_encode($error), $transaction_id);
+
+                $status = true;
             }
 
             $response = array(
