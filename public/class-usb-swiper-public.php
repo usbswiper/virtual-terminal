@@ -2709,11 +2709,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_post_meta( $transaction_id, '_payment_failed_response', $error );
                 update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
 
+                $api_log->log("", $transaction_id, true);
+
                 $api_log->log("Action: ".ucwords(str_replace('_', ' ', 'order_failed')), $transaction_id);
                 $api_log->log('Response Transaction ID: '.$order_id, $transaction_id);
                 $api_log->log('Response Order Status: '.$order_status, $transaction_id);
                 $api_log->log('Response Order Intent: '.$order_intent, $transaction_id);
                 $api_log->log('Response Message: '.$message, $transaction_id);
+                $api_log->log('Debug ID: '.$debug_id, $transaction_id);
+                $api_log->log('Transaction failed with error: '.json_encode($error), $transaction_id);
+
+                $status = true;
             }
 
             $response = array(
