@@ -4,6 +4,7 @@ $is_notice = get_user_meta( get_current_user_id(),'usb_swiper_vt_notice', true )
 $profile_status = filter_var($profile_status, FILTER_VALIDATE_BOOLEAN);
 $get_merchant_data = usbswiper_get_onboarding_merchant_response(get_current_user_id());
 $merchant_id = !empty( $get_merchant_data['merchant_id'] ) ? $get_merchant_data['merchant_id'] : '';
+$notifications = [];
 if( true === $profile_status && !empty($merchant_id)) {
 
     $disable_payment = '';
@@ -14,6 +15,15 @@ if( true === $profile_status && !empty($merchant_id)) {
         $notifications[] = [
                 'type' => 'error',
             'message' => sprintf(__('Kindly add the Brand Name on %s to initiate the transaction.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('My account', 'usb-swiper').'</a>')
+        ];
+    }
+
+    if( ! usbswiper_get_invoice_prefix() ){
+        $disable_payment = 'disabled';
+        $edit_page =  wc_get_account_endpoint_url( 'edit-account' );
+        $notifications[] = [
+            'type' => 'error',
+            'message' => sprintf(__('Kindly add the Invoice Prefix on %s to initiate the transaction.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('My account', 'usb-swiper').'</a>')
         ];
     }
 
