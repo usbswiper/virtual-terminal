@@ -207,6 +207,7 @@ if( true === $profile_status && !empty($merchant_id)) {
                                         </div>
                                     </div>
                                 </div>
+                                <input type="hidden" name="card_type" id="card_type" value="">
                                 <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
                                 <button type="submit" <?php echo esc_attr($disable_payment); ?> class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
                             </div>

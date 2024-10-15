@@ -914,6 +914,12 @@ function usbswiper_get_platform_fees( $cart_total, $type = 'transaction', $trans
 	$settings = usb_swiper_get_settings('partner_fees');
 	$fees = !empty( $settings['fees']) ? $settings['fees'] : '';
 	$default_partner_percentage = !empty( $settings['default_partner_percentage']) ? $settings['default_partner_percentage'] : '';
+    $default_amex_percentage = !empty( $settings['default_amex_percentage']) ? $settings['default_amex_percentage'] : '';
+    $card_brand = !empty($_POST['card_type']) ? sanitize_text_field($_POST['card_type']) : '';
+    $payment_card_brand = '';
+    if(!empty($transaction_id)){
+        $payment_card_brand = get_post_meta($transaction_id,'_payment_card_brand',true);
+    }
 
 	$country = !empty( $billing_country ) ? $billing_country : $merchant_country;
 
@@ -931,9 +937,12 @@ function usbswiper_get_platform_fees( $cart_total, $type = 'transaction', $trans
 	}
 
 	$percentage = $default_partner_percentage;
-	if( isset( $country_fees[$country] ) && !empty( $country_fees[$country] ) ) {
-		$percentage = $country_fees[$country];
-	}
+    if( (!empty($card_brand) && strtolower($card_brand) === 'american express') || (!empty($payment_card_brand) && strtolower($payment_card_brand) === 'amex') ){
+        $percentage = !empty( $default_amex_percentage ) ? $default_amex_percentage : 0;
+    } else if (isset($country_fees[$country]) && !empty($country_fees[$country])) {
+        $percentage = $country_fees[$country];
+    }
+
 	if( !empty( $percentage ) && $percentage > 0 ) {
 		$platform_fees = ( $cart_total * $percentage ) / 100;
 	}

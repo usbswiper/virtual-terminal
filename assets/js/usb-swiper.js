@@ -307,7 +307,7 @@ jQuery( document ).ready(function( $ ) {
             }).then(function (hf) {
                 hf.on('cardTypeChange', function (event) {
                     if (event.cards.length === 1) {
-
+                        $('#card_type').val(event.cards[0].niceType);
                     }
                 });
 
