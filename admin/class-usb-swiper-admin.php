@@ -1151,6 +1151,29 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 		                        ),); ?>
                             </td>
                         </tr>
+                        <tr>
+                            <th for="<?php echo 'default_amex_percentage'; ?>"><?php _e('Default Amex Fee','usb-swiper'); ?></th>
+                            <td>
+                                <?php echo usb_swiper_get_html_field(array(
+                                    'type' => 'number',
+                                    'id' => 'default_amex_percentage',
+                                    'name' => 'default_amex_percentage',
+                                    'label' => '',
+                                    'wrapper' => false,
+                                    'required' => false,
+                                    'attributes' => array(
+                                        'min' => 0,
+                                        'step' => 'any',
+                                        'minlength' => 0,
+                                        'max' => 100,
+                                        'maxlength' => 100,
+                                    ),
+                                    'description' => '',
+                                    'class' => 'regular-text',
+                                    'value' => !empty( $settings['default_amex_percentage'] ) ? $settings['default_amex_percentage'] : '',
+                                ),); ?>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -1239,6 +1262,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 		    $total_row = !empty( $_POST['partner_fee_total_row'] ) ? (int) $_POST['partner_fee_total_row'] : 0;
 		    $default_partner_percentage = !empty( $_POST['default_partner_percentage'] ) ? $_POST['default_partner_percentage'] : '';
+            $default_amex_percentage = !empty( $_POST['default_amex_percentage'] ) ? $_POST['default_amex_percentage'] : '';
 
 			$fees = array();
 
@@ -1278,6 +1302,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
             }
 
             $usb_swiper_settings[$current_section]['default_partner_percentage'] = $default_partner_percentage;
+            $usb_swiper_settings[$current_section]['default_amex_percentage'] = $default_amex_percentage;
 
             update_option( $setting_key, $usb_swiper_settings );
 			$is_partner_fee_exclude = !empty($_POST['partner_checkbox_input']) ? $_POST['partner_checkbox_input'] : '';
