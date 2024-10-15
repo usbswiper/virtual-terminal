@@ -592,7 +592,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $meta_key = '_transaction_type';
             $meta_value = !empty( $_REQUEST['transaction_type'] ) ? $_REQUEST['transaction_type'] : '';
-            //$transaction_type_query = '';
+            $transaction_type_query = '';
             // if( is_wc_endpoint_url('transactions') ){
             //     $meta_value = 'transaction';
             // }elseif ( is_wc_endpoint_url('invoices') ){
