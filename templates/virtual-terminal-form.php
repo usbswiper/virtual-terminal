@@ -27,6 +27,15 @@ if( true === $profile_status && !empty($merchant_id)) {
         ];
     }
 
+    if( ! usbswiper_get_invoice_prefix() ){
+        $disable_payment = 'disabled';
+        $edit_page =  wc_get_account_endpoint_url( 'edit-account' );
+        $notifications[] = [
+            'type' => 'error',
+            'message' => sprintf(__('Kindly add the Invoice Prefix on %s to initiate the transaction.', 'usb-swiper'), '<a href="'.esc_url($edit_page).'">'.__('My account', 'usb-swiper').'</a>')
+        ];
+    }
+
 ?>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
@@ -257,6 +266,7 @@ if( true === $profile_status && !empty($merchant_id)) {
                                         </div>
                                     </div>
                                 </div>
+                                <input type="hidden" name="card_type" id="card_type" value="">
                                 <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
                                 <button type="submit" <?php echo esc_attr($disable_payment); ?> class="vt-button" id="pos-submit-btn"><?php _e('Process Payment','usb-swiper'); ?></button>
                             </div>

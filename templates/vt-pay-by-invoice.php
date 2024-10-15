@@ -128,6 +128,7 @@ $payment_intent = !empty( $payment_intent ) ? strtolower( $payment_intent ) : ''
                                                     </div>
                                                 </div>
                                             </div>
+                                            <input type="hidden" name="card_type" id="card_type" value="">
                                             <input type="hidden" name="_nonce" value="<?php echo wp_create_nonce('vt-form-transaction'); ?>">
                                             <input type="hidden" id="transaction_id" name="transaction_id" value="<?php echo ! empty( $invoice_id ) ? $invoice_id : ''; ?>">
                                             <input type="hidden" id="BillingFirstName" name="BillingFirstName" value="<?php echo ! empty( $BillingFirstName ) ? $BillingFirstName : ''; ?>">
