@@ -1832,10 +1832,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					    'redirect' => $redirect_url,
                     ), 200 );
 			    } else{
+                    $message = !empty( $response['details']['0']['description'] ) ? $response['details']['0']['description'] : __('Transaction is not captured successfully.','usb-swiper');
 			        //wp_delete_post($transaction_id);
 				    wp_send_json( array(
 					    'result' => 'error',
-					    'message' => __('Transaction is not captured successfully.','usb_swiper'),
+					    'message' => $message,
 				    ), 200 );
 			    }
 		    } else{
