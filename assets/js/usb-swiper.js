@@ -1261,8 +1261,7 @@ jQuery( document ).ready(function( $ ) {
 
     var checkboxLabel = $('#save_customer_details').closest('.vt-fields-wrap').find('label');
     var checkbox = $('.review_changes').closest('.vt-fields-wrap');
-    var defaultLabel = 'Do you want to Save this customer’s record?';
-    checkboxLabel.text(defaultLabel);
+    checkboxLabel.text(usb_swiper_settings.default_customer_label);
     $('#save_customer_details').prop('checked', false);
     $(document).on('click','.vt-customer-search-result .customer-item', function (event) {
         let currentObj = $(this);
@@ -1309,8 +1308,12 @@ jQuery( document ).ready(function( $ ) {
                     let customer = JSON.parse(response.customer);
                     var updatedFields = [];
 
-                    // Change label to "Update this customer’s record"
-                    checkboxLabel.text('Do you want to Update this customer’s record?');
+                    updateSwitchFields('#billingInfo', customer.billingInfo);
+                    updateSwitchFields('#shippingDisabled', customer.shippingDisabled);
+                    updateSwitchFields('#shippingSameAsBilling', customer.shippingSameAsBilling);
+                    
+                    checkboxLabel.text(usb_swiper_settings.update_customer_label);
+                    $('.customer-review-tooltip').attr('data-tip',usb_swiper_settings.update_customer_tooltip);
                     $('#save_customer_details').prop('checked', false);
                     function compareValues(obj, originalObj, path = '') {
                         for (var key in obj) {
@@ -1633,4 +1636,14 @@ function updatePageSize() {
     }
 
     document.head.appendChild(styleSheet);
+}
+
+function updateSwitchFields(fieldId, fieldValue) {
+    if (fieldValue === "true") {
+        jQuery(fieldId).prop('checked', true);
+        jQuery(fieldId).bootstrapSwitch('state', true);
+    } else {
+        jQuery(fieldId).prop('checked', false);
+        jQuery(fieldId).bootstrapSwitch('state', false);
+    }
 }

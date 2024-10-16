@@ -287,6 +287,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
                     'is_customers' => false,
 					'timeout_option' => usb_swiper_get_user_timeout_option(),
+                    'default_customer_label' => __('Do you want to Save this customer’s record?', 'usb-swiper'),
+                    'update_customer_label' => __('Do you want to Update this customer’s record?', 'usb-swiper'),
+                    'update_customer_tooltip' => __('Select if you want to update the customer’s record.', 'usb-swiper'),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 

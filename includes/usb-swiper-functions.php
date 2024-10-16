@@ -821,6 +821,21 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
 				'class' => 'vt-shipping-address-field',
 			),
 		)),
+        'save_customer_info' => apply_filters( 'usb_swiper_shipping_address_fields', array(
+            array(
+                'type' => 'checkbox',
+                'id' => 'save_customer_details',
+                'name' => 'save_customer_details',
+                'label' => __( 'Save customer’s details for future use.', 'usb-swiper'),
+                'required' => false,
+                'description' => '',
+                'class' => '',
+                'wrapper_class' => '',
+                'symbol_wrap_class' => '',
+                'value' => true,
+                'checked' => false
+            ),
+        )),
 	);
 
     $form_fields = apply_filters( 'usb_swiper_get_vt_form_fields', $form_fields );
