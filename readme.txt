@@ -40,13 +40,10 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 = 4.0.0 =
 * Feature - Added Amex total amount and a filter option. ([VT-124](https://github.com/usbswiper/virtual-terminal/pull/81))
 * Feature - Added an option in account settings to choose the timeout duration. ([VT-115](https://github.com/usbswiper/virtual-terminal/pull/73))
-* Feature - Added an option to save customer details when creating an order. ([VT-102](https://github.com/usbswiper/virtual-terminal/pull/77))
-* Feature - Added a feature to save merchant details and reuse them for the next order. ([VT-20](https://github.com/usbswiper/virtual-terminal/pull/77))
 * Update - Merged transaction, invoice, and Zettle transaction on the transaction page in my account. ([VT-120](https://github.com/usbswiper/virtual-terminal/pull/79))
 * Update - Automatically update the merchant's business name in account settings. ([VT-113](https://github.com/usbswiper/virtual-terminal/pull/74))
 * Update - Refund email notifications are successfully sent based on system settings. ([VT-112](https://github.com/usbswiper/virtual-terminal/pull/78))
 * Update - Declined order error logs are now displayed on the same screen. ([VT-103](https://github.com/usbswiper/virtual-terminal/pull/80))
-* Update - Payment failure messages are displayed on the same screen, and form details are retained to avoid re-entry upon error. ([VT-110](https://github.com/usbswiper/virtual-terminal/pull/76))
 * Update - Enhanced log updates during payment processing. ([VT-96](https://github.com/usbswiper/virtual-terminal/pull/80))
 * Fix - Corrected itemized details to allow 2 decimal places without failing. ([VT-125](https://github.com/usbswiper/virtual-terminal/pull/70))
 * Fix - Invoice prefix notice/validation added([VT-128](https://github.com/usbswiper/virtual-terminal/pull/82))
