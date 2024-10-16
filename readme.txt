@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.4
-Stable tag: 4.0.0
+Stable tag: 3.2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,17 +36,6 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
-
-= 4.0.0 =
-* Feature - Added Amex total amount and a filter option. ([VT-124](https://github.com/usbswiper/virtual-terminal/pull/81))
-* Feature - Added an option in account settings to choose the timeout duration. ([VT-115](https://github.com/usbswiper/virtual-terminal/pull/73))
-* Update - Merged transaction, invoice, and Zettle transaction on the transaction page in my account. ([VT-120](https://github.com/usbswiper/virtual-terminal/pull/79))
-* Update - Automatically update the merchant's business name in account settings. ([VT-113](https://github.com/usbswiper/virtual-terminal/pull/74))
-* Update - Refund email notifications are successfully sent based on system settings. ([VT-112](https://github.com/usbswiper/virtual-terminal/pull/78))
-* Update - Declined order error logs are now displayed on the same screen. ([VT-103](https://github.com/usbswiper/virtual-terminal/pull/80))
-* Update - Enhanced log updates during payment processing. ([VT-96](https://github.com/usbswiper/virtual-terminal/pull/80))
-* Fix - Corrected itemized details to allow 2 decimal places without failing. ([VT-125](https://github.com/usbswiper/virtual-terminal/pull/70))
-* Fix - Invoice prefix notice/validation added([VT-128](https://github.com/usbswiper/virtual-terminal/pull/82))
 
 = 3.2.2 =
 * Fix - Tax calculation with shipping and handling amount. ([VT-108](https://github.com/usbswiper/virtual-terminal/pull/68))
