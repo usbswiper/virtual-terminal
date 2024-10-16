@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.4
-Stable tag: 3.2.2
+Stable tag: 3.3.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 3.3.0 =
+* Feature - Amex platform fee override (VT-130)
 
 = 3.2.2 =
 * Fix - Tax calculation with shipping and handling amount. ([VT-108](https://github.com/usbswiper/virtual-terminal/pull/68))
