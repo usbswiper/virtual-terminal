@@ -133,7 +133,7 @@ if( true === $profile_status && !empty($merchant_id)) {
                     <div class="vt-payment-wrapper">
                         <div class="vt-col vt-col-pay-by-invoice">
                             <fieldset>
-                                <label><?php _e('Customer Information', 'usb-swiper'); ?><span class="tool" data-tip="<?php _e('Select if you want to update the customer’s record with the new details.', 'usb-swiper'); ?>" tabindex="1">?</span></label>
+                                <label><?php _e('Customer Information', 'usb-swiper'); ?><span class="tool customer-review-tooltip" id="tooltip"  data-tip="<?php _e('Select if you want to save the new customer’s record.', 'usb-swiper'); ?>" tabindex="1">?</span></label>
 
                                 <div class="vt-fields-wrap review_changes">
                                     <?php
