@@ -3000,9 +3000,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         }
 
         /**
-         * Display HTML on click of add item in vt-product-wrapper
+         * Display HTML on currency change.
          *
-         * @since 1.1.9
+         * @since 4.0.1
+         *
+         * @return string
          */
         public function display_vt_product_wrapper() {
 
