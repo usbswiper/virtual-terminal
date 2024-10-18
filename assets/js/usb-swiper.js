@@ -13,6 +13,38 @@ jQuery( document ).ready(function( $ ) {
         var InvoiceNumber = localStorage.getItem('InvoiceNumber');
         var Notes = localStorage.getItem('Notes');
 
+        var ProductsData = localStorage.getItem('ProductsData');
+        if(ProductsData){
+            ProductsData = JSON.parse(ProductsData);
+        }
+
+        if (ProductsData && ProductsData.length > 0) {
+
+            for( var i = 0; i < ProductsData.length; i++ ){
+
+                if( i === 0 ){
+                    jQuery('#VTProduct_'+i).val(ProductsData[i].name);
+                    jQuery('#VTProductQuantity_'+i).val(ProductsData[i].quantity);
+                    jQuery('#VTProductPrice_'+i).val(ProductsData[i].price);
+                    jQuery('#VTProductID_'+i).val(ProductsData[i].id);
+                    continue;
+                }
+
+                var productHtml = usb_swiper_settings.display_vt_product_wrapper;
+                if(productHtml){
+                    productHtml = productHtml.replace(/index_id/g,i);
+
+                    jQuery('#vt_repeater_field').append(productHtml);
+                    jQuery('#VTProduct_'+i).val(ProductsData[i].name);
+                    jQuery('#VTProductQuantity_'+i).val(ProductsData[i].quantity);
+                    jQuery('#VTProductPrice_'+i).val(ProductsData[i].price);
+                    jQuery('#VTProductID_'+i).val(ProductsData[i].id);
+                }
+
+            }
+
+        }
+
         if (company !== null && company !== 'undefined') $('#company').val(company);
         if (BillingFirstName !== null && BillingFirstName !== 'undefined') $('#BillingFirstName').val(BillingFirstName);
         if (BillingLastName !== null && BillingLastName !== 'undefined') $('#BillingLastName').val(BillingLastName);
@@ -377,6 +409,7 @@ jQuery( document ).ready(function( $ ) {
                                             localStorage.removeItem('TaxRate');
                                             localStorage.removeItem('InvoiceNumber');
                                             localStorage.removeItem('Notes');
+                                            localStorage.removeItem('ProductsData');
                                             window.location.href = data.redirect;
                                         } else{
                                             set_notification(data.message, 'error', data.message_type);
@@ -473,6 +506,7 @@ jQuery( document ).ready(function( $ ) {
                                     localStorage.removeItem('TaxRate');
                                     localStorage.removeItem('InvoiceNumber');
                                     localStorage.removeItem('Notes');
+                                    localStorage.removeItem('ProductsData');
                                     window.location.href = data.redirect;
                                 } else{
                                     set_notification(data.message, 'error', data.message_type);
@@ -526,6 +560,26 @@ jQuery( document ).ready(function( $ ) {
         localStorage.setItem('TaxRate', TaxRate);
         localStorage.setItem('InvoiceNumber', InvoiceNumber);
         localStorage.setItem('Notes', Notes);
+
+        var productsArray = [];
+
+        $('#vt_repeater_field .vt-fields-wrap').each(function () {
+            var productName = $(this).find('.vt-product-input').val();
+            var productQuantity = $(this).find('.vt-product-quantity').val();
+            var productPrice = $(this).find('.vt-product-price').val();
+            var productId = $(this).find('input[name="VTProductID[]"]').val();
+
+            var productData = {
+                name: productName,
+                quantity: productQuantity,
+                price: productPrice,
+                id: productId
+            };
+
+            productsArray.push(productData);
+
+        });
+        localStorage.setItem('ProductsData', JSON.stringify(productsArray));
 
         $('form#ae-paypal-pos-form').addClass('processing').block({
             message: null,

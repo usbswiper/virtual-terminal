@@ -287,6 +287,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
                     'is_customers' => false,
 					'timeout_option' => usb_swiper_get_user_timeout_option(),
+                    'display_vt_product_wrapper' => $this->display_vt_product_wrapper(),
 				) );
 			} elseif ( $myaccount_page_id === get_the_ID() ) {
 
@@ -2996,6 +2997,34 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             );
 
             wp_send_json( $response , 200 );
+        }
+
+        /**
+         * Display HTML on click of add item in vt-product-wrapper
+         *
+         * @since 1.1.9
+         */
+        public function display_vt_product_wrapper() {
+
+            $product_fields = usb_swiper_get_vt_form_fields('product_info');
+
+            $html = '<div id="vt_fields_wrap_index_id" class="vt-fields-wrap" data-id="index_id">';
+            if (!empty($product_fields) && is_array($product_fields)) {
+                foreach ($product_fields as $product_field) {
+                    $field_id = !empty($product_field['id']) ? $product_field['id'] : '';
+                    if (!empty($field_id)) {
+                        $product_field['id'] = $field_id . "_index_id";
+                    }
+                    $html .= usb_swiper_get_html_field($product_field);
+                }
+            }
+            $html .= '<span class="vt-remove-fields-wrap">';
+            $html .= '<svg viewBox="0 0 24 24" width="25" height="25" stroke="#d00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+            $html .= '</span>';
+            $html .= '</div>';
+
+            return $html;
+
         }
 
 		/**
