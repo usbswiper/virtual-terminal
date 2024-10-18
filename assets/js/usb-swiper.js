@@ -12,6 +12,28 @@ jQuery( document ).ready(function( $ ) {
         var TaxRate = localStorage.getItem('TaxRate');
         var InvoiceNumber = localStorage.getItem('InvoiceNumber');
         var Notes = localStorage.getItem('Notes');
+        var billingInfo = localStorage.getItem('billingInfo');
+        var BillingStreet = localStorage.getItem('BillingStreet');
+        var BillingStreet2 = localStorage.getItem('BillingStreet2');
+        var BillingCity = localStorage.getItem('BillingCity');
+        var BillingState = localStorage.getItem('BillingState');
+        var BillingPostalCode = localStorage.getItem('BillingPostalCode');
+        var BillingCountryCode = localStorage.getItem('BillingCountryCode');
+        var BillingPhoneNumber = localStorage.getItem('BillingPhoneNumber');
+        var shippingDisabled = localStorage.getItem('shippingDisabled');
+        var shippingSameAsBilling = localStorage.getItem('shippingSameAsBilling');
+        var ShippingFirstName = localStorage.getItem('ShippingFirstName');
+        var ShippingLastName = localStorage.getItem('ShippingLastName');
+        var ShippingStreet = localStorage.getItem('ShippingStreet');
+        var ShippingStreet2 = localStorage.getItem('ShippingStreet2');
+        var ShippingCity = localStorage.getItem('ShippingCity');
+        var ShippingState = localStorage.getItem('ShippingState');
+        var ShippingPostalCode = localStorage.getItem('ShippingPostalCode');
+        var ShippingCountryCode = localStorage.getItem('ShippingCountryCode');
+        var ShippingPhoneNumber = localStorage.getItem('ShippingPhoneNumber');
+        var ShippingEmail = localStorage.getItem('ShippingEmail');
+        var TaxAmount = localStorage.getItem('TaxAmount');
+        var GrandTotal = localStorage.getItem('GrandTotal');
 
         var ProductsData = localStorage.getItem('ProductsData');
         if(ProductsData){
@@ -60,6 +82,37 @@ jQuery( document ).ready(function( $ ) {
         }
         if (InvoiceNumber !== null && InvoiceNumber !== 'undefined') $('#InvoiceID').val(InvoiceNumber);
         if (Notes !== null && Notes !== 'undefined') $('#Notes').val(Notes);
+        if (BillingStreet !== null && BillingStreet !== 'undefined') $('#BillingStreet').val(BillingStreet);
+        if (BillingStreet2 !== null && BillingStreet2 !== 'undefined') $('#BillingStreet2').val(BillingStreet2);
+        if (BillingCity !== null && BillingCity !== 'undefined') $('#BillingCity').val(BillingCity);
+        if (BillingState !== null && BillingState !== 'undefined') $('#BillingState').val(BillingState);
+        if (BillingPostalCode !== null && BillingPostalCode !== 'undefined') $('#BillingPostalCode').val(BillingPostalCode);
+        if (BillingCountryCode !== null && BillingCountryCode !== 'undefined') $('#BillingCountryCode').val(BillingCountryCode);
+        if (BillingPhoneNumber !== null && BillingPhoneNumber !== 'undefined') $('#BillingPhoneNumber').val(BillingPhoneNumber);
+        if (ShippingFirstName !== null && ShippingFirstName !== 'undefined') $('#ShippingFirstName').val(ShippingFirstName);
+        if (ShippingLastName !== null && ShippingLastName !== 'undefined') $('#ShippingLastName').val(ShippingLastName);
+        if (ShippingStreet !== null && ShippingStreet !== 'undefined') $('#ShippingStreet').val(ShippingStreet);
+        if (ShippingStreet2 !== null && ShippingStreet2 !== 'undefined') $('#ShippingStreet2').val(ShippingStreet2);
+        if (ShippingCity !== null && ShippingCity !== 'undefined') $('#ShippingCity').val(ShippingCity);
+        if (ShippingState !== null && ShippingState !== 'undefined') $('#ShippingState').val(ShippingState);
+        if (ShippingPostalCode !== null && ShippingPostalCode !== 'undefined') $('#ShippingPostalCode').val(ShippingPostalCode);
+        if (ShippingCountryCode !== null && ShippingCountryCode !== 'undefined') $('#ShippingCountryCode').val(ShippingCountryCode);
+        if (ShippingPhoneNumber !== null && ShippingPhoneNumber !== 'undefined') $('#ShippingPhoneNumber').val(ShippingPhoneNumber);
+        if (ShippingEmail !== null && ShippingEmail !== 'undefined') $('#ShippingEmail').val(ShippingEmail);
+        setTimeout(function(){
+            if (billingInfo !== null && billingInfo !== 'undefined') {
+                $('#billingInfo').bootstrapSwitch('state', billingInfo === 'true');
+            }
+            if (shippingDisabled !== null && shippingDisabled !== 'undefined') {
+                $('#shippingDisabled').bootstrapSwitch('state', shippingDisabled === 'true');
+            }
+            if (shippingSameAsBilling !== null && shippingSameAsBilling !== 'undefined') {
+                $('#shippingSameAsBilling').bootstrapSwitch('state', shippingSameAsBilling === 'true');
+            }
+        }, 900);
+
+        if (TaxAmount !== null && TaxAmount !== 'undefined') $('#TaxAmount').val(TaxAmount);
+        if (GrandTotal !== null && GrandTotal !== 'undefined') $('#GrandTotal').val(GrandTotal);
     }
 
     $(document).on('click','#PayByInvoice', function (){
@@ -410,6 +463,28 @@ jQuery( document ).ready(function( $ ) {
                                             localStorage.removeItem('TaxRate');
                                             localStorage.removeItem('InvoiceNumber');
                                             localStorage.removeItem('Notes');
+                                            localStorage.removeItem('billingInfo');
+                                            localStorage.removeItem('BillingStreet');
+                                            localStorage.removeItem('BillingStreet2');
+                                            localStorage.removeItem('BillingCity');
+                                            localStorage.removeItem('BillingState');
+                                            localStorage.removeItem('BillingPostalCode');
+                                            localStorage.removeItem('BillingCountryCode');
+                                            localStorage.removeItem('BillingPhoneNumber');
+                                            localStorage.removeItem('shippingDisabled');
+                                            localStorage.removeItem('shippingSameAsBilling');
+                                            localStorage.removeItem('ShippingFirstName');
+                                            localStorage.removeItem('ShippingLastName');
+                                            localStorage.removeItem('ShippingStreet');
+                                            localStorage.removeItem('ShippingStreet2');
+                                            localStorage.removeItem('ShippingCity');
+                                            localStorage.removeItem('ShippingState');
+                                            localStorage.removeItem('ShippingPostalCode');
+                                            localStorage.removeItem('ShippingCountryCode');
+                                            localStorage.removeItem('ShippingPhoneNumber');
+                                            localStorage.removeItem('ShippingEmail');
+                                            localStorage.removeItem('TaxAmount');
+                                            localStorage.removeItem('GrandTotal');
                                             localStorage.removeItem('ProductsData');
                                             window.location.href = data.redirect;
                                         } else{
@@ -507,6 +582,28 @@ jQuery( document ).ready(function( $ ) {
                                     localStorage.removeItem('TaxRate');
                                     localStorage.removeItem('InvoiceNumber');
                                     localStorage.removeItem('Notes');
+                                    localStorage.removeItem('billingInfo');
+                                    localStorage.removeItem('BillingStreet');
+                                    localStorage.removeItem('BillingStreet2');
+                                    localStorage.removeItem('BillingCity');
+                                    localStorage.removeItem('BillingState');
+                                    localStorage.removeItem('BillingPostalCode');
+                                    localStorage.removeItem('BillingCountryCode');
+                                    localStorage.removeItem('BillingPhoneNumber');
+                                    localStorage.removeItem('shippingDisabled');
+                                    localStorage.removeItem('shippingSameAsBilling');
+                                    localStorage.removeItem('ShippingFirstName');
+                                    localStorage.removeItem('ShippingLastName');
+                                    localStorage.removeItem('ShippingStreet');
+                                    localStorage.removeItem('ShippingStreet2');
+                                    localStorage.removeItem('ShippingCity');
+                                    localStorage.removeItem('ShippingState');
+                                    localStorage.removeItem('ShippingPostalCode');
+                                    localStorage.removeItem('ShippingCountryCode');
+                                    localStorage.removeItem('ShippingPhoneNumber');
+                                    localStorage.removeItem('ShippingEmail');
+                                    localStorage.removeItem('TaxAmount');
+                                    localStorage.removeItem('GrandTotal');
                                     localStorage.removeItem('ProductsData');
                                     window.location.href = data.redirect;
                                 } else{
@@ -549,6 +646,30 @@ jQuery( document ).ready(function( $ ) {
         var InvoiceNumber = $('#InvoiceID').val();
         var Company = $('#company').val();
         var Notes = $('#Notes').val();
+        var TaxAmount = $('#TaxAmount').val();
+        var GrandTotal = $('#GrandTotal').val();
+        var billingInfo = $('#billingInfo').val();
+        var BillingStreet = $('#BillingStreet').val();
+        var BillingStreet2 = $('#BillingStreet2').val();
+        var BillingCity = $('#BillingCity').val();
+        var BillingState = $('#BillingState').val();
+        var BillingPostalCode = $('#BillingPostalCode').val();
+        var BillingCountryCode = $('#BillingCountryCode').val();
+        var BillingPhoneNumber = $('#BillingPhoneNumber').val();
+        var shippingDisabled = $('#shippingDisabled').val();
+        var shippingSameAsBilling = $('#shippingSameAsBilling').val();
+        var ShippingFirstName = $('#ShippingFirstName').val();
+        var ShippingLastName = $('#ShippingLastName').val();
+        var ShippingStreet = $('#ShippingStreet').val();
+        var ShippingStreet2 = $('#ShippingStreet2').val();
+        var ShippingCity = $('#ShippingCity').val();
+        var ShippingState = $('#ShippingState').val();
+        var ShippingPostalCode = $('#ShippingPostalCode').val();
+        var ShippingCountryCode = $('#ShippingCountryCode').val();
+        var ShippingPhoneNumber = $('#ShippingPhoneNumber').val();
+        var TaxAmount = $('#TaxAmount').val();
+        var GrandTotal = $('#GrandTotal').val();
+
         localStorage.setItem('Company', Company);
         localStorage.setItem('BillingFirstName', BillingFirstName);
         localStorage.setItem('BillingLastName', BillingLastName);
@@ -561,6 +682,27 @@ jQuery( document ).ready(function( $ ) {
         localStorage.setItem('TaxRate', TaxRate);
         localStorage.setItem('InvoiceNumber', InvoiceNumber);
         localStorage.setItem('Notes', Notes);
+        localStorage.setItem('billingInfo', billingInfo);
+        localStorage.setItem('BillingStreet', BillingStreet);
+        localStorage.setItem('BillingStreet2', BillingStreet2);
+        localStorage.setItem('BillingCity', BillingCity);
+        localStorage.setItem('BillingState', BillingState);
+        localStorage.setItem('BillingPostalCode', BillingPostalCode);
+        localStorage.setItem('BillingCountryCode', BillingCountryCode);
+        localStorage.setItem('BillingPhoneNumber', BillingPhoneNumber);
+        localStorage.setItem('shippingDisabled', shippingDisabled);
+        localStorage.setItem('shippingSameAsBilling', shippingSameAsBilling);
+        localStorage.setItem('ShippingFirstName', ShippingFirstName);
+        localStorage.setItem('ShippingLastName', ShippingLastName);
+        localStorage.setItem('ShippingStreet', ShippingStreet);
+        localStorage.setItem('ShippingStreet2', ShippingStreet2);
+        localStorage.setItem('ShippingCity', ShippingCity);
+        localStorage.setItem('ShippingState', ShippingState);
+        localStorage.setItem('ShippingPostalCode', ShippingPostalCode);
+        localStorage.setItem('ShippingCountryCode', ShippingCountryCode);
+        localStorage.setItem('ShippingPhoneNumber', ShippingPhoneNumber);
+        localStorage.setItem('TaxAmount', TaxAmount);
+        localStorage.setItem('GrandTotal', GrandTotal);
 
         var productsArray = [];
 
