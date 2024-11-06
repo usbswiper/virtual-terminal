@@ -76,6 +76,7 @@ if( true === $profile_status && !empty($merchant_id)) {
                                 'readonly' => false,
                                 'disabled' => false,
                                 'class' => 'usbswiper-change-currency vt-select-field',
+                                'is_currency' => true,
                             ) ); ?>
                         </div>
 	                    <?php if( empty( $is_notice ) ) { ?>

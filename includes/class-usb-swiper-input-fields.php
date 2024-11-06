@@ -387,6 +387,7 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
 			$readonly = !empty( $args['readonly'] ) ? 'readonly' : '';
 			$class = !empty( $args['class'] ) ? $args['class'] : '';
 			$options = !empty( $args['options'] ) ? $args['options'] : '';
+            $is_currency = !empty( $args['is_currency'] ) ? $args['is_currency'] : false;
 
 			$attributes = '';
 			if( !empty($args['attributes']) && is_array($args['attributes'])) {
@@ -409,8 +410,13 @@ if( !class_exists('Usb_Swiper_Input_Fields')) {
                 <?php
                 if( !empty($options) && is_array($options)) {
                     foreach ($options as $key => $option ) {
+                        $data_code = '';
+						if( $is_currency) {
+							$code = get_woocommerce_currency_symbol($key);
+							$data_code = 'data-currency_code="'.$code.'"';
+						}
                         ?>
-                        <option <?php selected($key, $value ); ?> value="<?php echo $key ?>"><?php echo $option; ?></option>
+                        <option <?php echo $data_code; ?> <?php selected($key, $value ); ?> value="<?php echo $key ?>"><?php echo $option; ?></option>
                         <?php
                     }
                 }
