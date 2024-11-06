@@ -1507,7 +1507,7 @@ jQuery( document ).ready(function( $ ) {
                     updateSwitchFields('#billingInfo', customer.billingInfo);
                     updateSwitchFields('#shippingDisabled', customer.shippingDisabled);
                     updateSwitchFields('#shippingSameAsBilling', customer.shippingSameAsBilling);
-                    
+
                     checkboxLabel.text(usb_swiper_settings.update_customer_label);
                     $('.customer-review-tooltip').attr('data-tip',usb_swiper_settings.update_customer_tooltip);
                     $('#save_customer_details').prop('checked', false);
@@ -1532,6 +1532,9 @@ jQuery( document ).ready(function( $ ) {
                     compareValues(customer, originalInfo);
                     window.customerData = customer;
                     $('#customerInformation').val('');
+                    $('.clear-customer-details').show();
+                } else {
+                    $('.clear-customer-details').hide();
                 }
             }
         });
@@ -1567,6 +1570,21 @@ jQuery( document ).ready(function( $ ) {
                 fields.prop('readonly', true);
             }
         });
+    });
+
+    $(document).on('click', '.clear-customer-details', function(event) {
+        event.preventDefault();
+
+        if (confirm('Are you sure you want to clear the current customer’s details from this order?')) {
+
+            jQuery('input[type="text"]').val('');
+            jQuery('input[type="number"]').val('');
+            jQuery('#BillingState').val('');
+
+            // Hide the customer search result and "Clear Customer" button
+            $('.vt-customer-search-result').remove();
+            $('.clear-customer-details').hide();
+        }
     });
 
     $(document).on('click','.vt_delete_customer', function (event) {
