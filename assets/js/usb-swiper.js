@@ -301,7 +301,7 @@ jQuery( document ).ready(function( $ ) {
         var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
         $('.vt-form-notification').empty().append(notification);
 
-        $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 10 }, 1000);
+        $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 150 }, 1000);
     }
 
     $.validator.addMethod("is_email", function(value, element) {
