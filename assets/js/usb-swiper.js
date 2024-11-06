@@ -1266,25 +1266,43 @@ jQuery( document ).ready(function( $ ) {
         };
         $.post(usb_swiper_settings.ajax_url, data, function (response) {
             $('.vt-customer-search-result').remove();
-            if (response.status) {
-                if( response.customer ) {
-                    let customer = JSON.parse(response.customer);
-                    $.each(customer, function(key, value) {
-                        if(key === 'save_customer_details') {
-                            $('#'+key).prop('checked','checked');
-                        }else if( key === 'billingInfo' || key === 'shippingDisabled' || key === 'shippingSameAsBilling' ) {
-                            if( value === 'true' ) {
-                                jQuery('#' + key).bootstrapSwitch('state', true);
-                            } else {
-                                jQuery('#' + key).bootstrapSwitch('state', false);
-                            }
+
+            if (response.status && response.customer) {
+                let customer = JSON.parse(response.customer);
+                $.each(customer, function(key, value) {
+                    if (key === 'save_customer_details') {
+                        $('#' + key).prop('checked', 'checked');
+                    } else if (key === 'billingInfo' || key === 'shippingDisabled' || key === 'shippingSameAsBilling') {
+                        if( value === 'true' ) {
+                            jQuery('#' + key).bootstrapSwitch('state', true);
                         } else {
-                            $('#'+key).val(value);
+                            jQuery('#' + key).bootstrapSwitch('state', false);
                         }
-                    });
-                }
+                    } else {
+                        $('#' + key).val(value);
+                    }
+                });
+
+                $('.clear-customer-details').show();
+            } else {
+                $('.clear-customer-details').hide();
             }
         });
+    });
+
+    $(document).on('click', '.clear-customer-details', function(event) {
+        event.preventDefault();
+
+        if (confirm('Are you sure you want to clear the current customer’s details from this order?')) {
+
+            jQuery('input[type="text"]').val('');
+            jQuery('input[type="number"]').val('');
+            jQuery('#BillingState').val('');
+
+            // Hide the customer search result and "Clear Customer" button
+            $('.vt-customer-search-result').remove();
+            $('.clear-customer-details').hide();
+        }
     });
 
     $(document).on('click','.vt_delete_customer', function (event) {

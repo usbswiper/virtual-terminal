@@ -58,6 +58,7 @@ if( true === $profile_status && !empty($merchant_id)) {
 				                'tooltip' => true,
 				                'tooltip_text' => __( 'Search Customer using firstname, lastname, email and company.', 'usb-swiper'),
 			                )); ?>
+                            <button type="button" class="clear-customer-details hidden" data-tip="Clear all of the currently selected customer details from the order, so that you can start a new order." tabindex="1" style="display: none;">&times;</button>
                         </div>
                     </fieldset>
                     <fieldset>
