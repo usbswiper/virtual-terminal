@@ -417,6 +417,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			return $menu_links;
 		}
 
+        /**
+         * Filter woocommerce currency with paypal supported.
+         *
+         * @param $currency_code_options
+         * @return mixed
+         * @since 4.1.0
+         */
+        public function paypal_supported_currency($currency_code_options) {
+            // Supported PayPal currencies
+            $paypal_supported_currency = [
+                'AUD', 'BRL', 'CAD', 'CNY', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF',
+                'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP',
+                'PLN', 'GBP', 'SGD', 'SEK', 'CHF', 'THB', 'USD'
+            ];
+
+            foreach ($currency_code_options as $code => $name) {
+                if (!in_array($code, $paypal_supported_currency)) {
+                    unset($currency_code_options[$code]);
+                }
+            }
+
+            return $currency_code_options;
+        }
+
 		/**
 		 * Add new transaction endpoint.
          *
