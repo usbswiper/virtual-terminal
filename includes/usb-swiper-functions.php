@@ -1161,7 +1161,7 @@ if( !function_exists( 'usb_swiper_get_unique_id_data') ) {
  */
 function usbswiper_get_currency_code_options() {
 
-	$currency_code_options = get_woocommerce_currencies();
+    $currency_code_options = apply_filters('paypal_supported_currency',get_woocommerce_currencies());
 
 	foreach ( $currency_code_options as $code => $name ) {
 		$currency_code_options[ $code ] = $name . ' (' . get_woocommerce_currency_symbol( $code ) . ')';

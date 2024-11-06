@@ -69,7 +69,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$this->currency_list = array('AUD', 'BRL', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'INR', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'GBP', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD');
 			$this->currency = in_array(usbswiper_get_default_currency(), $this->currency_list) ? usbswiper_get_default_currency() : 'USD';
 
-			$smart_js_arg['currency'] = $this->currency;
+			//$smart_js_arg['currency'] = $this->currency;
 
 			if ($this->is_sandbox) {
 				if (is_user_logged_in() && WC()->customer && WC()->customer->get_billing_country() && 2 === strlen(WC()->customer->get_billing_country())) {
@@ -419,6 +419,30 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 			return $menu_links;
 		}
+
+        /**
+         * Filter woocommerce currency with paypal supported.
+         *
+         * @param $currency_code_options
+         * @return mixed
+         * @since 4.1.0
+         */
+        public function paypal_supported_currency($currency_code_options) {
+            // Supported PayPal currencies
+            $paypal_supported_currency = [
+                'AUD', 'BRL', 'CAD', 'CNY', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF',
+                'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP',
+                'PLN', 'GBP', 'SGD', 'SEK', 'CHF', 'THB', 'USD'
+            ];
+
+            foreach ($currency_code_options as $code => $name) {
+                if (!in_array($code, $paypal_supported_currency)) {
+                    unset($currency_code_options[$code]);
+                }
+            }
+
+            return $currency_code_options;
+        }
 
 		/**
 		 * Add new transaction endpoint.

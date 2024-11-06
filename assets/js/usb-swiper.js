@@ -633,76 +633,43 @@ jQuery( document ).ready(function( $ ) {
         current_obj.children('.vt-loader').remove();
     };
 
-    $(document).on('change','.usbswiper-change-currency', function () {
-        var BillingLastName = $('#BillingLastName').val();
-        var BillingFirstName = $('#BillingFirstName').val();
-        var BillingEmail = $('#BillingEmail').val();
-        var OrderAmount = $('#OrderAmount').val();
-        var Discount = $('#Discount').val();
-        var NetAmount = $('#NetAmount').val();
-        var ShippingAmount = $('#ShippingAmount').val();
-        var HandlingAmount = $('#HandlingAmount').val();
-        var TaxRate = $('#TaxRate').val();
-        var InvoiceNumber = $('#InvoiceID').val();
-        var Company = $('#company').val();
-        var Notes = $('#Notes').val();
-        var TaxAmount = $('#TaxAmount').val();
-        var GrandTotal = $('#GrandTotal').val();
-        var billingInfo = $('#billingInfo').val();
-        var BillingStreet = $('#BillingStreet').val();
-        var BillingStreet2 = $('#BillingStreet2').val();
-        var BillingCity = $('#BillingCity').val();
-        var BillingState = $('#BillingState').val();
-        var BillingPostalCode = $('#BillingPostalCode').val();
-        var BillingCountryCode = $('#BillingCountryCode').val();
-        var BillingPhoneNumber = $('#BillingPhoneNumber').val();
-        var shippingDisabled = $('#shippingDisabled').val();
-        var shippingSameAsBilling = $('#shippingSameAsBilling').val();
-        var ShippingFirstName = $('#ShippingFirstName').val();
-        var ShippingLastName = $('#ShippingLastName').val();
-        var ShippingStreet = $('#ShippingStreet').val();
-        var ShippingStreet2 = $('#ShippingStreet2').val();
-        var ShippingCity = $('#ShippingCity').val();
-        var ShippingState = $('#ShippingState').val();
-        var ShippingPostalCode = $('#ShippingPostalCode').val();
-        var ShippingCountryCode = $('#ShippingCountryCode').val();
-        var ShippingPhoneNumber = $('#ShippingPhoneNumber').val();
-        var TaxAmount = $('#TaxAmount').val();
-        var GrandTotal = $('#GrandTotal').val();
-
-        localStorage.setItem('Company', Company);
-        localStorage.setItem('BillingFirstName', BillingFirstName);
-        localStorage.setItem('BillingLastName', BillingLastName);
-        localStorage.setItem('BillingEmail', BillingEmail);
-        localStorage.setItem('OrderAmount', OrderAmount);
-        localStorage.setItem('Discount', Discount);
-        localStorage.setItem('NetAmount', NetAmount);
-        localStorage.setItem('ShippingAmount', ShippingAmount);
-        localStorage.setItem('HandlingAmount', HandlingAmount);
-        localStorage.setItem('TaxRate', TaxRate);
-        localStorage.setItem('InvoiceNumber', InvoiceNumber);
-        localStorage.setItem('Notes', Notes);
-        localStorage.setItem('billingInfo', billingInfo);
-        localStorage.setItem('BillingStreet', BillingStreet);
-        localStorage.setItem('BillingStreet2', BillingStreet2);
-        localStorage.setItem('BillingCity', BillingCity);
-        localStorage.setItem('BillingState', BillingState);
-        localStorage.setItem('BillingPostalCode', BillingPostalCode);
-        localStorage.setItem('BillingCountryCode', BillingCountryCode);
-        localStorage.setItem('BillingPhoneNumber', BillingPhoneNumber);
-        localStorage.setItem('shippingDisabled', shippingDisabled);
-        localStorage.setItem('shippingSameAsBilling', shippingSameAsBilling);
-        localStorage.setItem('ShippingFirstName', ShippingFirstName);
-        localStorage.setItem('ShippingLastName', ShippingLastName);
-        localStorage.setItem('ShippingStreet', ShippingStreet);
-        localStorage.setItem('ShippingStreet2', ShippingStreet2);
-        localStorage.setItem('ShippingCity', ShippingCity);
-        localStorage.setItem('ShippingState', ShippingState);
-        localStorage.setItem('ShippingPostalCode', ShippingPostalCode);
-        localStorage.setItem('ShippingCountryCode', ShippingCountryCode);
-        localStorage.setItem('ShippingPhoneNumber', ShippingPhoneNumber);
-        localStorage.setItem('TaxAmount', TaxAmount);
-        localStorage.setItem('GrandTotal', GrandTotal);
+    $(document).on('change','.usbswiper-change-currency', function (e) {
+        e.preventDefault();
+        var formData = {
+            Company: $('#company').val(),
+            BillingFirstName: $('#BillingFirstName').val(),
+            BillingLastName: $('#BillingLastName').val(),
+            BillingEmail: $('#BillingEmail').val(),
+            OrderAmount: $('#OrderAmount').val(),
+            Discount: $('#Discount').val(),
+            NetAmount: $('#NetAmount').val(),
+            ShippingAmount: $('#ShippingAmount').val(),
+            HandlingAmount: $('#HandlingAmount').val(),
+            TaxRate: $('#TaxRate').val(),
+            InvoiceNumber: $('#InvoiceID').val(),
+            Notes: $('#Notes').val(),
+            billingInfo: $('#billingInfo').val(),
+            BillingStreet: $('#BillingStreet').val(),
+            BillingStreet2: $('#BillingStreet2').val(),
+            BillingCity: $('#BillingCity').val(),
+            BillingState: $('#BillingState').val(),
+            BillingPostalCode: $('#BillingPostalCode').val(),
+            BillingCountryCode: $('#BillingCountryCode').val(),
+            BillingPhoneNumber: $('#BillingPhoneNumber').val(),
+            shippingDisabled: $('#shippingDisabled').val(),
+            shippingSameAsBilling: $('#shippingSameAsBilling').val(),
+            ShippingFirstName: $('#ShippingFirstName').val(),
+            ShippingLastName: $('#ShippingLastName').val(),
+            ShippingStreet: $('#ShippingStreet').val(),
+            ShippingStreet2: $('#ShippingStreet2').val(),
+            ShippingCity: $('#ShippingCity').val(),
+            ShippingState: $('#ShippingState').val(),
+            ShippingPostalCode: $('#ShippingPostalCode').val(),
+            ShippingCountryCode: $('#ShippingCountryCode').val(),
+            ShippingPhoneNumber: $('#ShippingPhoneNumber').val(),
+            TaxAmount: $('#TaxAmount').val(),
+            GrandTotal: $('#GrandTotal').val()
+        };
 
         var productsArray = [];
 
@@ -722,17 +689,13 @@ jQuery( document ).ready(function( $ ) {
             productsArray.push(productData);
 
         });
-        localStorage.setItem('ProductsData', JSON.stringify(productsArray));
+        saveDataToLocalStorage(formData);
 
-        $('form#ae-paypal-pos-form').addClass('processing').block({
-            message: null,
-            overlayCSS: {
-                background: '#fff',
-                opacity: 0.6
-            }
-        });
+        var selectedCurrencyCode = $(this).find('option:selected').data('currency_code');
+        var selectedCurrency = $(this).val();
+        updateCurrencySymbol(selectedCurrencyCode, selectedCurrency);
 
-        window.location.href = usb_swiper_settings.vt_page_url+'?'+$(this).attr('name')+'='+$(this).val();
+        $('form#ae-paypal-pos-form').removeClass('processing').unblock();
     });
 
     $('.refund-form-wrap').hide();
@@ -1829,6 +1792,7 @@ if(paymentButton) {
     document.addEventListener('DOMContentLoaded', checkPaymentButton);
 }
 
+
 function updatePageSize() {
     var pageSize = $('#page-size').val();
     var css = '';
@@ -1860,4 +1824,52 @@ function updateSwitchFields(fieldId, fieldValue) {
         jQuery(fieldId).prop('checked', false);
         jQuery(fieldId).bootstrapSwitch('state', false);
     }
+}
+
+function saveDataToLocalStorage(data) {
+    for (const [key, value] of Object.entries(data)) {
+        localStorage.setItem(key, value || '');
+    }
+}
+
+// Function to load saved data from localStorage on page load
+function loadSavedData() {
+    jQuery('#company').val(localStorage.getItem('Company') || '');
+    jQuery('#BillingFirstName').val(localStorage.getItem('BillingFirstName') || '');
+    jQuery('#BillingLastName').val(localStorage.getItem('BillingLastName') || '');
+    jQuery('#BillingEmail').val(localStorage.getItem('BillingEmail') || '');
+    jQuery('#OrderAmount').val(localStorage.getItem('OrderAmount') || '');
+    jQuery('#Discount').val(localStorage.getItem('Discount') || '');
+    jQuery('#NetAmount').val(localStorage.getItem('NetAmount') || '');
+    jQuery('#ShippingAmount').val(localStorage.getItem('ShippingAmount') || '');
+    jQuery('#HandlingAmount').val(localStorage.getItem('HandlingAmount') || '');
+    jQuery('#TaxRate').val(localStorage.getItem('TaxRate') || '');
+    jQuery('#InvoiceID').val(localStorage.getItem('InvoiceNumber') || '');
+    jQuery('#Notes').val(localStorage.getItem('Notes') || '');
+    jQuery('#billingInfo').val(localStorage.getItem('billingInfo') || '');
+    jQuery('#BillingStreet').val(localStorage.getItem('BillingStreet') || '');
+    jQuery('#BillingStreet2').val(localStorage.getItem('BillingStreet2') || '');
+    jQuery('#BillingCity').val(localStorage.getItem('BillingCity') || '');
+    jQuery('#BillingState').val(localStorage.getItem('BillingState') || '');
+    jQuery('#BillingPostalCode').val(localStorage.getItem('BillingPostalCode') || '');
+    jQuery('#BillingCountryCode').val(localStorage.getItem('BillingCountryCode') || '');
+    jQuery('#BillingPhoneNumber').val(localStorage.getItem('BillingPhoneNumber') || '');
+    jQuery('#shippingDisabled').val(localStorage.getItem('shippingDisabled') || '');
+    jQuery('#shippingSameAsBilling').val(localStorage.getItem('shippingSameAsBilling') || '');
+    jQuery('#ShippingFirstName').val(localStorage.getItem('ShippingFirstName') || '');
+    jQuery('#ShippingLastName').val(localStorage.getItem('ShippingLastName') || '');
+    jQuery('#ShippingStreet').val(localStorage.getItem('ShippingStreet') || '');
+    jQuery('#ShippingStreet2').val(localStorage.getItem('ShippingStreet2') || '');
+    jQuery('#ShippingCity').val(localStorage.getItem('ShippingCity') || '');
+    jQuery('#ShippingState').val(localStorage.getItem('ShippingState') || '');
+    jQuery('#ShippingPostalCode').val(localStorage.getItem('ShippingPostalCode') || '');
+    jQuery('#ShippingCountryCode').val(localStorage.getItem('ShippingCountryCode') || '');
+    jQuery('#ShippingPhoneNumber').val(localStorage.getItem('ShippingPhoneNumber') || '');
+    jQuery('#TaxAmount').val(localStorage.getItem('TaxAmount') || '');
+    jQuery('#GrandTotal').val(localStorage.getItem('GrandTotal') || '');
+}
+
+// Function to update currency symbol based on selected currency
+function updateCurrencySymbol(code, currency) {
+    jQuery('.sign-symbol').text(code);
 }

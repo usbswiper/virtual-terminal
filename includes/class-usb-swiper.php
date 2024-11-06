@@ -237,6 +237,7 @@ class Usb_Swiper {
 		$this->loader->add_action( 'wp_ajax_vt_handle_customer_form', $plugin_public, 'vt_handle_customer_form');
         $this->loader->add_action('wp_ajax_vt_check_email_exists', $plugin_public, 'vt_check_email_exists');
         $this->loader->add_action('wp_ajax_nopriv_vt_check_email_exists', $plugin_public, 'vt_check_email_exists');
+        $this->loader->add_filter( 'paypal_supported_currency',$plugin_public, 'paypal_supported_currency');
 
 		if (!is_admin()) {
 			return;
