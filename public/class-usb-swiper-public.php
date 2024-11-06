@@ -69,7 +69,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			$this->currency_list = array('AUD', 'BRL', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'INR', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'GBP', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD');
 			$this->currency = in_array(usbswiper_get_default_currency(), $this->currency_list) ? usbswiper_get_default_currency() : 'USD';
 
-			$smart_js_arg['currency'] = $this->currency;
+			//$smart_js_arg['currency'] = $this->currency;
 
 			if ($this->is_sandbox) {
 				if (is_user_logged_in() && WC()->customer && WC()->customer->get_billing_country() && 2 === strlen(WC()->customer->get_billing_country())) {
