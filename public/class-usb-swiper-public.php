@@ -621,7 +621,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $post_author = '';
 	        if ( is_user_logged_in() && $user_id > 0 && !current_user_can( 'administrator' ) ) {
-		        $post_author  = 'wp_posts.post_author IN ('.$user_id.') AND';
+		        $post_author  = 'wp_posts.post_author IN ('.$user_id.') AND ';
 	        }
 
             $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
