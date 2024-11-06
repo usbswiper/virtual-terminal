@@ -10,12 +10,7 @@ jQuery(function( $ ) {
         {
             jQuery('#swiper').focus();
         } else {
-            if (jQuery('.vt-form-notification').length > 0){
-                jQuery('.vt-form-notification').focus();
-            }
-            else{
-                jQuery('#customerInformation').focus();
-            }
+            jQuery('#customerInformation').focus();
         }
 
         /* Bootstrap Switch Plugin on checkboxes for POS form */
