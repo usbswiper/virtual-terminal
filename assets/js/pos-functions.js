@@ -6,13 +6,15 @@ jQuery(function( $ ) {
         jQuery('#DivCreditCardIssueNumber').hide();
 
         /* Auto focus on swipe field if present */
-        if(jQuery('#pos-panel-swipe').length > 0)
-        {
+        if(jQuery('#pos-panel-swipe').length > 0) {
             jQuery('#swiper').focus();
-        }
-        else
-        {
-            jQuery('#customerInformation').focus();
+        } else {
+            if (jQuery('.vt-form-notification').length > 0){
+                jQuery('.vt-form-notification').focus();
+            }
+            else{
+                jQuery('#customerInformation').focus();
+            }
         }
 
         /* Bootstrap Switch Plugin on checkboxes for POS form */
