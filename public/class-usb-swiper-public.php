@@ -621,13 +621,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $post_author = '';
 	        if ( is_user_logged_in() && $user_id > 0 && !current_user_can( 'administrator' ) ) {
-		        $post_author  = 'wp_posts.post_author IN ('.$user_id.') AND ';
+		        $post_author  = $wpdb->posts.'.post_author IN ('.$user_id.') AND ';
 	        }
 
             $transaction_search = !empty( $wp_query->get('transaction_search') ) ? $wp_query->get('transaction_search') : '';
             $search_term = !empty( $wp_query->get( 'search_prod_title' ) ) ? $wp_query->get( 'search_prod_title' ) : '';
             if ( '1' == $transaction_search && !empty( $search_term ) ) {
-                $where .= ' OR  ( (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\'AND '.$post_author.$wpdb->posts.'.post_type=\'transactions\')' . $transaction_type_query . ' )' ;
+                $where .= ' OR  ( (' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $search_term ) . '%\' AND '.$post_author.$wpdb->posts.'.post_type=\'transactions\')' . $transaction_type_query . ' )' ;
             }
             return $where;
         }
