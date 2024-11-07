@@ -311,7 +311,7 @@ button[disabled] {opacity: 0.5;}
 .reviewChangesList .review-changes-list:last-child {margin-bottom: 5px}
 .review-changes-list { list-style-type: circle; padding-left: 6px;}
 .review-changes-list::before { font-size: 18px; display: inline-block; width: 1rem; content: "\2022";}
-.clear-customer-details { position: absolute; top: 73%; right: 10px; transform: translateY(-50%);font-size: 12px; cursor: pointer; color: white; background-color: #3e474f; border: 1px solid; border-radius: 100%; z-index: 100;}
+.clear-customer-details { position: absolute; top: 48px; right: 10px; transform: translateY(-50%);font-size: 12px; cursor: pointer; color: white; background-color: #3e474f; border: 1px solid; border-radius: 100%; z-index: 100;}
 .clear-customer-details::before { border-left: 1em solid transparent; border-right: 1em solid transparent; border-bottom: 1em solid #3e474f; top: 100%; content: ""; margin-left: -0.5em; transition: all .65s cubic-bezier(.84,-0.18,.31,1.26), opacity .65s .5s; transform: scale(.6) translateY(-90%); left: 5px;}
 .clear-customer-details::before, .clear-customer-details::after { opacity: 0; position: absolute; z-index: -100;}
 .clear-customer-details:hover::after, .clear-customer-details:focus::after { transition: all .65s cubic-bezier(.84,-0.18,.31,1.26);}

@@ -1356,6 +1356,7 @@ jQuery( document ).ready(function( $ ) {
     $(document).on('click','.vt-customer-search-result .customer-item', function (event) {
         let currentObj = $(this);
         let customer_id = currentObj.attr('data-customer_id');
+        let customer_name = currentObj.text();
         let data = {
             'action': 'vt_get_customer_by_id',
             'customer_id': customer_id,
@@ -1397,7 +1398,7 @@ jQuery( document ).ready(function( $ ) {
                 if (response.customer) {
                     let customer = JSON.parse(response.customer);
                     var updatedFields = [];
-
+                    $('#customerInformation').val(customer_name);
                     updateSwitchFields('#billingInfo', customer.billingInfo);
                     updateSwitchFields('#shippingDisabled', customer.shippingDisabled);
                     updateSwitchFields('#shippingSameAsBilling', customer.shippingSameAsBilling);
