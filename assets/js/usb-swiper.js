@@ -1277,7 +1277,7 @@ jQuery( document ).ready(function( $ ) {
             originalInfo[fieldId] = $(this).val();
         });
 
-        $('.vt-input-field').on('change', function() {
+        $('.vt-input-field,.usbswiper-change-currency').on('change', function() {
             FormData = window.customerData
 
             if( undefined !== FormData && FormData.hasOwnProperty($(this).attr('id')) ){
