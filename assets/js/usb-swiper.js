@@ -1426,7 +1426,6 @@ jQuery( document ).ready(function( $ ) {
 
                     compareValues(customer, originalInfo);
                     window.customerData = customer;
-                    $('#customerInformation').val('');
                     $('.clear-customer-details').show();
                 } else {
                     $('.clear-customer-details').hide();
