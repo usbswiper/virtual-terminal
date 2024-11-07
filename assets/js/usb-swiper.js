@@ -450,42 +450,7 @@ jQuery( document ).ready(function( $ ) {
                                     let transaction_id = localStorage.getItem("transaction_id");
                                     $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + payload.orderId + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce + "&pbi_transaction_id="+transaction_id, function (data) {
                                         if( data.result === 'success' ) {
-                                            localStorage.removeItem('transaction_id');
-                                            localStorage.removeItem('Company');
-                                            localStorage.removeItem('BillingFirstName');
-                                            localStorage.removeItem('BillingLastName');
-                                            localStorage.removeItem('BillingEmail');
-                                            localStorage.removeItem('OrderAmount');
-                                            localStorage.removeItem('Discount');
-                                            localStorage.removeItem('NetAmount');
-                                            localStorage.removeItem('ShippingAmount');
-                                            localStorage.removeItem('HandlingAmount');
-                                            localStorage.removeItem('TaxRate');
-                                            localStorage.removeItem('InvoiceNumber');
-                                            localStorage.removeItem('Notes');
-                                            localStorage.removeItem('billingInfo');
-                                            localStorage.removeItem('BillingStreet');
-                                            localStorage.removeItem('BillingStreet2');
-                                            localStorage.removeItem('BillingCity');
-                                            localStorage.removeItem('BillingState');
-                                            localStorage.removeItem('BillingPostalCode');
-                                            localStorage.removeItem('BillingCountryCode');
-                                            localStorage.removeItem('BillingPhoneNumber');
-                                            localStorage.removeItem('shippingDisabled');
-                                            localStorage.removeItem('shippingSameAsBilling');
-                                            localStorage.removeItem('ShippingFirstName');
-                                            localStorage.removeItem('ShippingLastName');
-                                            localStorage.removeItem('ShippingStreet');
-                                            localStorage.removeItem('ShippingStreet2');
-                                            localStorage.removeItem('ShippingCity');
-                                            localStorage.removeItem('ShippingState');
-                                            localStorage.removeItem('ShippingPostalCode');
-                                            localStorage.removeItem('ShippingCountryCode');
-                                            localStorage.removeItem('ShippingPhoneNumber');
-                                            localStorage.removeItem('ShippingEmail');
-                                            localStorage.removeItem('TaxAmount');
-                                            localStorage.removeItem('GrandTotal');
-                                            localStorage.removeItem('ProductsData');
+                                            removeLocalData();
                                             window.location.href = data.redirect;
                                         } else{
                                             set_notification(data.message, 'error', data.message_type);
@@ -570,41 +535,7 @@ jQuery( document ).ready(function( $ ) {
                         if (data.orderID) {
                             $.post(usb_swiper_settings.cc_capture + "&paypal_transaction_id=" + data.orderID + "&wc-process-transaction-nonce=" + usb_swiper_settings.usb_swiper_transaction_nonce, function (data) {
                                 if( data.result === 'success' ) {
-                                    localStorage.removeItem('Company');
-                                    localStorage.removeItem('BillingFirstName');
-                                    localStorage.removeItem('BillingLastName');
-                                    localStorage.removeItem('BillingEmail');
-                                    localStorage.removeItem('OrderAmount');
-                                    localStorage.removeItem('Discount');
-                                    localStorage.removeItem('NetAmount');
-                                    localStorage.removeItem('ShippingAmount');
-                                    localStorage.removeItem('HandlingAmount');
-                                    localStorage.removeItem('TaxRate');
-                                    localStorage.removeItem('InvoiceNumber');
-                                    localStorage.removeItem('Notes');
-                                    localStorage.removeItem('billingInfo');
-                                    localStorage.removeItem('BillingStreet');
-                                    localStorage.removeItem('BillingStreet2');
-                                    localStorage.removeItem('BillingCity');
-                                    localStorage.removeItem('BillingState');
-                                    localStorage.removeItem('BillingPostalCode');
-                                    localStorage.removeItem('BillingCountryCode');
-                                    localStorage.removeItem('BillingPhoneNumber');
-                                    localStorage.removeItem('shippingDisabled');
-                                    localStorage.removeItem('shippingSameAsBilling');
-                                    localStorage.removeItem('ShippingFirstName');
-                                    localStorage.removeItem('ShippingLastName');
-                                    localStorage.removeItem('ShippingStreet');
-                                    localStorage.removeItem('ShippingStreet2');
-                                    localStorage.removeItem('ShippingCity');
-                                    localStorage.removeItem('ShippingState');
-                                    localStorage.removeItem('ShippingPostalCode');
-                                    localStorage.removeItem('ShippingCountryCode');
-                                    localStorage.removeItem('ShippingPhoneNumber');
-                                    localStorage.removeItem('ShippingEmail');
-                                    localStorage.removeItem('TaxAmount');
-                                    localStorage.removeItem('GrandTotal');
-                                    localStorage.removeItem('ProductsData');
+                                    removeLocalData();
                                     window.location.href = data.redirect;
                                 } else{
                                     set_notification(data.message, 'error', data.message_type);
@@ -1544,6 +1475,8 @@ jQuery( document ).ready(function( $ ) {
             jQuery('input[type="number"]').val('');
             jQuery('#BillingState').val('');
 
+            removeLocalData();
+
             // Hide the customer search result and "Clear Customer" button
             $('.vt-customer-search-result').remove();
             $('.clear-customer-details').hide();
@@ -1872,4 +1805,43 @@ function loadSavedData() {
 // Function to update currency symbol based on selected currency
 function updateCurrencySymbol(code, currency) {
     jQuery('.sign-symbol').text(code);
+}
+
+function removeLocalData() {
+    localStorage.removeItem('transaction_id');
+    localStorage.removeItem('Company');
+    localStorage.removeItem('BillingFirstName');
+    localStorage.removeItem('BillingLastName');
+    localStorage.removeItem('BillingEmail');
+    localStorage.removeItem('OrderAmount');
+    localStorage.removeItem('Discount');
+    localStorage.removeItem('NetAmount');
+    localStorage.removeItem('ShippingAmount');
+    localStorage.removeItem('HandlingAmount');
+    localStorage.removeItem('TaxRate');
+    localStorage.removeItem('InvoiceNumber');
+    localStorage.removeItem('Notes');
+    localStorage.removeItem('billingInfo');
+    localStorage.removeItem('BillingStreet');
+    localStorage.removeItem('BillingStreet2');
+    localStorage.removeItem('BillingCity');
+    localStorage.removeItem('BillingState');
+    localStorage.removeItem('BillingPostalCode');
+    localStorage.removeItem('BillingCountryCode');
+    localStorage.removeItem('BillingPhoneNumber');
+    localStorage.removeItem('shippingDisabled');
+    localStorage.removeItem('shippingSameAsBilling');
+    localStorage.removeItem('ShippingFirstName');
+    localStorage.removeItem('ShippingLastName');
+    localStorage.removeItem('ShippingStreet');
+    localStorage.removeItem('ShippingStreet2');
+    localStorage.removeItem('ShippingCity');
+    localStorage.removeItem('ShippingState');
+    localStorage.removeItem('ShippingPostalCode');
+    localStorage.removeItem('ShippingCountryCode');
+    localStorage.removeItem('ShippingPhoneNumber');
+    localStorage.removeItem('ShippingEmail');
+    localStorage.removeItem('TaxAmount');
+    localStorage.removeItem('GrandTotal');
+    localStorage.removeItem('ProductsData');
 }
