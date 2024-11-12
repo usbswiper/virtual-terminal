@@ -214,7 +214,7 @@ class Usb_Swiper_Customers {
 		if( !empty( $customer_data['save_customer_details'] ) && '1' === $customer_data['save_customer_details'] ) {
 
 			if( !$customer_id ) {
-				$email = !empty($customer_data['BillingEmail']) ? $customer_data['BillingEmail'] : '';
+				$email = !empty($customer_data['CustomerEmail']) ? $customer_data['CustomerEmail'] : '';
 				$customer_id = $this->get_customer_id_by_email($email);
 			}
 

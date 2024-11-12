@@ -339,6 +339,17 @@ function usb_swiper_get_vt_form_fields( $tab = '' ) {
                 ),
                 'class' => 'vt-input-field',
             ),
+            array(
+                'type' => 'hidden',
+                'id' => 'CustomerEmail',
+                'name' => 'CustomerEmail',
+                'placeholder' => __( 'Customer Email Address', 'usb-swiper'),
+                'options' => array(),
+                'attributes' => array(
+                    //'maxlength' => 25
+                ),
+                'class' => 'vt-input-field',
+            ),
 		)),
 		'payment_info' => apply_filters( 'usb_swiper_payment_info_fields', array(
 			array(
