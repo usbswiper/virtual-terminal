@@ -113,6 +113,10 @@ jQuery( document ).ready(function( $ ) {
 
         if (TaxAmount !== null && TaxAmount !== 'undefined') $('#TaxAmount').val(TaxAmount);
         if (GrandTotal !== null && GrandTotal !== 'undefined') $('#GrandTotal').val(GrandTotal);
+
+        var selectedCurrencyCode = $('.usbswiper-change-currency').find('option:selected').data('currency_code');
+        var selectedCurrency = $('.usbswiper-change-currency').val();
+        updateCurrencySymbol(selectedCurrencyCode, selectedCurrency);
     }
     $(document).on('click','#PayByInvoice', function (){
 
