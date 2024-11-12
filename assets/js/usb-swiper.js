@@ -103,6 +103,7 @@ jQuery( document ).ready(function( $ ) {
         if (ShippingPostalCode !== null && ShippingPostalCode !== 'undefined') $('#ShippingPostalCode').val(ShippingPostalCode);
         if (ShippingCountryCode !== null && ShippingCountryCode !== 'undefined') $('#ShippingCountryCode').val(ShippingCountryCode);
         if (ShippingPhoneNumber !== null && ShippingPhoneNumber !== 'undefined') $('#ShippingPhoneNumber').val(ShippingPhoneNumber);
+        if (ShippingPhoneNumber !== null && ShippingPhoneNumber !== 'undefined') $('#ShippingPhoneNumber').val(ShippingPhoneNumber);
         if (ShippingEmail !== null && ShippingEmail !== 'undefined') $('#ShippingEmail').val(ShippingEmail);
         setTimeout(function(){
             if (billingInfo !== null && billingInfo !== 'undefined') {
@@ -125,6 +126,10 @@ jQuery( document ).ready(function( $ ) {
         } else {
             jQuery('.clear-customer-details').addClass('hidden').hide();
         }
+
+        var selectedCurrencyCode = $('.usbswiper-change-currency').find('option:selected').data('currency_code');
+        var selectedCurrency = $('.usbswiper-change-currency').val();
+        updateCurrencySymbol(selectedCurrencyCode, selectedCurrency);
     }
 
     $(document).on('click','#PayByInvoice', function (){
@@ -1864,4 +1869,5 @@ function removeLocalData() {
     localStorage.removeItem('GrandTotal');
     localStorage.removeItem('ProductsData');
     localStorage.removeItem('CustomerInformation');
+    localStorage.removeItem('TransactionCurrency');
 }
