@@ -12,6 +12,7 @@ jQuery( document ).ready(function( $ ) {
         var TaxRate = localStorage.getItem('TaxRate');
         var InvoiceNumber = localStorage.getItem('InvoiceNumber');
         var Notes = localStorage.getItem('Notes');
+        var CustomerInformation = localStorage.getItem('CustomerInformation');
 
         if (company !== null && company !== 'undefined') $('#company').val(company);
         if (BillingFirstName !== null && BillingFirstName !== 'undefined') $('#BillingFirstName').val(BillingFirstName);
@@ -28,6 +29,13 @@ jQuery( document ).ready(function( $ ) {
         }
         if (InvoiceNumber !== null && InvoiceNumber !== 'undefined') $('#InvoiceID').val(InvoiceNumber);
         if (Notes !== null && Notes !== 'undefined') $('#Notes').val(Notes);
+        if (CustomerInformation !== null && CustomerInformation !== 'undefined') $('#customerInformation').val(CustomerInformation);
+
+        if (CustomerInformation !== null && CustomerInformation !== 'undefined') {
+            jQuery('#clearCustomerDetails').removeClass('hidden').show();
+        } else {
+            jQuery('#clearCustomerDetails').addClass('hidden').hide();
+        }
     }
     $(document).on('click','#PayByInvoice', function (){
 
@@ -1278,7 +1286,7 @@ jQuery( document ).ready(function( $ ) {
             jQuery('input[type="number"]').val('');
             jQuery('#BillingState').val('');
 
-            removeLocalData();
+            //removeLocalData();
 
             // Hide the customer search result and "Clear Customer" button
             $('.vt-customer-search-result').remove();
