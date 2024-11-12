@@ -119,9 +119,9 @@ jQuery( document ).ready(function( $ ) {
         if (CustomerInformation !== null && CustomerInformation !== 'undefined') $('#customerInformation').val(CustomerInformation);
 
         if (CustomerInformation !== null && CustomerInformation !== 'undefined') {
-            jQuery('#clearCustomerDetails').removeClass('hidden').show();
+            jQuery('.clear-customer-details').removeClass('hidden').show();
         } else {
-            jQuery('#clearCustomerDetails').addClass('hidden').hide();
+            jQuery('.clear-customer-details').addClass('hidden').hide();
         }
     }
 
