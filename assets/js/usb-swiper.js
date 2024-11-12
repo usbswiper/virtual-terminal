@@ -1436,6 +1436,8 @@ jQuery( document ).ready(function( $ ) {
                     compareValues(customer, originalInfo);
                     window.customerData = customer;
                     $('.clear-customer-details').show();
+                    localStorage.setItem('CustomerInformation', customer_name);
+                    saveDataToLocalStorage(window.customerData);
                 } else {
                     $('.clear-customer-details').hide();
                 }
