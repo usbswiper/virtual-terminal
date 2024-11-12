@@ -667,7 +667,8 @@ jQuery( document ).ready(function( $ ) {
             ShippingCountryCode: $('#ShippingCountryCode').val(),
             ShippingPhoneNumber: $('#ShippingPhoneNumber').val(),
             TaxAmount: $('#TaxAmount').val(),
-            GrandTotal: $('#GrandTotal').val()
+            GrandTotal: $('#GrandTotal').val(),
+            CustomerInformation: $('#customerInformation').val(),
         };
 
         var productsArray = [];
@@ -1728,6 +1729,7 @@ function loadSavedData() {
     jQuery('#ShippingPhoneNumber').val(localStorage.getItem('ShippingPhoneNumber') || '');
     jQuery('#TaxAmount').val(localStorage.getItem('TaxAmount') || '');
     jQuery('#GrandTotal').val(localStorage.getItem('GrandTotal') || '');
+    jQuery('#customerInformation').val(localStorage.getItem('CustomerInformation') || '');
 }
 
 // Function to update currency symbol based on selected currency
