@@ -1572,4 +1572,5 @@ function removeLocalData() {
     localStorage.removeItem('TaxAmount');
     localStorage.removeItem('GrandTotal');
     localStorage.removeItem('ProductsData');
+    localStorage.removeItem('CustomerInformation');
 }
