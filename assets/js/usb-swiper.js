@@ -68,6 +68,7 @@ jQuery( document ).ready(function( $ ) {
             }
 
         }
+        var TransactionCurrency = localStorage.getItem('TransactionCurrency');
 
         if (company !== null && company !== 'undefined') $('#company').val(company);
         if (BillingFirstName !== null && BillingFirstName !== 'undefined') $('#BillingFirstName').val(BillingFirstName);
@@ -79,6 +80,7 @@ jQuery( document ).ready(function( $ ) {
         if (ShippingAmount !== null && ShippingAmount !== 'undefined') $('#ShippingAmount').val(ShippingAmount);
         if (HandlingAmount !== null && HandlingAmount !== 'undefined') $('#HandlingAmount').val(HandlingAmount);
         if (CustomerEmail !== null && CustomerEmail !== 'undefined') $('#CustomerEmail').val(CustomerEmail);
+        if (TransactionCurrency !== null && TransactionCurrency !== 'undefined') $('#TransactionCurrency').val(TransactionCurrency);
         if (!isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null && TaxRate !== 'undefined') {
             TaxRate = parseInt(TaxRate);
             $('#TaxRate').val(TaxRate);
@@ -611,6 +613,7 @@ jQuery( document ).ready(function( $ ) {
             TaxAmount: $('#TaxAmount').val(),
             GrandTotal: $('#GrandTotal').val(),
             CustomerInformation: $('#customerInformation').val(),
+            TransactionCurrency: $('#TransactionCurrency').val(),
         };
 
         var productsArray = [];
