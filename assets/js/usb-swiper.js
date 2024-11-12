@@ -1333,7 +1333,9 @@ jQuery( document ).ready(function( $ ) {
 
                     compareValues(customer, originalInfo);
                     window.customerData = customer;
-                    $('#customerInformation').val('');
+                    $('.clear-customer-details').show();
+                    localStorage.setItem('CustomerInformation', customer_name);
+                    saveDataToLocalStorage(window.customerData);
                 }
             }
         });
