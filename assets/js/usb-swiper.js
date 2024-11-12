@@ -4,6 +4,7 @@ jQuery( document ).ready(function( $ ) {
         var BillingFirstName = localStorage.getItem('BillingFirstName');
         var BillingLastName = localStorage.getItem('BillingLastName');
         var BillingEmail = localStorage.getItem('BillingEmail');
+        var CustomerEmail = localStorage.getItem('CustomerEmail');
         var OrderAmount = localStorage.getItem('OrderAmount');
         var Discount = localStorage.getItem('Discount');
         var NetAmount = localStorage.getItem('NetAmount');
@@ -77,6 +78,7 @@ jQuery( document ).ready(function( $ ) {
         if (NetAmount !== null && NetAmount !== 'undefined') $('#NetAmount').val(NetAmount);
         if (ShippingAmount !== null && ShippingAmount !== 'undefined') $('#ShippingAmount').val(ShippingAmount);
         if (HandlingAmount !== null && HandlingAmount !== 'undefined') $('#HandlingAmount').val(HandlingAmount);
+        if (CustomerEmail !== null && CustomerEmail !== 'undefined') $('#CustomerEmail').val(CustomerEmail);
         if (!isNaN(TaxRate) && TaxRate !== '' && TaxRate !== null && TaxRate !== 'undefined') {
             TaxRate = parseInt(TaxRate);
             $('#TaxRate').val(TaxRate);
@@ -1437,6 +1439,8 @@ jQuery( document ).ready(function( $ ) {
                     window.customerData = customer;
                     $('.clear-customer-details').show();
                     localStorage.setItem('CustomerInformation', customer_name);
+                    localStorage.setItem('CustomerEmail',customer.BillingEmail);
+                    jQuery('#CustomerEmail').val(customer.BillingEmail);
                     saveDataToLocalStorage(window.customerData);
                 } else {
                     $('.clear-customer-details').hide();
