@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.4
-Stable tag: 4.0.0
+Stable tag: 4.1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,13 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 4.1.0 =
+* Feature - Customer database and auto-fill selector on the VT screen.
+* Update - Transactions for VT, Zettle, and Invoicing have been consolidated into a single page.
+* Update - Payer name is included in transaction details for Zettle transactions.
+* Update - Additional error details now included in the details page when a transaction is declined.
+* Update - AVS/CVV codes are displayed in transaction details any time the PayPal response includes it.
 
 = 4.0.0 =
 * Feature - Added Amex total amount and a filter option. ([VT-124](https://github.com/usbswiper/virtual-terminal/pull/81))
