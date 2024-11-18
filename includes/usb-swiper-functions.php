@@ -2874,3 +2874,19 @@ function vt_response_code_description($response_code) {
 
     return !empty($responseCodes[$response_code]) ? $responseCodes[$response_code] : '';
 }
+
+/**
+ * Clean price string.
+ *
+ * @since 4.1.1
+ *
+ * @param string $input Get price string.
+ * @return string
+ */
+function usb_swiper_clean_price_string($input) {
+    $mainPart = substr($input, 0, -3);
+    $lastThree = substr($input, -3);
+    $cleanedMain = preg_replace('/[^0-9]/', '', $mainPart);
+
+    return $cleanedMain . $lastThree;
+}

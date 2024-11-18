@@ -382,7 +382,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <tr>
                         <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_name'] ) ? $vt_product['product_name'].$is_taxable_label : '-'; ?></td>
                         <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_quantity'] ) ? $vt_product['product_quantity'] : '-'; ?></td>
-                        <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_price'] ) ? wc_price($vt_product['product_price'], array('currency' => $transaction_currency)) : 0; ?></td>
+                        <td class="transaction-table-product-td" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $vt_product['product_price'] ) ? wc_price(usb_swiper_clean_price_string($vt_product['product_price']), array('currency' => $transaction_currency)) : 0; ?></td>
                     </tr>
                     <?php
                 }
