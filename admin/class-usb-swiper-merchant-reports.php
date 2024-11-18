@@ -240,6 +240,7 @@ class Merchant_Report_Table extends WP_List_Table {
             $last_30_days_date = date('Y-m-d', strtotime('-30 days', strtotime($current_date)));
             $start_date = !empty($_GET['start_date']) ? date('Y-m-d', strtotime(sanitize_text_field($_GET['start_date']))) : $last_30_days_date;
             $end_date = !empty($_GET['end_date']) ? date('Y-m-d', strtotime(sanitize_text_field($_GET['end_date']))) : $current_date;
+            $selected_merchant = !empty($_GET['merchant']) ? sanitize_text_field($_GET['merchant']) : '';
             $merchants = $this->get_merchants();
             ?>
             <form class="alignleft actions">
@@ -249,7 +250,7 @@ class Merchant_Report_Table extends WP_List_Table {
                 <select name="merchant">
                     <option value=""><?php esc_html_e('All Merchants', 'usb-swiper'); ?></option>
                     <?php foreach ($merchants as $merchant) : ?>
-                        <option value="<?php echo esc_attr($merchant['id']); ?>" <?php selected($merchant['id'], sanitize_text_field($_GET['merchant'])); ?>>
+                        <option value="<?php echo esc_attr($merchant['id']); ?>" <?php selected($merchant['id'], $selected_merchant); ?>>
                             <?php echo esc_html($merchant['display_name']); ?>
                         </option>
                     <?php endforeach; ?>
