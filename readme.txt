@@ -37,6 +37,7 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
+
 = 4.1.1 =
 * Fix - Fixed AMEX merchant select dropdown warning in WordPress backend.
 
