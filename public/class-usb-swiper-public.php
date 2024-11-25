@@ -1326,6 +1326,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
                 $result_status = !empty( $response['resultStatus'] ) ? $response['resultStatus'] : 'CREATED';
+
+                $response = usb_swiper_processor_response($transaction_id, $response);
 	            update_post_meta( $transaction_id, '_payment_response', $response);
 	            update_post_meta($transaction_id, '_payment_status', strtoupper( $result_status ) );
 
@@ -1626,6 +1628,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                     ), 'order_response', $transaction_id);
                                     $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
                                     if( !empty( $order_response ) ) {
+                                        $order_response = usb_swiper_processor_response($transaction_id, $order_response);
                                         update_post_meta($transaction_id, '_payment_response', $order_response);
                                         update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
                                     }
@@ -1755,12 +1758,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             ), 'order_response', $transaction_id);
                             $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
                             if( !empty( $order_response ) ) {
+                                $order_response = usb_swiper_processor_response($transaction_id, $order_response);
                                 update_post_meta($transaction_id, '_payment_response', $order_response);
                             }
                         }
                     }
                 }else{
                     if( !empty( $response ) ){
+                        $response = usb_swiper_processor_response($transaction_id, $response);
                         update_post_meta($transaction_id, '_payment_response', $response);
                     }
                 }
@@ -1908,6 +1913,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             ), 'order_response', $transaction_id);
                             $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
                             if( !empty( $order_response ) ) {
+                                $order_response = usb_swiper_processor_response($transaction_id, $order_response);
                                 update_post_meta($transaction_id, '_payment_response', $order_response);
                                 update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
                             }
@@ -2045,6 +2051,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             $response = $Paypal_request->request($Paypal_request->order_url . $paypal_transaction_id, $order_args, 'order_response', $post_id);
                             $Paypal_request->handle_paypal_debug_id($response, $post_id);
                             if (!empty($response)) {
+                                $response = usb_swiper_processor_response($post_id, $response);
                                 update_post_meta($post_id, '_payment_response', $response);
                                 update_post_meta($post_id, '_payment_status', usbswiper_get_transaction_status($post_id) );
                             }
@@ -2533,7 +2540,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 			if( !empty( $_POST['_nonce'] ) && wp_verify_nonce($_POST['_nonce'],'refund-request') ) {
 
 				$transaction_id = !empty( $_POST['transaction_id'] ) ? (int)$_POST['transaction_id'] : '';
-
 				if( !empty( $transaction_id ) && $transaction_id > 0 ) {
 
 					$payment_response = get_post_meta( $transaction_id,'_payment_response', true);
@@ -3308,8 +3314,9 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 'Authorization' => 'Bearer ' . $Paypal_request->get_access_token(),
                             ),
                         ), 'order_response', $transaction_id);
-                        $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);
+                        $Paypal_request->handle_paypal_debug_id($order_response, $transaction_id);;
                         if( !empty( $order_response ) ) {
+                            $order_response = usb_swiper_processor_response($transaction_id, $order_response);
                             update_post_meta($transaction_id, '_payment_response', $order_response);
                             update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
                         }
@@ -4093,7 +4100,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		        $post_id = !empty( $data['transaction_id'] ) ? $data['transaction_id'] : '';
 		        $paypal_transaction_id = !empty( $data['paypal_transaction_id'] ) ? $data['paypal_transaction_id'] : '';
 		        if( !empty( $post_id ) && $post_id > 0 ) {
-
 			        $transaction_status = usbswiper_get_transaction_status($post_id);
 			        $payment_intent = usbswiper_get_transaction_type($post_id);
 
@@ -4164,6 +4170,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	                        $Paypal_request->handle_paypal_debug_id($response, $post_id);
 
 	                        if ( !empty( $response ) ) {
+                                $response = usb_swiper_processor_response($post_id, $response);
 		                        update_post_meta($post_id, '_payment_response', $response);
 		                        update_post_meta($post_id, '_payment_status', usbswiper_get_transaction_status($post_id) );
 	                        }
