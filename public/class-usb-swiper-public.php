@@ -1789,7 +1789,31 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 				    update_post_meta($transaction_id, '_payment_card_type', $type);
 			    }
 
-			    if( !empty($response ) && is_array($response) && isset($response['id']) && !empty($response['id'])) {
+                $order_status = '';
+
+                if(!empty($response) && !empty($response['purchase_units'][0]['payments'])){
+
+                    $order_payments = $response['purchase_units'][0]['payments'];
+                    if( !empty( $order_payments ) ){
+                        foreach($order_payments as $order_payment){
+                            $order_status = !empty( $order_payment[0]['status'] ) ? $order_payment[0]['status'] : '';
+
+                            if( !empty($order_status) || strtolower($order_status) === 'declined' ) {
+                                $link = !empty($response['links'][0]['href']) ? $response['links'][0]['href'] : '';
+                                if( !empty($link) ){
+                                    $order_status_response = wp_remote_get( $link  );
+                                    if( is_array($order_status_response) ) {
+                                        $order_status_response = !empty( $order_status_response['body'] ) ? json_decode($order_status_response['body']) : [];
+                                        $response['details']['0']['description'] = !empty($order_status_response->message) ? $order_status_response->message : __('Transaction is not captured successfully.','usb-swiper');
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+			    if( !empty($response ) && is_array($response) && isset($response['id']) && !empty($response['id']) && (empty($order_status) || strtolower($order_status) !== 'declined') ) {
 
 				    update_post_meta($transaction_id, '_paypal_transaction_id', $response['id']);
                     $BillingFirstName = get_post_meta( $transaction_id,'BillingFirstName', true);
