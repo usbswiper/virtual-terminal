@@ -580,6 +580,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['response_code'] ) ? $processor_response['response_code'] : ''; ?></td>
                 </tr>
             <?php } ?>
+            <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { ?>
+                <tr>
+                    <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Processor Response Message','usb-swiper'); ?></th>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['response_description'] ) ? $processor_response['response_description'] : ''; ?></td>
+                </tr>
+            <?php } ?>
 
             <?php if( !empty( $transaction_debug_id ) ) { ?>
                 <tr>
