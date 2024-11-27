@@ -1804,13 +1804,22 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                             $order_status = !empty( $order_payment[0]['status'] ) ? $order_payment[0]['status'] : '';
 
                             if( !empty($order_status) || strtolower($order_status) === 'declined' ) {
-                                $link = !empty($response['links'][0]['href']) ? $response['links'][0]['href'] : '';
-                                if( !empty($link) ){
-                                    $order_status_response = wp_remote_get( $link  );
-                                    if( is_array($order_status_response) ) {
-                                        $order_status_response = !empty( $order_status_response['body'] ) ? json_decode($order_status_response['body']) : [];
-                                        $response['details']['0']['description'] = !empty($order_status_response->message) ? $order_status_response->message : __('Transaction is not captured successfully.','usb-swiper');
-                                    }
+                                $order_status_response = [
+                                    'response_code' => $order_payments['captures'][0]['processor_response']['response_code'],
+                                    'response_description' => $order_payments['captures'][0]['processor_response']['response_description'],
+                                ];
+
+                                if (is_array($order_status_response)) {
+                                    $order_status_response = !empty($order_status_response['body']) ? json_decode($order_status_response['body']) : new stdClass();
+
+                                    $response_code = !empty($order_payments['captures'][0]['processor_response']['response_code']) ? $order_payments['captures'][0]['processor_response']['response_code'] : '';
+                                    $response_description = !empty($order_payments['captures'][0]['processor_response']['response_description']) ? $order_payments['captures'][0]['processor_response']['response_description'] : '';
+
+                                    $order_status_response->message = !empty($order_status_response->message)
+                                        ? $order_status_response->message
+                                        : sprintf(__('%s (Response Code: <strong>%s</strong>)', 'usb-swiper'), $response_description, $response_code);
+
+                                    $response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code'] = $order_status_response->message;
                                 }
                             }
 
@@ -1886,7 +1895,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					    'redirect' => $redirect_url,
                     ), 200 );
 			    } else{
-                    $message = !empty( $response['details']['0']['description'] ) ? $response['details']['0']['description'] : __('Transaction is not captured successfully.','usb-swiper');
+                    $message = !empty( $order_status_response->message ) ? $order_status_response->message : __('Transaction is not captured successfully.','usb-swiper');
 			        //wp_delete_post($transaction_id);
 				    wp_send_json( array(
 					    'result' => 'error',
