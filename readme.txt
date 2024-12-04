@@ -37,7 +37,7 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 
 == Changelog ==
 
-= 4.1.2 =
+= 4.1.3 =
 * Fix - AVS/CVV2 codes display properly in results.
 * Fix - PayPal error details displayed on same screen as VT when failure occurs.
 
