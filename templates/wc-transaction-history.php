@@ -63,6 +63,7 @@ $payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
+$payment_processor_response = get_post_meta($transaction_id, '_processor_response', true);
 
 $processor_response = !empty( $payment_details['captures']['0']['processor_response'] ) ? $payment_details['captures']['0']['processor_response'] : '';
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
@@ -567,11 +568,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('AVS Code','usb-swiper'); ?></th>
-                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['avs_code'] ) ? strtoupper( $processor_response['avs_code'] ) : 'N/A'; ?></td>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_processor_response['avs_code'] ) ? strtoupper( $payment_processor_response['avs_code'] ) : 'N/A'; ?></td>
             </tr>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('CVV2 Code','usb-swiper'); ?></th>
-                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['cvv_code'] ) ? strtoupper( $processor_response['cvv_code'] ) : 'N/A'; ?></td>
+                <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_processor_response['cvv_code'] ) ? strtoupper( $payment_processor_response['cvv_code'] ) : 'N/A'; ?></td>
             </tr>
 
             <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { ?>
