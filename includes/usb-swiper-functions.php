@@ -2890,24 +2890,3 @@ function usb_swiper_clean_price_string($input) {
 
     return $cleanedMain . $lastThree;
 }
-
-/**
- * Store Previous Processor response if not found is current API call.
- *
- * @since 4.1.3
- *
- * @param int $transaction_id Get the transaction_id.
- * @param array $object Get the current api call response.
- *
- * @return array
- */
-function usb_swiper_processor_response( $transaction_id, $object ) {
-    $payment_response = get_post_meta( $transaction_id, '_payment_response',true);
-    $object_processor_response = (!empty( $object['purchase_units'] ) && !empty($object['purchase_units'][0]['payments']['captures'][0]['processor_response']) ) ? $object['purchase_units'][0]['payments']['captures'][0]['processor_response'] : [];
-    $payment_processor_response = (!empty( $payment_response['purchase_units'] ) && !empty($payment_response['purchase_units'][0]['payments']['captures'][0]['processor_response']) ) ? $payment_response['purchase_units'][0]['payments']['captures'][0]['processor_response'] : [];
-    if(empty($object_processor_response) && !empty($payment_processor_response) && isset($object['purchase_units'][0]['payments']['captures'][0])){
-        $object['purchase_units'][0]['payments']['captures'][0]['processor_response'] = $payment_processor_response;
-    }
-
-    return $object;
-}

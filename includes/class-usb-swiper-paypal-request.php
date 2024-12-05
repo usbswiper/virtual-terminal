@@ -295,7 +295,12 @@ class Usb_Swiper_Paypal_request{
 			return;
 		}
 
-		$debug_id = !empty( $response['debug_id'] ) ? $response['debug_id'] : '';
+        $processor_response = !empty($response['purchase_units'][0]['payments']['captures'][0]['processor_response']) ? $response['purchase_units'][0]['payments']['captures'][0]['processor_response'] : '';
+        if (!empty($processor_response)) {
+            update_post_meta($transaction_id, '_processor_response', $processor_response);
+        }
+
+        $debug_id = !empty( $response['debug_id'] ) ? $response['debug_id'] : '';
 		if( !empty( $debug_id ) && $transaction_id > 0 ) {
 			update_post_meta( $transaction_id, '_payment_failed_response', $response );
 			update_post_meta( $transaction_id, '_paypal_transaction_debug_id', $debug_id );
@@ -831,7 +836,6 @@ class Usb_Swiper_Paypal_request{
 			$response = $this->request($this->order_url.$paypal_transaction_id, $order_args, 'order_response', $transaction_id);
 			$this->handle_paypal_debug_id($response, $transaction_id);
             if( !empty( $response ) ) {
-                $response = usb_swiper_processor_response($transaction_id, $response);
                 update_post_meta($transaction_id, '_payment_response', $response);
                 update_post_meta($transaction_id, '_payment_status', usbswiper_get_transaction_status($transaction_id) );
             }
