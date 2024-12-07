@@ -2,7 +2,7 @@
 Tags: usbswiper, paypal, virtual terminal, vt, credit cards, credit card, payments, payment, visa, mastercard, american express, discover
 Requires at least: 5.3
 Tested up to: 6.5.4
-Stable tag: 4.1.3
+Stable tag: 4.1.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,9 @@ Automatic updates should work great for you.  As always, though, we recommend ba
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 4.1.4 =
+* Tweak - Pulls result codes from Capture response instead of Order details response.
 
 = 4.1.3 =
 * Fix - AVS/CVV2 codes display properly in results.
