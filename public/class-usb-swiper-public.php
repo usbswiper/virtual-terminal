@@ -1354,12 +1354,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	                ));
 
 	                $admin_email = WC()->mailer()->emails['transaction_email_admin'];
-	                $get_recipient = '';
-	                if( true !== (bool)$ignore_email ){
-		                $get_recipient .= $current_user->user_email;
-	                }
+                    $get_recipient = [];
+                    if (isset($admin_email->enabled) && $admin_email->enabled === 'yes') {
+                        $get_recipient[] = $admin_email->recipient;
+                    }
+                    if (false === (bool)$ignore_email) {
+                        $get_recipient[] = $current_user->user_email;
+                    }
 
-	                $admin_email->recipient = $get_recipient;
+	                $admin_email->recipient = implode(', ',$get_recipient);
 	                $admin_email->trigger( array(
 		                'transaction_id' => $transaction_id,
 		                'email_args' => $email_args,
@@ -1875,11 +1878,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         ));
 
                         $admin_email = WC()->mailer()->emails['transaction_email_admin'];
-                        $get_recipient = '';
-                        if( true !== (bool)$ignore_email ){
-                            $get_recipient .= $current_user->user_email;
+                        $recipients = [];
+                        if (isset($admin_email->enabled) && $admin_email->enabled === 'yes') {
+                            $recipients[] = $admin_email->recipient;
                         }
-                        $admin_email->recipient = $get_recipient;
+                        if (false === (bool)$ignore_email) {
+                            $recipients[] = $current_user->user_email;
+                        }
+                        $admin_email->recipient = implode(', ',$recipients);
                         $admin_email->trigger( array(
                             'transaction_id' => $transaction_id,
                             'email_args' => $email_args,
@@ -2126,11 +2132,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                 ));
 
                                 $admin_email = WC()->mailer()->emails['transaction_email_admin'];
-                                $get_recipient = '';
-                                if (true !== (bool)$ignore_email) {
-                                    $get_recipient = $current_user->user_email;
+                                $recipients = [];
+                                if (isset($admin_email->enabled) && $admin_email->enabled === 'yes') {
+                                    $recipients[] = $admin_email->recipient;
                                 }
-                                $admin_email->recipient = $get_recipient;
+                                if (false === (bool)$ignore_email) {
+                                    $recipients[] = $current_user->user_email;
+                                }
+                                $admin_email->recipient = implode(', ',$recipients);
                                 $admin_email->trigger( array(
                                     'transaction_id' => $post_id,
                                     'email_args' => $email_args,
