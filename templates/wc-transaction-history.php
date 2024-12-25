@@ -64,8 +64,26 @@ $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
 $payment_processor_response = get_post_meta($transaction_id, '_processor_response', true);
+$payment_processor_response = !empty( $payment_processor_response ) ? $payment_processor_response : [];
 
 $processor_response = !empty( $payment_details['captures']['0']['processor_response'] ) ? $payment_details['captures']['0']['processor_response'] : '';
+
+if( !empty($processor_response['cvv_code']) && empty($payment_processor_response['cvv_code']) ){
+    $payment_processor_response['cvv_code'] = $processor_response['cvv_code'];
+}
+
+if( !empty($processor_response['avs_code']) && empty($payment_processor_response['avs_code']) ){
+    $payment_processor_response['avs_code'] = $processor_response['avs_code'];
+}
+
+if( empty($processor_response['response_description']) && !empty($payment_processor_response['response_description']) ){
+    $processor_response['response_description'] = $payment_processor_response['response_description'];
+}
+
+if( empty($processor_response['response_code']) && !empty($payment_processor_response['response_code']) ){
+    $processor_response['response_code'] = $payment_processor_response['response_code'];
+}
+
 if( !class_exists('Usb_Swiper_Paypal_request') ) {
     include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 }
