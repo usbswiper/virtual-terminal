@@ -1892,7 +1892,34 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     ), 200 );
 			    } else{
                     $message = !empty( $order_status_response->message ) ? $order_status_response->message : __('Transaction is not captured successfully.','usb-swiper');
-			        //wp_delete_post($transaction_id);
+
+                    if( !empty( $order_status ) && strtolower($order_status) == 'declined' ){
+                        $BillingFirstName = get_post_meta($transaction_id, 'BillingFirstName', true);
+                        $BillingEmail = get_post_meta($transaction_id, 'BillingEmail', true);
+
+                        $email_args = array(
+                            'display_name' => wp_strip_all_tags($BillingFirstName),
+                            'transaction_id' => $transaction_id,
+                            'status' => 'Declined',
+                            'message' => $message,
+                        );
+
+                        $customer_email = WC()->mailer()->emails['transaction_email'];
+                        $customer_email->recipient = $BillingEmail;
+                        $customer_email->trigger(array(
+                            'transaction_id' => $transaction_id,
+                            'email_args' => $email_args,
+                        ));
+
+                        $admin_email = WC()->mailer()->emails['transaction_email_admin'];
+                        $admin_email->recipient = get_option('admin_email');
+                        $admin_email->trigger(array(
+                            'transaction_id' => $transaction_id,
+                            'email_args' => $email_args,
+                        ));
+                    }
+
+                    //wp_delete_post($transaction_id);
 				    wp_send_json( array(
 					    'result' => 'error',
 					    'message' => $message,
