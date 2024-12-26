@@ -1792,6 +1792,13 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $order_status = '';
 
+                if( empty($payment_status) && $response['name'] === 'UNPROCESSABLE_ENTITY' ){
+                    update_post_meta($transaction_id, '_payment_status', 'FAILED');
+                    $order_status_response = (object)[
+                            'message' => !empty($response['details'][0]['description']) ? $response['details'][0]['description'] : ''
+                    ];
+                }
+
                 if(!empty($response) && !empty($response['purchase_units'][0]['payments'])){
 
                     $order_payments = $response['purchase_units'][0]['payments'];
