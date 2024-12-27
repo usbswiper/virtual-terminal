@@ -66,7 +66,7 @@ $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'upda
 $payment_processor_response = get_post_meta($transaction_id, '_processor_response', true);
 $payment_processor_response = !empty( $payment_processor_response ) ? $payment_processor_response : [];
 
-$processor_response = !empty( $payment_details['captures']['0']['processor_response'] ) ? $payment_details['captures']['0']['processor_response'] : '';
+$processor_response = !empty( $payment_details['captures']['0']['processor_response'] ) ? $payment_details['captures']['0']['processor_response'] : [];
 
 if( !empty($processor_response['cvv_code']) && empty($payment_processor_response['cvv_code']) ){
     $payment_processor_response['cvv_code'] = $processor_response['cvv_code'];
