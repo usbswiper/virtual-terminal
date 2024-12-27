@@ -157,6 +157,7 @@ jQuery( document ).ready(function( $ ) {
                     return res.json();
                 }).then(function (data) {
                     if( undefined !== data.invoiceUrl ){
+                        removeLocalData();
                         window.location.href = data.invoiceUrl;
                     } else {
                         set_notification(data.message, 'error', data.message_type);
