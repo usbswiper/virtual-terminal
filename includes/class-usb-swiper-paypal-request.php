@@ -273,6 +273,10 @@ class Usb_Swiper_Paypal_request{
 					$this->api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($response), true), true), $log_file);
 				}
 
+                if( $status_code !== 200 && $status_code !== 201 ) {
+                    $response['response_code'] = $status_code;
+                }
+
 				return $response;
 			}
 		} catch (Exception $ex) {
