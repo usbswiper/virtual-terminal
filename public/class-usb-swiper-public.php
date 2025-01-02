@@ -285,6 +285,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'zettle_socket_error_message' => __("Something went wrong. Please try again", 'usb-swiper'),
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
+                    'start_new_order_conformation' => __( 'Are you sure you want to discard the current order details?', 'usb-swiper'),
+                    'start_new_order_success' => __( 'New order started successfully.', 'usb-swiper'),
                     'is_customers' => false,
 					'timeout_option' => usb_swiper_get_user_timeout_option(),
                     'default_customer_label' => __('Do you want to Save this customer’s record?', 'usb-swiper'),
@@ -342,6 +344,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					'default_tax_tooltip_message' => __( 'Tax Rule: ', 'usb-swiper'),
                     'is_customers' => is_wc_endpoint_url('vt-customers'),
 					'delete_customer_confirm_message' => __( 'Are you sure you want to delete this customer?', 'usb-swiper'),
+                    'start_new_order_conformation' => __( 'Are you sure you want to discard the current order details?', 'usb-swiper'),
+                    'start_new_order_success' => __( 'New order started successfully.', 'usb-swiper'),
                     'timeout_option' => usb_swiper_get_user_timeout_option(),
 				) );
             }

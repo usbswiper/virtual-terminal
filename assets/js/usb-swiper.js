@@ -132,6 +132,25 @@ jQuery( document ).ready(function( $ ) {
         updateCurrencySymbol(selectedCurrencyCode, selectedCurrency);
     }
 
+    $(document).on('click', '#new-order-btn', function(event) {
+        event.preventDefault();
+        const confirmDiscard = confirm(usb_swiper_settings.start_new_order_conformation);
+        if (confirmDiscard) {
+            jQuery('input[type="text"]').val('');
+            jQuery('input[type="number"]').val('');
+            jQuery('#BillingState').val('');
+            $('.vt-customer-search-result').remove();
+            $('.clear-customer-details').hide();
+            removeLocalData();
+
+            set_notification(usb_swiper_settings.start_new_order_success, 'success', '');
+            document.querySelector('.start-new-order').style.display = 'none';
+            setTimeout(function() {
+                $('.vt-form-notification .notification').remove();
+            }, 5000);
+        }
+    });
+
     $(document).on('click','#PayByInvoice', function (){
 
         var VtForm = $('form#ae-paypal-pos-form');
@@ -398,6 +417,7 @@ jQuery( document ).ready(function( $ ) {
                             } else {
                                 set_notification(data.message, 'error', data.message_type);
                                 VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                document.querySelector('.start-new-order').style.display = 'block';
                             }
                         });
                     }
@@ -473,6 +493,7 @@ jQuery( document ).ready(function( $ ) {
                                         } else{
                                             set_notification(data.message, 'error', data.message_type);
                                             VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                            document.querySelector('.start-new-order').style.display = 'block';
                                         }
                                     });
                                 } else{
@@ -540,6 +561,7 @@ jQuery( document ).ready(function( $ ) {
                                 } else {
                                     set_notification(data.message, 'error', data.message_type);
                                     VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                    document.querySelector('.start-new-order').style.display = 'block';
                                 }
 
                                 return data.orderID;
@@ -558,6 +580,7 @@ jQuery( document ).ready(function( $ ) {
                                 } else{
                                     set_notification(data.message, 'error', data.message_type);
                                     VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                    document.querySelector('.start-new-order').style.display = 'block';
                                 }
                             });
                         } else {
