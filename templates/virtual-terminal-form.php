@@ -27,6 +27,9 @@ if( true === $profile_status && !empty($merchant_id)) {
         ];
     }
 ?>
+<div class= "start-new-order" style="display:none;">
+    <button type="reset" class="vt-button" id="new-order-btn"><?php _e('Start New Order','usb-swiper'); ?></button>
+</div>
 <div class="vt-form-wrap woocommerce">
     <div class="vt-form-notification">
         <?php
