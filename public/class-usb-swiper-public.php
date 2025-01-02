@@ -2513,6 +2513,48 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		                    ?>
                         </td>
                     </tr>
+                    <?php if (!empty($merchant_data['products'])) { ?>
+                        <tr>
+                            <th><?php _e('Products', 'usb-swiper'); ?>:</th>
+                            <td>
+                                <?php
+                                    foreach ($merchant_data['products'] as $product) {
+                                        $product_name = !empty($product['name']) ? esc_html($product['name']) : __('Unknown Product', 'usb-swiper');
+                                        $vetting_status = !empty($product['vetting_status']) ? esc_html($product['vetting_status']) : __('Unknown', 'usb-swiper');
+
+                                        echo "<h4>{$product_name} (Status: {$vetting_status})</h4>";
+
+                                        if (!empty($product['capabilities']) && is_array($product['capabilities'])) {
+                                            echo '<ul class="capabilities-list">';
+                                            foreach ($product['capabilities'] as $capability) {
+                                                echo "<li><strong>" . esc_html($capability) . "</strong></li>";
+                                            }
+                                            echo '</ul>';
+                                        }
+                                    }
+                                ?>
+                            </td>
+                        </tr>
+                    <?php } if (!empty($merchant_data['capabilities'])) { ?>
+                        <tr>
+                            <th><?php _e('Capabilities', 'usb-swiper'); ?>:</th>
+                            <td>
+                                <?php
+                                $capabilities = !empty($merchant_data['capabilities']) ? $merchant_data['capabilities'] : array();
+
+                                if (!empty($capabilities) && is_array($capabilities)) {
+                                    echo '<ul class="capabilities-list">';
+                                    foreach ($capabilities as $capability) {
+                                        $name = !empty($capability['name']) ? esc_html($capability['name']) : __('Unknown', 'usb-swiper');
+                                        $status = !empty($capability['status']) ? esc_html($capability['status']) : __('Unknown', 'usb-swiper');
+                                        echo "<li><strong>{$name}</strong>: {$status}</li>";
+                                    }
+                                    echo '</ul>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                    <?php } ?>
                     <tr>
                         <th><?php _e('Country','usb-swiper' ); ?>:</th>
                         <td><?php
