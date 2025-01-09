@@ -2890,3 +2890,16 @@ function usb_swiper_clean_price_string($input) {
 
     return $cleanedMain . $lastThree;
 }
+
+/**
+ * Check if the given status code is a successful HTTP response.
+ *
+ * @since 4.1.4
+ *
+ * @param int $status_code The HTTP status code to check.
+ * @return bool True if the status code is between 200 and 299, false otherwise.
+ */
+function is_success_status_code( $status_code ) {
+    $status_code = intval( $status_code );
+    return ( $status_code >= 200 && $status_code <= 299 );
+}

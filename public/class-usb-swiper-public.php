@@ -1799,7 +1799,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 $order_status = '';
 
-                if( !empty($response['response_code']) && $response['response_code'] !== 200 && $response['response_code'] !== 201 ){
+                if( !empty($response['response_code']) && !is_success_status_code($response['response_code']) ){
                     update_post_meta($transaction_id, '_payment_status', 'FAILED');
                     $order_status_response = (object)[
                             'message' => !empty($response['details'][0]['description']) ? $response['details'][0]['description'] : ''
