@@ -1,4 +1,6 @@
 jQuery( document ).ready(function( $ ) {
+    let hostedFieldsInstance;
+
     if(!usb_swiper_settings.is_customers) {
         var company = localStorage.getItem('Company');
         var BillingFirstName = localStorage.getItem('BillingFirstName');
@@ -141,6 +143,11 @@ jQuery( document ).ready(function( $ ) {
             jQuery('#BillingState').val('');
             $('.vt-customer-search-result').remove();
             $('.clear-customer-details').hide();
+            if(paypal.HostedFields && hostedFieldsInstance) {
+                hostedFieldsInstance.clear('number');
+                hostedFieldsInstance.clear('expirationDate');
+                hostedFieldsInstance.clear('cvv');
+            }
             removeLocalData();
 
             set_notification(usb_swiper_settings.start_new_order_success, 'success', '');
@@ -440,6 +447,7 @@ jQuery( document ).ready(function( $ ) {
                     }
                 }
             }).then(function (hf) {
+                hostedFieldsInstance = hf;
                 hf.on('cardTypeChange', function (event) {
                     if (event.cards.length === 1) {
                         $('#card_type').val(event.cards[0].niceType);
