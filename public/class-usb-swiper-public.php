@@ -4440,6 +4440,8 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 unset($customer_data['action_type']);
                 unset($customer_data['nonce']);
 
+                $customer_data['merchant_id'] = get_current_user_id();
+
 		        $usb_swiper_customers = new Usb_Swiper_Customers();
 		        $customer_data = $usb_swiper_customers->handle_customer($customer_data,$customer_id);
 

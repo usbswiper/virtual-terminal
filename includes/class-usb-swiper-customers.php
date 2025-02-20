@@ -35,26 +35,32 @@ class Usb_Swiper_Customers {
 		$current_page = !empty( $args['current_page'] ) ? (int) $args['current_page'] : 1;
 		$order = !empty( $args['order'] ) ? $args['order'] : 'id';
 		$order_by = !empty( $args['order_by'] ) ? $args['order_by'] : 'DESC';
+        $merchant_id = get_current_user_id();
 
 		$offset = ( $current_page - 1 ) * $per_page;
-
+        $order = 'c.'.$order;
 		if( !empty( $customer ) ) {
 
-			$results = $wpdb->get_results($wpdb->prepare(
-				"SELECT * FROM $this->customer_table WHERE email LIKE %s OR first_name LIKE %s OR last_name LIKE %s ORDER BY %s %s LIMIT %d OFFSET %d",
-				'%' . $wpdb->esc_like($customer) . '%',
-				'%' . $wpdb->esc_like($customer) . '%',
-				'%' . $wpdb->esc_like($customer) . '%',
-				$order,
-				$order_by,
-				(int) $per_page,
-				(int) $offset
-			));
+            $results = $wpdb->get_results($wpdb->prepare(
+                "SELECT  c.*  FROM $this->customer_table c INNER JOIN $this->customer_meta_table cm ON c.id = cm.customer_id WHERE cm.meta_key = %s AND cm.meta_value = %d AND (c.email LIKE %s OR c.first_name LIKE %s OR c.last_name LIKE %s) ORDER BY %s %s LIMIT %d OFFSET %d",
+                'merchant_id',
+                $merchant_id,
+                '%' . $wpdb->esc_like($customer) . '%',
+                '%' . $wpdb->esc_like($customer) . '%',
+                '%' . $wpdb->esc_like($customer) . '%',
+                $order,
+                $order_by,
+                (int) $per_page,
+                (int) $offset
+            ));
 		} else {
 
+
 			$results = $wpdb->get_results($wpdb->prepare(
-				"SELECT * FROM $this->customer_table WHERE 1=1 ORDER BY %s %s LIMIT %d OFFSET %d",
-				$order,
+				"SELECT c.* FROM $this->customer_table c INNER JOIN $this->customer_meta_table cm ON c.id = cm.customer_id WHERE cm.meta_key = %s AND cm.meta_value = %d ORDER BY %s %s LIMIT %d OFFSET %d",
+                'merchant_id',
+                $merchant_id,
+                $order,
 				$order_by,
 				(int) $per_page,
 				(int) $offset
@@ -121,7 +127,9 @@ class Usb_Swiper_Customers {
 		}
 
 		$total_customers = $wpdb->get_var($wpdb->prepare(
-			"SELECT COUNT(*) FROM $this->customer_table WHERE email LIKE %s OR first_name LIKE %s OR last_name LIKE %s",
+			"SELECT COUNT(*) FROM $this->customer_table c INNER JOIN $this->customer_meta_table cm ON c.id = cm.customer_id WHERE cm.meta_key = %s AND cm.meta_value = %d AND (c.email LIKE %s OR c.first_name LIKE %s OR c.last_name LIKE %s)",
+            'merchant_id',
+            $merchant_id,
 			'%' . $wpdb->esc_like($customer) . '%',
 			'%' . $wpdb->esc_like($customer) . '%',
 			'%' . $wpdb->esc_like($customer) . '%'
@@ -215,7 +223,9 @@ class Usb_Swiper_Customers {
 
 			if( !$customer_id ) {
 				$email = !empty($customer_data['CustomerEmail']) ? $customer_data['CustomerEmail'] : '';
-				$customer_id = $this->get_customer_id_by_email($email);
+                if( !empty( $email ) ) {
+                    $customer_id = $this->get_customer_id_by_email($email);
+                }
 			}
 
 			if( !empty( $customer_id ) && $customer_id > 0 ) {
@@ -239,6 +249,10 @@ class Usb_Swiper_Customers {
 						$this->update_customer_meta($customer_id, $currency_field_id, $currency_field_value);
 					}
 				}
+
+                if( !empty($customer_data['merchant_id']) ){
+                    $this->update_customer_meta($customer_id, 'merchant_id', $customer_data['merchant_id']);
+                }
 
 				$billing_address_fields = usb_swiper_get_vt_form_fields( 'billing_address' );
 				if( !empty( $billing_address_fields ) && is_array( $billing_address_fields ) ) {
