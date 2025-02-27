@@ -15,7 +15,6 @@ if( !empty( $customers ) ) :
 <table class="woocommerce-transactions-table woocommerce-MyAccount-transactions shop_table shop_table_responsive my_account_transactions account-transactions-table">
 	<thead>
 	<tr>
-		<th class="woocommerce-orders-table__header woocommerce-orders-table__header-id"><?php _e('ID','usb-swiper'); ?></th>
 		<th class="woocommerce-orders-table__header woocommerce-orders-table__header-first_name"><?php _e('First Name','usb-swiper'); ?></th>
 		<th class="woocommerce-orders-table__header woocommerce-orders-table__header-last_name"><?php _e('Last Name','usb-swiper'); ?></th>
 		<th class="woocommerce-orders-table__header woocommerce-orders-table__header-email"><?php _e('Email','usb-swiper'); ?></th>
@@ -33,7 +32,6 @@ if( !empty( $customers ) ) :
             $customer_id = !empty( $customer['customer_id'] ) ? $customer['customer_id'] : 0;
 			?>
 			<tr class="woocommerce-transactions-table__row customers">
-				<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-id"><?php echo $customer_id; ?></td>
 				<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-first_name"><?php echo !empty( $customer['BillingFirstName'] ) ? $customer['BillingFirstName'] : ''; ?></td>
 				<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-last_name"><?php echo !empty( $customer['BillingLastName'] ) ? $customer['BillingLastName'] : ''; ?></td>
 				<td class="woocommerce-transactions-table__cell woocommerce-orders-table__cell-email"><?php echo !empty( $customer['BillingEmail'] ) ? $customer['BillingEmail'] : ''; ?></td>
