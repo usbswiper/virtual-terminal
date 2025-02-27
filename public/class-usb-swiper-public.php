@@ -354,6 +354,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             wp_enqueue_style( 'pay-by-invoice', USBSWIPER_URL . 'assets/css/pay-by-invoice.css', array(), $this->version, 'all' );
 			wp_enqueue_style( $this->plugin_name, USBSWIPER_URL . 'assets/css/usb-swiper.css' );
 
+            wp_localize_script( 'usb-swiper-general', 'usb_swiper_general', array(
+                    'is_user_logged_in' => is_user_logged_in()
+            ));
+
         }
 
 		/**

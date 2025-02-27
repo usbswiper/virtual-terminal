@@ -212,4 +212,49 @@ jQuery( document ).ready(function( $ ) {
             });
         }
     });
+
+    if( ! usb_swiper_general.is_user_logged_in ) {
+        clearLocalStorageData();
+    }
 });
+
+function clearLocalStorageData() {
+    localStorage.removeItem('transaction_id');
+    localStorage.removeItem('Company');
+    localStorage.removeItem('BillingFirstName');
+    localStorage.removeItem('BillingLastName');
+    localStorage.removeItem('BillingEmail');
+    localStorage.removeItem('OrderAmount');
+    localStorage.removeItem('Discount');
+    localStorage.removeItem('NetAmount');
+    localStorage.removeItem('ShippingAmount');
+    localStorage.removeItem('HandlingAmount');
+    localStorage.removeItem('TaxRate');
+    localStorage.removeItem('InvoiceNumber');
+    localStorage.removeItem('Notes');
+    localStorage.removeItem('billingInfo');
+    localStorage.removeItem('BillingStreet');
+    localStorage.removeItem('BillingStreet2');
+    localStorage.removeItem('BillingCity');
+    localStorage.removeItem('BillingState');
+    localStorage.removeItem('BillingPostalCode');
+    localStorage.removeItem('BillingCountryCode');
+    localStorage.removeItem('BillingPhoneNumber');
+    localStorage.removeItem('shippingDisabled');
+    localStorage.removeItem('shippingSameAsBilling');
+    localStorage.removeItem('ShippingFirstName');
+    localStorage.removeItem('ShippingLastName');
+    localStorage.removeItem('ShippingStreet');
+    localStorage.removeItem('ShippingStreet2');
+    localStorage.removeItem('ShippingCity');
+    localStorage.removeItem('ShippingState');
+    localStorage.removeItem('ShippingPostalCode');
+    localStorage.removeItem('ShippingCountryCode');
+    localStorage.removeItem('ShippingPhoneNumber');
+    localStorage.removeItem('ShippingEmail');
+    localStorage.removeItem('TaxAmount');
+    localStorage.removeItem('GrandTotal');
+    localStorage.removeItem('ProductsData');
+    localStorage.removeItem('CustomerInformation');
+    localStorage.removeItem('TransactionCurrency');
+}

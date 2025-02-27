@@ -127,6 +127,7 @@ if( !function_exists('deactivate_usb_swiper' ) ) {
 register_deactivation_hook( __FILE__, 'deactivate_usb_swiper' );
 
 require_once 'includes/class-usb-swiper.php';
+require_once 'includes/class-usb-swiper-plugin-upgrade.php';
 
 /**
  * Begins execution of the plugin.
@@ -154,6 +155,9 @@ if( !function_exists( 'load_usb_swiper' ) ) {
      * @since 1.0.0
      */
 	function load_usb_swiper() {
+
+        $plugin_upgrade = new Usb_Swiper_Upgrade();
+        $plugin_upgrade::vt_upgrade_plugin();
 
 		$plugin = new Usb_Swiper();
 		$plugin->run();
