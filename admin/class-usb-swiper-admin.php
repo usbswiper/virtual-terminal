@@ -854,7 +854,24 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'class' => 'regular-text',
 				    'value' => 'true',
 			    ),
-                array(
+			    array(
+				    'label' => __('PayPal Mocker', 'usb_swiper'),
+				    'type' => 'select',
+				    'id' => 'vt_mock_response',
+                    'name' => 'vt_mock_response',
+                    'options' => array(
+					    '' => __('— Disabled —', 'usb_swiper'),
+					    'CARD_DECLINED' => 'CARD_DECLINED',
+					    'INSTRUMENT_DECLINED' => 'INSTRUMENT_DECLINED',
+					    'PAYER_ACTION_REQUIRED' => 'PAYER_ACTION_REQUIRED',
+					    'INTERNAL_SERVER_ERROR' => 'INTERNAL_SERVER_ERROR',
+					    'UNPROCESSABLE_ENTITY' => 'UNPROCESSABLE_ENTITY',
+					    'PAYER_CANNOT_PAY' => 'PAYER_CANNOT_PAY',
+					    'TRANSACTION_REFUSED' => 'TRANSACTION_REFUSED',
+				    ),
+				    'description' => __('Simulate PayPal errors via sandbox-only mock header. Requires Sandbox Mode.', 'usb_swiper'),
+			    ),
+			    array(
                     'type' => 'text',
                     'id' => 'sandbox_merchant_id',
                     'name' => 'sandbox_merchant_id',
