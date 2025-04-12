@@ -16,6 +16,23 @@ class Usb_Swiper_Paypal_request{
 	public $generate_token_url ='';
 	protected static $_instance = null;
 
+	public $settings;
+	public $brand_name;
+	public $landing_page;
+	public $advanced_card_payments;
+	public $enable_checkout_button;
+	public $payee_preferred;
+	public $soft_descriptor;
+	public $token_url;
+	public $order_url;
+	public $paypal_order_api;
+	public $paypal_refund_api;
+	public $auth;
+	public $partner_client_id;
+	public $partner_client_secret;
+	public $attribution_id;
+	public $result;
+
     /**
      * Create the self instance of the class.
      *

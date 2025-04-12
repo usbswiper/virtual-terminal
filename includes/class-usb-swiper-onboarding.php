@@ -13,6 +13,9 @@ class Usb_Swiper_Onboarding{
 	public $seller_merchant_id = '';
 	public $api_log ='';
 
+	public $dcc_applies;
+	public $api_request;
+
 	public function __construct() {
 
 		$settings = usb_swiper_get_settings('general');
