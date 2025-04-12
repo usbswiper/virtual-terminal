@@ -37,6 +37,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		private $version;
 
+		public $settings;
+		public $is_sandbox;
+		public $payment_action;
+		public $currency_list;
+		public $currency;
+
 		/**
 		 * Initialize the class and set its properties.
 		 *

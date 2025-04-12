@@ -11,6 +11,7 @@ class Usb_Swiper_PPCP{
 	public $merchant_id = '';
 	public $seller_merchant_id = '';
 	public $api_log ='';
+	public $settings;
 
 	public function __construct() {
 
