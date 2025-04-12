@@ -13,6 +13,7 @@ class Usb_Swiper_Paypal_request{
 	public $merchant_id = '';
 	public $seller_merchant_id = '';
 	public $api_log ='';
+    public $api_response = '';
 	public $generate_token_url ='';
 	protected static $_instance = null;
 
