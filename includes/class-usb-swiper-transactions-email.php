@@ -10,6 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class UsbSwiperTransactionEmail extends WC_Email {
 
 	public $profile_args;
+    public $customer_email;
+    public $transaction_id;
+    public $transaction_amount;
+
 
     /**
      * Set email defaults
