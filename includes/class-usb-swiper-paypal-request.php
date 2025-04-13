@@ -280,6 +280,10 @@ class Usb_Swiper_Paypal_request{
 
 				$this->api_log->log("Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
 				$this->api_log->log('Request URL: '.$url, $log_file);
+				if ( !empty( $request['headers'] ) && is_array( $request['headers'] ) ) {
+					$this->api_log->log( 'Request Headers: ' . print_r( $request['headers'], true ), $log_file );
+				}
+
 				if ( !empty($request['body']) && is_array($request['body']) ) {
 					$this->api_log->log( 'Request Body: ' . print_r( $request, true ), $log_file );
 				} elseif ( !empty($request['body']) && is_string($request['body']) ) {
