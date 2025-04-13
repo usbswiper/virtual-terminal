@@ -872,6 +872,23 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'description' => __('Simulate PayPal errors via sandbox-only mock header. Requires Sandbox Mode.', 'usb_swiper'),
 			    ),
 			    array(
+				    'label' => __('Mock Target API Call', 'usb_swiper'),
+				    'type' => 'select',
+                    'id' => 'vt_mock_response_action',
+                    'name' => 'vt_mock_response_action',
+				    'options' => array(
+					    '' => __('— Any API Call —', 'usb_swiper'),
+					    'get_access_token' => 'Get Access Token',
+					    'create_order' => 'Create Order',
+					    'capture_order' => 'Capture Order',
+					    'refund_payment' => 'Refund Payment',
+					    'get_transaction_details' => 'Get Transaction Details',
+					    'order_response' => 'Order Response',
+				    ),
+				    'desc' => __('Restrict mock behavior to a specific API action. Used only when sandbox + mocker are active.', 'usb_swiper'),
+			    ),
+
+			    array(
                     'type' => 'text',
                     'id' => 'sandbox_merchant_id',
                     'name' => 'sandbox_merchant_id',
