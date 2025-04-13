@@ -278,7 +278,7 @@ class Usb_Swiper_Paypal_request{
 					do_action('usb_swiper_request_respose_data', $request, $response, $action_name);
 				}
 
-				$this->api_log->log("Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
+				$this->api_log->log(PHP_EOL . "==========" . PHP_EOL . "==========" . PHP_EOL . "Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
 				$this->api_log->log('Request URL: '.$url, $log_file);
 				if ( !empty( $request['headers'] ) && is_array( $request['headers'] ) ) {
 					$this->api_log->log( 'Request Headers: ' . print_r( $request['headers'], true ), $log_file );
