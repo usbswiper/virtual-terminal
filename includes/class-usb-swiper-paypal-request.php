@@ -223,9 +223,13 @@ class Usb_Swiper_Paypal_request{
 			$settings = usb_swiper_get_settings('general');
 			$is_sandbox = !empty($settings['is_paypal_sandbox']) && $settings['is_paypal_sandbox'] === 'true';
 			$mock_response = !empty($settings['vt_mock_response']) ? trim($settings['vt_mock_response']) : '';
+			$mock_target_action = !empty($settings['vt_mock_response_action']) ? trim($settings['vt_mock_response_action']) : '';
 
 			if ( $is_sandbox && $mock_response ) {
-				$args['headers']['PayPal-Mock-Response'] = $mock_response;
+				// If a specific action is selected, only mock when it matches the current $action_name
+				if ( empty($mock_target_action) || $mock_target_action === $action_name ) {
+					$args['headers']['PayPal-Mock-Response'] = $mock_response;
+				}
 			}
 
 			$this->result = wp_remote_get($url, $args);
