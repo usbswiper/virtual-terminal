@@ -153,8 +153,9 @@ jQuery( document ).ready(function( $ ) {
     }
 
     $( "input#is_paypal_sandbox" ).change(function() {
-        const liveField =  $('input.paypal-is-live');
-        const sandboxField =  $('input.paypal-is-sandbox');
+        const liveField = $('input.paypal-is-live, select.paypal-is-live, textarea.paypal-is-live');
+        const sandboxField = $('input.paypal-is-sandbox, select.paypal-is-sandbox, textarea.paypal-is-sandbox');
+
         if($(this).prop('checked') === true){
             liveField.parents('tr').hide();
             liveField.removeAttr('required');

@@ -858,7 +858,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'label' => __('PayPal Mocker', 'usb_swiper'),
 				    'type' => 'select',
 				    'id' => 'vt_mock_response',
+                    'class' => 'regular-text paypal-is-sandbox',
                     'name' => 'vt_mock_response',
+				    'wrapper' => false,
+				    'value' => 'true',
+				    'attributes' => '',
                     'options' => array(
 					    '' => __('— Disabled —', 'usb_swiper'),
 					    'CARD_DECLINED' => 'CARD_DECLINED',
@@ -875,7 +879,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'label' => __('Mock Target Action', 'usb_swiper'),
 				    'type' => 'select',
                     'id' => 'vt_mock_response_action',
+                    'class' => 'regular-text paypal-is-sandbox',
                     'name' => 'vt_mock_response_action',
+                    'wrapper' => false,
+                    'value' => 'true',
+                    'attributes' => '',
 				    'options' => array(
 					    '' => __('— Any API Call —', 'usb_swiper'),
 					    'get_access_token' => 'Get Access Token',
