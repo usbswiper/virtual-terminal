@@ -14,6 +14,7 @@ class UsbSwiperTransactionEmail extends WC_Email {
     public $transaction_id;
     public $transaction_amount;
 
+
     /**
      * Set email defaults
      */
