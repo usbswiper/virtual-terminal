@@ -222,15 +222,32 @@ class Usb_Swiper_Paypal_request{
 			// PayPal Mock Response - https://usbswiper.atlassian.net/browse/VT-151
 			$settings = usb_swiper_get_settings('general');
 			$is_sandbox = !empty($settings['is_paypal_sandbox']) && $settings['is_paypal_sandbox'] === 'true';
-			$mock_response = !empty($settings['vt_mock_response']) ? trim($settings['vt_mock_response']) : '';
+			$mock_response = $settings['vt_mock_response'] ?? '';
+			if ($mock_response === 'disabled') {
+				$mock_response = ''; // treat as disabled
+			}
+
 
 			if ( $is_sandbox && $mock_response && strpos($mock_response, '::') !== false ) {
 				list($mock_action, $mock_code) = explode('::', $mock_response, 2);
 
 				if ( $mock_action === $action_name ) {
-					$args['headers']['PayPal-Mock-Response'] = json_encode([
-						'mock_application_codes' => $mock_code,
-					]);
+					$mock_header = [
+						'mock_application_codes' => $mock_code
+					];
+
+					$mock_detail = !empty($settings['vt_mock_response_details']) ? trim($settings['vt_mock_response_details']) : '';
+
+					if ( $mock_detail ) {
+						$mock_detail = stripslashes($mock_detail); // 👈 remove escaped quotes
+						$decoded = json_decode($mock_detail, true);
+						if ( json_last_error() === JSON_ERROR_NONE && is_array($decoded) ) {
+							$mock_header['mock_error_response'] = $decoded;
+						}
+					}
+
+
+					$args['headers']['PayPal-Mock-Response'] = json_encode($mock_header);
 				}
 			}
 

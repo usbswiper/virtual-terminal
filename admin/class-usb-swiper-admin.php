@@ -860,26 +860,56 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 				    'id' => 'vt_mock_response',
 				    'class' => 'regular-text paypal-is-sandbox',
 				    'name' => 'vt_mock_response',
+                    'required' => false,
 				    'wrapper' => false,
 				    'value' => '',
 				    'attributes' => '',
 				    'options' => array(
-					    '' => __('— Disabled —', 'usb_swiper'),
+					    'disabled' => __('— Disabled —', 'usb_swiper'),
 
-					    // Create Order errors
+					    // Create Order
+					    'create_order::INTERNAL_SERVER_ERROR' => 'Create Order → INTERNAL_SERVER_ERROR',
 					    'create_order::DUPLICATE_INVOICE_ID' => 'Create Order → DUPLICATE_INVOICE_ID',
 					    'create_order::INVALID_REQUEST' => 'Create Order → INVALID_REQUEST',
+					    'create_order::UNPROCESSABLE_ENTITY' => 'Create Order → UNPROCESSABLE_ENTITY',
+					    'create_order::INSTRUMENT_DECLINED' => 'Create Order → INSTRUMENT_DECLINED',
+					    'create_order::ORDER_ALREADY_COMPLETED' => 'Create Order → ORDER_ALREADY_COMPLETED',
+					    'create_order::PAYER_CANNOT_PAY' => 'Create Order → PAYER_CANNOT_PAY',
 
-					    // Authorize Payment errors
-					    'authorize_order::ORDER_NOT_APPROVED' => 'Authorize Order → ORDER_NOT_APPROVED',
+					    // Authorize Order
 					    'authorize_order::INSTRUMENT_DECLINED' => 'Authorize Order → INSTRUMENT_DECLINED',
+					    'authorize_order::PAYER_CANNOT_PAY' => 'Authorize Order → PAYER_CANNOT_PAY',
+					    'authorize_order::ORDER_NOT_APPROVED' => 'Authorize Order → ORDER_NOT_APPROVED',
+					    'authorize_order::UNPROCESSABLE_ENTITY' => 'Authorize Order → UNPROCESSABLE_ENTITY',
 
-					    // Capture Order errors
+					    // Capture Order
 					    'capture_order::INSTRUMENT_DECLINED' => 'Capture Order → INSTRUMENT_DECLINED',
 					    'capture_order::ORDER_NOT_APPROVED' => 'Capture Order → ORDER_NOT_APPROVED',
 					    'capture_order::PAYER_CANNOT_PAY' => 'Capture Order → PAYER_CANNOT_PAY',
+					    'capture_order::PAYMENT_DENIED' => 'Capture Order → PAYMENT_DENIED',
+					    'capture_order::UNPROCESSABLE_ENTITY' => 'Capture Order → UNPROCESSABLE_ENTITY',
+
+					    // Refund Payment
+					    'refund_payment::INTERNAL_SERVER_ERROR' => 'Refund Payment → INTERNAL_SERVER_ERROR',
+					    'refund_payment::REFUND_NOT_ALLOWED' => 'Refund Payment → REFUND_NOT_ALLOWED',
+					    'refund_payment::REFUND_EXCEEDED_TRANSACTION_AMOUNT' => 'Refund Payment → REFUND_EXCEEDED_TRANSACTION_AMOUNT',
+
+					    // Get Transaction Details
+					    'get_transaction_details::INTERNAL_SERVER_ERROR' => 'Get Transaction Details → INTERNAL_SERVER_ERROR',
+					    'get_transaction_details::RESOURCE_NOT_FOUND' => 'Get Transaction Details → RESOURCE_NOT_FOUND',
 				    ),
 				    'description' => __('Simulate PayPal API errors in sandbox using built-in mocker. Choose the endpoint and error you want to trigger.', 'usb_swiper'),
+			    ),
+			    array(
+				    'type' => 'textarea',
+				    'id' => 'vt_mock_response_details',
+				    'name' => 'vt_mock_response_details',
+				    'label' => __('Mock Response Detail (Advanced)', 'usb-swiper'),
+				    'class' => 'regular-text paypal-is-sandbox',
+				    'wrapper' => false,
+				    'required' => 'false',
+				    'attributes' => 'rows="4" cols="60"',
+				    'description' => __('Optional JSON object for advanced mocking, e.g., {"issue":"PAYEE_ACCOUNT_RESTRICTED","description":"The payee account is restricted"}. ⚠️ Note: This feature is not officially documented by PayPal and may return a 403 error depending on the API endpoint and issue code.', 'usb-swiper'),
 			    ),
 			    array(
                     'type' => 'text',
