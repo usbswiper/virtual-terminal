@@ -1616,6 +1616,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
 					}
 
+					if ( !isset($_POST['merchant_id']) || empty($_POST['merchant_id']) ) {
+						$_POST['merchant_id'] = get_current_user_id();
+					}
+
 					$usb_swiper_customers = new Usb_Swiper_Customers();
 					$usb_swiper_customers->handle_customer($_POST);
 				}
