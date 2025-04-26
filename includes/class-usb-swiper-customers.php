@@ -219,6 +219,10 @@ class Usb_Swiper_Customers {
 		$status = false;
 		$message = '';
 
+		if ( !isset($customer_data['merchant_id']) || empty($customer_data['merchant_id']) ) {
+			$customer_data['merchant_id'] = get_current_user_id();
+		}
+
 		if( !empty( $customer_data['save_customer_details'] ) && '1' === $customer_data['save_customer_details'] ) {
 
 			if( !$customer_id ) {
