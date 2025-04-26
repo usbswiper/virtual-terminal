@@ -234,7 +234,7 @@ class Usb_Swiper_Customers {
 				$customer_id = $this->update_customer($customer_data, $customer_id);
 			} else {
 				$status = true;
-				$message = __('Customer inserted successfully.', 'usb-swiper');
+				$message = __('Customer saved successfully.', 'usb-swiper');
 				$customer_id = $this->insert_customer($customer_data);
 			}
 
