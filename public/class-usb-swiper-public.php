@@ -1611,14 +1611,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
                 update_post_meta( $transaction_id, 'vt_products', $vt_products );
 
-				if( !class_exists('Usb_Swiper_Customers') ) {
-					include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+				if ( ! empty($_POST['save_customer_details']) ) {
+					if( !class_exists('Usb_Swiper_Customers') ) {
+						include_once USBSWIPER_PATH.'/includes/class-usb-swiper-customers.php';
+					}
+
+					$usb_swiper_customers = new Usb_Swiper_Customers();
+					$usb_swiper_customers->handle_customer($_POST);
 				}
 
-				$usb_swiper_customers = new Usb_Swiper_Customers();
-				$usb_swiper_customers->handle_customer($_POST);
 
-			    if( !class_exists('Usb_Swiper_Paypal_request') ) {
+				if( !class_exists('Usb_Swiper_Paypal_request') ) {
 				    include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 			    }
 
