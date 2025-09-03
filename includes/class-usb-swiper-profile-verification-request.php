@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 class Usb_Swiper_Profile_Verification_Request_Email extends WC_Email {
 
+    public $profile_args;
+    
     /**
      * Set email defaults options.
      */

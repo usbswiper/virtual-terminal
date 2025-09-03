@@ -12,6 +12,15 @@ class Usb_Swiper_PPCP{
 	public $seller_merchant_id = '';
 	public $api_log ='';
 	public $settings;
+	public $host;
+	public $api_request;
+	public $api_response;
+
+	/**
+	 * Constructor for the class.
+	 *
+	 * @since 1.0.0
+	 */
 
 	public function __construct() {
 
