@@ -704,14 +704,18 @@ class UsbSwiperZettle {
 	 */
 	public static function get_request_uuid( $transaction_id ) {
 
-		return strtolower( sprintf(
+		if ( empty( $transaction_id ) ) {
+			return false;
+		}
+
+		return strtolower(sprintf(
 			'%s-%s-%s-%s-%s',
-			substr( uniqid(), 0, 8),
-			$transaction_id,
-			substr( uniqid(), 0, 4),
-			substr( uniqid(), 0, 4),
-			substr( uniqid(), 0, 12),
-		) );
+			str_pad( $transaction_id, 8, '0', STR_PAD_LEFT ),
+			substr(uniqid('', true), 0, 4),
+			substr(uniqid('', true), 0, 4),
+			substr(uniqid('', true), 0, 4),
+			substr(uniqid('', true), 0, 12)
+		));
 	}
 
 	/**
@@ -730,7 +734,7 @@ class UsbSwiperZettle {
 
 		$message = explode('-',$message_id );
 
-		return !empty( $message[1] ) ? (int) $message[1] : 0;
+		return !empty( $message[0] ) ? (int) ltrim($message[0], '0') : 0;
 	}
 
 	/**
