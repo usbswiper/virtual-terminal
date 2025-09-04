@@ -239,35 +239,41 @@ jQuery( document ).ready(function( $ ) {
                             socket.addEventListener('message', (event) => {
                                 if( event.data ) {
                                     var data = JSON.parse( event.data );
-                                    var messageData = data.payload;
+                                    
+                                    if( data.errorCode === 400 ) {
+                                        add_zettle_notification(data.errorMessage, notificationObj);
+                                    } else {
 
-                                    if( messageData.paymentProgress !== '' && undefined !== messageData.paymentProgress ) {
-                                        add_zettle_notification(messageData.paymentProgress, notificationObj);
-                                    } else if( messageData.type === 'PAYMENT_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
-                                        add_zettle_notification(messageData.resultErrorDescription, notificationObj);
-                                    }
+                                        var messageData = data.payload;
 
-                                    if( messageData.type === 'PAYMENT_RESULT_RESPONSE' ) {
+                                        if( messageData.paymentProgress !== '' && undefined !== messageData.paymentProgress ) {
+                                            add_zettle_notification(messageData.paymentProgress, notificationObj);
+                                        } else if( messageData.type === 'PAYMENT_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
+                                            add_zettle_notification(messageData.resultErrorDescription, notificationObj);
+                                        }
 
-                                        $.ajax({
-                                            url: usb_swiper_settings.zettle_payment_response,
-                                            type: 'POST',
-                                            dataType: 'json',
-                                            data: "action=zettle_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
-                                        }).done(function (response) {
-                                            if( response.status ){
-                                                localStorage.removeItem('vt_order_id');
-                                                localStorage.removeItem('transaction_id');
-                                                window.location.href = response.redirect_url;
-                                            } else {
-                                                set_notification( response.message, 'error'  );
-                                            }
+                                        if( messageData.type === 'PAYMENT_RESULT_RESPONSE' ) {
 
-                                            currentObj.prop('disabled', false);
-                                            vt_remove_notification();
-                                            remove_zettle_notification(notificationObj);
-                                            VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
-                                        });
+                                            $.ajax({
+                                                url: usb_swiper_settings.zettle_payment_response,
+                                                type: 'POST',
+                                                dataType: 'json',
+                                                data: "action=zettle_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
+                                            }).done(function (response) {
+                                                if( response.status ){
+                                                    localStorage.removeItem('vt_order_id');
+                                                    localStorage.removeItem('transaction_id');
+                                                    window.location.href = response.redirect_url;
+                                                } else {
+                                                    set_notification( response.message, 'error'  );
+                                                }
+
+                                                currentObj.prop('disabled', false);
+                                                vt_remove_notification();
+                                                remove_zettle_notification(notificationObj);
+                                                VtForm.removeClass('processing paypal_cc_submiting HostedFields createOrder').unblock();
+                                            });
+                                        }
                                     }
                                 }
                             });
