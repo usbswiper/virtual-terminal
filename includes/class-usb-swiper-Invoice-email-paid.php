@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class UsbSwiperInvoiceEmailPaid extends WC_Email {
 
+    public $profile_args;
+    
     /**
      * Set email defaults
      */

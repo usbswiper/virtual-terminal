@@ -160,10 +160,14 @@ jQuery( document ).ready(function( $ ) {
             liveField.parents('tr').hide();
             liveField.removeAttr('required');
             sandboxField.parents('tr').show();
-            sandboxField.attr('required', true);
+            if (!sandboxField.hasClass('exclude-from-required')) {
+                sandboxField.attr('required', true);
+            }
         } else{
             liveField.parents('tr').show();
+            if (!liveField.hasClass('exclude-from-required')) {
             liveField.attr('required', true);
+            }
             sandboxField.parents('tr').hide();
             sandboxField.removeAttr('required');
         }

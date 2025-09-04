@@ -177,7 +177,7 @@ if( ! class_exists( 'Usb_Swiper_Log')  ) {
 
 			$upload_dir = wp_upload_dir();
 			$basedir = !empty( $upload_dir['basedir']) ? $upload_dir['basedir'] : '';
-			$log_files = scandir($basedir.'/'.$this->handle);
+			$log_files = is_dir( $basedir.'/'.$this->handle ) ? scandir($basedir.'/'.$this->handle) : array();
 
 			$files = array();
 
