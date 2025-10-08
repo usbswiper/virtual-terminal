@@ -113,6 +113,7 @@ jQuery(function( $ ) {
                 $('#BillingFirstName').prop('required',false);
                 $('#BillingLastName').prop('required',false);
                 $('#BillingEmail').prop('required',false);
+                $('#TransactionType').val('capture').trigger('change');
             } else {
                 $('#PayWithZettle').hide();
                 $('.vt-col-payments').show();
