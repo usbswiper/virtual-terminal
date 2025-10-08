@@ -1159,7 +1159,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					        if( !empty( $_POST[$field_id] ) && is_array( $_POST[$field_id] ) ) {
 						        $_POST[$field_id] = array_filter($_POST[$field_id], function($value) { return !is_null($value) && $value !== ''; });
 					        }
-					        $transaction[$field_id] = !empty( $_POST[$field_id] ) ? $_POST[$field_id] : '';
+
+                            if( 'TransactionType' === $field_id ) {
+                                $transaction[$field_id] = 'capture';
+                            } else {
+                                $transaction[$field_id] = !empty( $_POST[$field_id] ) ? $_POST[$field_id] : '';
+                            }
 				        }
 			        }
 		        }
