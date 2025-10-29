@@ -593,16 +593,23 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_processor_response['cvv_code'] ) ? strtoupper( $payment_processor_response['cvv_code'] ) : 'N/A'; ?></td>
             </tr>
 
-            <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { ?>
+            <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { 
+                $response_description = !empty($processor_response['response_description']) ? $processor_response['response_description'] : '';
+                $response_code = !empty($processor_response['response_code']) ? $processor_response['response_code'] : '';
+                $status_reason = !empty($payment_response['status_details']['reason']) ? $payment_response['status_details']['reason'] : '';
+
+                // Check for missing or '0000' code (PayPal fraud filter declines)
+                if (empty($response_code) || $response_code === '0000') {
+                    $response_description = !empty($status_reason) ? $status_reason : 'Declined by PayPal Fraud Filters — Transaction Not Processed';
+                }
+            ?>
                 <tr>
                     <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Processor Response Code','usb-swiper'); ?></th>
-                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['response_code'] ) ? $processor_response['response_code'] : ''; ?></td>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html__($response_code, 'usb-swiper'); ?></td>
                 </tr>
-            <?php } ?>
-            <?php if( !empty( $payment_status ) && in_array( strtolower( $payment_status ), [ 'failed', 'declined' ] ) ) { ?>
                 <tr>
                     <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Processor Response Message','usb-swiper'); ?></th>
-                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $processor_response['response_description'] ) ? $processor_response['response_description'] : ''; ?></td>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html__($response_description, 'usb-swiper'); ?></td>
                 </tr>
             <?php } ?>
 
