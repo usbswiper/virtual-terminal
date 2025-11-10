@@ -19,6 +19,7 @@ class UsbSwiperZettle {
 		'WRITE:USERINFO',
 		'READ:PRODUCT',
 		'WRITE:PRODUCT',
+		'WRITE:REFUND2',
 		'READ:PAYMENT',
 		'WRITE:PAYMENT',
 		'READ:PURCHASE',
@@ -797,7 +798,7 @@ class UsbSwiperZettle {
 		$request_args = json_encode([
 			"type" => "MESSAGE",
 			"linkId" => $link_id,
-            "channelId" =>  '1',
+            		"channelId" =>  '1',
 			"messageId" =>  $get_request_uuid,
 			"payload" => [
 				"type" => "REFUND_REQUEST",
@@ -930,7 +931,7 @@ class UsbSwiperZettle {
 				<table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 0 !important;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table refund_details">
 					<thead>
 					<tr>
-						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-id"><?php _e('ID','usb-swiper'); ?></th>
+						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-id"><?php _e('Refund UUID','usb-swiper'); ?></th>
 						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-amount"><?php _e('Amount','usb-swiper'); ?></th>
 						<th style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;" class="refund-date"><?php _e('Date','usb-swiper'); ?></th>
 					</tr>
@@ -938,16 +939,17 @@ class UsbSwiperZettle {
 					<tbody>
 					<?php
 					foreach ( $refund_response as $key => $payment_refund ) {
-
 						$result_payload = !empty( $payment_refund['result_payload'] ) ? $payment_refund['result_payload'] : '';
 						$result_payload = !empty( $payment_refund['resultPayload'] ) ? $payment_refund['resultPayload'] : $result_payload;
 
-						$amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? usbswiper_convert_zettle_amount($result_payload->REFUNDED_AMOUNT) : 0;
-						$transaction_id = !empty( $result_payload->TRANSACTION_ID ) ? $result_payload->TRANSACTION_ID : '';
+						$amount = !empty( $result_payload->AMOUNT ) ? usbswiper_convert_zettle_amount(($result_payload->AMOUNT)) : 0;
+						$refundUUID = !empty( $result_payload->REFUND_UUID ) ? $result_payload->REFUND_UUID : '';
+						$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+						$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency($transaction_id);
 						?>
 						<tr>
-							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $transaction_id ) ? $transaction_id : ''; ?></td>
-							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $amount ) ? wc_price( $amount ) : 0; ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $refundUUID ) ? $refundUUID : ''; ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $amount ) ? wc_price( $amount, array('currency' => $transaction_currency) ) : 0; ?></td>
 							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['create_time'] ) ? date('Y/m/d g:i a', strtotime($payment_refund['create_time'])) : '' ?></td>
 						</tr>
 						<?php
