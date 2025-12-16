@@ -60,6 +60,8 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
 
 $payment_intent_id = usbswiper_get_intent_id($transaction_id);
 $payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
+$original_transaction_id = get_post_meta( $transaction_id, '_original_transaction_id', true );
+$original_payment_transaction_id = $original_transaction_id ? usbswiper_get_transaction_id($original_transaction_id) : '';
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
@@ -536,7 +538,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </table>
         </div>
         <?php
-    } elseif( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
+    } elseif( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'refund' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
         <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
@@ -558,6 +560,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
                 <?php } ?>
             </tr>
+            <?php if ( $original_transaction_id ) : ?>
+                <tr>
+                    <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Original PayPal Transaction ID','usb-swiper'); ?></th>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_original_transaction_url($original_transaction_id); ?>" target="_blank"><?php echo !empty( $original_payment_transaction_id ) ? $original_payment_transaction_id : ''; ?></a></td>
+                </tr>
+            <?php endif; ?>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status($payment_status) : ''; ?></td>

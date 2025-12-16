@@ -299,6 +299,13 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
 		    $transaction_id = !empty( $post->ID ) ? $post->ID : '';
 
+            // Check if original transaction ID exists
+            $original_transaction_id = get_post_meta( $transaction_id, '_original_transaction_id', true );
+
+            if ( ! empty( $original_transaction_id ) ) {
+                $transaction_id = $original_transaction_id;
+            }
+
 		    $Usb_Swiper_Log = new Usb_Swiper_Log();
 		    ?>
             <div class="usb-swiper-log-viewer">
@@ -381,7 +388,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					}
 					$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 					$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $post_id);
-					$grand_total = get_post_meta( $post_id, 'GrandTotal', true );
+					$grand_total = ( $transaction_type === 'REFUND' ) ? get_post_meta( $post_id, '_transaction_amount', true ) : get_post_meta( $post_id, 'GrandTotal', true );
 					echo !empty( $grand_total ) ? wc_price($grand_total, array('currency' => $transaction_currency)) : '';
 					break;
 				case 'payment_status' :

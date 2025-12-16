@@ -28,7 +28,7 @@ if( $has_transactions ) : ?>
                 $id = !empty($transaction->ID) ? esc_html( $transaction->ID ) : 0;
                 $transaction_type = get_post_meta( $id, '_transaction_type', true);
                 $user_invoice_id = get_post_meta( $id, '_user_invoice_id', true);
-                $grand_total = get_post_meta( $id, 'GrandTotal', true );
+                $grand_total = ( $transaction_type === 'REFUND' ) ? get_post_meta( $id, '_transaction_amount', true ) : get_post_meta( $id, 'GrandTotal', true );
                 $payment_response = get_post_meta( $id, '_payment_response', true);
                 $payment_transaction_id = usbswiper_get_transaction_id($transaction->ID);
                 $payment_status = usbswiper_get_transaction_status($transaction->ID);

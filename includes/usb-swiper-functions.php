@@ -1530,18 +1530,20 @@ function usbswiper_get_transaction_id( $transaction_id ) {
     }
 
 	$payment_transaction_id = !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
+    $refund_transaction_id  = '';
 
 	$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 	$payments = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 	$captures = !empty( $payments['captures'][0] ) ? $payments['captures'][0] : '';
 	$authorizations = !empty( $payments['authorizations'][0] ) ? $payments['authorizations'][0] : '';
-	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
-		$payment_transaction_id = $captures['id'];
-	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
-		$payment_transaction_id = $authorizations['id'];
-	}
 
-	return $payment_transaction_id;
+	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
+        $payment_transaction_id = $captures['id'];
+	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
+        $payment_transaction_id = $authorizations['id'];
+    }
+
+	return ($transaction_type === 'REFUND') ? get_post_meta($transaction_id, '_paypal_refund_id', true) : $payment_transaction_id;
 }
 
 /**
@@ -2097,6 +2099,30 @@ function get_paypal_transaction_url( $transaction_id ) {
 
     return "https://www{$is_sandbox}.paypal.com/activity/payment/{$transaction_id}";
 }
+
+/**
+ * Get the paypal transaction url.
+ *
+ * @since 1.1.17
+ *
+ * @param int $transaction_id get the transaction id.
+ *
+ * @return string return the original transaction url for the refund transactions.
+ */
+function get_original_transaction_url( $transaction_id ) {
+
+    if( empty($transaction_id)) {
+        return '';
+    }
+
+    // Admin side → edit post URL
+    if ( is_admin() ) {
+        return admin_url( 'post.php?post=' . absint( $transaction_id ) . '&action=edit' );
+    }
+
+    // Frontend (My Account → View Transaction)
+    return wc_get_endpoint_url( 'view-transaction', absint( $transaction_id ), wc_get_page_permalink( 'myaccount' ) );
+}   
 
 /**
  * Get the address in format.

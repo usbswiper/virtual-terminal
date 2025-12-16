@@ -2648,6 +2648,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 					$payment_details = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 					$captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
+                    $refunds_count = !empty( $payment_details['refunds'] ) ? count( $payment_details['refunds'] ) : 0;
 					$payment_links = !empty( $captures['links'] ) ? $captures['links'] : '';
 
 					if( !empty( $payment_links ) && is_array( $payment_links ) ) {
@@ -2667,7 +2668,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 						        $Paypal_request = Usb_Swiper_Paypal_request::instance();
 						        $response = $Paypal_request->refund_request( $payment_link['href'], $args );
 
-						        if( !empty( $response['id'] ) ) {
+                                if( !empty( $response['id'] ) ) {
 						            $status = true;
 							        $message = __( 'Transaction amount refunded successfully.','usb-swiper' );
 							        $refund_html =  $Paypal_request->get_refund_html($transaction_id);
@@ -2681,6 +2682,47 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                         'invoice' => true,
                                         'display_name' => wp_strip_all_tags($BillingFirstName)
                                     );
+
+                                    // For Refunds Data
+                                    $refund_purchase_units = !empty( $response['purchase_units'][0] ) ? $response['purchase_units'][0] : '';
+                                    $refund_payment_details = !empty( $refund_purchase_units['payments'] ) ? $refund_purchase_units['payments'] : '';
+                                    $refunds_data = !empty( $refund_payment_details['refunds'][$refunds_count] ) ? $refund_payment_details['refunds'][$refunds_count] : [];
+
+                                    $original_post = get_post( $transaction_id );
+                                    $refund_post_id = wp_insert_post(array(
+                                        'post_type'   => $original_post->post_type,
+                                        'post_status' => $original_post->post_status,
+                                        'post_author' => $original_post->post_author,
+                                        'post_title'  => 'Refund – ' . $original_post->post_title,
+                                        'post_date'   => current_time('mysql'),
+                                    ));
+                                    
+                                    $original_meta = get_post_meta( $transaction_id );
+                                    foreach ( $original_meta as $meta_key => $meta_values ) {
+                                        foreach ( $meta_values as $meta_value ) {
+                                            update_post_meta( $refund_post_id, $meta_key, maybe_unserialize( $meta_value ) );
+                                        }
+                                    }
+                                    // Mark as refund
+                                    update_post_meta( $refund_post_id, '_transaction_type', strtoupper( 'refund' ) );
+
+                                    // Refund status
+                                    update_post_meta( $refund_post_id, '_payment_status', 'refunded' );
+
+                                    // Refund amount (important)
+                                    update_post_meta( $refund_post_id, '_transaction_amount', $_POST['refund_amount'] );
+
+                                    // PayPal refund id
+                                    update_post_meta( $refund_post_id, '_paypal_refund_id', $refunds_data['id'] );
+
+                                    // PayPal transaction id
+                                    update_post_meta( $refund_post_id, '_paypal_transaction_id', $response['id'] );
+
+                                    // Link to original transaction
+                                    update_post_meta( $refund_post_id, '_original_transaction_id', $transaction_id );
+
+                                    // Optional: store full refund response
+                                    update_post_meta( $refund_post_id, '_paypal_refund_response', $response );
 
                                     $customer_email = WC()->mailer()->emails['payment_email_refund'];
                                     $customer_email->recipient = $BillingEmail;
