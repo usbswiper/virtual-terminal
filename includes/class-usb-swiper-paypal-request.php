@@ -884,10 +884,12 @@ class Usb_Swiper_Paypal_request{
 					<tbody>
 					<?php
 					foreach ( $payment_refunds as $key => $payment_refund ) {
+							$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+							$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $transaction_id);
 						?>
 						<tr>
 							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['id'] ) ? $payment_refund['id'] : '' ?></td>
-							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['amount']['value'] ) ? wc_price($payment_refund['amount']['value']) : '' ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['amount']['value'] ) ? wc_price($payment_refund['amount']['value'], array('currency' => $transaction_currency)) : '' ?></td>
 							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['create_time'] ) ? date('Y/m/d g:i a', strtotime($payment_refund['create_time'])) : '' ?></td>
 						</tr>
 						<?php

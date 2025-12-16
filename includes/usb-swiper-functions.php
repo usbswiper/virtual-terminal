@@ -1323,7 +1323,7 @@ function get_total_refund_amount( $transaction_id ) {
 
                 $result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
                 $result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
-	            $refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
+	            $refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
 	            $refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
 	            $total_refund_amount =  $total_refund_amount + $refund_amount;
             }
@@ -2641,7 +2641,7 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 
 			$result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
 			$result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
-			$refund_amount = !empty( $result_payload->REFUNDED_AMOUNT ) ? $result_payload->REFUNDED_AMOUNT : 0;
+            $refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
 			$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
 			$total_refund_amount =  $total_refund_amount + $refund_amount;
 		}
