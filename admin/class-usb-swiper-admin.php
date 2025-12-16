@@ -388,7 +388,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 					}
 					$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
 					$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency( $post_id);
-					$grand_total = ( $transaction_type === 'REFUND' ) ? get_post_meta( $post_id, '_transaction_amount', true ) : get_post_meta( $post_id, 'GrandTotal', true );
+					$grand_total = ( ( strtolower( $transaction_type ) === 'transaction-refund' ) || ( strtolower( $transaction_type ) === 'invoice-refund' ) || ( strtolower( $transaction_type ) === 'zettle-refund' ) ) ? get_post_meta( $post_id, '_transaction_amount', true ) : get_post_meta( $post_id, 'GrandTotal', true );
 					echo !empty( $grand_total ) ? wc_price($grand_total, array('currency' => $transaction_currency)) : '';
 					break;
 				case 'payment_status' :

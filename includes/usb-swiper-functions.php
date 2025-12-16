@@ -1512,6 +1512,7 @@ function usbswiper_get_transaction_id( $transaction_id ) {
 
     $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
 	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+    $refund_response = get_post_meta( $transaction_id, '_payment_refund_response', true);
 
     if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
 
@@ -1529,6 +1530,18 @@ function usbswiper_get_transaction_id( $transaction_id ) {
         return $payment_transaction_id;
     }
 
+    if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle-refund' ) {
+	    $result_status = !empty( $refund_response[0]['result_status'] ) ? $refund_response[0]['result_status'] : '';
+	    $result_status = !empty( $refund_response[0]['resultStatus'] ) ? $refund_response[0]['resultStatus'] : $result_status;
+	    $payment_transaction_id = '';
+        if( !empty( $result_status ) && strtolower( $result_status ) == 'completed' ) {
+            $result_payload = !empty( $refund_response[0]['result_payload'] ) ? $refund_response[0]['result_payload'] : '';
+            $result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $result_payload;
+	        $payment_transaction_id = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
+        }
+        return $payment_transaction_id;
+    }
+
 	$payment_transaction_id = !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
     $refund_transaction_id  = '';
 
@@ -1543,7 +1556,7 @@ function usbswiper_get_transaction_id( $transaction_id ) {
         $payment_transaction_id = $authorizations['id'];
     }
 
-	return ($transaction_type === 'REFUND') ? get_post_meta($transaction_id, '_paypal_refund_id', true) : $payment_transaction_id;
+	return ( ( strtolower( $transaction_type ) === 'transaction-refund' ) || ( strtolower( $transaction_type ) === 'invoice-refund' ) ) ? get_post_meta($transaction_id, '_paypal_refund_id', true) : $payment_transaction_id;
 }
 
 /**

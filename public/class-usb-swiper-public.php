@@ -1423,12 +1423,47 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     $refund_amount = usbswiper_get_zettle_transaction_refund_total( $transaction_id );
                     $original_amount = usbswiper_get_zettle_transaction_total($transaction_id);
 
+                    if( !empty( $refund_response ) && is_array( $refund_response ) ) {
+                        $result_payload = !empty( $refund_response[0]['result_payload'] ) ? $refund_response[0]['result_payload'] : '';
+                        $result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $result_payload;
+                        $passing_refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
+                        $passing_refund_amount = !empty( $passing_refund_amount ) ? $passing_refund_amount/100 : 0;
+                    }
+
                     $payment_status = 'partially_refunded';
                     if( $refund_amount >= $original_amount ) {
 	                    $payment_status = 'refunded';
                     }
 
 			        update_post_meta($transaction_id, '_payment_status', strtoupper( $payment_status ) );
+
+                    $original_post = get_post( $transaction_id );
+                    $refund_post_id = wp_insert_post(array(
+                        'post_type'   => $original_post->post_type,
+                        'post_status' => $original_post->post_status,
+                        'post_author' => $original_post->post_author,
+                        'post_title'  => 'Refund – ' . $original_post->post_title,
+                        'post_date'   => current_time('mysql'),
+                    ));
+                    
+                    $original_meta = get_post_meta( $transaction_id );
+                    foreach ( $original_meta as $meta_key => $meta_values ) {
+                        foreach ( $meta_values as $meta_value ) {
+                            update_post_meta( $refund_post_id, $meta_key, maybe_unserialize( $meta_value ) );
+                        }
+                    }
+
+                    // Mark as refund
+                    update_post_meta( $refund_post_id, '_transaction_type', strtoupper( 'zettle-refund' ) );
+
+                    // Refund amount (important)
+                    update_post_meta( $refund_post_id, '_transaction_amount', $passing_refund_amount );
+
+                    // Zettle refund id
+                    update_post_meta( $refund_post_id, '_original_transaction_id', $transaction_id );
+
+                    // Zettle refund response
+                    update_post_meta( $refund_post_id, '_payment_refund_response', $refund_response );
 
 			        $billing_email = get_post_meta( $transaction_id,'BillingEmail', true);
 			        $billing_first_name = get_post_meta( $transaction_id,'BillingFirstName', true);
@@ -2650,6 +2685,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 					$captures = !empty( $payment_details['captures'][0] ) ? $payment_details['captures'][0] : '';
                     $refunds_count = !empty( $payment_details['refunds'] ) ? count( $payment_details['refunds'] ) : 0;
 					$payment_links = !empty( $captures['links'] ) ? $captures['links'] : '';
+                    $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true );
 
 					if( !empty( $payment_links ) && is_array( $payment_links ) ) {
 					    foreach ( $payment_links as $key => $payment_link ) {
@@ -2704,7 +2740,11 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                         }
                                     }
                                     // Mark as refund
-                                    update_post_meta( $refund_post_id, '_transaction_type', strtoupper( 'refund' ) );
+                                    if ( $transaction_type === 'INVOICE' ) {
+                                        update_post_meta( $refund_post_id, '_transaction_type', strtoupper( 'invoice-refund' ) );
+                                    } else {
+                                        update_post_meta( $refund_post_id, '_transaction_type', strtoupper( 'transaction-refund' ) );
+                                    }
 
                                     // Refund status
                                     update_post_meta( $refund_post_id, '_payment_status', 'refunded' );
