@@ -2903,3 +2903,27 @@ function is_success_status_code( $status_code ) {
     $status_code = intval( $status_code );
     return ( $status_code >= 200 && $status_code <= 299 );
 }
+
+/**
+ * Retrieve the PayPal Partner Attribution ID based on environment.
+ * 
+ * Returns the sandbox attribution ID if PayPal is in sandbox mode,
+ * otherwise returns the live attribution ID. If no attribution ID
+ * is set in settings, an empty string is returned.
+ *
+ * @since 4.1.6
+ * 
+ * @return string The PayPal attribution ID or an empty string if not set.
+ */
+function get_paypal_attribution_id() {
+
+    $settings = usb_swiper_get_settings( 'general' );
+
+    $is_sandbox = !empty( $settings['is_paypal_sandbox'] );
+
+    if ( $is_sandbox ) {
+        return !empty( $settings['sandbox_attribution_id'] ) ? $settings['sandbox_attribution_id'] : '';
+    }
+
+    return !empty( $settings['attribution_id'] ) ? $settings['attribution_id'] : '';
+}
