@@ -8,6 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 class UsbSwiperPaypalConnectedEmail extends WC_Email {
 
+	public $user_email;
+
+	public $template_html_path;
+	
 	/**
 	 * Set email defaults
 	 *

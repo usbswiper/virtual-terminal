@@ -1,0 +1,25 @@
+{
+  "name": "usbswiper/virtual-terminal",
+  "description": "Create PayPal transaction using swiper or manually and manage transactions.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [],
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "phpcompatibility/php-compatibility": "^9.3",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "squizlabs/php_codesniffer": "^3.10",
+    "wp-coding-standards/wpcs": "^3.0"
+  },
+  "scripts": {
+    "lint:errors": "phpcs --standard=phpcs-errors.xml.dist",
+    "lint": "phpcs --standard=phpcs.xml.dist",
+    "lint:fix": "phpcbf --standard=phpcs.xml.dist"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

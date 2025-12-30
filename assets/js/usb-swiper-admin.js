@@ -153,16 +153,21 @@ jQuery( document ).ready(function( $ ) {
     }
 
     $( "input#is_paypal_sandbox" ).change(function() {
-        const liveField =  $('input.paypal-is-live');
-        const sandboxField =  $('input.paypal-is-sandbox');
+        const liveField = $('input.paypal-is-live, select.paypal-is-live, textarea.paypal-is-live');
+        const sandboxField = $('input.paypal-is-sandbox, select.paypal-is-sandbox, textarea.paypal-is-sandbox');
+
         if($(this).prop('checked') === true){
             liveField.parents('tr').hide();
             liveField.removeAttr('required');
             sandboxField.parents('tr').show();
-            sandboxField.attr('required', true);
+            if (!sandboxField.hasClass('exclude-from-required')) {
+                sandboxField.attr('required', true);
+            }
         } else{
             liveField.parents('tr').show();
+            if (!liveField.hasClass('exclude-from-required')) {
             liveField.attr('required', true);
+            }
             sandboxField.parents('tr').hide();
             sandboxField.removeAttr('required');
         }

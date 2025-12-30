@@ -37,6 +37,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		 */
 		private $version;
 
+		public $settings;
+		public $is_sandbox;
+		public $payment_action;
+		public $currency_list;
+		public $currency;
+
 		/**
 		 * Initialize the class and set its properties.
 		 *
@@ -3391,13 +3397,32 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                     'body' => json_encode($paypal_response),
                 );
                 $Paypal_request->parse_response($log_arr, '', '', 'order_failed', $transaction_id);
-                $error_message_type = !empty($paypal_response['name']) ? $paypal_response['name'] : '';
-                $error_message = !empty($paypal_response['message']) ? $paypal_response['message'] : '';
-                $response = array(
-                    'message' => sprintf('%s %s', '<strong>' . $error_message_type . '</strong>', $error_message),
-                );
 
-                wp_send_json($response, 200);
+                $error_message_type = !empty($paypal_response['name']) ? $paypal_response['name'] : '';
+	            $error_message = !empty($paypal_response['message']) ? $paypal_response['message'] : '';
+
+	            $details = '';
+	            if (!empty($paypal_response['details']) && is_array($paypal_response['details'])) {
+		            $details .= '<ul>';
+		            foreach ($paypal_response['details'] as $detail) {
+			            $issue = isset($detail['issue']) ? esc_html($detail['issue']) : 'Unknown Issue';
+			            $description = isset($detail['description']) ? esc_html($detail['description']) : '';
+			            $details .= "<li><strong>{$issue}</strong>: {$description}</li>";
+		            }
+		            $details .= '</ul>';
+	            }
+
+	            $response = array(
+		            'message' => sprintf(
+			            '%s %s %s',
+			            '<strong>' . esc_html($error_message_type) . '</strong>',
+			            esc_html($error_message),
+			            $details
+		            ),
+	            );
+
+
+	            wp_send_json($response, 200);
             }
 
             $order_data = !empty($_POST['orderData']) ? json_decode(stripslashes($_POST['orderData'])) : '';

@@ -13,8 +13,26 @@ class Usb_Swiper_Paypal_request{
 	public $merchant_id = '';
 	public $seller_merchant_id = '';
 	public $api_log ='';
+    public $api_response = '';
 	public $generate_token_url ='';
 	protected static $_instance = null;
+
+	public $settings;
+	public $brand_name;
+	public $landing_page;
+	public $advanced_card_payments;
+	public $enable_checkout_button;
+	public $payee_preferred;
+	public $soft_descriptor;
+	public $token_url;
+	public $order_url;
+	public $paypal_order_api;
+	public $paypal_refund_api;
+	public $auth;
+	public $partner_client_id;
+	public $partner_client_secret;
+	public $attribution_id;
+	public $result;
 
     /**
      * Create the self instance of the class.
@@ -201,6 +219,38 @@ class Usb_Swiper_Paypal_request{
 
 			$args['headers']['PayPal-Partner-Attribution-Id'] = $this->attribution_id;
 
+			// PayPal Mock Response - https://usbswiper.atlassian.net/browse/VT-151
+			$settings = usb_swiper_get_settings('general');
+			$is_sandbox = !empty($settings['is_paypal_sandbox']) && $settings['is_paypal_sandbox'] === 'true';
+			$mock_response = $settings['vt_mock_response'] ?? '';
+			if ($mock_response === 'disabled') {
+				$mock_response = ''; // treat as disabled
+			}
+
+
+			if ( $is_sandbox && $mock_response && strpos($mock_response, '::') !== false ) {
+				list($mock_action, $mock_code) = explode('::', $mock_response, 2);
+
+				if ( $mock_action === $action_name ) {
+					$mock_header = [
+						'mock_application_codes' => $mock_code
+					];
+
+					$mock_detail = !empty($settings['vt_mock_response_details']) ? trim($settings['vt_mock_response_details']) : '';
+
+					if ( $mock_detail ) {
+						$mock_detail = stripslashes($mock_detail); // 👈 remove escaped quotes
+						$decoded = json_decode($mock_detail, true);
+						if ( json_last_error() === JSON_ERROR_NONE && is_array($decoded) ) {
+							$mock_header['mock_error_response'] = $decoded;
+						}
+					}
+
+
+					$args['headers']['PayPal-Mock-Response'] = json_encode($mock_header);
+				}
+			}
+
 			$this->result = wp_remote_get($url, $args);
 
 			return $this->parse_response($this->result, $url, $args, $action_name, $log_file);
@@ -240,15 +290,19 @@ class Usb_Swiper_Paypal_request{
 				$status_code = (int) wp_remote_retrieve_response_code($paypal_api_response);
 				$headers = wp_remote_retrieve_headers($paypal_api_response);
 
-				$response = !empty($body) ? json_decode($body, true) : '';
+				$response = !empty($body) ? json_decode($body, true) : array();
 				$response = isset($response['body']) ? $response['body'] : $response;
 
 				if (strpos($url, 'paypal.com') !== false) {
 					do_action('usb_swiper_request_respose_data', $request, $response, $action_name);
 				}
 
-				$this->api_log->log("Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
+				$this->api_log->log(PHP_EOL . "==========" . PHP_EOL . "==========" . PHP_EOL . "Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
 				$this->api_log->log('Request URL: '.$url, $log_file);
+				if ( !empty( $request['headers'] ) && is_array( $request['headers'] ) ) {
+					$this->api_log->log( 'Request Headers: ' . print_r( $request['headers'], true ), $log_file );
+				}
+
 				if ( !empty($request['body']) && is_array($request['body']) ) {
 					$this->api_log->log( 'Request Body: ' . print_r( $request, true ), $log_file );
 				} elseif ( !empty($request['body']) && is_string($request['body']) ) {
@@ -273,9 +327,13 @@ class Usb_Swiper_Paypal_request{
 					$this->api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($response), true), true), $log_file);
 				}
 
-                if( $status_code !== 200 && $status_code !== 201 ) {
-                    $response['response_code'] = $status_code;
-                }
+				if ( $status_code !== 200 && $status_code !== 201 ) {
+					if ( is_array( $response ) ) {
+						$response['response_code'] = $status_code;
+					} else {
+						$response = array( 'response_code' => $status_code );
+					}
+				}
 
 				return $response;
 			}

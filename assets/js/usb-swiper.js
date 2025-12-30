@@ -1782,7 +1782,7 @@ if(paymentButton) {
 
 
 function updatePageSize() {
-    var pageSize = $('#page-size').val();
+    var pageSize = jQuery('#page-size').val();
     var css = '';
     if (pageSize === 'a4') {
         css = `@page { size: 210mm 297mm; }`;
