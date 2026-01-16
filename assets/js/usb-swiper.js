@@ -759,68 +759,21 @@ jQuery( document ).ready(function( $ ) {
                 dataType: 'json',
                 data: $(this).serialize()+"&action=create_zettle_refund_request",
             }).done(function ( response ) {
+                usb_swiper_remove_loader(submitButton);
 
-                if(response.status) {
-                    var refund_request = response.data.refund_request;
+                if (response.status) {
+                    set_notification(response.message, 'success');
 
-                    const socket = new WebSocket( response.data.websocket_url );
-
-                    if( 1 === WebSocket.OPEN ) {
-
-                        add_zettle_notification(response.data.refund_request_message, notificationObj);
-                        notificationWrap.show();
-
-                        socket.addEventListener('open', (event) => {
-                            socket.send(refund_request);
-                        });
-
-                        socket.addEventListener('message', (event) => {
-
-                            if( event.data ) {
-                                var data = JSON.parse( event.data );
-                                var messageData = data.payload;
-                                
-                                if( messageData.refundProgress !== '' && undefined !== messageData.refundProgress ) {
-                                    add_zettle_notification(messageData.refundProgress, notificationObj);
-                                } else if( messageData.type === 'REFUND_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
-                                    add_zettle_notification(messageData.resultErrorCode, notificationObj);
-                                }
-
-                                if( messageData.type === 'REFUND_RESULT_RESPONSE' ) {
-
-                                    $.ajax({
-                                        url: usb_swiper_settings.zettle_payment_response,
-                                        type: 'POST',
-                                        dataType: 'json',
-                                        data: "action=zettle_refund_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
-                                    }).done( function (response) {
-                                        if( response.status ){
-                                            window.location.href = response.redirect_url;
-                                        } else {
-                                            set_notification( response.message, 'error'  );
-                                        }
-                                    });
-                                }
-                            }
-                        });
-
-                        socket.addEventListener('error', (event) => {
-
-                        });
-
-                        socket.addEventListener('close', (event) => {
-                            console.log('WebSocket connection closed:', event);
-                        });
-                    } else {
-                        remove_zettle_notification(notificationObj);
-                        add_zettle_notification(response.websocket_message, notificationObj);
-                        notificationWrap.show();
-                        usb_swiper_remove_loader(submitButton);
+                    // Redirect to the specified URL
+                    if (response.redirect_url) {
+                        window.location.href = response.redirect_url;
                     }
-
                 } else {
                     set_notification(response.message, 'error');
                 }
+            }).fail(function () {
+                usb_swiper_remove_loader(submitButton);
+                set_notification('Refund request failed.', 'error');
             });
         } else {
 

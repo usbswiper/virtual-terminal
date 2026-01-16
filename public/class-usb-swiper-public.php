@@ -1284,40 +1284,70 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        $transaction_id = !empty( $_POST['transaction_id'] ) ? $_POST['transaction_id'] : 0;
 	        $refund_amount = !empty( $_POST['refund_amount'] ) ? $_POST['refund_amount'] : 0;
 
-	        $current_user_id = get_current_user_id();
+            if (!$transaction_id || $refund_amount <= 0) {
+                wp_send_json([
+                    'status'  => false,
+                    'message' => __('Invalid refund request.', 'usb-swiper'),
+                ], 400);
+            }
+
+            $payment_response = get_post_meta($transaction_id, '_payment_response', true);
+
+            if (empty($payment_response)) {
+                wp_send_json([
+                    'status'  => false,
+                    'message' => __('Payment data not found.', 'usb-swiper'),
+                ], 400);
+            }
+
+            $payment_status = !empty($payment_response['resultStatus']) ? $payment_response['resultStatus'] : '';
+
+            if ($payment_status !== 'COMPLETED') {
+                wp_send_json([
+                    'status'  => false,
+                    'message' => __('Only completed payments can be refunded.', 'usb-swiper'),
+                ], 400);
+            }
+
+            $result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
+		    $result_payload = !empty( $payment_response['resultPayload'] )  ? $payment_response['resultPayload'] : $result_payload;
+            $payment_uuid = ( !empty($result_payload) && !empty($result_payload->CARD_PAYMENT_UUID) ) ? $result_payload->CARD_PAYMENT_UUID : '';
+
+            if (empty($payment_uuid)) {
+                wp_send_json([
+                    'status'  => false,
+                    'message' => __('Payment ID not found.', 'usb-swiper'),
+                ], 400);
+            }
 
 	        if( !class_exists('UsbSwiperZettle') ) {
 		        include_once USBSWIPER_PATH.'/includes/class-usb-swiper-zettle.php';
 	        }
 
-	        $reader_data = UsbSwiperZettle::get_zettle_reader_data( $current_user_id );
-	        $id = !empty( $reader_data['id'] ) ? $reader_data['id'] : '';
-	        $response = UsbSwiperZettle::websocket_connection($id);
-	        $response_status = !empty( $response['status'] ) ? $response['status'] :  '';
-	        $message = !empty( $response['message'] ) ? $response['message']: __('Something went wrong. Please try again', 'usb-swiper');
+	        $refund_response = UsbSwiperZettle::refund_api_payment_request([
+                'transaction_id' => $transaction_id,
+                'payment_uuid' => $payment_uuid,
+                'refund_amount' => $refund_amount,
+            ]);
 
-	        if( !empty( $response_status ) && ( 200 === (int) $response_status || 201 === (int) $response_status ) ) {
-		        $websocket_url = !empty($response['data']['location']) ? $response['data']['location'] : '';
-		        $payment_request = UsbSwiperZettle::refund_payment_request( $websocket_url, [
-			        'transaction_id' => $transaction_id,
-			        'reader_data' => $reader_data,
-			        'amount' => $refund_amount,
-		        ]);
+            if (empty($refund_response['state'])) {
+                wp_send_json([
+                    'status' => false, 
+                    'message' => __('Refund failed.', 'usb-swiper')
+                ], 400);
+            }
 
-		        wp_send_json( [
-			        'status' => true,
-			        'message' => $message,
-			        'data' => $payment_request,
-			        'transaction_id' => $transaction_id,
-			        'websocket_message' => __('Zettle device is not ready.', 'usb-swiper'),
-		        ], 200 );
+            if (in_array($refund_response['state'], ['COMPLETED', 'PENDING'], true)) {
+                $result = $this->handle_zettle_refund_payment_response($transaction_id, $refund_api_response);
 
-	        } else {
-		        wp_send_json( [
-			        'status' => false,
-			        'message' => $message,
-		        ], 200 );
-	        }
+                wp_send_json($result, 200);
+            }
+
+            wp_send_json([
+                'status'  => false,
+                'message' => __('Zettle refund request failed.', 'usb-swiper'),
+                'data'    => $refund_response,
+            ], 400);
         }
 
         public function handle_zettle_payment_response() {
@@ -1390,132 +1420,93 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	        ], 200 );
         }
 
-        public function handle_zettle_refund_payment_response() {
+        public function handle_zettle_refund_payment_response($transaction_id, $response) {
+            $existing = get_post_meta($transaction_id, '_payment_refund_response', true);
+            $refund_responses = is_array($existing) ? $existing : [];
+            array_unshift($refund_responses, $response);
 
-	        $status = false;
-	        $message = __( 'Something went wrong. Please try again.','usb-swiper');
-	        $message_type = 'error';
-	        $redirect_url = '';
-	        $refund_response = [];
+            update_post_meta($transaction_id, '_payment_refund_response', $refund_responses);
 
-	        $transaction_id = !empty( $_POST['message_id'] ) ? UsbSwiperZettle::get_transaction_id_from_message_id( $_POST['message_id'] ) : '';
-	        $response = !empty( $_POST['response'] ) ? (array) json_decode( stripslashes( $_POST['response'] ) ) : [];
+            if (strtoupper($response['state']) !== 'COMPLETED') {
+                return [
+                    'status'  => true,
+                    'message' => __('Refund initiated and is pending.', 'usb-swiper'),
+                ];
+            }
 
-	        UsbSwiperZettle::add_log( $response, '', '','websocket_payment_response', $transaction_id );
+            // ---- Amount calculations ----
+            $refund_amount = abs($response['amount']) / 100;
+            $original_amount = usbswiper_get_zettle_transaction_total($transaction_id);
+            $total_refunded = usbswiper_get_zettle_transaction_refund_total($transaction_id);
 
-	        if( !empty( $_POST['action'] ) && $_POST['action'] === 'zettle_refund_payment_response' && !empty( $transaction_id ) && $transaction_id > 0 ) {
-		        $result_status = !empty( $response['resultStatus'] ) ? $response['resultStatus'] : '';
+            $payment_status = ($total_refunded >= $original_amount)
+                ? 'REFUNDED'
+                : 'PARTIALLY_REFUNDED';
 
-		        $payment_refund_response = get_post_meta( $transaction_id, '_payment_refund_response',  true);
+            update_post_meta($transaction_id, '_payment_status', $payment_status);
 
-		        $response['create_time'] = current_time('mysql');
+            // ---- Create refund post ----
+            $original_post = get_post($transaction_id);
 
-		        $refund_response[] = $response;
-		        if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
-			        $refund_response = array_merge( $refund_response, $payment_refund_response);
-		        }
+            $refund_post_id = wp_insert_post([
+                'post_type'   => $original_post->post_type,
+                'post_status' => $original_post->post_status,
+                'post_author' => $original_post->post_author,
+                'post_title'  => 'Refund – ' . $original_post->post_title,
+                'post_date'   => current_time('mysql'),
+            ]);
 
-		        update_post_meta( $transaction_id, '_payment_refund_response', $refund_response );
+            update_post_meta($refund_post_id, '_transaction_type', 'ZETTLE-REFUND');
+            update_post_meta($refund_post_id, '_transaction_amount', $refund_amount);
+            update_post_meta($refund_post_id, '_original_transaction_id', $transaction_id);
+            update_post_meta($refund_post_id, '_payment_refund_response', $refund_responses);
 
-		        if( !empty( $result_status ) && strtolower( $result_status ) === 'completed'  ) {
+            $billing_email = get_post_meta( $transaction_id,'BillingEmail', true);
+            $billing_first_name = get_post_meta( $transaction_id,'BillingFirstName', true);
+            $attachment = apply_filters( 'usb_swiper_email_attachment', '', $transaction_id );
 
-			        $status = true;
-                    $refund_amount = usbswiper_get_zettle_transaction_refund_total( $transaction_id );
-                    $original_amount = usbswiper_get_zettle_transaction_total($transaction_id);
+            $customer_email = WC()->mailer()->emails['payment_email_refund'];
+            $customer_email->recipient = $billing_email;
+            $customer_email->heading = __( '{#transaction_type#} Transaction {#transaction_id#} refunded', 'usb-swiper' );
+            $customer_email->subject = __( 'Your {#transaction_type#} Transaction {#transaction_id#} has been refunded', 'usb-swiper');
+            $customer_email->trigger([
+                'transaction_id' => $transaction_id,
+                'email_args' => [
+                    'invoice' => false,
+                    'display_name' => wp_strip_all_tags($billing_first_name)
+                ],
+                'attachment' => [ $attachment ],
+            ]);
 
-                    if( !empty( $refund_response ) && is_array( $refund_response ) ) {
-                        $result_payload = !empty( $refund_response[0]['result_payload'] ) ? $refund_response[0]['result_payload'] : '';
-                        $result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $result_payload;
-                        $passing_refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
-                        $passing_refund_amount = !empty( $passing_refund_amount ) ? $passing_refund_amount/100 : 0;
-                    }
+            $get_recipient = '';
+            $author_id = get_post_field( 'post_author', $transaction_id );
+            $author_id = ! empty( $author_id ) ? $author_id : 1;
+            $current_user = get_user_by('id', $author_id );
+            $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
+            if( true !== (bool)$ignore_email ){
+                $get_recipient = $current_user->user_email;
+            }
 
-                    $payment_status = 'partially_refunded';
-                    if( $refund_amount >= $original_amount ) {
-	                    $payment_status = 'refunded';
-                    }
+            $admin_email = WC()->mailer()->emails['payment_email_refund_admin'];
+            $admin_email->recipient = $get_recipient;
+            $admin_email->heading = __( '{#transaction_type#} Transaction {#transaction_id#} refunded', 'usb-swiper' );
+            $admin_email->subject = __( '{#transaction_type#} Transaction {#transaction_id#} has been refunded', 'usb-swiper');
 
-			        update_post_meta($transaction_id, '_payment_status', strtoupper( $payment_status ) );
+            $admin_email->trigger( [
+                'transaction_id' => $transaction_id,
+                'email_args' => [
+                    'invoice' => false,
+                    'display_name' => wp_strip_all_tags($billing_first_name)
+                ],
+            ]);
 
-                    $original_post = get_post( $transaction_id );
-                    $refund_post_id = wp_insert_post(array(
-                        'post_type'   => $original_post->post_type,
-                        'post_status' => $original_post->post_status,
-                        'post_author' => $original_post->post_author,
-                        'post_title'  => 'Refund – ' . $original_post->post_title,
-                        'post_date'   => current_time('mysql'),
-                    ));
-                    
-                    $original_meta = get_post_meta( $transaction_id );
-                    foreach ( $original_meta as $meta_key => $meta_values ) {
-                        foreach ( $meta_values as $meta_value ) {
-                            update_post_meta( $refund_post_id, $meta_key, maybe_unserialize( $meta_value ) );
-                        }
-                    }
-
-                    // Mark as refund
-                    update_post_meta( $refund_post_id, '_transaction_type', strtoupper( 'zettle-refund' ) );
-
-                    // Refund amount (important)
-                    update_post_meta( $refund_post_id, '_transaction_amount', $passing_refund_amount );
-
-                    // Zettle refund id
-                    update_post_meta( $refund_post_id, '_original_transaction_id', $transaction_id );
-
-                    // Zettle refund response
-                    update_post_meta( $refund_post_id, '_payment_refund_response', $refund_response );
-
-			        $billing_email = get_post_meta( $transaction_id,'BillingEmail', true);
-			        $billing_first_name = get_post_meta( $transaction_id,'BillingFirstName', true);
-			        $attachment = apply_filters( 'usb_swiper_email_attachment', '', $transaction_id );
-
-			        $customer_email = WC()->mailer()->emails['payment_email_refund'];
-			        $customer_email->recipient = $billing_email;
-			        $customer_email->heading = __( '{#transaction_type#} Transaction {#transaction_id#} refunded', 'usb-swiper' );
-			        $customer_email->subject = __( 'Your {#transaction_type#} Transaction {#transaction_id#} has been refunded', 'usb-swiper');
-			        $customer_email->trigger([
-				        'transaction_id' => $transaction_id,
-				        'email_args' => [
-					        'invoice' => false,
-					        'display_name' => wp_strip_all_tags($billing_first_name)
-				        ],
-				        'attachment' => [ $attachment ],
-                    ]);
-
-			        $get_recipient = '';
-			        $author_id = get_post_field( 'post_author', $transaction_id );
-			        $author_id = ! empty( $author_id ) ? $author_id : 1;
-			        $current_user = get_user_by('id', $author_id );
-			        $ignore_email = get_user_meta( $author_id,'ignore_transaction_email', true );
-			        if( true !== (bool)$ignore_email ){
-				        $get_recipient = $current_user->user_email;
-			        }
-
-			        $admin_email = WC()->mailer()->emails['payment_email_refund_admin'];
-			        $admin_email->recipient = $get_recipient;
-			        $admin_email->heading = __( '{#transaction_type#} Transaction {#transaction_id#} refunded', 'usb-swiper' );
-			        $admin_email->subject = __( '{#transaction_type#} Transaction {#transaction_id#} has been refunded', 'usb-swiper');
-
-			        $admin_email->trigger( [
-				        'transaction_id' => $transaction_id,
-				        'email_args' => [
-					        'invoice' => false,
-					        'display_name' => wp_strip_all_tags($billing_first_name)
-                        ],
-                    ]);
-
-			        $redirect_url = esc_url(wc_get_endpoint_url('view-transaction', $transaction_id, wc_get_page_permalink('myaccount')));
-		        }  else {
-			        $message = __( 'Zettle refund request failed. Please try again.', 'usb-swiper' );
-		        }
-	        }
-
-	        wp_send_json( [
-		        'status' => $status,
-		        'message' => $message,
-		        'message_type' => $message_type,
-		        'redirect_url' => $redirect_url,
-	        ], 200 );
+	        return [
+                'status'       => true,
+                'message'      => __('Refund completed successfully.', 'usb-swiper'),
+                'redirect_url' => esc_url(
+                    wc_get_endpoint_url('view-transaction', $transaction_id, wc_get_page_permalink('myaccount'))
+                ),
+            ];
         }
 
 		/**

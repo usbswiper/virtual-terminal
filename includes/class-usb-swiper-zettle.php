@@ -820,6 +820,46 @@ class UsbSwiperZettle {
 			'refund_request_message' => sprintf(__( '%s refund request sent to zettle', 'usb-swiper' ), wc_price( $amount, ['currency' => usbswiper_get_default_currency()])),
 		];
 	}
+
+	public static function refund_api_payment_request( $args = [] ) {
+		$transaction_id = $args['transaction_id'];
+		$payment_uuid = $args['payment_uuid'];
+    		$refund_amount = $args['refund_amount'];
+
+		$access_token = self::get_access_token(); 
+
+		$payload = json_encode([
+			'amount' => intval($refund_amount * 100),
+			'reference' => strtoupper(substr(bin2hex(random_bytes(5)), 0, 10)),
+		]);
+
+		$request_url = "https://api.zettle.com/v2/payments/{$payment_uuid}/refunds";
+
+		self::add_log( [], $request_url, $payload, 'zettle_refund_payment_request', $transaction_id );
+
+		$response = wp_remote_post(
+			$request_url,
+			[
+				'headers' => [
+					'Authorization' => 'Bearer ' . $access_token,
+					'Content-Type' => 'application/json'
+				],
+				'body' => $payload,
+				'timeout' => 30,
+			]
+		);
+
+		self::add_log( $response, '', '', 'zettle_refund_payment_response', $transaction_id );
+
+		if (is_wp_error($response)) {
+			return [
+				'state' => 'FAILED',
+				'error' => $response->get_error_message()
+			];
+		}
+
+		return json_decode(wp_remote_retrieve_body($response), true);
+	}
 	
 	/**
 	 * Add zettle request and response logs.
@@ -938,19 +978,18 @@ class UsbSwiperZettle {
 					</thead>
 					<tbody>
 					<?php
-					foreach ( $refund_response as $key => $payment_refund ) {
-						$result_payload = !empty( $payment_refund['result_payload'] ) ? $payment_refund['result_payload'] : '';
-						$result_payload = !empty( $payment_refund['resultPayload'] ) ? $payment_refund['resultPayload'] : $result_payload;
+					$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
+					$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency($transaction_id);
 
-						$amount = !empty( $result_payload->AMOUNT ) ? usbswiper_convert_zettle_amount(abs($result_payload->AMOUNT)) : 0;
-						$reference_number = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
-						$Usb_Swiper_Paypal_request = new Usb_Swiper_Paypal_request();
-						$transaction_currency = $Usb_Swiper_Paypal_request->get_transaction_currency($transaction_id);
+					foreach ( $refund_response as $key => $payment_refund ) {
+						$amount = !empty( $payment_refund['amount'] ) ? usbswiper_convert_zettle_amount(abs($payment_refund['amount'])) : 0;
+						$reference_number = !empty( $payment_refund['reference'] ) ? $payment_refund['reference'] : '';
+						$created_date = !empty( $payment_refund['created'] ) ? $payment_refund['created'] : '';
 						?>
 						<tr>
-							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $reference_number ) ? $reference_number : ''; ?></td>
-							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $amount ) ? wc_price( $amount, array('currency' => $transaction_currency) ) : 0; ?></td>
-							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo !empty( $payment_refund['create_time'] ) ? date('Y/m/d g:i a', strtotime($payment_refund['create_time'])) : '' ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo esc_html($reference_number); ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo wc_price( $amount, array('currency' => $transaction_currency) ); ?></td>
+							<td style="text-align:left;width: 33.33%;padding: 10px;border-bottom: 1px solid #ebebeb;border-right: 1px solid #ebebeb;"><?php echo date('Y/m/d g:i a', strtotime($created_date)); ?></td>
 						</tr>
 						<?php
 					}
