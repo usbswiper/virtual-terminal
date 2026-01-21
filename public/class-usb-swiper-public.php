@@ -1311,7 +1311,10 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             $result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
 		    $result_payload = !empty( $payment_response['resultPayload'] )  ? $payment_response['resultPayload'] : $result_payload;
-            $payment_uuid = ( !empty($result_payload) && !empty($result_payload->CARD_PAYMENT_UUID) ) ? $result_payload->CARD_PAYMENT_UUID : '';
+
+            //$payment_uuid = ( !empty($result_payload) && !empty($result_payload->CARD_PAYMENT_UUID) ) ? $result_payload->CARD_PAYMENT_UUID : '';
+            $payment_references = ( !empty($result_payload) && !empty($result_payload->REFERENCES) ) ? $result_payload->REFERENCES : '';
+            $payment_uuid = ( !empty($payment_references) && !empty($payment_references->trackingId) ) ? $payment_references->trackingId : '';
 
             if (empty($payment_uuid)) {
                 wp_send_json([
