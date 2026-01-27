@@ -826,14 +826,26 @@ class UsbSwiperZettle {
 		$payment_uuid = $args['payment_uuid'];
     		$refund_amount = $args['refund_amount'];
 
-		$access_token = self::get_access_token(); 
+		// Get PayPal settings and extract paypalPartnerAttributionId based on sandbox
+		$settings = usb_swiper_get_settings('general');
+		$is_sandbox = !empty( $settings['is_paypal_sandbox'] );
+		$paypalPartnerAttributionId = $is_sandbox ? usb_swiper_get_field_value('sandbox_attribution_id') : usb_swiper_get_field_value('attribution_id');
+
+		// Get access token
+		$access_token = self::get_access_token();
+
+		// Get API reference
+		$apiReference = self::get_request_uuid($transaction_id);
 
 		$payload = json_encode([
 			'amount' => intval($refund_amount * 100),
-			'reference' => strtoupper(substr(bin2hex(random_bytes(5)), 0, 10)),
+			'references' => [
+				'apiReference' => $apiReference,
+				'paypalPartnerAttributionId' => $paypalPartnerAttributionId,
+			],
 		]);
 
-		$request_url = "https://api.zettle.com/v2/payments/{$payment_uuid}/refunds";
+		$request_url = "https://transactions.izettlepay.com/card/{$payment_uuid}/refunds";
 
 		self::add_log( [], $request_url, $payload, 'zettle_refund_payment_request', $transaction_id );
 
