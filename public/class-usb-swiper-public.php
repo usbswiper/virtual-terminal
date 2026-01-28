@@ -1313,8 +1313,6 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 		    $result_payload = !empty( $payment_response['resultPayload'] )  ? $payment_response['resultPayload'] : $result_payload;
 
             $payment_uuid = ( !empty($result_payload) && !empty($result_payload->CARD_PAYMENT_UUID) ) ? $result_payload->CARD_PAYMENT_UUID : '';
-            // $payment_references = ( !empty($result_payload) && !empty($result_payload->REFERENCES) ) ? $result_payload->REFERENCES : '';
-            // $payment_uuid = ( !empty($payment_references) && !empty($payment_references->trackingId) ) ? $payment_references->trackingId : '';
 
             if (empty($payment_uuid)) {
                 wp_send_json([
@@ -1341,7 +1339,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             }
 
             if (in_array($refund_response['state'], ['COMPLETED', 'PENDING'], true)) {
-                $result = $this->handle_zettle_refund_payment_response($transaction_id, $refund_api_response);
+                $result = $this->handle_zettle_refund_payment_response($transaction_id, $refund_response);
 
                 wp_send_json($result, 200);
             }
@@ -1426,7 +1424,17 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         public function handle_zettle_refund_payment_response($transaction_id, $response) {
             $existing = get_post_meta($transaction_id, '_payment_refund_response', true);
             $refund_responses = is_array($existing) ? $existing : [];
-            array_unshift($refund_responses, $response);
+
+            // Normalize refund entry
+            $refund_entry = [
+                'amount'    => abs($response['amount']),
+                'reference' => !empty($response['body']['referenceNumber']) ? $response['body']['referenceNumber'] : '',
+                'zettle_id' => !empty($response['body']['transactionId']) ? $response['body']['transactionId'] : '',
+                'created'   => current_time('mysql'),
+                'raw'       => $response,
+            ];
+
+            array_unshift($refund_responses, $refund_entry);
 
             update_post_meta($transaction_id, '_payment_refund_response', $refund_responses);
 

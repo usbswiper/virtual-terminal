@@ -826,6 +826,8 @@ class UsbSwiperZettle {
 		$payment_uuid = $args['payment_uuid'];
     		$refund_amount = $args['refund_amount'];
 
+		$refund_amount_units = intval( round( $refund_amount * 100 ) );
+
 		// Get PayPal settings and extract paypalPartnerAttributionId based on sandbox
 		$settings = usb_swiper_get_settings('general');
 		$is_sandbox = !empty( $settings['is_paypal_sandbox'] );
@@ -838,7 +840,7 @@ class UsbSwiperZettle {
 		$apiReference = self::get_request_uuid($transaction_id);
 
 		$payload = json_encode([
-			'amount' => intval($refund_amount * 100),
+			'amount' => $refund_amount_units,
 			'references' => [
 				'apiReference' => $apiReference,
 				'paypalPartnerAttributionId' => $paypalPartnerAttributionId,
@@ -863,14 +865,35 @@ class UsbSwiperZettle {
 
 		self::add_log( $response, '', '', 'zettle_refund_payment_response', $transaction_id );
 
+		// handle error
 		if (is_wp_error($response)) {
 			return [
-				'state' => 'FAILED',
+				'state' => strtoupper('failed'),
+				'amount' => $refund_amount_units,
 				'error' => $response->get_error_message()
 			];
 		}
+		
+		// Get status code & body
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body        = wp_remote_retrieve_body( $response );
 
-		return json_decode(wp_remote_retrieve_body($response), true);
+		// Success Cases
+		if ( in_array( $status_code, [200, 201], true ) ) {
+			return [
+				'state' => strtoupper('completed'),
+				'amount' => $refund_amount_units,
+				'body'  => json_decode( $body, true ),
+			];
+		}
+
+		// Everything else = failed
+		return [
+			'state' => strtoupper('failed'),
+			'amount' => $refund_amount_units,
+			'code'  => $status_code,
+			'body'  => $body,
+		];
 	}
 	
 	/**
