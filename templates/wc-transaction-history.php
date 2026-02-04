@@ -477,9 +477,11 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
 
         $refund_reference_number = '';
         if ( strtolower($transaction_type) === 'zettle-refund' ) {
-            $refund_result_payload = !empty( $refund_response[0]['result_payload'] )  ? $refund_response[0]['result_payload'] : $result_payload;
-            $refund_result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $refund_result_payload;
-            $refund_reference_number = !empty( $refund_result_payload->REFERENCE_NUMBER ) ? $refund_result_payload->REFERENCE_NUMBER : '';    
+            // $refund_result_payload = !empty( $refund_response[0]['result_payload'] )  ? $refund_response[0]['result_payload'] : $result_payload;
+            // $refund_result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $refund_result_payload;
+            // $refund_reference_number = !empty( $refund_result_payload->REFERENCE_NUMBER ) ? $refund_result_payload->REFERENCE_NUMBER : '';  
+            
+            $refund_reference_number = !empty( $refund_response[0]['reference'] ) ? $refund_response[0]['reference'] : '';
         }
 
         $reference_number = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';

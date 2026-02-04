@@ -1320,11 +1320,11 @@ function get_total_refund_amount( $transaction_id ) {
         if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
 
             foreach ( $payment_refund_response as $key => $refund_response ) {
-
-                $result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
-                $result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
-	            $refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
-	            $refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
+                //$result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
+                //$result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
+	            //$refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
+	            //$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
+                $refund_amount = !empty( $refund_response['amount'] ) ? usbswiper_convert_zettle_amount(abs($refund_response['amount'])) : 0;
 	            $total_refund_amount =  $total_refund_amount + $refund_amount;
             }
         }
@@ -1531,14 +1531,18 @@ function usbswiper_get_transaction_id( $transaction_id ) {
     }
 
     if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle-refund' ) {
-	    $result_status = !empty( $refund_response[0]['result_status'] ) ? $refund_response[0]['result_status'] : '';
+	    /*$result_status = !empty( $refund_response[0]['result_status'] ) ? $refund_response[0]['result_status'] : '';
 	    $result_status = !empty( $refund_response[0]['resultStatus'] ) ? $refund_response[0]['resultStatus'] : $result_status;
 	    $payment_transaction_id = '';
         if( !empty( $result_status ) && strtolower( $result_status ) == 'completed' ) {
             $result_payload = !empty( $refund_response[0]['result_payload'] ) ? $refund_response[0]['result_payload'] : '';
             $result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $result_payload;
 	        $payment_transaction_id = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
-        }
+        }*/
+
+        $result_payload = !empty( $refund_response[0] ) ? $refund_response[0] : ''; 
+        $payment_transaction_id = !empty( $result_payload['reference'] ) ? $result_payload['reference'] : '';
+        
         return $payment_transaction_id;
     }
 
@@ -2581,7 +2585,7 @@ function usbswiper_get_zettle_transaction_total( $transaction_id ) {
 
 	    if( !empty( $result_status ) && !empty( $result_payload ) ) {
 
-		    $tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : '';
+		    $tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : 0;
 		    if( !empty( $tip_amount ) ) {
 			    $grand_total = $grand_total + ( $tip_amount / 100);
 		    }
@@ -2648,7 +2652,7 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 	$payment_refund_response = get_post_meta( $transaction_id,'_payment_refund_response', true);
 
 	$total_refund_amount = 0;
-	if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
+	/*if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
 
 		foreach ( $payment_refund_response as $key => $refund_response ) {
 
@@ -2658,7 +2662,12 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 			$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
 			$total_refund_amount =  $total_refund_amount + $refund_amount;
 		}
-	}
+	}*/
+
+    foreach ( $payment_refund_response as $key => $payment_refund ) {
+        $refund_amount = !empty( $payment_refund['amount'] ) ? usbswiper_convert_zettle_amount(abs($payment_refund['amount'])) : 0;
+        $total_refund_amount =  $total_refund_amount + $refund_amount;
+    }
 
     return !empty( $total_refund_amount ) ? trim($total_refund_amount) : 0;
 }

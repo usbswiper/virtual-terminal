@@ -341,11 +341,22 @@ jQuery( document ).ready(function( $ ) {
         });
     }
 
-    const set_notification = ( message, type ='success', message_type='' ) => {
-        var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
-        $('.vt-form-notification').empty().append(notification);
+    const set_notification = ( message, type ='success', message_type='', isParentObject = '' ) => {
+        // var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>";
+        var notification = "<p class='notification " + type + "'>";
 
-        $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 150 }, 1000);
+        if(message_type) {
+            notification += "<strong>" + message_type + "</strong>";   
+        }
+
+        notification += message + "</p>";
+
+        if(isParentObject) {
+            $(isParentObject+' .vt-form-notification').empty().append(notification);
+        } else {
+            $('.vt-form-notification').empty().append(notification);
+            $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 150 }, 1000);
+        }
     }
 
     $.validator.addMethod("is_email", function(value, element) {
@@ -762,19 +773,21 @@ jQuery( document ).ready(function( $ ) {
                 usb_swiper_remove_loader(submitButton);
 
                 if (response.status) {
-                    set_notification(response.message, 'success');
+
+                    set_notification(response.message, 'success' , '', '.vt-refund-popup-wrapper');
 
                     // Redirect to the specified URL
                     if (response.redirect_url) {
                         window.location.href = response.redirect_url;
                     }
                 } else {
-                    set_notification(response.message, 'error');
+                    let errorMessage = response.message;
+                    if(response.data.body) {
+                        errorMessage += " "+response.data.body;
+                    }
+                    set_notification( errorMessage, 'error' , '', '.vt-refund-popup-wrapper');
                 }
-            }).fail(function () {
-                usb_swiper_remove_loader(submitButton);
-                set_notification('Refund request failed.', 'error');
-            });
+            })
         } else {
 
             jQuery.ajax({
@@ -785,7 +798,7 @@ jQuery( document ).ready(function( $ ) {
             }).done(function ( response ) {
 
                 if( response.status) {
-                    set_notification(response.message, 'success');
+                    set_notification(response.message, 'success', '', '.vt-refund-popup-wrapper');
                     document.getElementById(form_id).reset();
                     $('.transaction-refund').show();
                     $('.refund-form-wrap').hide();
@@ -803,7 +816,7 @@ jQuery( document ).ready(function( $ ) {
                         $('.send-email-btn-wrapper').remove();
                     }
                 } else{
-                    set_notification(response.message, 'error', response.message_type);
+                    set_notification(response.message, 'error', response.message_type, '.vt-refund-popup-wrapper');
                     $(".vt-refund-popup-wrapper").hide();
                 }
 
@@ -1209,6 +1222,7 @@ jQuery( document ).ready(function( $ ) {
         var refund_amount = $(this).parent().siblings('.refund-amount-field').children('#refund_amount_display').val();
         $('.vt-refund-popup-wrapper #refund_amount').val(refund_amount);
         $(".vt-refund-popup-wrapper").show();
+        $('.vt-refund-popup-wrapper .vt-form-notification .notification').remove();
     });
 
     $(document).on("click",".vt-refund-popup-wrapper .cancel-refund,.vt-refund-popup-wrapper  .close a",function(){

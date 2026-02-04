@@ -1120,7 +1120,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 	                        ], 200 );
 
                         } elseif ( !empty( $_POST['action'] ) && 'zettle_refund_payment_response' === $_POST['action'] ) {
-	                        $this->handle_zettle_refund_payment_response();
+	                        // $this->handle_zettle_refund_payment_response();
                         } else {
 	                        $this->handle_zettle_payment_response();
                         }
@@ -1288,7 +1288,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_send_json([
                     'status'  => false,
                     'message' => __('Invalid refund request.', 'usb-swiper'),
-                ], 400);
+                ], 200);
             }
 
             $payment_response = get_post_meta($transaction_id, '_payment_response', true);
@@ -1297,7 +1297,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_send_json([
                     'status'  => false,
                     'message' => __('Payment data not found.', 'usb-swiper'),
-                ], 400);
+                ], 200);
             }
 
             $payment_status = !empty($payment_response['resultStatus']) ? $payment_response['resultStatus'] : '';
@@ -1306,7 +1306,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_send_json([
                     'status'  => false,
                     'message' => __('Only completed payments can be refunded.', 'usb-swiper'),
-                ], 400);
+                ], 200);
             }
 
             $result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
@@ -1318,7 +1318,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_send_json([
                     'status'  => false,
                     'message' => __('Payment ID not found.', 'usb-swiper'),
-                ], 400);
+                ], 200);
             }
 
 	        if( !class_exists('UsbSwiperZettle') ) {
@@ -1335,7 +1335,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_send_json([
                     'status' => false, 
                     'message' => __('Refund failed.', 'usb-swiper')
-                ], 400);
+                ], 200);
             }
 
             if (in_array($refund_response['state'], ['COMPLETED', 'PENDING'], true)) {
@@ -1348,7 +1348,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'status'  => false,
                 'message' => __('Zettle refund request failed.', 'usb-swiper'),
                 'data'    => $refund_response,
-            ], 400);
+            ], 200);
         }
 
         public function handle_zettle_payment_response() {
@@ -1449,6 +1449,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $refund_amount = abs($response['amount']) / 100;
             $original_amount = usbswiper_get_zettle_transaction_total($transaction_id);
             $total_refunded = usbswiper_get_zettle_transaction_refund_total($transaction_id);
+
 
             $payment_status = ($total_refunded >= $original_amount)
                 ? 'REFUNDED'
