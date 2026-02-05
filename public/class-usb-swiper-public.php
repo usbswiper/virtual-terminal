@@ -1344,10 +1344,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 wp_send_json($result, 200);
             }
 
+            $error_message = ( !empty( $refund_responses['body']['developerMessage'] ) ) ? __($refund_responses['body']['developerMessage'], 'usb-swiper') : __('Zettle refund request failed.', 'usb-swiper');
             wp_send_json([
                 'status'  => false,
-                'message' => __('Zettle refund request failed.', 'usb-swiper'),
+                'message' => $error_message,
                 'data'    => $refund_response,
+                'error_type' => ( !empty( $refund_responses['body']['code'] ) ) ? $refund_responses['body']['code'] : '',
             ], 200);
         }
 
@@ -1424,13 +1426,14 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
         public function handle_zettle_refund_payment_response($transaction_id, $response) {
             $existing = get_post_meta($transaction_id, '_payment_refund_response', true);
             $refund_responses = is_array($existing) ? $existing : [];
+            $current_user_id = get_current_user_id();
 
             // Normalize refund entry
             $refund_entry = [
                 'amount'    => abs($response['amount']),
                 'reference' => !empty($response['body']['referenceNumber']) ? $response['body']['referenceNumber'] : '',
                 'zettle_id' => !empty($response['body']['transactionId']) ? $response['body']['transactionId'] : '',
-                'created'   => current_time('mysql'),
+                'created'   => usbswiper_get_user_date_i18n( $current_user_id ),
                 'raw'       => $response,
             ];
 
@@ -1440,7 +1443,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
             if (strtoupper($response['state']) !== 'COMPLETED') {
                 return [
-                    'status'  => true,
+                    'status'  => false,
                     'message' => __('Refund initiated and is pending.', 'usb-swiper'),
                 ];
             }
@@ -1465,8 +1468,15 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 'post_status' => $original_post->post_status,
                 'post_author' => $original_post->post_author,
                 'post_title'  => 'Refund – ' . $original_post->post_title,
-                'post_date'   => current_time('mysql'),
+                'post_date'   => usbswiper_get_user_date_i18n( $current_user_id ),
             ]);
+
+            $original_meta = get_post_meta( $transaction_id );
+            foreach ( $original_meta as $meta_key => $meta_values ) {
+                foreach ( $meta_values as $meta_value ) {
+                    update_post_meta( $refund_post_id, $meta_key, maybe_unserialize( $meta_value ) );
+                }
+            }
 
             update_post_meta($refund_post_id, '_transaction_type', 'ZETTLE-REFUND');
             update_post_meta($refund_post_id, '_transaction_amount', $refund_amount);
@@ -1514,7 +1524,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
 
 	        return [
                 'status'       => true,
-                'message'      => __('Refund completed successfully.', 'usb-swiper'),
+                'message'      => __('Transaction amount refunded successfully.', 'usb-swiper'),
                 'redirect_url' => esc_url(
                     wc_get_endpoint_url('view-transaction', $transaction_id, wc_get_page_permalink('myaccount'))
                 ),
@@ -2733,7 +2743,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                                         'post_status' => $original_post->post_status,
                                         'post_author' => $original_post->post_author,
                                         'post_title'  => 'Refund – ' . $original_post->post_title,
-                                        'post_date'   => current_time('mysql'),
+                                        'post_date'   => usbswiper_get_user_date_i18n( get_current_user_id() ),
                                     ));
                                     
                                     $original_meta = get_post_meta( $transaction_id );

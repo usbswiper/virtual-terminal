@@ -341,22 +341,11 @@ jQuery( document ).ready(function( $ ) {
         });
     }
 
-    const set_notification = ( message, type ='success', message_type='', isParentObject = '' ) => {
-        // var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>";
-        var notification = "<p class='notification " + type + "'>";
+    const set_notification = ( message, type ='success', message_type='' ) => {
+        var notification = "<p class='notification "+type+"'><strong>"+message_type+"</strong>"+message+"</p>"
+        $('.vt-form-notification').empty().append(notification);
 
-        if(message_type) {
-            notification += "<strong>" + message_type + "</strong>";   
-        }
-
-        notification += message + "</p>";
-
-        if(isParentObject) {
-            $(isParentObject+' .vt-form-notification').empty().append(notification);
-        } else {
-            $('.vt-form-notification').empty().append(notification);
-            $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 150 }, 1000);
-        }
+        $([document.documentElement, document.body]).animate({ scrollTop: ( $(".vt-form-notification").offset().top) - 150 }, 1000);
     }
 
     $.validator.addMethod("is_email", function(value, element) {
@@ -774,7 +763,8 @@ jQuery( document ).ready(function( $ ) {
 
                 if (response.status) {
 
-                    set_notification(response.message, 'success' , '', '.vt-refund-popup-wrapper');
+                    set_notification(response.message, 'success');
+                    $(".vt-refund-popup-wrapper").hide();
 
                     // Redirect to the specified URL
                     if (response.redirect_url) {
@@ -785,7 +775,8 @@ jQuery( document ).ready(function( $ ) {
                     if(response.data.body) {
                         errorMessage += " "+response.data.body;
                     }
-                    set_notification( errorMessage, 'error' , '', '.vt-refund-popup-wrapper');
+                    set_notification( errorMessage, 'error');
+                    $(".vt-refund-popup-wrapper").hide();
                 }
             })
         } else {
@@ -798,7 +789,7 @@ jQuery( document ).ready(function( $ ) {
             }).done(function ( response ) {
 
                 if( response.status) {
-                    set_notification(response.message, 'success', '', '.vt-refund-popup-wrapper');
+                    set_notification(response.message, 'success');
                     document.getElementById(form_id).reset();
                     $('.transaction-refund').show();
                     $('.refund-form-wrap').hide();
@@ -816,7 +807,7 @@ jQuery( document ).ready(function( $ ) {
                         $('.send-email-btn-wrapper').remove();
                     }
                 } else{
-                    set_notification(response.message, 'error', response.message_type, '.vt-refund-popup-wrapper');
+                    set_notification(response.message, 'error');
                     $(".vt-refund-popup-wrapper").hide();
                 }
 

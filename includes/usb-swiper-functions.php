@@ -2664,9 +2664,11 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 		}
 	}*/
 
-    foreach ( $payment_refund_response as $key => $payment_refund ) {
-        $refund_amount = !empty( $payment_refund['amount'] ) ? usbswiper_convert_zettle_amount(abs($payment_refund['amount'])) : 0;
-        $total_refund_amount =  $total_refund_amount + $refund_amount;
+    if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
+        foreach ( $payment_refund_response as $key => $payment_refund ) {
+            $refund_amount = !empty( $payment_refund['amount'] ) ? usbswiper_convert_zettle_amount(abs($payment_refund['amount'])) : 0;
+            $total_refund_amount =  $total_refund_amount + $refund_amount;
+        }
     }
 
     return !empty( $total_refund_amount ) ? trim($total_refund_amount) : 0;
