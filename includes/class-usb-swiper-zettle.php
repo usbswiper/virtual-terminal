@@ -58,8 +58,7 @@ class UsbSwiperZettle {
 	 *
 	 * @var string
 	 */
-	//public static string $reader_connect_url = 'https://reader-connect.zettle.com/v1/integrator';
-	public static string $reader_connect_url = 'http://localhost:8000/zettle-simulator/v1/integrator';
+	public static string $reader_connect_url = 'https://reader-connect.zettle.com/v1/integrator';
 	
 	/**
 	 * Define random number prefix.
