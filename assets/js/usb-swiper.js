@@ -134,6 +134,28 @@ jQuery( document ).ready(function( $ ) {
         updateCurrencySymbol(selectedCurrencyCode, selectedCurrency);
     }
 
+    // Validation Checks for the Refund Data Form
+    const refundInput = $('#refund_amount_display');
+    const refundBtn   = $('#transaction_refund_btn_display');
+    
+    // Disable the refund button
+    function toggleRefundButton() {
+        const value = $.trim(refundInput.val());
+        if (value === '' || Number(value) <= 0) {
+            refundBtn.prop('disabled', true);
+        } else {
+            refundBtn.prop('disabled', false);
+        }
+    }
+
+    // Initial check (for pre-filled value)
+    toggleRefundButton();
+
+    // On change / typing
+    refundInput.on('input change', function () {
+        toggleRefundButton();
+    });
+
     $(document).on('click', '#new-order-btn', function(event) {
         event.preventDefault();
         const confirmDiscard = confirm(usb_swiper_settings.start_new_order_conformation);
@@ -772,8 +794,9 @@ jQuery( document ).ready(function( $ ) {
                     }
                 } else {
                     let errorMessage = response.message;
-                    if(response.data.body) {
-                        errorMessage += " "+response.data.body;
+                    if (response?.data?.body) {
+                        const body = typeof response.data.body === 'string' ? response.data.body : JSON.stringify(response.data.body);
+                        errorMessage += ` ${body}`;
                     }
                     set_notification( errorMessage, 'error');
                     $(".vt-refund-popup-wrapper").hide();

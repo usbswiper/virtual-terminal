@@ -1839,7 +1839,7 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
                         $meta_query[] = array(
                             'key' => '_transaction_type',
                             'value' => $transaction_type,
-                            'compare' => 'LIKE',
+                            'compare' => '=',
                         );
                     }
 
@@ -1906,8 +1906,11 @@ if( !class_exists( 'Usb_Swiper_Admin' ) ) {
 
                 $transaction_types = array(
                         'transaction' => __('Transaction','usb-swiper'),
+                        'transaction-refund' => __('Transaction - Refund','usb-swiper'),
                         'invoice' => __('Invoice','usb-swiper'),
+                        'invoice-refund' => __('Invoice - Refund','usb-swiper'),
                         'zettle' => __('Zettle', 'usb-swiper'),
+                        'zettle-refund' => __('Zettle - Refund', 'usb-swiper'),
                 );
                 $intent_types = array(
                         'authorize' => __('Authorize','usb-swiper'),
