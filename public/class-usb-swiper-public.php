@@ -1456,9 +1456,12 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                 update_post_meta($refund_post_id, '_payment_status', 'FAILED');
                 return [
                     'status'  => false,
-                    'message' => !empty($response['body']['code'])
-                        ? $response['body']['code']
-                        : __('Zettle refund request failed.', 'usb-swiper'),
+                    'message' => !empty($response['body']['developerMessage'])
+                        ? $response['body']['developerMessage']
+                        : (!empty($response['body']['code'])
+                            ? $response['body']['code']
+                            : __('Zettle refund request failed.', 'usb-swiper'),
+                        ),
                 ];
             }
 
