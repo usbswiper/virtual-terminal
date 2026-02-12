@@ -1460,7 +1460,7 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
                         ? $response['body']['developerMessage']
                         : (!empty($response['body']['code'])
                             ? $response['body']['code']
-                            : __('Zettle refund request failed.', 'usb-swiper'),
+                            : __('Zettle refund request failed.', 'usb-swiper')
                         ),
                 ];
             }
