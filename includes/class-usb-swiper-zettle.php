@@ -704,14 +704,18 @@ class UsbSwiperZettle {
 	 */
 	public static function get_request_uuid( $transaction_id ) {
 
-		return strtolower( sprintf(
+		if ( empty( $transaction_id ) ) {
+			return false;
+		}
+
+		return strtolower(sprintf(
 			'%s-%s-%s-%s-%s',
-			substr( uniqid(), 0, 8),
-			$transaction_id,
-			substr( uniqid(), 0, 4),
-			substr( uniqid(), 0, 4),
-			substr( uniqid(), 0, 12),
-		) );
+			str_pad( $transaction_id, 8, '0', STR_PAD_LEFT ),
+			substr(uniqid('', true), 0, 4),
+			substr(uniqid('', true), 0, 4),
+			substr(uniqid('', true), 0, 4),
+			substr(uniqid('', true), 0, 12)
+		));
 	}
 
 	/**
@@ -730,7 +734,7 @@ class UsbSwiperZettle {
 
 		$message = explode('-',$message_id );
 
-		return !empty( $message[1] ) ? (int) $message[1] : 0;
+		return !empty( $message[0] ) ? (int) ltrim($message[0], '0') : 0;
 	}
 
 	/**
@@ -749,19 +753,26 @@ class UsbSwiperZettle {
 
 		$get_request_uuid = self::get_request_uuid($transaction_id);
 
+		$payload =  [
+			"type" => "PAYMENT_REQUEST",
+			'accessToken' => self::get_access_token(),
+			'expiresAt' => time() + ( 60 * 5 ),
+			'internalTraceId' => $get_request_uuid,
+			'amount' => !empty( $amount ) ? (int) round( $amount * 100 ) : 0,
+			'tippingType' => !empty( $args['tipping'] ) ? 'DEFAULT' : 'NONE',
+		];
+
+		$attribution_id = get_paypal_attribution_id();
+		if ( $attribution_id ) {
+			$payload['partnerAttributionId'] = $attribution_id;
+		}
+
 		$request_args = json_encode([
 			"type" => "MESSAGE",
 			"linkId" => $link_id,
 			"channelId" => '1',
 			"messageId" =>  $get_request_uuid,
-			"payload" =>  [
-				"type" => "PAYMENT_REQUEST",
-				'accessToken' => self::get_access_token(),
-				'expiresAt' => time() + ( 60 * 5 ),
-				'internalTraceId' => $get_request_uuid,
-				'amount' => !empty( $amount ) ? (int) round( $amount * 100 ) : 0,
-				'tippingType' => !empty( $args['tipping'] ) ? 'DEFAULT' : 'NONE',
-			]
+			"payload" => $payload,
 		]);
 		
 		self::add_log( [], $websocket_url, $request_args,'websocket_payment_request', $transaction_id );
@@ -794,19 +805,26 @@ class UsbSwiperZettle {
 
 		$get_request_uuid = self::get_request_uuid( $transaction_id );
 
+		$payload = [
+			"type" => "REFUND_REQUEST",
+			'accessToken' => self::get_access_token(),
+			'expiresAt' => time() + ( 60 * 5 ),
+			'refundTraceId' => $get_request_uuid,
+			'paymentTraceId' => usbswiper_get_zettle_tracking_id( $transaction_id ),
+			'refundAmount' => !empty( $amount ) ? (int)   round( $amount * 100 ) : 0,
+		];
+
+		$attribution_id = get_paypal_attribution_id();
+		if ( $attribution_id ) {
+			$payload['partnerAttributionId'] = $attribution_id;
+		}
+
 		$request_args = json_encode([
 			"type" => "MESSAGE",
 			"linkId" => $link_id,
             "channelId" =>  '1',
 			"messageId" =>  $get_request_uuid,
-			"payload" => [
-				"type" => "REFUND_REQUEST",
-				'accessToken' => self::get_access_token(),
-				'expiresAt' => time() + ( 60 * 5 ),
-				'refundTraceId' => $get_request_uuid,
-				'paymentTraceId' => usbswiper_get_zettle_tracking_id( $transaction_id ),
-				'refundAmount' => !empty( $amount ) ? (int)   round( $amount * 100 ) : 0,
-			]
+			"payload" => $payload,
 		]);
 
 		self::add_log( [], $websocket_url, $request_args,'websocket_refund_payment_request', $transaction_id );
