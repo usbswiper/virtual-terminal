@@ -134,6 +134,28 @@ jQuery( document ).ready(function( $ ) {
         updateCurrencySymbol(selectedCurrencyCode, selectedCurrency);
     }
 
+    // Validation Checks for the Refund Data Form
+    const refundInput = $('#refund_amount_display');
+    const refundBtn   = $('#transaction_refund_btn_display');
+    
+    // Disable the refund button
+    function toggleRefundButton() {
+        const value = $.trim(refundInput.val());
+        if (value === '' || Number(value) <= 0) {
+            refundBtn.prop('disabled', true);
+        } else {
+            refundBtn.prop('disabled', false);
+        }
+    }
+
+    // Initial check (for pre-filled value)
+    toggleRefundButton();
+
+    // On change / typing
+    refundInput.on('input change', function () {
+        toggleRefundButton();
+    });
+
     $(document).on('click', '#new-order-btn', function(event) {
         event.preventDefault();
         const confirmDiscard = confirm(usb_swiper_settings.start_new_order_conformation);
@@ -771,69 +793,27 @@ jQuery( document ).ready(function( $ ) {
                 dataType: 'json',
                 data: $(this).serialize()+"&action=create_zettle_refund_request",
             }).done(function ( response ) {
+                usb_swiper_remove_loader(submitButton);
 
-                if(response.status) {
-                    var refund_request = response.data.refund_request;
+                if (response.status) {
 
-                    const socket = new WebSocket( response.data.websocket_url );
+                    set_notification(response.message, 'success');
+                    $(".vt-refund-popup-wrapper").hide();
 
-                    if( 1 === WebSocket.OPEN ) {
-
-                        add_zettle_notification(response.data.refund_request_message, notificationObj);
-                        notificationWrap.show();
-
-                        socket.addEventListener('open', (event) => {
-                            socket.send(refund_request);
-                        });
-
-                        socket.addEventListener('message', (event) => {
-
-                            if( event.data ) {
-                                var data = JSON.parse( event.data );
-                                var messageData = data.payload;
-                                
-                                if( messageData.refundProgress !== '' && undefined !== messageData.refundProgress ) {
-                                    add_zettle_notification(messageData.refundProgress, notificationObj);
-                                } else if( messageData.type === 'REFUND_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
-                                    add_zettle_notification(messageData.resultErrorCode, notificationObj);
-                                }
-
-                                if( messageData.type === 'REFUND_RESULT_RESPONSE' ) {
-
-                                    $.ajax({
-                                        url: usb_swiper_settings.zettle_payment_response,
-                                        type: 'POST',
-                                        dataType: 'json',
-                                        data: "action=zettle_refund_payment_response&message_id="+data.messageId+"&response=" + JSON.stringify(messageData),
-                                    }).done( function (response) {
-                                        if( response.status ){
-                                            window.location.href = response.redirect_url;
-                                        } else {
-                                            set_notification( response.message, 'error'  );
-                                        }
-                                    });
-                                }
-                            }
-                        });
-
-                        socket.addEventListener('error', (event) => {
-
-                        });
-
-                        socket.addEventListener('close', (event) => {
-                            console.log('WebSocket connection closed:', event);
-                        });
-                    } else {
-                        remove_zettle_notification(notificationObj);
-                        add_zettle_notification(response.websocket_message, notificationObj);
-                        notificationWrap.show();
-                        usb_swiper_remove_loader(submitButton);
+                    // Redirect to the specified URL
+                    if (response.redirect_url) {
+                        window.location.href = response.redirect_url;
                     }
-
                 } else {
-                    set_notification(response.message, 'error');
+                    let errorMessage = response.message;
+                    if (response?.data?.body) {
+                        const body = typeof response.data.body === 'string' ? response.data.body : JSON.stringify(response.data.body);
+                        errorMessage += ` ${body}`;
+                    }
+                    set_notification( errorMessage, 'error');
+                    $(".vt-refund-popup-wrapper").hide();
                 }
-            });
+            })
         } else {
 
             jQuery.ajax({
@@ -862,7 +842,7 @@ jQuery( document ).ready(function( $ ) {
                         $('.send-email-btn-wrapper').remove();
                     }
                 } else{
-                    set_notification(response.message, 'error', response.message_type);
+                    set_notification(response.message, 'error');
                     $(".vt-refund-popup-wrapper").hide();
                 }
 
@@ -1268,6 +1248,7 @@ jQuery( document ).ready(function( $ ) {
         var refund_amount = $(this).parent().siblings('.refund-amount-field').children('#refund_amount_display').val();
         $('.vt-refund-popup-wrapper #refund_amount').val(refund_amount);
         $(".vt-refund-popup-wrapper").show();
+        $('.vt-refund-popup-wrapper .vt-form-notification .notification').remove();
     });
 
     $(document).on("click",".vt-refund-popup-wrapper .cancel-refund,.vt-refund-popup-wrapper  .close a",function(){

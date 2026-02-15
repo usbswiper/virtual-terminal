@@ -47,6 +47,7 @@ $transaction_debug_id = get_post_meta( $transaction_id, '_paypal_transaction_deb
 $transaction_issue = get_post_meta( $transaction_id, '_payment_failed_response', true);
 $status_note = get_post_meta( $transaction_id, '_payment_status_notes', true);
 $payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+$refund_response = get_post_meta( $transaction_id, '_payment_refund_response', true);
 $payment_source = !empty( $payment_response['payment_source'] ) ? $payment_response['payment_source'] : '';
 $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
 $payment_card_number = !empty( $payment_source['card']['last_digits'] ) ? $payment_source['card']['last_digits'] : '';
@@ -60,6 +61,8 @@ $payment_refunds = !empty( $payment_details['refunds'] ) ? $payment_details['ref
 
 $payment_intent_id = usbswiper_get_intent_id($transaction_id);
 $payment_transaction_id = usbswiper_get_transaction_id($transaction_id);
+$original_transaction_id = get_post_meta( $transaction_id, '_original_transaction_id', true );
+$original_payment_transaction_id = $original_transaction_id ? usbswiper_get_transaction_id($original_transaction_id) : '';
 $payment_action = usbswiper_get_transaction_type($transaction_id);
 $payment_create_time = usbswiper_get_transaction_datetime($transaction_id);
 $payment_update_time = usbswiper_get_transaction_datetime($transaction_id, 'update_time');
@@ -467,10 +470,19 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
         </table>
     </div>
     <?php
-    if( !empty( $transaction_type ) && strtolower($transaction_type) === 'zettle' ) {
+    if( !empty( $transaction_type ) && ( ( strtolower($transaction_type) === 'zettle' ) || ( strtolower($transaction_type) === 'zettle-refund' ) ) ) {
 
         $result_payload = !empty( $payment_response['result_payload'] )  ? $payment_response['result_payload'] : [];
 	    $result_payload = !empty( $payment_response['resultPayload'] ) ? $payment_response['resultPayload'] : $result_payload;
+
+        $refund_reference_number = '';
+        if ( strtolower($transaction_type) === 'zettle-refund' ) {
+            // $refund_result_payload = !empty( $refund_response[0]['result_payload'] )  ? $refund_response[0]['result_payload'] : $result_payload;
+            // $refund_result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $refund_result_payload;
+            // $refund_reference_number = !empty( $refund_result_payload->REFERENCE_NUMBER ) ? $refund_result_payload->REFERENCE_NUMBER : '';  
+            
+            $refund_reference_number = !empty( $refund_response[0]['reference'] ) ? $refund_response[0]['reference'] : '';
+        }
 
         $reference_number = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
         $application_identifier = !empty( $result_payload->APPLICATION_IDENTIFIER ) ? $result_payload->APPLICATION_IDENTIFIER : '';
@@ -488,10 +500,21 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
             <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important;" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
                 <tbody>
-                    <tr>
-                        <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Reference Number','usb-swiper'); ?></th>
-                        <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $reference_number ); ?></td>
-                    </tr>
+                    <?php if ( !empty( $refund_reference_number ) ) : ?>
+                        <tr>
+                            <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Reference Number','usb-swiper'); ?></th>
+                            <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $refund_reference_number ); ?></td>
+                        </tr>
+                        <tr>
+                            <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Original Reference Number', 'usb-swiper'); ?></th>
+                            <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_original_transaction_url($original_transaction_id); ?>"><?php echo esc_html( $reference_number ); ?></a></td>
+                        </tr>
+                    <?php else : ?>
+                        <tr>
+                            <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e( 'Reference Number', 'usb-swiper'); ?></th>
+                            <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $reference_number ); ?></td>
+                        </tr>
+                    <?php endif; ?>
                     <tr>
                         <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Application Identifier','usb-swiper'); ?></th>
                         <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo esc_html( $application_identifier ); ?></td>
@@ -536,7 +559,7 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
             </table>
         </div>
         <?php
-    } elseif( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
+    } elseif( empty( $transaction_type ) || empty( $payment_status ) || ( strtolower($transaction_type) === 'transaction' ) || ( strtolower($transaction_type) === 'transaction-refund' ) || ( strtolower($transaction_type) === 'invoice-refund' ) || ( strtolower($transaction_type) === 'invoice' && strtolower($payment_status) !== 'pending' ) ){ ?>
         <div class="payment-details transaction-history-field" style="width: 100%;display: block;margin: 0 0 10px 0;padding: 0;float: left;">
         <h2 class="transaction-details__title transaction-history-title" ><?php _e('Transaction Details','usb-swiper'); ?></h2>
         <table style="width: 100%;display: table;border: 1px solid #ebebeb;border-radius: 0;margin-bottom: 10px !important" cellspacing="0" cellpadding="0" width="100%" class="woocommerce-table woocommerce-table--order-details shop_table order_details">
@@ -558,6 +581,12 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
                     <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_transaction_id ) ? $payment_transaction_id : ''; ?></td>
                 <?php } ?>
             </tr>
+            <?php if ( $original_transaction_id ) : ?>
+                <tr>
+                    <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Original PayPal Transaction ID','usb-swiper'); ?></th>
+                    <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><a style='text-decoration: none;' href="<?php echo get_original_transaction_url($original_transaction_id); ?>" target="_blank"><?php echo !empty( $original_payment_transaction_id ) ? $original_payment_transaction_id : ''; ?></a></td>
+                </tr>
+            <?php endif; ?>
             <tr>
                 <th class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php _e('Payment Status','usb-swiper'); ?></th>
                 <td class="transaction-table-header" style="padding: 12px;border: 1px solid #ebebeb;"><?php echo !empty( $payment_status ) ? usbswiper_get_payment_status($payment_status) : ''; ?></td>
@@ -662,14 +691,13 @@ $vt_products = get_post_meta( $transaction_id, 'vt_products', true );
     <?php } ?>
 
     <div class="refund-details transaction-history-field" style="width: 100%;float: left;display: block;margin: 0 0 10px 0;padding: 0;">
-        <?php if( !empty( $payment_refunds ) && is_array($payment_refunds) && !empty( $transaction_type ) && strtolower($transaction_type) !== 'zettle') {
+        <?php if( !empty( $payment_refunds ) && is_array($payment_refunds) && !empty( $transaction_type ) && ( strtolower($transaction_type) !== 'zettle' || strtolower($transaction_type) !== 'zettle-refund' ) ) {
             if( !class_exists('Usb_Swiper_Paypal_request') ) {
                 include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
             }
             $Paypal_request = new Usb_Swiper_Paypal_request();
             echo $Paypal_request->get_refund_html($transaction_id);
-        } elseif ( !empty( $transaction_type ) && strtolower($transaction_type) === 'zettle' ) {
-
+        } elseif ( !empty( $transaction_type ) && ( strtolower($transaction_type) === 'zettle' || strtolower($transaction_type) === 'zettle-refund' ) ) {
             echo UsbSwiperZettle::get_refund_html( $transaction_id );
         } ?>
     </div>

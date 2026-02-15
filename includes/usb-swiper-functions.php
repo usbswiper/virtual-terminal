@@ -1320,11 +1320,11 @@ function get_total_refund_amount( $transaction_id ) {
         if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
 
             foreach ( $payment_refund_response as $key => $refund_response ) {
-
-                $result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
-                $result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
-	            $refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
-	            $refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
+                //$result_payload = !empty( $refund_response['result_payload'] ) ? $refund_response['result_payload'] : '';
+                //$result_payload = !empty( $refund_response['resultPayload'] ) ? $refund_response['resultPayload'] : $result_payload;
+	            //$refund_amount = !empty( $result_payload->AMOUNT ) ? abs($result_payload->AMOUNT) : 0;
+	            //$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
+                $refund_amount = !empty( $refund_response['amount'] ) ? usbswiper_convert_zettle_amount(abs($refund_response['amount'])) : 0;
 	            $total_refund_amount =  $total_refund_amount + $refund_amount;
             }
         }
@@ -1512,6 +1512,7 @@ function usbswiper_get_transaction_id( $transaction_id ) {
 
     $transaction_type = get_post_meta( $transaction_id, '_transaction_type', true);
 	$payment_response = get_post_meta( $transaction_id, '_payment_response', true);
+    $refund_response = get_post_meta( $transaction_id, '_payment_refund_response', true);
 
     if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle' ) {
 
@@ -1529,19 +1530,37 @@ function usbswiper_get_transaction_id( $transaction_id ) {
         return $payment_transaction_id;
     }
 
+    if( !empty(  $transaction_type ) && strtolower( $transaction_type ) === 'zettle-refund' ) {
+	    /*$result_status = !empty( $refund_response[0]['result_status'] ) ? $refund_response[0]['result_status'] : '';
+	    $result_status = !empty( $refund_response[0]['resultStatus'] ) ? $refund_response[0]['resultStatus'] : $result_status;
+	    $payment_transaction_id = '';
+        if( !empty( $result_status ) && strtolower( $result_status ) == 'completed' ) {
+            $result_payload = !empty( $refund_response[0]['result_payload'] ) ? $refund_response[0]['result_payload'] : '';
+            $result_payload = !empty( $refund_response[0]['resultPayload'] ) ? $refund_response[0]['resultPayload'] : $result_payload;
+	        $payment_transaction_id = !empty( $result_payload->REFERENCE_NUMBER ) ? $result_payload->REFERENCE_NUMBER : '';
+        }*/
+
+        $result_payload = !empty( $refund_response[0] ) ? $refund_response[0] : ''; 
+        $payment_transaction_id = !empty( $result_payload['reference'] ) ? $result_payload['reference'] : '';
+        
+        return $payment_transaction_id;
+    }
+
 	$payment_transaction_id = !empty( $payment_response['id'] ) ? $payment_response['id'] : '';
+    $refund_transaction_id  = '';
 
 	$purchase_units = !empty( $payment_response['purchase_units'][0] ) ? $payment_response['purchase_units'][0] : '';
 	$payments = !empty( $purchase_units['payments'] ) ? $purchase_units['payments'] : '';
 	$captures = !empty( $payments['captures'][0] ) ? $payments['captures'][0] : '';
 	$authorizations = !empty( $payments['authorizations'][0] ) ? $payments['authorizations'][0] : '';
-	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
-		$payment_transaction_id = $captures['id'];
-	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
-		$payment_transaction_id = $authorizations['id'];
-	}
 
-	return $payment_transaction_id;
+	if ( !empty( $captures ) && is_array($captures) && !empty( $captures['id'] ) ) {
+        $payment_transaction_id = $captures['id'];
+	}elseif( !empty( $authorizations ) && is_array($authorizations) && !empty( $authorizations['id'] ) ) {
+        $payment_transaction_id = $authorizations['id'];
+    }
+
+	return ( ( strtolower( $transaction_type ) === 'transaction-refund' ) || ( strtolower( $transaction_type ) === 'invoice-refund' ) ) ? get_post_meta($transaction_id, '_paypal_refund_id', true) : $payment_transaction_id;
 }
 
 /**
@@ -2099,6 +2118,30 @@ function get_paypal_transaction_url( $transaction_id ) {
 }
 
 /**
+ * Get the paypal transaction url.
+ *
+ * @since 1.1.17
+ *
+ * @param int $transaction_id get the transaction id.
+ *
+ * @return string return the original transaction url for the refund transactions.
+ */
+function get_original_transaction_url( $transaction_id ) {
+
+    if( empty($transaction_id)) {
+        return '';
+    }
+
+    // Admin side → edit post URL
+    if ( is_admin() ) {
+        return admin_url( 'post.php?post=' . absint( $transaction_id ) . '&action=edit' );
+    }
+
+    // Frontend (My Account → View Transaction)
+    return wc_get_endpoint_url( 'view-transaction', absint( $transaction_id ), wc_get_page_permalink( 'myaccount' ) );
+}   
+
+/**
  * Get the address in format.
  *
  * @since 1.1.17
@@ -2542,7 +2585,7 @@ function usbswiper_get_zettle_transaction_total( $transaction_id ) {
 
 	    if( !empty( $result_status ) && !empty( $result_payload ) ) {
 
-		    $tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : '';
+		    $tip_amount =  !empty( $result_payload->REFERENCES->gratuityAmount ) ? $result_payload->REFERENCES->gratuityAmount : 0;
 		    if( !empty( $tip_amount ) ) {
 			    $grand_total = $grand_total + ( $tip_amount / 100);
 		    }
@@ -2609,7 +2652,7 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 	$payment_refund_response = get_post_meta( $transaction_id,'_payment_refund_response', true);
 
 	$total_refund_amount = 0;
-	if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
+	/*if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
 
 		foreach ( $payment_refund_response as $key => $refund_response ) {
 
@@ -2619,7 +2662,14 @@ function usbswiper_get_zettle_transaction_refund_total( $transaction_id ) {
 			$refund_amount = !empty( $refund_amount ) ? $refund_amount/100 : 0;
 			$total_refund_amount =  $total_refund_amount + $refund_amount;
 		}
-	}
+	}*/
+
+    if( !empty( $payment_refund_response ) && is_array( $payment_refund_response ) ) {
+        foreach ( $payment_refund_response as $key => $payment_refund ) {
+            $refund_amount = !empty( $payment_refund['amount'] ) ? usbswiper_convert_zettle_amount(abs($payment_refund['amount'])) : 0;
+            $total_refund_amount =  $total_refund_amount + $refund_amount;
+        }
+    }
 
     return !empty( $total_refund_amount ) ? trim($total_refund_amount) : 0;
 }
