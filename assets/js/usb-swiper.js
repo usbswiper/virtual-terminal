@@ -246,6 +246,12 @@ jQuery( document ).ready(function( $ ) {
 
                                         var messageData = data.payload;
 
+                                    if( messageData.paymentProgress !== '' && undefined !== messageData.paymentProgress ) {
+                                        add_zettle_notification(messageData.paymentProgress, notificationObj);
+                                    } else if( messageData.type === 'PAYMENT_RESULT_RESPONSE' && messageData.resultStatus.toLowerCase() === 'failed' ) {
+                                        add_zettle_notification(messageData.resultErrorDescription, notificationObj);
+                                    }
+
                                         if( messageData.paymentProgress !== '' && undefined !== messageData.paymentProgress ) {
                                             add_zettle_notification(messageData.paymentProgress, notificationObj);
                                         } else if( messageData.type === 'PAYMENT_RESULT_RESPONSE' && messageData.resultStatus === 'failed' ) {
