@@ -422,22 +422,25 @@ if( !class_exists( 'Usb_Swiper_Public' ) ) {
             $invoice_id = !empty( $invoice_session->id ) ? $invoice_session->id : '';
             $invoice_status = usbswiper_get_transaction_status($invoice_id);
 
-			$this->maybe_log_client_token_debug_marker( 'script_loader_tag', array(
-				'handle' => $handle,
-				'current_page_id' => $current_page_id,
-				'virtual_terminal_page_id' => $vt_page_id,
-				'pay_by_invoice_page_id' => $paybyinvoice_page_id,
-				'invoice_status' => $invoice_status,
-			) );
-
 			if ('usb-swiper-paypal-checkout-sdk' === $handle && ( ( !empty($vt_page_id) && $vt_page_id === $current_page_id ) || ( !empty($paybyinvoice_page_id) && $paybyinvoice_page_id === $current_page_id && strtolower($invoice_status) !== 'paid') ) ) {
+				$this->maybe_log_client_token_debug_marker( 'paypal_sdk_tag_matched', array(
+					'handle' => $handle,
+					'current_page_id' => $current_page_id,
+					'virtual_terminal_page_id' => $vt_page_id,
+					'pay_by_invoice_page_id' => $paybyinvoice_page_id,
+					'invoice_status' => $invoice_status,
+				) );
 
 				if( !class_exists('Usb_Swiper_Paypal_request') ) {
 					include_once USBSWIPER_PATH.'/includes/class-usb-swiper-paypal-request.php';
 				}
 
 				$Paypal_request = Usb_Swiper_Paypal_request::instance();
+				$this->maybe_log_client_token_debug_marker( 'before_get_generate_token' );
 				$generate_token = $Paypal_request->get_generate_token();
+				$this->maybe_log_client_token_debug_marker( 'after_get_generate_token', array(
+					'client_token_present' => ! empty( $generate_token ) ? 'yes' : 'no',
+				) );
 
 				$client_token = "data-client-token='{$generate_token}'";
 

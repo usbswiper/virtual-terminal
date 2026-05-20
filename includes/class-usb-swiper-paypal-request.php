@@ -342,6 +342,16 @@ class Usb_Swiper_Paypal_request{
 						'error_code' => $paypal_api_response->get_error_code()
 					),
 				);
+				$this->api_log->log(PHP_EOL . "==========" . PHP_EOL . "==========" . PHP_EOL . "Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
+				$this->api_log->log('Request URL: '.$url, $log_file);
+				if ( !empty( $request['headers'] ) && is_array( $request['headers'] ) ) {
+					$this->api_log->log( 'Request Headers: ' . print_r( $this->redact_sensitive_log_data( $request['headers'] ), true ), $log_file );
+				}
+				$this->api_log->log( 'Request Body: ' . print_r( $this->get_request_body_for_log( $request ), true ), $log_file );
+				$this->api_log->log( 'WordPress HTTP Error Code: ' . $paypal_api_response->get_error_code(), $log_file );
+				$this->api_log->log( 'WordPress HTTP Error Message: ' . $paypal_api_response->get_error_message(), $log_file );
+				$this->api_log->log( 'WordPress HTTP Error Data: ' . print_r( $this->redact_sensitive_log_data( $paypal_api_response->get_error_data() ), true ), $log_file );
+				return $response;
 			} else {
 
 				$body = wp_remote_retrieve_body($paypal_api_response);
