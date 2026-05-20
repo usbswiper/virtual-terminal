@@ -261,6 +261,65 @@ class Usb_Swiper_Paypal_request{
 	}
 
     /**
+     * Redact sensitive request and response values before writing logs.
+     *
+     * @since 4.1.7
+     *
+     * @param mixed $data Request or response data.
+     * @return mixed
+     */
+	private function redact_sensitive_log_data( $data ) {
+
+		$sensitive_keys = array(
+			'access_token',
+			'authorization',
+			'client_secret',
+			'client_token',
+			'id_token',
+			'refresh_token',
+		);
+
+		if ( is_array( $data ) ) {
+			foreach ( $data as $key => $value ) {
+				if ( in_array( strtolower( (string) $key ), $sensitive_keys, true ) ) {
+					$data[ $key ] = '[REDACTED]';
+				} else {
+					$data[ $key ] = $this->redact_sensitive_log_data( $value );
+				}
+			}
+		}
+
+		return $data;
+	}
+
+    /**
+     * Prepare the request body for logging.
+     *
+     * @since 4.1.7
+     *
+     * @param array $request Request arguments.
+     * @return mixed|string
+     */
+	private function get_request_body_for_log( $request ) {
+
+		if ( ! is_array( $request ) || ! array_key_exists( 'body', $request ) || '' === $request['body'] || null === $request['body'] ) {
+			return '[empty]';
+		}
+
+		$body = $request['body'];
+
+		if ( is_string( $body ) ) {
+			$decoded_body = json_decode( $body, true );
+
+			if ( JSON_ERROR_NONE === json_last_error() ) {
+				$body = $decoded_body;
+			}
+		}
+
+		return $this->redact_sensitive_log_data( $body );
+	}
+
+    /**
      * Parse the api response and add log.
      *
      * @since 1.0.0
@@ -300,20 +359,16 @@ class Usb_Swiper_Paypal_request{
 				$this->api_log->log(PHP_EOL . "==========" . PHP_EOL . "==========" . PHP_EOL . "Action: ".ucwords(str_replace('_', ' ', $action_name)), $log_file);
 				$this->api_log->log('Request URL: '.$url, $log_file);
 				if ( !empty( $request['headers'] ) && is_array( $request['headers'] ) ) {
-					$this->api_log->log( 'Request Headers: ' . print_r( $request['headers'], true ), $log_file );
+					$this->api_log->log( 'Request Headers: ' . print_r( $this->redact_sensitive_log_data( $request['headers'] ), true ), $log_file );
 				}
 
-				if ( !empty($request['body']) && is_array($request['body']) ) {
-					$this->api_log->log( 'Request Body: ' . print_r( $request, true ), $log_file );
-				} elseif ( !empty($request['body']) && is_string($request['body']) ) {
-					$this->api_log->log( 'Request Body: ' . print_r(json_decode($request['body'], true), true), $log_file);
-				}
+				$this->api_log->log( 'Request Body: ' . print_r( $this->get_request_body_for_log( $request ), true ), $log_file );
 
 				$this->api_log->log('Response headers: '.print_r($headers, true), $log_file);
 				$this->api_log->log('Response Code: '.$status_code, $log_file);
 				$this->api_log->log('Response Message: '.wp_remote_retrieve_response_message($paypal_api_response), $log_file);
 				if ( !empty( $response['body']) && is_array($response['body'])) {
-					$this->api_log->log('Response Body: ' . print_r($response['body'], true), $log_file);
+					$this->api_log->log('Response Body: ' . print_r($this->redact_sensitive_log_data($response['body']), true), $log_file);
 				} elseif ( !empty($response) && is_array($response)) {
                     $response_code = ( isset($response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code']) && !empty($response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code'])) ? $response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_code'] : '';
                     if( !empty($response_code) ){
@@ -322,9 +377,9 @@ class Usb_Swiper_Paypal_request{
                             $response['purchase_units'][0]['payments']['captures'][0]['processor_response']['response_description'] = $response_description;
                         }
                     }
-					$this->api_log->log('Response Body: ' . print_r($response, true), $log_file);
+					$this->api_log->log('Response Body: ' . print_r($this->redact_sensitive_log_data($response), true), $log_file);
 				} else {
-					$this->api_log->log('Response Body: ' . print_r(json_decode(wp_remote_retrieve_body($response), true), true), $log_file);
+					$this->api_log->log('Response Body: ' . print_r($this->redact_sensitive_log_data(json_decode($body, true)), true), $log_file);
 				}
 
 				if ( $status_code !== 200 && $status_code !== 201 ) {
